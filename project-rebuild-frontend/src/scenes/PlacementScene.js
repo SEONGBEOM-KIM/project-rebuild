@@ -8,34 +8,7 @@ import CameraController from '../systems/CameraController.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import { formatEffect } from '../data/stateLabels.js';
 import PlacementViewManager from '../systems/PlacementViewManager.js';
-import { REQUIRED_PLACEMENTS } from '../systems/PlacementViewManager.js';
-
-const TILE_COLORS = {
-  empty: 0x2f855a,
-  forest: 0x166534,
-  road: 0x64748b,
-  river: 0x2563eb,
-};
-
-const TILE_STROKES = {
-  buildable: 0x86efac,
-  blocked: 0x334155,
-};
-
-const TILE_LABELS = {
-  empty: '빈 땅',
-  forest: '숲',
-  road: '도로',
-  river: '강',
-};
-
-const ZONE_LABELS = {
-  center: '중심지',
-  outskirts: '외곽',
-  nature: '자연',
-  traffic: '교통',
-};
-
+import { TILE_LABELS, ZONE_LABELS, REQUIRED_PLACEMENTS } from '../systems/PlacementViewManager.js';
 
 export default class PlacementScene extends Phaser.Scene {
   constructor() {
@@ -168,12 +141,7 @@ export default class PlacementScene extends Phaser.Scene {
   }
 
   createLegend() {
-    const legendItems = [
-      { label: '빈 땅', color: TILE_COLORS.empty, note: '배치 가능' },
-      { label: '숲', color: TILE_COLORS.forest, note: '배치 불가' },
-      { label: '도로', color: TILE_COLORS.road, note: '배치 불가' },
-      { label: '강', color: TILE_COLORS.river, note: '배치 불가' },
-    ];
+    const legendItems = PlacementViewManager.getLegendItems();
 
     this.createFixedRectangle(1615, 150, 330, 190, 0x111827, 0.88, 0x475569);
     this.createFixedText(1480, 76, '타일 범례', {
@@ -187,7 +155,7 @@ export default class PlacementScene extends Phaser.Scene {
       this.createFixedRectangle(1492, y + 10, 26, 20, item.color, 1, 0xffffff);
       this.createFixedText(1520, y, `${item.label} - ${item.note}`, {
         fontSize: '19px',
-        color: item.note === '배치 가능' ? '#bbf7d0' : '#fecaca',
+        color: PlacementViewManager.getLegendTextColor(item),
       });
     });
   }
@@ -312,9 +280,8 @@ export default class PlacementScene extends Phaser.Scene {
     for (let y = 0; y < this.placementSystem.mapData.height; y += 1) {
       for (let x = 0; x < this.placementSystem.mapData.width; x += 1) {
         const tile = this.placementSystem.mapData.tiles[y][x];
-        const color = TILE_COLORS[tile.type] ?? TILE_COLORS.empty;
-        const stroke = tile.buildable ? TILE_STROKES.buildable : TILE_STROKES.blocked;
-        this.drawDiamond(this.mapGraphics, x, y, color, 0.88, stroke, 1.5);
+        const tileStyle = PlacementViewManager.getTileRenderStyle(tile);
+        this.drawDiamond(this.mapGraphics, x, y, tileStyle.color, 0.88, tileStyle.stroke, 1.5);
       }
     }
   }
@@ -448,7 +415,7 @@ export default class PlacementScene extends Phaser.Scene {
 
   drawImpactMarkers(building, tileX, tileY, animate = true) {
     const center = this.getFootprintCenter(tileX, tileY, building.footprint);
-    const markerData = this.getImpactMarkerData(building);
+    const markerData = PlacementViewManager.getImpactMarkerData(building);
     const markerContainer = this.add.container(center.x, center.y - 92).setDepth(45 + tileX + tileY);
 
     const bubble = this.add.circle(0, 0, 34, markerData.color, 0.9)
@@ -481,19 +448,6 @@ export default class PlacementScene extends Phaser.Scene {
     }
   }
 
-  getImpactMarkerData(building) {
-    const effect = building.effect;
-    if ((effect.environment ?? 0) > 0 || (effect.pollution ?? 0) < 0) {
-      return { icon: '🌿', label: '환경 회복', color: 0x22c55e };
-    }
-    if ((effect.traffic ?? 0) < 0) {
-      return { icon: '🚌', label: '이동 편의', color: 0xfacc15 };
-    }
-    if ((effect.population ?? 0) > 0 || (effect.economy ?? 0) > 0) {
-      return { icon: '＋', label: '지역 활력', color: 0x38bdf8 };
-    }
-    return { icon: '✓', label: '시설 효과', color: 0x93c5fd };
-  }
 
   drawPlacedBuilding(building, tileX, tileY) {    const graphics = this.add.graphics().setDepth(10 + tileX + tileY);
     for (const tile of this.placementSystem.getFootprintTiles(tileX, tileY, building.footprint)) {

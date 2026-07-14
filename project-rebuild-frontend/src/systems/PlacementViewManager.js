@@ -1,8 +1,70 @@
 import { STATE_LABELS, formatSignedValue } from '../data/stateLabels.js';
 
+
+export const TILE_COLORS = {
+  empty: 0x2f855a,
+  forest: 0x166534,
+  road: 0x64748b,
+  river: 0x2563eb,
+};
+
+export const TILE_STROKES = {
+  buildable: 0x86efac,
+  blocked: 0x334155,
+};
+
+export const TILE_LABELS = {
+  empty: '빈 땅',
+  forest: '숲',
+  road: '도로',
+  river: '강',
+};
+
+export const ZONE_LABELS = {
+  center: '중심지',
+  outskirts: '외곽',
+  nature: '자연',
+  traffic: '교통',
+};
+
 export const REQUIRED_PLACEMENTS = 3;
 
 export default class PlacementViewManager {
+
+  static getTileRenderStyle(tile) {
+    return {
+      color: TILE_COLORS[tile.type] ?? TILE_COLORS.empty,
+      stroke: tile.buildable ? TILE_STROKES.buildable : TILE_STROKES.blocked,
+    };
+  }
+
+  static getLegendItems() {
+    return [
+      { label: '빈 땅', color: TILE_COLORS.empty, note: '배치 가능' },
+      { label: '숲', color: TILE_COLORS.forest, note: '배치 불가' },
+      { label: '도로', color: TILE_COLORS.road, note: '배치 불가' },
+      { label: '강', color: TILE_COLORS.river, note: '배치 불가' },
+    ];
+  }
+
+  static getLegendTextColor(item) {
+    return item.note === '배치 가능' ? '#bbf7d0' : '#fecaca';
+  }
+
+  static getImpactMarkerData(building) {
+    const effect = building.effect;
+    if ((effect.environment ?? 0) > 0 || (effect.pollution ?? 0) < 0) {
+      return { icon: '🌿', label: '환경 회복', color: 0x22c55e };
+    }
+    if ((effect.traffic ?? 0) < 0) {
+      return { icon: '🚌', label: '이동 편의', color: 0xfacc15 };
+    }
+    if ((effect.population ?? 0) > 0 || (effect.economy ?? 0) > 0) {
+      return { icon: '＋', label: '지역 활력', color: 0x38bdf8 };
+    }
+    return { icon: '✓', label: '시설 효과', color: 0x93c5fd };
+  }
+
   static formatCursorInfo(tile, mapTile, validation, tileLabels, zoneLabels) {
     if (!tile) {
       return {

@@ -25,7 +25,7 @@ import ApiPayloadViewManager from '../src/systems/ApiPayloadViewManager.js';
 import MockApiClient, { MOCK_SUBMISSION_LOG_STORAGE_KEY } from '../src/systems/MockApiClient.js';
 import MockSubmissionLogViewManager from '../src/systems/MockSubmissionLogViewManager.js';
 import PlacementSystem from '../src/systems/PlacementSystem.js';
-import PlacementViewManager, { REQUIRED_PLACEMENTS } from '../src/systems/PlacementViewManager.js';
+import PlacementViewManager, { TILE_COLORS, TILE_STROKES, TILE_LABELS, ZONE_LABELS, REQUIRED_PLACEMENTS } from '../src/systems/PlacementViewManager.js';
 import SaveManager, { LEARNING_SAVE_STORAGE_KEY } from '../src/systems/SaveManager.js';
 import SavedDataViewManager from '../src/systems/SavedDataViewManager.js';
 import StorageSummaryManager from '../src/systems/StorageSummaryManager.js';
@@ -595,6 +595,17 @@ function testMapData() {
 
 function testPlacementViewManager() {
   assert.equal(REQUIRED_PLACEMENTS, 3);
+  assert.equal(TILE_COLORS.empty, 0x2f855a);
+  assert.equal(TILE_STROKES.buildable, 0x86efac);
+  assert.equal(TILE_LABELS.river, '강');
+  assert.equal(ZONE_LABELS.traffic, '교통');
+  assert.deepEqual(PlacementViewManager.getTileRenderStyle({ type: 'road', buildable: false }), {
+    color: 0x64748b,
+    stroke: 0x334155,
+  });
+  assert.equal(PlacementViewManager.getLegendItems().length, 4);
+  assert.equal(PlacementViewManager.getLegendTextColor({ note: '배치 가능' }), '#bbf7d0');
+  assert.equal(PlacementViewManager.getLegendTextColor({ note: '배치 불가' }), '#fecaca');
   assert.deepEqual(PlacementViewManager.formatCursorInfo(null), {
     text: '커서 타일: 지도 밖 또는 UI 영역',
     color: '#bfdbfe',
@@ -643,6 +654,16 @@ function testPlacementViewManager() {
     strokeColor: 0xfde68a,
     fillColor: 0x334155,
     fillAlpha: 1,
+  });
+  assert.deepEqual(PlacementViewManager.getImpactMarkerData(buildings.find((building) => building.id === 'small_park')), {
+    icon: '🌿',
+    label: '환경 회복',
+    color: 0x22c55e,
+  });
+  assert.deepEqual(PlacementViewManager.getImpactMarkerData(buildings.find((building) => building.id === 'bus_station')), {
+    icon: '🚌',
+    label: '이동 편의',
+    color: 0xfacc15,
   });
 }
 
