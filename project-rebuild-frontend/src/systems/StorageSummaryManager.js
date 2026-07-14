@@ -1,4 +1,43 @@
 export default class StorageSummaryManager {
+  static getPanelLayout() {
+    return {
+      saved: {
+        panel: { x: 575, y: 520, width: 760, height: 580, strokeColor: 0x93c5fd },
+        title: { x: 575, y: 275, color: '#172554' },
+        body: { x: 255, y: 345 },
+      },
+      submissions: {
+        panel: { x: 1345, y: 520, width: 760, height: 580, strokeColor: 0xbbf7d0 },
+        title: { x: 1345, y: 275, color: '#14532d' },
+        body: { x: 1025, y: 345 },
+      },
+    };
+  }
+
+  static getBodyTextStyle() {
+    return {
+      fontSize: '26px',
+      color: '#1e293b',
+      lineSpacing: 13,
+      wordWrap: { width: 640 },
+    };
+  }
+
+  static getControlLayout() {
+    return {
+      status: { x: 960, y: 835 },
+      clearSave: { x: 360, y: 930 },
+      clearLog: { x: 710, y: 930 },
+      clearAll: { x: 1050, y: 930 },
+      title: { x: 1370, y: 930 },
+      savedData: { x: 1640, y: 930 },
+    };
+  }
+
+  static formatStatusText() {
+    return '필요한 저장 항목만 개별 삭제하거나 전체 초기화할 수 있습니다.';
+  }
+
   static formatDate(value) {
     if (!value) {
       return '알 수 없음';

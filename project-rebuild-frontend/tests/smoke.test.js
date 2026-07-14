@@ -883,6 +883,18 @@ function testSavedDataViewManager() {
 }
 
 function testStorageSummaryManager() {
+  assert.equal(StorageSummaryManager.getPanelLayout().saved.panel.x, 575);
+  assert.equal(StorageSummaryManager.getPanelLayout().submissions.panel.strokeColor, 0xbbf7d0);
+  assert.deepEqual(StorageSummaryManager.getControlLayout(), {
+    status: { x: 960, y: 835 },
+    clearSave: { x: 360, y: 930 },
+    clearLog: { x: 710, y: 930 },
+    clearAll: { x: 1050, y: 930 },
+    title: { x: 1370, y: 930 },
+    savedData: { x: 1640, y: 930 },
+  });
+  assert.equal(StorageSummaryManager.getBodyTextStyle().wordWrap.width, 640);
+  assert.match(StorageSummaryManager.formatStatusText(), /개별 삭제/);
   assert.equal(StorageSummaryManager.formatDate(null), '알 수 없음');
   assert.equal(StorageSummaryManager.formatDate('not-a-date'), 'not-a-date');
 
