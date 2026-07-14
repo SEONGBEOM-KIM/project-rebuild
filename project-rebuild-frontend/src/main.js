@@ -1,0 +1,61 @@
+import Phaser from 'phaser';
+import './style.css';
+
+import BootScene from './scenes/BootScene.js';
+import TitleScene from './scenes/TitleScene.js';
+import AuthScene from './scenes/AuthScene.js';
+import StoryScene from './scenes/StoryScene.js';
+import ExplorationScene from './scenes/ExplorationScene.js';
+import DataBriefingScene from './scenes/DataBriefingScene.js';
+import CauseQuizScene from './scenes/CauseQuizScene.js';
+import ProblemSummaryScene from './scenes/ProblemSummaryScene.js';
+import SelectionScene from './scenes/SelectionScene.js';
+import PlacementScene from './scenes/PlacementScene.js';
+import ResultScene from './scenes/ResultScene.js';
+import SideEffectScene from './scenes/SideEffectScene.js';
+import ReflectionScene from './scenes/ReflectionScene.js';
+import EndingScene from './scenes/EndingScene.js';
+import LearningDataScene from './scenes/LearningDataScene.js';
+import ApiPayloadScene from './scenes/ApiPayloadScene.js';
+import ApiContractScene from './scenes/ApiContractScene.js';
+import MockSubmissionLogScene from './scenes/MockSubmissionLogScene.js';
+import TeacherReportScene from './scenes/TeacherReportScene.js';
+import SavedDataScene from './scenes/SavedDataScene.js';
+import StorageManagerScene from './scenes/StorageManagerScene.js';
+
+const config = {
+  type: Phaser.AUTO,
+  parent: 'app',
+  width: 1920,
+  height: 1080,
+  backgroundColor: '#10253f',
+  scale: {
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+  },
+  scene: [
+    BootScene,
+    TitleScene,
+    SavedDataScene,
+    StorageManagerScene,
+    AuthScene,
+    StoryScene,
+    ExplorationScene,
+    DataBriefingScene,
+    CauseQuizScene,
+    ProblemSummaryScene,
+    SelectionScene,
+    PlacementScene,
+    ResultScene,
+    SideEffectScene,
+    ReflectionScene,
+    EndingScene,
+    LearningDataScene,
+    ApiPayloadScene,
+    ApiContractScene,
+    MockSubmissionLogScene,
+    TeacherReportScene,
+  ],
+};
+
+new Phaser.Game(config);

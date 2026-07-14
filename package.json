@@ -1,0 +1,16 @@
+{
+  "name": "project-rebuild",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Project Rebuild workspace root. Frontend app lives in project-rebuild-frontend/.",
+  "scripts": {
+    "dev": "npm --prefix project-rebuild-frontend run dev",
+    "build": "npm --prefix project-rebuild-frontend run build",
+    "preview": "npm --prefix project-rebuild-frontend run preview",
+    "frontend:dev": "npm --prefix project-rebuild-frontend run dev",
+    "frontend:build": "npm --prefix project-rebuild-frontend run build",
+    "frontend:preview": "npm --prefix project-rebuild-frontend run preview",
+    "test": "npm --prefix project-rebuild-frontend run test",
+    "verify": "npm test && npm run build"
+  }
+}
