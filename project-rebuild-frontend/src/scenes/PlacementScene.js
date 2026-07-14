@@ -6,7 +6,9 @@ import GameState from '../systems/GameState.js';
 import PlacementSystem from '../systems/PlacementSystem.js';
 import CameraController from '../systems/CameraController.js';
 import LearningProgress from '../systems/LearningProgress.js';
-import { STATE_LABELS, formatEffect, formatSignedValue } from '../data/stateLabels.js';
+import { formatEffect } from '../data/stateLabels.js';
+import PlacementViewManager from '../systems/PlacementViewManager.js';
+import { REQUIRED_PLACEMENTS } from '../systems/PlacementViewManager.js';
 
 const TILE_COLORS = {
   empty: 0x2f855a,
@@ -34,7 +36,6 @@ const ZONE_LABELS = {
   traffic: '교통',
 };
 
-const REQUIRED_PLACEMENTS = 3;
 
 export default class PlacementScene extends Phaser.Scene {
   constructor() {
@@ -154,8 +155,7 @@ export default class PlacementScene extends Phaser.Scene {
 
     const handleContinue = () => {
       if (this.placedBuildings.length < REQUIRED_PLACEMENTS) {
-        const remaining = REQUIRED_PLACEMENTS - this.placedBuildings.length;
-        this.showMessage(`종합 결과를 보려면 시설 ${remaining}개를 더 배치하세요.`, '#fecaca');
+        this.showMessage(PlacementViewManager.formatNeedMoreMessage(this.placedBuildings.length), '#fecaca');
         return;
       }
       this.scene.start('ResultScene');
@@ -299,11 +299,10 @@ export default class PlacementScene extends Phaser.Scene {
 
   updateSelectedBuildingUi() {
     for (const [buildingId, objects] of this.cardObjects.entries()) {
-      const selected = buildingId === this.selectedBuilding.id;
       const recommended = this.isRecommendedBuilding(buildings.find((building) => building.id === buildingId));
-      const strokeColor = selected ? 0xfde68a : recommended ? 0xf59e0b : 0x475569;
-      objects.card.setStrokeStyle(selected ? 5 : recommended ? 4 : 3, strokeColor);
-      objects.card.setFillStyle(selected ? 0x334155 : recommended ? 0x2b250f : 0x1e293b, 1);
+      const style = PlacementViewManager.getBuildingCardStyle(buildingId, this.selectedBuilding, recommended);
+      objects.card.setStrokeStyle(style.strokeWidth, style.strokeColor);
+      objects.card.setFillStyle(style.fillColor, style.fillAlpha);
     }
   }
 
@@ -434,11 +433,7 @@ export default class PlacementScene extends Phaser.Scene {
     this.updateLastChangePanel(this.registry.get('lastPlacementResult'));
     this.updatePlacementHistoryPanel();
     this.updateContinueButton();
-    const remaining = Math.max(0, REQUIRED_PLACEMENTS - this.placedBuildings.length);
-    const nextMessage = remaining === 0
-      ? `${this.selectedBuilding.name} 배치 완료: 종합 결과를 확인할 수 있습니다.`
-      : `${this.selectedBuilding.name} 배치 완료: 시설 ${remaining}개를 더 배치하세요.`;
-    this.showMessage(nextMessage, '#bbf7d0');
+    this.showMessage(PlacementViewManager.formatPlacementSuccessMessage(this.selectedBuilding.name, this.placedBuildings.length), '#bbf7d0');
     this.updatePreview(pointer);
   }
 
@@ -569,22 +564,18 @@ export default class PlacementScene extends Phaser.Scene {
     }
 
     if (!tile) {
-      this.cursorInfoText.setText('커서 타일: 지도 밖 또는 UI 영역');
-      this.cursorInfoText.setColor('#bfdbfe');
+      const cursorState = PlacementViewManager.formatCursorInfo(null);
+      this.cursorInfoText.setText(cursorState.text);
+      this.cursorInfoText.setColor(cursorState.color);
       return;
     }
 
     const mapTile = this.placementSystem.getTile(tile.x, tile.y);
     const status = validation ?? this.placementSystem.validatePlacement(tile.x, tile.y, this.selectedBuilding);
-    const tileLabel = TILE_LABELS[mapTile?.type] ?? mapTile?.type ?? '알 수 없음';
-    const zoneLabel = ZONE_LABELS[mapTile?.zone] ?? mapTile?.zone ?? '알 수 없음';
-    this.cursorInfoText.setText([
-      `커서 타일: (${tile.x}, ${tile.y})`,
-      `지형: ${tileLabel} / 구역: ${zoneLabel}`,
-      status.valid ? '판정: 배치 가능' : `판정: 배치 불가`,
-      status.valid ? '' : `이유: ${status.reason}`,
-    ].filter(Boolean).join('\n'));
-    this.cursorInfoText.setColor(status.valid ? '#bbf7d0' : '#fecaca');
+    const cursorState = PlacementViewManager.formatCursorInfo(tile, mapTile, status, TILE_LABELS, ZONE_LABELS);
+    this.cursorInfoText.setText(cursorState.text);
+    this.cursorInfoText.setColor(cursorState.color);
+
   }
 
   updateStatusBar() {
@@ -592,16 +583,8 @@ export default class PlacementScene extends Phaser.Scene {
       return;
     }
     const state = this.registry.get('gameState');
-    const rows = [
-      `인구: ${state.population}`,
-      `경제: ${state.economy}`,
-      `환경: ${state.environment}`,
-      `만족도: ${state.satisfaction}`,
-      `예산: ${state.budget}`,
-      `교통: ${state.traffic}`,
-      `오염: ${state.pollution}`,
-    ];
-    this.statusText.setText(['현재 상태', ...rows].join('\n'));
+    this.statusText.setText(PlacementViewManager.formatStatusText(state));
+
   }
 
   updateLastChangePanel(lastPlacementResult = this.registry.get('lastPlacementResult')) {
@@ -609,27 +592,9 @@ export default class PlacementScene extends Phaser.Scene {
       return;
     }
 
-    if (!lastPlacementResult) {
-      this.lastChangeText.setText(`아직 배치된 시설이 없습니다.\n건물을 배치하면 변화 수치가\n여기에 표시됩니다.`);
-      this.lastChangeText.setColor('#fde68a');
-      return;
-    }
-
-    const changedRows = Object.entries(lastPlacementResult.delta)
-      .filter(([, value]) => value !== 0)
-      .map(([key, value]) => {
-        const before = lastPlacementResult.before[key] ?? 0;
-        const after = lastPlacementResult.after[key] ?? before + value;
-        return `• ${STATE_LABELS[key] ?? key}: ${before} → ${after} (${formatSignedValue(value)})`;
-      });
-
-    this.lastChangeText.setText([
-      `${lastPlacementResult.building.name} 배치`,
-      `위치: (${lastPlacementResult.position.x}, ${lastPlacementResult.position.y})`,
-      '',
-      ...changedRows,
-    ].join('\n'));
-    this.lastChangeText.setColor('#fef3c7');
+    const lastChangeState = PlacementViewManager.formatLastChangeState(lastPlacementResult);
+    this.lastChangeText.setText(lastChangeState.text);
+    this.lastChangeText.setColor(lastChangeState.color);
   }
 
   updatePlacementHistoryPanel() {
@@ -637,53 +602,26 @@ export default class PlacementScene extends Phaser.Scene {
       return;
     }
 
-    if (!this.placedBuildings.length) {
-      this.placementHistoryText.setText(`아직 기록이 없습니다.\n시설을 배치하면 순서대로\n기록됩니다.`);
-      this.placementHistoryText.setColor('#bfdbfe');
-      return;
-    }
-
-    const rows = this.placedBuildings
-      .slice(-5)
-      .map((record, index) => {
-        const order = Math.max(1, this.placedBuildings.length - 4) + index;
-        return `${order}. ${record.building.name} (${record.position.x}, ${record.position.y})`;
-      });
-
-    this.placementHistoryText.setText([
-      `총 배치: ${this.placedBuildings.length}개`,
-      '',
-      ...rows,
-    ].join('\n'));
-    this.placementHistoryText.setColor('#e0f2fe');
+    const historyState = PlacementViewManager.formatPlacementHistoryState(this.placedBuildings);
+    this.placementHistoryText.setText(historyState.text);
+    this.placementHistoryText.setColor(historyState.color);
   }
 
   updateContinueButton() {
-    const placedCount = this.placedBuildings.length;
-    const enabled = placedCount >= REQUIRED_PLACEMENTS;
-    const remaining = Math.max(0, REQUIRED_PLACEMENTS - placedCount);
+    const continueState = PlacementViewManager.getContinueState(this.placedBuildings.length, this.selectedPolicy);
 
     if (this.missionText) {
-      const policyLine = this.selectedPolicy ? `선택 방향: ${this.selectedPolicy.name}` : '선택 방향: 기본 배치 연습';
-      const recommendedLine = this.selectedPolicy ? `추천 시설: ${this.selectedPolicy.recommendedBuildings.join(', ')}` : null;
-      this.missionText.setText([
-        policyLine,
-        recommendedLine,
-        '미션: 시설 3개를 배치해',
-        '지역 상태 변화를 비교하세요.',
-        `진행: ${placedCount}/${REQUIRED_PLACEMENTS}`,
-        remaining > 0 ? `남은 배치: ${remaining}개` : '종합 결과 확인 가능',
-      ].filter(Boolean).join('\n'));
+      this.missionText.setText(continueState.missionText);
     }
 
     if (this.continueButton) {
-      this.continueButton.setText(enabled ? '종합 결과 확인' : `시설 ${remaining}개 더 배치`);
-      this.continueButton.setAlpha(enabled ? 1 : 0.75);
+      this.continueButton.setText(continueState.buttonText);
+      this.continueButton.setAlpha(continueState.buttonAlpha);
     }
 
     if (this.continueButtonBg) {
-      this.continueButtonBg.setFillStyle(enabled ? 0x93c5fd : 0x94a3b8, enabled ? 1 : 0.8);
-      this.continueButtonBg.setStrokeStyle(3, enabled ? 0xbfdbfe : 0xcbd5e1);
+      this.continueButtonBg.setFillStyle(continueState.backgroundFillColor, continueState.backgroundAlpha);
+      this.continueButtonBg.setStrokeStyle(3, continueState.strokeColor);
     }
   }
 

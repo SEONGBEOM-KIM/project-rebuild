@@ -25,6 +25,7 @@ import ApiPayloadViewManager from '../src/systems/ApiPayloadViewManager.js';
 import MockApiClient, { MOCK_SUBMISSION_LOG_STORAGE_KEY } from '../src/systems/MockApiClient.js';
 import MockSubmissionLogViewManager from '../src/systems/MockSubmissionLogViewManager.js';
 import PlacementSystem from '../src/systems/PlacementSystem.js';
+import PlacementViewManager, { REQUIRED_PLACEMENTS } from '../src/systems/PlacementViewManager.js';
 import SaveManager, { LEARNING_SAVE_STORAGE_KEY } from '../src/systems/SaveManager.js';
 import SavedDataViewManager from '../src/systems/SavedDataViewManager.js';
 import StorageSummaryManager from '../src/systems/StorageSummaryManager.js';
@@ -590,6 +591,59 @@ function testMapData() {
   assert.equal(mapData.tiles[1][9].type, 'river', 'known river anchor should stay in place');
   assert.equal(mapData.tiles[1][1].zone, 'center', 'known center buildable tile should stay in place');
   assert.equal(mapData.tiles[6][1].zone, 'outskirts', 'known outskirts buildable tile should stay in place');
+}
+
+function testPlacementViewManager() {
+  assert.equal(REQUIRED_PLACEMENTS, 3);
+  assert.deepEqual(PlacementViewManager.formatCursorInfo(null), {
+    text: '커서 타일: 지도 밖 또는 UI 영역',
+    color: '#bfdbfe',
+  });
+  assert.deepEqual(PlacementViewManager.formatCursorInfo(
+    { x: 1, y: 2 },
+    { type: 'empty', zone: 'center' },
+    { valid: true },
+    { empty: '빈 땅' },
+    { center: '중심지' },
+  ), {
+    text: '커서 타일: (1, 2)\n지형: 빈 땅 / 구역: 중심지\n판정: 배치 가능',
+    color: '#bbf7d0',
+  });
+  assert.match(PlacementViewManager.formatStatusText(GameState.createInitialState()), /현재 상태\n인구: 1000/);
+  assert.equal(PlacementViewManager.formatLastChangeState(null).color, '#fde68a');
+  assert.equal(PlacementViewManager.formatPlacementHistoryState([]).color, '#bfdbfe');
+
+  const youthCenter = buildings.find((building) => building.id === 'youth_center');
+  const lastChange = PlacementViewManager.formatLastChangeState({
+    building: youthCenter,
+    position: { x: 1, y: 1 },
+    before: GameState.createInitialState(),
+    after: GameState.applyEffect(GameState.createInitialState(), youthCenter.effect),
+    delta: youthCenter.effect,
+  });
+  assert.match(lastChange.text, /청년센터 배치/);
+  assert.match(lastChange.text, /인구: 1000 → 1080/);
+
+  const history = PlacementViewManager.formatPlacementHistoryState([
+    { building: youthCenter, position: { x: 1, y: 1 } },
+  ]);
+  assert.match(history.text, /총 배치: 1개/);
+  assert.match(history.text, /1\. 청년센터 \(1, 1\)/);
+
+  const continueState = PlacementViewManager.getContinueState(2, { name: '녹색 회복 계획', recommendedBuildings: ['작은 공원'] });
+  assert.equal(continueState.enabled, false);
+  assert.equal(continueState.buttonText, '시설 1개 더 배치');
+  assert.match(continueState.missionText, /추천 시설: 작은 공원/);
+  assert.equal(PlacementViewManager.getContinueState(3, null).buttonText, '종합 결과 확인');
+  assert.equal(PlacementViewManager.formatPlacementSuccessMessage('청년센터', 3), '청년센터 배치 완료: 종합 결과를 확인할 수 있습니다.');
+  assert.equal(PlacementViewManager.formatNeedMoreMessage(1), '종합 결과를 보려면 시설 2개를 더 배치하세요.');
+  assert.deepEqual(PlacementViewManager.getBuildingCardStyle('youth_center', youthCenter, false), {
+    selected: true,
+    strokeWidth: 5,
+    strokeColor: 0xfde68a,
+    fillColor: 0x334155,
+    fillAlpha: 1,
+  });
 }
 
 function testPlacementRules() {
@@ -1174,6 +1228,7 @@ function run() {
   testPolicyData();
   testPolicyRecommendationMatchingUsesIds();
   testMapData();
+  testPlacementViewManager();
   testPlacementRules();
   testEndingSummaryManager();
   testTeacherReportManager();
