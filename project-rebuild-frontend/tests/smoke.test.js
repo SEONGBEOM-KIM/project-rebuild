@@ -785,6 +785,21 @@ function testLearningApiPayloadManager() {
 
 
 function testMockSubmissionLogViewManager() {
+  assert.equal(MockSubmissionLogViewManager.getSummaryPanelLayout().panel.width, 520);
+  assert.equal(MockSubmissionLogViewManager.getLogPanelLayout().body.wordWrapWidth, 840);
+  assert.deepEqual(MockSubmissionLogViewManager.getControlLayout().api, {
+    x: 1300,
+    y: 940,
+    label: 'API 미리보기',
+    target: 'ApiPayloadScene',
+  });
+  assert.equal(MockSubmissionLogViewManager.getSummaryTextStyle(450).wordWrap.width, 450);
+  assert.equal(MockSubmissionLogViewManager.getLogTextStyle(840).fontFamily, 'monospace');
+  assert.match(MockSubmissionLogViewManager.formatStatusText(), /localStorage/);
+  assert.match(MockSubmissionLogViewManager.formatCopySuccess(), /클립보드/);
+  assert.match(MockSubmissionLogViewManager.formatCopyFailure(), /권한/);
+  assert.match(MockSubmissionLogViewManager.formatDownloadSuccess(), /다운로드/);
+  assert.equal(MockSubmissionLogViewManager.formatDownloadFileName(), 'project-rebuild-mock-submission-log.json');
   assert.equal(MockSubmissionLogViewManager.formatSubmittedAt('not-a-date'), 'not-a-date');
   assert.equal(MockSubmissionLogViewManager.formatLogBody([]), '[]');
   assert.deepEqual(MockSubmissionLogViewManager.formatSummaryRows([]), [
