@@ -15,6 +15,8 @@ import ExplorationViewManager from '../src/systems/ExplorationViewManager.js';
 import DataBriefingViewManager from '../src/systems/DataBriefingViewManager.js';
 import ReflectionViewManager from '../src/systems/ReflectionViewManager.js';
 import TitleViewManager from '../src/systems/TitleViewManager.js';
+import AuthViewManager from '../src/systems/AuthViewManager.js';
+import StoryViewManager from '../src/systems/StoryViewManager.js';
 import ApiContractViewManager from '../src/systems/ApiContractViewManager.js';
 import LearningDataManager from '../src/systems/LearningDataManager.js';
 import LearningDataViewManager from '../src/systems/LearningDataViewManager.js';
@@ -286,6 +288,33 @@ function testTitleViewManager() {
   assert.equal(TitleViewManager.getSecondaryButtonStyle().backgroundColor, '#bfdbfe');
   assert.equal(TitleViewManager.getStorageButtonStyle().backgroundColor, '#334155');
   assert.equal(TitleViewManager.getLoadButtonStyle().backgroundColor, '#1e293b');
+}
+
+
+function testAuthViewManager() {
+  const layout = AuthViewManager.getLayout();
+  assert.equal(layout.title.text, '학습자 입장');
+  assert.equal(layout.proceedButton.targetScene, 'StoryScene');
+  assert.deepEqual(AuthViewManager.getPanelPositions(1920, 1080).map((panel) => panel.title), ['로그인', '회원가입']);
+  assert.deepEqual(AuthViewManager.getPanelPositions(1920, 1080).map((panel) => ({ x: panel.x, y: panel.y })), [
+    { x: 700, y: 580 },
+    { x: 1220, y: 580 },
+  ]);
+  assert.deepEqual(AuthViewManager.getProceedButton(1920), {
+    ...layout.proceedButton,
+    x: 960,
+  });
+  assert.deepEqual(layout.panel.fields.map((field) => field.label), ['이름', '비밀번호']);
+}
+
+function testStoryViewManager() {
+  const layout = StoryViewManager.getLayout();
+  assert.equal(layout.startButton.label, '지역 탐색 시작');
+  assert.equal(layout.startButton.targetScene, 'ExplorationScene');
+  assert.deepEqual(StoryViewManager.getStartButton(1920), {
+    ...layout.startButton,
+    x: 960,
+  });
 }
 
 function testApiContractViewManager() {
@@ -1267,9 +1296,11 @@ function testSceneReferences() {
   }
 
   const missingTargets = [];
+  const sceneStartPattern = /scene\.start\('([^']+)'/g;
+  const managerTargetPattern = /targetScene:\s*'([^']+)'/g;
   for (const file of sceneFiles) {
     const source = readFileSync(join(SCENES_DIR, file), 'utf8');
-    for (const match of source.matchAll(/scene\.start\('([^']+)'/g)) {
+    for (const match of source.matchAll(sceneStartPattern)) {
       const target = match[1];
       if (!registeredSceneNames.has(target)) {
         missingTargets.push(`${file} -> ${target}`);
@@ -1277,7 +1308,17 @@ function testSceneReferences() {
     }
   }
 
-  assert.deepEqual(missingTargets, [], 'Every scene.start target must be registered in main.js');
+  for (const file of readdirSync(join(SRC_DIR, 'systems')).filter((name) => name.endsWith('Manager.js'))) {
+    const source = readFileSync(join(SRC_DIR, 'systems', file), 'utf8');
+    for (const match of source.matchAll(managerTargetPattern)) {
+      const target = match[1];
+      if (!registeredSceneNames.has(target)) {
+        missingTargets.push(`${file} targetScene -> ${target}`);
+      }
+    }
+  }
+
+  assert.deepEqual(missingTargets, [], 'Every scene.start and manager targetScene target must be registered in main.js');
 }
 
 function run() {
@@ -1290,6 +1331,8 @@ function run() {
   testDataBriefingViewManager();
   testReflectionViewManager();
   testTitleViewManager();
+  testAuthViewManager();
+  testStoryViewManager();
   testApiContractViewManager();
   testEvaluationRuleConstants();
   testEvaluationManager();
