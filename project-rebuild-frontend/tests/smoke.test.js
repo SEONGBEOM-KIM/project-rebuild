@@ -3,6 +3,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import GameState from '../src/systems/GameState.js';
+import BootFlowManager from '../src/systems/BootFlowManager.js';
 import IssueDetector from '../src/systems/IssueDetector.js';
 import SideEffectViewManager from '../src/systems/SideEffectViewManager.js';
 import EvaluationManager from '../src/systems/EvaluationManager.js';
@@ -94,6 +95,32 @@ function createCompleteLearningData(overrides = {}) {
   };
 }
 
+
+
+function testBootFlowManager() {
+  const entries = BootFlowManager.createInitialRegistryEntries();
+  const keys = entries.map(([key]) => key);
+  assert.deepEqual(keys, [
+    'gameState',
+    'lastPlacementResult',
+    'placedBuildings',
+    'selectedPolicy',
+    'exploredPlaces',
+    'quizResult',
+    'reflectionChoice',
+    'learningProgress',
+  ]);
+  const values = new Map(entries);
+  assert.deepEqual(values.get('gameState'), GameState.createInitialState());
+  assert.deepEqual(values.get('placedBuildings'), []);
+  assert.deepEqual(values.get('exploredPlaces'), []);
+  assert.equal(values.get('lastPlacementResult'), null);
+  assert.equal(values.get('selectedPolicy'), null);
+  assert.equal(values.get('quizResult'), null);
+  assert.equal(values.get('reflectionChoice'), null);
+  assert.equal(values.get('learningProgress').episode, 1);
+  assert.equal(BootFlowManager.getTargetScene(), 'TitleScene');
+}
 
 function testEpisodeMetadata() {
   assert.equal(CURRENT_EPISODE.id, 1);
@@ -1297,7 +1324,7 @@ function testSceneReferences() {
 
   const missingTargets = [];
   const sceneStartPattern = /scene\.start\('([^']+)'/g;
-  const managerTargetPattern = /targetScene:\s*'([^']+)'/g;
+  const managerTargetPattern = /(?:targetScene:\s*|BOOT_TARGET_SCENE\s*=\s*)'([^']+)'/g;
   for (const file of sceneFiles) {
     const source = readFileSync(join(SCENES_DIR, file), 'utf8');
     for (const match of source.matchAll(sceneStartPattern)) {
@@ -1322,6 +1349,7 @@ function testSceneReferences() {
 }
 
 function run() {
+  testBootFlowManager();
   testEpisodeMetadata();
   testEpisodeContent();
   testCauseQuizManager();

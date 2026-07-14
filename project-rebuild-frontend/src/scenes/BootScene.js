@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
-import GameState from '../systems/GameState.js';
-import LearningProgress from '../systems/LearningProgress.js';
+import BootFlowManager from '../systems/BootFlowManager.js';
 
 export default class BootScene extends Phaser.Scene {
   constructor() {
@@ -8,14 +7,9 @@ export default class BootScene extends Phaser.Scene {
   }
 
   create() {
-    this.registry.set('gameState', GameState.createInitialState());
-    this.registry.set('lastPlacementResult', null);
-    this.registry.set('placedBuildings', []);
-    this.registry.set('selectedPolicy', null);
-    this.registry.set('exploredPlaces', []);
-    this.registry.set('quizResult', null);
-    this.registry.set('reflectionChoice', null);
-    this.registry.set('learningProgress', LearningProgress.createInitialProgress());
-    this.scene.start('TitleScene');
+    for (const [key, value] of BootFlowManager.createInitialRegistryEntries()) {
+      this.registry.set(key, value);
+    }
+    this.scene.start(BootFlowManager.getTargetScene());
   }
 }
