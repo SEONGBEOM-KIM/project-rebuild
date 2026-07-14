@@ -428,6 +428,15 @@ function testEvaluationManager() {
 
 
 function testSideEffectViewManager() {
+  assert.equal(SideEffectViewManager.getIssuePanelLayout().panel.width, 980);
+  assert.deepEqual(SideEffectViewManager.getIssueCardLayout(1).title, { x: 310, y: 478 });
+  assert.equal(SideEffectViewManager.getHintPanelLayout().body.wordWrapWidth, 500);
+  assert.deepEqual(SideEffectViewManager.getControlLayout().next, {
+    x: 1160,
+    y: 955,
+    label: '생각 정리',
+    target: 'ReflectionScene',
+  });
   assert.match(SideEffectViewManager.formatEmptyIssueMessage(), /현재 큰 부작용 신호는 없습니다/);
   assert.deepEqual(SideEffectViewManager.formatHintRows([]), [
     '• 균형 확인',

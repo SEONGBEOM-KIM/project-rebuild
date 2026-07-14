@@ -35,48 +35,47 @@ export default class SideEffectScene extends Phaser.Scene {
   }
 
   drawIssueArea(issues) {
-    this.add.rectangle(665, 545, 980, 650, 0xffffff, 0.96).setStrokeStyle(5, 0xfde68a);
-    this.add.text(665, 260, '감지된 주의 신호', {
+    const layout = SideEffectViewManager.getIssuePanelLayout();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0xffffff, 0.96)
+      .setStrokeStyle(5, layout.panel.strokeColor);
+    this.add.text(layout.title.x, layout.title.y, '감지된 주의 신호', {
       fontSize: '38px',
       color: '#172554',
       fontStyle: 'bold',
     }).setOrigin(0.5);
 
     if (!issues.length) {
-      this.add.text(230, 385, [
-        '현재 큰 부작용 신호는 없습니다.',
-        '',
-        '다만 실제 정책 판단에서는 시간이 지나며 새로운 문제가 생길 수 있습니다.',
-        '다음 단계에서는 더 많은 시설과 정책 조합을 비교할 수 있게 확장합니다.',
-      ].join('\n'), {
+      this.add.text(layout.emptyBody.x, layout.emptyBody.y, SideEffectViewManager.formatEmptyIssueMessage(), {
         fontSize: '30px',
         color: '#1e293b',
         lineSpacing: 14,
-        wordWrap: { width: 860 },
+        wordWrap: { width: layout.emptyBody.wordWrapWidth },
       });
       return;
     }
 
     issues.slice(0, 4).forEach((issue, index) => {
-      const y = 335 + index * 135;
-      this.add.rectangle(665, y + 48, 860, 112, 0xe0f2fe, 1).setStrokeStyle(3, issue.color);
-      this.add.circle(270, y + 48, 22, issue.color, 1).setStrokeStyle(3, 0xffffff);
-      this.add.text(310, y + 8, issue.title, {
+      const card = SideEffectViewManager.getIssueCardLayout(index);
+      this.add.rectangle(card.background.x, card.background.y, card.background.width, card.background.height, 0xe0f2fe, 1).setStrokeStyle(3, issue.color);
+      this.add.circle(card.marker.x, card.marker.y, card.marker.radius, issue.color, 1).setStrokeStyle(3, 0xffffff);
+      this.add.text(card.title.x, card.title.y, issue.title, {
         fontSize: '27px',
         color: '#0f172a',
         fontStyle: 'bold',
       });
-      this.add.text(310, y + 45, issue.message, {
+      this.add.text(card.message.x, card.message.y, issue.message, {
         fontSize: '22px',
         color: '#334155',
-        wordWrap: { width: 760 },
+        wordWrap: { width: card.message.wordWrapWidth },
       });
     });
   }
 
   drawConceptPanel(issues) {
-    this.add.rectangle(1480, 545, 560, 650, 0x1e293b, 0.98).setStrokeStyle(5, 0x93c5fd);
-    this.add.text(1480, 260, '다음 선택 힌트', {
+    const layout = SideEffectViewManager.getHintPanelLayout();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0x1e293b, 0.98)
+      .setStrokeStyle(5, layout.panel.strokeColor);
+    this.add.text(layout.title.x, layout.title.y, '다음 선택 힌트', {
       fontSize: '36px',
       color: '#ffffff',
       fontStyle: 'bold',
@@ -84,20 +83,21 @@ export default class SideEffectScene extends Phaser.Scene {
 
     const rows = SideEffectViewManager.formatHintRows(issues);
 
-    this.add.text(1230, 330, rows.join('\n'), {
+    this.add.text(layout.body.x, layout.body.y, rows.join('\n'), {
       fontSize: '22px',
       color: '#dbeafe',
       lineSpacing: 10,
-      wordWrap: { width: 500 },
+      wordWrap: { width: layout.body.wordWrapWidth },
     });
   }
 
   drawControls() {
-    const backButton = this.createButton(760, 955, '결과 다시 보기', '#c4b5fd', '#1e1b4b');
-    backButton.on('pointerdown', () => this.scene.start('ResultScene'));
+    const layout = SideEffectViewManager.getControlLayout();
+    const backButton = this.createButton(layout.back.x, layout.back.y, layout.back.label, '#c4b5fd', '#1e1b4b');
+    backButton.on('pointerdown', () => this.scene.start(layout.back.target));
 
-    const nextButton = this.createButton(1160, 955, '생각 정리', '#bbf7d0', '#123524');
-    nextButton.on('pointerdown', () => this.scene.start('ReflectionScene'));
+    const nextButton = this.createButton(layout.next.x, layout.next.y, layout.next.label, '#bbf7d0', '#123524');
+    nextButton.on('pointerdown', () => this.scene.start(layout.next.target));
   }
 
   createButton(x, y, label, backgroundColor, color) {

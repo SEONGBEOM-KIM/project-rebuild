@@ -1,4 +1,37 @@
 export default class SideEffectViewManager {
+  static getIssuePanelLayout() {
+    return {
+      panel: { x: 665, y: 545, width: 980, height: 650, strokeColor: 0xfde68a },
+      title: { x: 665, y: 260 },
+      emptyBody: { x: 230, y: 385, wordWrapWidth: 860 },
+    };
+  }
+
+  static getIssueCardLayout(index) {
+    const y = 335 + index * 135;
+    return {
+      background: { x: 665, y: y + 48, width: 860, height: 112 },
+      marker: { x: 270, y: y + 48, radius: 22 },
+      title: { x: 310, y: y + 8 },
+      message: { x: 310, y: y + 45, wordWrapWidth: 760 },
+    };
+  }
+
+  static getHintPanelLayout() {
+    return {
+      panel: { x: 1480, y: 545, width: 560, height: 650, strokeColor: 0x93c5fd },
+      title: { x: 1480, y: 260 },
+      body: { x: 1230, y: 330, wordWrapWidth: 500 },
+    };
+  }
+
+  static getControlLayout() {
+    return {
+      back: { x: 760, y: 955, label: '결과 다시 보기', target: 'ResultScene' },
+      next: { x: 1160, y: 955, label: '생각 정리', target: 'ReflectionScene' },
+    };
+  }
+
   static formatEmptyIssueMessage() {
     return [
       '현재 큰 부작용 신호는 없습니다.',
