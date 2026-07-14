@@ -625,6 +625,24 @@ function testEndingSummaryManager() {
 }
 
 function testTeacherReportManager() {
+  const panels = TeacherReportManager.getPanelLayout();
+  assert.equal(panels.progress.title, '학습 진행');
+  assert.equal(panels.teaching.width, 420);
+  assert.deepEqual(TeacherReportManager.getPanelTitlePosition(panels.progress), { x: 400, y: 214 });
+  assert.deepEqual(TeacherReportManager.getPanelBodyPosition(panels.progress), { x: 148, y: 270 });
+  assert.equal(TeacherReportManager.getPanelBodyStyle(panels.progress).wordWrap.width, 504);
+  assert.deepEqual(TeacherReportManager.getControlLayout().data, {
+    x: 1490,
+    y: 940,
+    label: '학습 데이터 보기',
+    target: 'LearningDataScene',
+  });
+  assert.match(TeacherReportManager.formatStatusText(), /텍스트 파일/);
+  assert.match(TeacherReportManager.formatCopySuccess(), /클립보드/);
+  assert.match(TeacherReportManager.formatCopyFailure(), /권한/);
+  assert.match(TeacherReportManager.formatDownloadSuccess(), /다운로드/);
+  assert.equal(TeacherReportManager.formatDownloadFileName(), 'project-rebuild-ep1-teacher-report.txt');
+
   const registry = createMemoryRegistry();
   const placedBuildings = [
     createPlacementRecord('youth_center'),

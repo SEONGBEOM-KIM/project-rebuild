@@ -4,6 +4,67 @@ import IssueDetector from './IssueDetector.js';
 import LearningProgress from './LearningProgress.js';
 
 export default class TeacherReportManager {
+  static getPanelLayout() {
+    return {
+      progress: { x: 400, y: 450, width: 580, height: 560, title: '학습 진행' },
+      choice: { x: 1010, y: 450, width: 580, height: 560, title: '선택과 결과' },
+      teaching: { x: 1620, y: 450, width: 420, height: 560, title: '지도 포인트' },
+    };
+  }
+
+  static getPanelTitlePosition(panel) {
+    return {
+      x: panel.x,
+      y: panel.y - panel.height / 2 + 44,
+    };
+  }
+
+  static getPanelBodyPosition(panel) {
+    return {
+      x: panel.x - panel.width / 2 + 38,
+      y: panel.y - panel.height / 2 + 100,
+    };
+  }
+
+  static getPanelBodyStyle(panel) {
+    return {
+      fontSize: '23px',
+      color: '#1e293b',
+      lineSpacing: 10,
+      wordWrap: { width: panel.width - 76 },
+    };
+  }
+
+  static getControlLayout() {
+    return {
+      status: { x: 960, y: 855 },
+      copy: { x: 520, y: 940, label: '리포트 복사' },
+      download: { x: 820, y: 940, label: 'TXT 다운로드' },
+      ending: { x: 1140, y: 940, label: '마무리로 돌아가기', target: 'EndingScene' },
+      data: { x: 1490, y: 940, label: '학습 데이터 보기', target: 'LearningDataScene' },
+    };
+  }
+
+  static formatStatusText() {
+    return '리포트를 복사하거나 텍스트 파일로 저장할 수 있습니다.';
+  }
+
+  static formatCopySuccess() {
+    return '교사용 리포트를 클립보드에 복사했습니다.';
+  }
+
+  static formatCopyFailure() {
+    return '클립보드 복사에 실패했습니다. 브라우저 권한을 확인하세요.';
+  }
+
+  static formatDownloadSuccess() {
+    return '교사용 리포트 다운로드를 시작했습니다.';
+  }
+
+  static formatDownloadFileName() {
+    return 'project-rebuild-ep1-teacher-report.txt';
+  }
+
   static build(registry) {
     const progress = LearningProgress.get(registry);
     const selectedPolicy = registry.get('selectedPolicy');
