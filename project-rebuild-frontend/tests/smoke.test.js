@@ -25,7 +25,7 @@ import ApiPayloadViewManager from '../src/systems/ApiPayloadViewManager.js';
 import MockApiClient, { MOCK_SUBMISSION_LOG_STORAGE_KEY } from '../src/systems/MockApiClient.js';
 import MockSubmissionLogViewManager from '../src/systems/MockSubmissionLogViewManager.js';
 import PlacementSystem from '../src/systems/PlacementSystem.js';
-import PlacementViewManager, { TILE_COLORS, TILE_STROKES, TILE_LABELS, ZONE_LABELS, REQUIRED_PLACEMENTS, PLACEMENT_DRAG_THRESHOLD, PLACEMENT_UI_BOUNDS, PREVIEW_STYLES, PLACEMENT_UI_LAYOUT, BUILDING_CARD_LAYOUT } from '../src/systems/PlacementViewManager.js';
+import PlacementViewManager, { TILE_COLORS, TILE_STROKES, TILE_LABELS, ZONE_LABELS, REQUIRED_PLACEMENTS, PLACEMENT_DRAG_THRESHOLD, PLACEMENT_UI_BOUNDS, PREVIEW_STYLES, PLACEMENT_UI_LAYOUT, BUILDING_CARD_LAYOUT, PLACEMENT_MAP_VISUALS } from '../src/systems/PlacementViewManager.js';
 import SaveManager, { LEARNING_SAVE_STORAGE_KEY } from '../src/systems/SaveManager.js';
 import SavedDataViewManager from '../src/systems/SavedDataViewManager.js';
 import StorageSummaryManager from '../src/systems/StorageSummaryManager.js';
@@ -600,6 +600,7 @@ function testPlacementViewManager() {
   assert.equal(PREVIEW_STYLES.valid.fillColor, 0x22c55e);
   assert.equal(PLACEMENT_UI_LAYOUT.title.text, '건물 선택');
   assert.equal(BUILDING_CARD_LAYOUT.card.width, 300);
+  assert.equal(PLACEMENT_MAP_VISUALS.impactMarker.bubbleRadius, 34);
   assert.equal(TILE_COLORS.empty, 0x2f855a);
   assert.equal(TILE_STROKES.buildable, 0x86efac);
   assert.equal(TILE_LABELS.river, '강');
@@ -607,6 +608,12 @@ function testPlacementViewManager() {
   assert.deepEqual(PlacementViewManager.getTileRenderStyle({ type: 'road', buildable: false }), {
     color: 0x64748b,
     stroke: 0x334155,
+  });
+  assert.deepEqual(PlacementViewManager.getMapTileVisual({ type: 'road', buildable: false }), {
+    color: 0x64748b,
+    stroke: 0x334155,
+    alpha: 0.88,
+    strokeWidth: 1.5,
   });
   assert.equal(PlacementViewManager.getLegendItems().length, 4);
   assert.equal(PlacementViewManager.getLegendTextColor({ note: '배치 가능' }), '#bbf7d0');
@@ -631,6 +638,25 @@ function testPlacementViewManager() {
   assert.equal(PlacementViewManager.getBuildingCardLayout(40, 185).description.wrapWidth, 255);
   assert.equal(PlacementViewManager.formatBuildingDetail(buildings.find((building) => building.id === 'youth_center')), '2×2 | 비용 180');
   assert.match(PlacementViewManager.formatPlacementHint(buildings.find((building) => building.id === 'bus_station')), /^조건:/);
+  assert.deepEqual(PlacementViewManager.getPlacedBuildingVisual(buildings.find((building) => building.id === 'small_park'), 6, 1), {
+    fillColor: buildings.find((building) => building.id === 'small_park').color,
+    alpha: 0.78,
+    strokeColor: 0xffffff,
+    strokeWidth: 2,
+    depth: 17,
+  });
+  assert.deepEqual(PlacementViewManager.getBuildingLabelLayout({ x: 500, y: 300 }, 2, 3).text, {
+    x: 500,
+    y: 265,
+    depth: 35,
+  });
+  assert.deepEqual(PlacementViewManager.getImpactMarkerLayout({ x: 500, y: 300 }, 2, 3).animation, {
+    initialScale: 0.2,
+    initialAlpha: 0.2,
+    targetY: 188,
+    duration: 280,
+    ease: 'Back.Out',
+  });
   assert.deepEqual(PlacementViewManager.formatCursorInfo(null), {
     text: '커서 타일: 지도 밖 또는 UI 영역',
     color: '#bfdbfe',

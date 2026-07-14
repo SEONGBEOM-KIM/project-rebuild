@@ -85,6 +85,44 @@ export const BUILDING_CARD_LAYOUT = {
   effect: { offsetX: 24, offsetY: 142, wrapWidth: 265 },
 };
 
+
+export const PLACEMENT_MAP_VISUALS = {
+  tile: { alpha: 0.88, strokeWidth: 1.5 },
+  placedBuilding: { alpha: 0.78, strokeColor: 0xffffff, strokeWidth: 2, depthBase: 10 },
+  buildingLabel: {
+    width: 128,
+    height: 34,
+    radius: 8,
+    offsetY: -52,
+    textOffsetY: -35,
+    fillColor: 0x0f172a,
+    fillAlpha: 0.82,
+    depthBase: 30,
+  },
+  impactMarker: {
+    containerOffsetY: -92,
+    animatedTargetOffsetY: -112,
+    depthBase: 45,
+    bubbleRadius: 34,
+    bubbleAlpha: 0.9,
+    bubbleStrokeColor: 0xffffff,
+    bubbleStrokeAlpha: 0.95,
+    bubbleStrokeWidth: 3,
+    iconY: -2,
+    labelY: 48,
+    labelWidth: 170,
+    labelHeight: 34,
+    labelFillColor: 0x0f172a,
+    labelFillAlpha: 0.85,
+    labelStrokeAlpha: 0.9,
+    labelStrokeWidth: 2,
+    initialScale: 0.2,
+    initialAlpha: 0.2,
+    tweenDuration: 280,
+    tweenEase: 'Back.Out',
+  },
+};
+
 export default class PlacementViewManager {
 
 
@@ -112,6 +150,64 @@ export default class PlacementViewManager {
 
   static formatPlacementHint(building) {
     return `조건: ${building.placementHint}`;
+  }
+
+
+  static getMapTileVisual(tile) {
+    const tileStyle = PlacementViewManager.getTileRenderStyle(tile);
+    return {
+      ...tileStyle,
+      alpha: PLACEMENT_MAP_VISUALS.tile.alpha,
+      strokeWidth: PLACEMENT_MAP_VISUALS.tile.strokeWidth,
+    };
+  }
+
+  static getPlacedBuildingVisual(building, tileX, tileY) {
+    return {
+      fillColor: building.color,
+      alpha: PLACEMENT_MAP_VISUALS.placedBuilding.alpha,
+      strokeColor: PLACEMENT_MAP_VISUALS.placedBuilding.strokeColor,
+      strokeWidth: PLACEMENT_MAP_VISUALS.placedBuilding.strokeWidth,
+      depth: PLACEMENT_MAP_VISUALS.placedBuilding.depthBase + tileX + tileY,
+    };
+  }
+
+  static getBuildingLabelLayout(labelPosition, tileX, tileY) {
+    const label = PLACEMENT_MAP_VISUALS.buildingLabel;
+    return {
+      background: {
+        x: labelPosition.x - label.width / 2,
+        y: labelPosition.y + label.offsetY,
+        width: label.width,
+        height: label.height,
+        radius: label.radius,
+        fillColor: label.fillColor,
+        fillAlpha: label.fillAlpha,
+      },
+      text: {
+        x: labelPosition.x,
+        y: labelPosition.y + label.textOffsetY,
+        depth: label.depthBase + tileX + tileY,
+      },
+    };
+  }
+
+  static getImpactMarkerLayout(center, tileX, tileY) {
+    const marker = PLACEMENT_MAP_VISUALS.impactMarker;
+    return {
+      container: { x: center.x, y: center.y + marker.containerOffsetY, depth: marker.depthBase + tileX + tileY },
+      bubble: { radius: marker.bubbleRadius, alpha: marker.bubbleAlpha, strokeColor: marker.bubbleStrokeColor, strokeAlpha: marker.bubbleStrokeAlpha, strokeWidth: marker.bubbleStrokeWidth },
+      icon: { x: 0, y: marker.iconY },
+      labelBackground: { x: 0, y: marker.labelY, width: marker.labelWidth, height: marker.labelHeight, fillColor: marker.labelFillColor, fillAlpha: marker.labelFillAlpha, strokeAlpha: marker.labelStrokeAlpha, strokeWidth: marker.labelStrokeWidth },
+      label: { x: 0, y: marker.labelY },
+      animation: {
+        initialScale: marker.initialScale,
+        initialAlpha: marker.initialAlpha,
+        targetY: center.y + marker.animatedTargetOffsetY,
+        duration: marker.tweenDuration,
+        ease: marker.tweenEase,
+      },
+    };
   }
 
   static getTileRenderStyle(tile) {

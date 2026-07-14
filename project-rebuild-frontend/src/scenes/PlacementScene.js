@@ -336,8 +336,8 @@ export default class PlacementScene extends Phaser.Scene {
     for (let y = 0; y < this.placementSystem.mapData.height; y += 1) {
       for (let x = 0; x < this.placementSystem.mapData.width; x += 1) {
         const tile = this.placementSystem.mapData.tiles[y][x];
-        const tileStyle = PlacementViewManager.getTileRenderStyle(tile);
-        this.drawDiamond(this.mapGraphics, x, y, tileStyle.color, 0.88, tileStyle.stroke, 1.5);
+        const tileStyle = PlacementViewManager.getMapTileVisual(tile);
+        this.drawDiamond(this.mapGraphics, x, y, tileStyle.color, tileStyle.alpha, tileStyle.stroke, tileStyle.strokeWidth);
       }
     }
   }
@@ -479,18 +479,26 @@ export default class PlacementScene extends Phaser.Scene {
   drawImpactMarkers(building, tileX, tileY, animate = true) {
     const center = this.getFootprintCenter(tileX, tileY, building.footprint);
     const markerData = PlacementViewManager.getImpactMarkerData(building);
-    const markerContainer = this.add.container(center.x, center.y - 92).setDepth(45 + tileX + tileY);
+    const markerLayout = PlacementViewManager.getImpactMarkerLayout(center, tileX, tileY);
+    const markerContainer = this.add.container(markerLayout.container.x, markerLayout.container.y)
+      .setDepth(markerLayout.container.depth);
 
-    const bubble = this.add.circle(0, 0, 34, markerData.color, 0.9)
-      .setStrokeStyle(3, 0xffffff, 0.95);
-    const icon = this.add.text(0, -2, markerData.icon, {
+    const bubble = this.add.circle(0, 0, markerLayout.bubble.radius, markerData.color, markerLayout.bubble.alpha)
+      .setStrokeStyle(markerLayout.bubble.strokeWidth, markerLayout.bubble.strokeColor, markerLayout.bubble.strokeAlpha);
+    const icon = this.add.text(markerLayout.icon.x, markerLayout.icon.y, markerData.icon, {
       fontSize: '30px',
       color: '#ffffff',
       fontStyle: 'bold',
     }).setOrigin(0.5);
-    const labelBg = this.add.rectangle(0, 48, 170, 34, 0x0f172a, 0.85)
-      .setStrokeStyle(2, markerData.color, 0.9);
-    const label = this.add.text(0, 48, markerData.label, {
+    const labelBg = this.add.rectangle(
+      markerLayout.labelBackground.x,
+      markerLayout.labelBackground.y,
+      markerLayout.labelBackground.width,
+      markerLayout.labelBackground.height,
+      markerLayout.labelBackground.fillColor,
+      markerLayout.labelBackground.fillAlpha,
+    ).setStrokeStyle(markerLayout.labelBackground.strokeWidth, markerData.color, markerLayout.labelBackground.strokeAlpha);
+    const label = this.add.text(markerLayout.label.x, markerLayout.label.y, markerData.label, {
       fontSize: '17px',
       color: '#ffffff',
     }).setOrigin(0.5);
@@ -498,32 +506,48 @@ export default class PlacementScene extends Phaser.Scene {
     markerContainer.add([bubble, icon, labelBg, label]);
 
     if (animate) {
-      markerContainer.setScale(0.2);
-      markerContainer.setAlpha(0.2);
+      markerContainer.setScale(markerLayout.animation.initialScale);
+      markerContainer.setAlpha(markerLayout.animation.initialAlpha);
       this.tweens.add({
         targets: markerContainer,
         scale: 1,
         alpha: 1,
-        y: center.y - 112,
-        duration: 280,
-        ease: 'Back.Out',
+        y: markerLayout.animation.targetY,
+        duration: markerLayout.animation.duration,
+        ease: markerLayout.animation.ease,
       });
     }
   }
 
-
-  drawPlacedBuilding(building, tileX, tileY) {    const graphics = this.add.graphics().setDepth(10 + tileX + tileY);
+  drawPlacedBuilding(building, tileX, tileY) {
+    const buildingVisual = PlacementViewManager.getPlacedBuildingVisual(building, tileX, tileY);
+    const graphics = this.add.graphics().setDepth(buildingVisual.depth);
     for (const tile of this.placementSystem.getFootprintTiles(tileX, tileY, building.footprint)) {
-      this.drawDiamond(graphics, tile.x, tile.y, building.color, 0.78, 0xffffff, 2);
+      this.drawDiamond(
+        graphics,
+        tile.x,
+        tile.y,
+        buildingVisual.fillColor,
+        buildingVisual.alpha,
+        buildingVisual.strokeColor,
+        buildingVisual.strokeWidth,
+      );
     }
 
     const labelPosition = this.getFootprintCenter(tileX, tileY, building.footprint);
-    graphics.fillStyle(0x0f172a, 0.82);
-    graphics.fillRoundedRect(labelPosition.x - 64, labelPosition.y - 52, 128, 34, 8);
-    const label = this.add.text(labelPosition.x, labelPosition.y - 35, building.name, {
+    const labelLayout = PlacementViewManager.getBuildingLabelLayout(labelPosition, tileX, tileY);
+    graphics.fillStyle(labelLayout.background.fillColor, labelLayout.background.fillAlpha);
+    graphics.fillRoundedRect(
+      labelLayout.background.x,
+      labelLayout.background.y,
+      labelLayout.background.width,
+      labelLayout.background.height,
+      labelLayout.background.radius,
+    );
+    const label = this.add.text(labelLayout.text.x, labelLayout.text.y, building.name, {
       fontSize: '18px',
       color: '#ffffff',
-    }).setOrigin(0.5).setDepth(30 + tileX + tileY);
+    }).setOrigin(0.5).setDepth(labelLayout.text.depth);
 
     this.mapLabels.add(label);
   }
