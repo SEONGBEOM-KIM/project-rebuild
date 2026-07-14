@@ -14,6 +14,7 @@ import ProblemSummaryViewManager from '../src/systems/ProblemSummaryViewManager.
 import ExplorationViewManager from '../src/systems/ExplorationViewManager.js';
 import DataBriefingViewManager from '../src/systems/DataBriefingViewManager.js';
 import ReflectionViewManager from '../src/systems/ReflectionViewManager.js';
+import TitleViewManager from '../src/systems/TitleViewManager.js';
 import LearningDataManager from '../src/systems/LearningDataManager.js';
 import LearningDataViewManager from '../src/systems/LearningDataViewManager.js';
 import TeacherReportManager from '../src/systems/TeacherReportManager.js';
@@ -260,6 +261,29 @@ function testReflectionViewManager() {
     fillColor: 0x0f172a,
     fillAlpha: 0.96,
   });
+}
+
+function testTitleViewManager() {
+  assert.deepEqual(TitleViewManager.getLayout(false), {
+    startButtonY: 620,
+    loadButtonY: null,
+    importButtonY: 745,
+    storageButtonY: 820,
+    importStatusY: 885,
+  });
+  assert.deepEqual(TitleViewManager.getLayout(true), {
+    startButtonY: 620,
+    loadButtonY: 745,
+    importButtonY: 835,
+    storageButtonY: 910,
+    importStatusY: 975,
+  });
+  assert.equal(TitleViewManager.formatImportError(new Error('bad json')), 'bad json');
+  assert.equal(TitleViewManager.formatImportError(null), 'JSON 가져오기에 실패했습니다.');
+  assert.equal(TitleViewManager.getPrimaryButtonStyle().backgroundColor, '#a7f3d0');
+  assert.equal(TitleViewManager.getSecondaryButtonStyle().backgroundColor, '#bfdbfe');
+  assert.equal(TitleViewManager.getStorageButtonStyle().backgroundColor, '#334155');
+  assert.equal(TitleViewManager.getLoadButtonStyle().backgroundColor, '#1e293b');
 }
 
 function testEpisodeContent() {
@@ -823,6 +847,19 @@ function testSavedDataViewManager() {
   assert.equal(SavedDataViewManager.formatBody(null), '저장된 데이터가 없습니다.');
   assert.equal(SavedDataViewManager.canContinue(null), false);
   assert.equal(SavedDataViewManager.getContinueButtonColor(null), '#94a3b8');
+  assert.deepEqual(SavedDataViewManager.getContinueButtonState(null), {
+    canContinue: false,
+    backgroundColor: '#94a3b8',
+    textColor: '#123524',
+  });
+  assert.deepEqual(SavedDataViewManager.getButtonLayout(1920), {
+    back: { x: 360, y: 940 },
+    import: { x: 760, y: 940 },
+    continue: { x: 1135, y: 940 },
+    clear: { x: 1520, y: 940 },
+  });
+  assert.equal(SavedDataViewManager.getBodyTextStyle().fontFamily, 'monospace');
+  assert.equal(SavedDataViewManager.getStatusTextStyle().color, '#fecaca');
 
   const saved = {
     savedAt: '2026-07-12T10:00:00+09:00',
@@ -835,6 +872,11 @@ function testSavedDataViewManager() {
   };
   assert.equal(SavedDataViewManager.canContinue(saved), true);
   assert.equal(SavedDataViewManager.getContinueButtonColor(saved), '#bbf7d0');
+  assert.deepEqual(SavedDataViewManager.getContinueButtonState(saved), {
+    canContinue: true,
+    backgroundColor: '#bbf7d0',
+    textColor: '#123524',
+  });
   assert.match(SavedDataViewManager.formatBody(saved), /"episode": 1/);
   assert.equal(SavedDataViewManager.getImportErrorMessage(new Error('bad json')), 'bad json');
   assert.equal(SavedDataViewManager.getImportErrorMessage(null), 'JSON 가져오기에 실패했습니다.');
@@ -988,6 +1030,7 @@ function run() {
   testExplorationViewManager();
   testDataBriefingViewManager();
   testReflectionViewManager();
+  testTitleViewManager();
   testEvaluationRuleConstants();
   testEvaluationManager();
   testSideEffectViewManager();

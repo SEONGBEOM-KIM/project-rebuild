@@ -28,36 +28,29 @@ export default class SavedDataScene extends Phaser.Scene {
 
     const body = SavedDataViewManager.formatBody(saved);
 
-    this.add.text(340, 245, body, {
-      fontSize: '21px',
-      color: '#dbeafe',
-      fontFamily: 'monospace',
-      lineSpacing: 5,
-      wordWrap: { width: 1240 },
-    });
+    this.add.text(340, 245, body, SavedDataViewManager.getBodyTextStyle());
 
-    this.importStatusText = this.add.text(width / 2, 865, '', {
-      fontSize: '23px',
-      color: '#fecaca',
-      align: 'center',
-    }).setOrigin(0.5);
+    this.importStatusText = this.add.text(width / 2, 865, '', SavedDataViewManager.getStatusTextStyle()).setOrigin(0.5);
 
-    const backButton = this.createButton(width / 2 - 600, 940, '제목으로', '#c4b5fd', '#1e1b4b');
+    const buttonLayout = SavedDataViewManager.getButtonLayout(width);
+    const continueButtonState = SavedDataViewManager.getContinueButtonState(saved);
+
+    const backButton = this.createButton(buttonLayout.back.x, buttonLayout.back.y, '제목으로', '#c4b5fd', '#1e1b4b');
     backButton.on('pointerdown', () => this.scene.start('TitleScene'));
 
-    const importButton = this.createButton(width / 2 - 200, 940, 'JSON 가져오기', '#bfdbfe', '#0f172a');
+    const importButton = this.createButton(buttonLayout.import.x, buttonLayout.import.y, 'JSON 가져오기', '#bfdbfe', '#0f172a');
     importButton.on('pointerdown', () => this.openImportPicker());
 
-    const continueButton = this.createButton(width / 2 + 175, 940, '이어보기', SavedDataViewManager.getContinueButtonColor(saved), '#123524');
+    const continueButton = this.createButton(buttonLayout.continue.x, buttonLayout.continue.y, '이어보기', continueButtonState.backgroundColor, continueButtonState.textColor);
     continueButton.on('pointerdown', () => {
-      if (!SavedDataViewManager.canContinue(saved)) {
+      if (!continueButtonState.canContinue) {
         return;
       }
       this.restoreSavedData(saved.data);
       this.scene.start('EndingScene');
     });
 
-    const clearButton = this.createButton(width / 2 + 560, 940, '저장 삭제', '#fecaca', '#7f1d1d');
+    const clearButton = this.createButton(buttonLayout.clear.x, buttonLayout.clear.y, '저장 삭제', '#fecaca', '#7f1d1d');
     clearButton.on('pointerdown', () => {
       SaveManager.clear();
       this.scene.restart();
