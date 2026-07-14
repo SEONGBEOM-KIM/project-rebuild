@@ -81,47 +81,63 @@ export default class PlacementScene extends Phaser.Scene {
   createUi() {
     this.uiObjects = [];
     this.cardObjects = new Map();
+    const layout = PlacementViewManager.getUiLayout();
 
-    this.createFixedRectangle(210, 540, 380, 1000, 0x111827, 0.94, 0x60a5fa);
-    this.createFixedText(40, 54, '건물 선택', { fontSize: '34px', color: '#ffffff', fontStyle: 'bold' });
-    this.createFixedText(40, 100, '샘플 3종 중 하나를 고른 뒤\n지도 위에 배치하세요.', {
+    this.createFixedRectangle(
+      layout.leftPanel.x,
+      layout.leftPanel.y,
+      layout.leftPanel.width,
+      layout.leftPanel.height,
+      layout.leftPanel.fillColor,
+      layout.leftPanel.alpha,
+      layout.leftPanel.strokeColor,
+    );
+    this.createFixedText(layout.title.x, layout.title.y, layout.title.text, { fontSize: '34px', color: '#ffffff', fontStyle: 'bold' });
+    this.createFixedText(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, {
       fontSize: '22px',
       color: '#bfdbfe',
       lineSpacing: 8,
     });
 
-    this.missionText = this.createFixedText(40, 145, '', {
+    this.missionText = this.createFixedText(layout.mission.x, layout.mission.y, '', {
       fontSize: '20px',
       color: '#fde68a',
       lineSpacing: 6,
     });
 
     buildings.forEach((building, index) => {
-      this.createBuildingCard(building, 40, 185 + index * 165);
+      this.createBuildingCard(building, layout.buildingList.x, layout.buildingList.startY + index * layout.buildingList.gapY);
     });
 
-    this.statusText = this.createFixedText(40, 690, '', {
+    this.statusText = this.createFixedText(layout.status.x, layout.status.y, '', {
       fontSize: '20px',
       color: '#f8fafc',
       lineSpacing: 8,
     });
 
-    this.cursorInfoText = this.createFixedText(40, 842, '커서 타일: 지도 위로 이동하세요.', {
+    this.cursorInfoText = this.createFixedText(layout.cursorInfo.x, layout.cursorInfo.y, layout.cursorInfo.text, {
       fontSize: '18px',
       color: '#bfdbfe',
       lineSpacing: 6,
       wordWrap: { width: 320 },
     });
 
-    this.messageText = this.createFixedText(40, 925, '아직 배치된 건물이 없습니다.', {
+    this.messageText = this.createFixedText(layout.message.x, layout.message.y, layout.message.text, {
       fontSize: '20px',
       color: '#fde68a',
       wordWrap: { width: 325 },
     });
 
-    this.continueButtonBg = this.createFixedRectangle(1615, 985, 300, 72, 0x94a3b8, 1, 0xe2e8f0)
-      .setInteractive({ useHandCursor: true });
-    this.continueButton = this.createFixedText(1615, 985, '시설 3개 더 배치', {
+    this.continueButtonBg = this.createFixedRectangle(
+      layout.continueButton.x,
+      layout.continueButton.y,
+      layout.continueButton.width,
+      layout.continueButton.height,
+      0x94a3b8,
+      1,
+      0xe2e8f0,
+    ).setInteractive({ useHandCursor: true });
+    this.continueButton = this.createFixedText(layout.continueButton.x, layout.continueButton.y, layout.continueButton.text, {
       fontSize: '30px',
       color: '#0f172a',
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
@@ -142,18 +158,35 @@ export default class PlacementScene extends Phaser.Scene {
 
   createLegend() {
     const legendItems = PlacementViewManager.getLegendItems();
+    const layout = PlacementViewManager.getUiLayout();
 
-    this.createFixedRectangle(1615, 150, 330, 190, 0x111827, 0.88, 0x475569);
-    this.createFixedText(1480, 76, '타일 범례', {
+    this.createFixedRectangle(
+      layout.legendPanel.x,
+      layout.legendPanel.y,
+      layout.legendPanel.width,
+      layout.legendPanel.height,
+      layout.legendPanel.fillColor,
+      layout.legendPanel.alpha,
+      layout.legendPanel.strokeColor,
+    );
+    this.createFixedText(layout.legendTitle.x, layout.legendTitle.y, layout.legendTitle.text, {
       fontSize: '26px',
       color: '#ffffff',
       fontStyle: 'bold',
     });
 
     legendItems.forEach((item, index) => {
-      const y = 118 + index * 34;
-      this.createFixedRectangle(1492, y + 10, 26, 20, item.color, 1, 0xffffff);
-      this.createFixedText(1520, y, `${item.label} - ${item.note}`, {
+      const y = layout.legendText.startY + index * layout.legendText.gapY;
+      this.createFixedRectangle(
+        layout.legendSwatch.x,
+        y + layout.legendSwatch.yOffset,
+        layout.legendSwatch.width,
+        layout.legendSwatch.height,
+        item.color,
+        1,
+        0xffffff,
+      );
+      this.createFixedText(layout.legendText.x, y, `${item.label} - ${item.note}`, {
         fontSize: '19px',
         color: PlacementViewManager.getLegendTextColor(item),
       });
@@ -161,63 +194,86 @@ export default class PlacementScene extends Phaser.Scene {
   }
 
   createLastChangePanel() {
-    this.createFixedRectangle(1615, 385, 330, 260, 0x111827, 0.88, 0xfde68a);
-    this.createFixedText(1478, 275, '최근 변화', {
+    const layout = PlacementViewManager.getUiLayout();
+    const emptyState = PlacementViewManager.getEmptyLastChangeState();
+
+    this.createFixedRectangle(
+      layout.lastChangePanel.x,
+      layout.lastChangePanel.y,
+      layout.lastChangePanel.width,
+      layout.lastChangePanel.height,
+      layout.lastChangePanel.fillColor,
+      layout.lastChangePanel.alpha,
+      layout.lastChangePanel.strokeColor,
+    );
+    this.createFixedText(layout.lastChangeTitle.x, layout.lastChangeTitle.y, layout.lastChangeTitle.text, {
       fontSize: '26px',
       color: '#ffffff',
       fontStyle: 'bold',
     });
-    this.lastChangeText = this.createFixedText(1478, 318, `아직 배치된 시설이 없습니다.\n건물을 배치하면 변화 수치가\n여기에 표시됩니다.`, {
+    this.lastChangeText = this.createFixedText(layout.lastChangeBody.x, layout.lastChangeBody.y, emptyState.text, {
       fontSize: '18px',
-      color: '#fde68a',
+      color: emptyState.color,
       lineSpacing: 6,
       wordWrap: { width: 270 },
     });
   }
 
   createPlacementHistoryPanel() {
-    this.createFixedRectangle(1615, 655, 330, 250, 0x111827, 0.88, 0x93c5fd);
-    this.createFixedText(1478, 545, '배치 기록', {
+    const layout = PlacementViewManager.getUiLayout();
+    const emptyState = PlacementViewManager.getEmptyPlacementHistoryState();
+
+    this.createFixedRectangle(
+      layout.historyPanel.x,
+      layout.historyPanel.y,
+      layout.historyPanel.width,
+      layout.historyPanel.height,
+      layout.historyPanel.fillColor,
+      layout.historyPanel.alpha,
+      layout.historyPanel.strokeColor,
+    );
+    this.createFixedText(layout.historyTitle.x, layout.historyTitle.y, layout.historyTitle.text, {
       fontSize: '26px',
       color: '#ffffff',
       fontStyle: 'bold',
     });
-    this.placementHistoryText = this.createFixedText(1478, 588, `아직 기록이 없습니다.\n시설을 배치하면 순서대로\n기록됩니다.`, {
+    this.placementHistoryText = this.createFixedText(layout.historyBody.x, layout.historyBody.y, emptyState.text, {
       fontSize: '18px',
-      color: '#bfdbfe',
+      color: emptyState.color,
       lineSpacing: 6,
       wordWrap: { width: 280 },
     });
   }
 
   createBuildingCard(building, x, y) {
-    const card = this.createFixedRectangle(x + 150, y + 64, 300, 146, 0x1e293b, 1, 0x475569)
+    const layout = PlacementViewManager.getBuildingCardLayout(x, y);
+    const card = this.createFixedRectangle(layout.card.x, layout.card.y, layout.card.width, layout.card.height, 0x1e293b, 1, 0x475569)
       .setInteractive({ useHandCursor: true });
-    const swatch = this.createFixedRectangle(x + 36, y + 54, 38, 38, building.color, 1, 0xffffff);
-    const title = this.createFixedText(x + 70, y + 18, building.name, {
+    const swatch = this.createFixedRectangle(layout.swatch.x, layout.swatch.y, layout.swatch.width, layout.swatch.height, building.color, 1, 0xffffff);
+    const title = this.createFixedText(layout.title.x, layout.title.y, building.name, {
       fontSize: '25px',
       color: '#ffffff',
       fontStyle: 'bold',
     });
-    const recommendationBadge = this.createRecommendationBadge(building, x + 246, y + 24);
-    const detail = this.createFixedText(x + 70, y + 52, `${building.footprint.width}×${building.footprint.height} | 비용 ${building.cost}`, {
+    const recommendationBadge = this.createRecommendationBadge(building, layout.recommendationBadge.x, layout.recommendationBadge.y);
+    const detail = this.createFixedText(layout.detail.x, layout.detail.y, PlacementViewManager.formatBuildingDetail(building), {
       fontSize: '18px',
       color: '#cbd5e1',
     });
-    const description = this.createFixedText(x + 24, y + 78, building.description, {
+    const description = this.createFixedText(layout.description.x, layout.description.y, building.description, {
       fontSize: '15px',
       color: '#bae6fd',
-      wordWrap: { width: 255 },
+      wordWrap: { width: layout.description.wrapWidth },
     });
-    const placementHint = this.createFixedText(x + 24, y + 112, `조건: ${building.placementHint}`, {
+    const placementHint = this.createFixedText(layout.placementHint.x, layout.placementHint.y, PlacementViewManager.formatPlacementHint(building), {
       fontSize: '14px',
       color: '#fef3c7',
-      wordWrap: { width: 265 },
+      wordWrap: { width: layout.placementHint.wrapWidth },
     });
-    const effect = this.createFixedText(x + 24, y + 142, formatEffect(building.effect), {
+    const effect = this.createFixedText(layout.effect.x, layout.effect.y, formatEffect(building.effect), {
       fontSize: '14px',
       color: '#fde68a',
-      wordWrap: { width: 265 },
+      wordWrap: { width: layout.effect.wrapWidth },
     });
 
     const selectBuilding = () => {

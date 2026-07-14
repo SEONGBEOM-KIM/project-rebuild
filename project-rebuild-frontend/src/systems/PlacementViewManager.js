@@ -51,7 +51,68 @@ export const PREVIEW_STYLES = {
   },
 };
 
+
+export const PLACEMENT_UI_LAYOUT = {
+  leftPanel: { x: 210, y: 540, width: 380, height: 1000, fillColor: 0x111827, alpha: 0.94, strokeColor: 0x60a5fa },
+  title: { x: 40, y: 54, text: '건물 선택' },
+  subtitle: { x: 40, y: 100, text: '샘플 3종 중 하나를 고른 뒤\n지도 위에 배치하세요.' },
+  mission: { x: 40, y: 145 },
+  buildingList: { x: 40, startY: 185, gapY: 165 },
+  status: { x: 40, y: 690 },
+  cursorInfo: { x: 40, y: 842, text: '커서 타일: 지도 위로 이동하세요.' },
+  message: { x: 40, y: 925, text: '아직 배치된 건물이 없습니다.' },
+  continueButton: { x: 1615, y: 985, width: 300, height: 72, text: '시설 3개 더 배치' },
+  legendPanel: { x: 1615, y: 150, width: 330, height: 190, fillColor: 0x111827, alpha: 0.88, strokeColor: 0x475569 },
+  legendTitle: { x: 1480, y: 76, text: '타일 범례' },
+  legendSwatch: { x: 1492, yOffset: 10, width: 26, height: 20 },
+  legendText: { x: 1520, startY: 118, gapY: 34 },
+  lastChangePanel: { x: 1615, y: 385, width: 330, height: 260, fillColor: 0x111827, alpha: 0.88, strokeColor: 0xfde68a },
+  lastChangeTitle: { x: 1478, y: 275, text: '최근 변화' },
+  lastChangeBody: { x: 1478, y: 318 },
+  historyPanel: { x: 1615, y: 655, width: 330, height: 250, fillColor: 0x111827, alpha: 0.88, strokeColor: 0x93c5fd },
+  historyTitle: { x: 1478, y: 545, text: '배치 기록' },
+  historyBody: { x: 1478, y: 588 },
+};
+
+export const BUILDING_CARD_LAYOUT = {
+  card: { offsetX: 150, offsetY: 64, width: 300, height: 146 },
+  swatch: { offsetX: 36, offsetY: 54, width: 38, height: 38 },
+  title: { offsetX: 70, offsetY: 18 },
+  recommendationBadge: { offsetX: 246, offsetY: 24 },
+  detail: { offsetX: 70, offsetY: 52 },
+  description: { offsetX: 24, offsetY: 78, wrapWidth: 255 },
+  placementHint: { offsetX: 24, offsetY: 112, wrapWidth: 265 },
+  effect: { offsetX: 24, offsetY: 142, wrapWidth: 265 },
+};
+
 export default class PlacementViewManager {
+
+
+  static getUiLayout() {
+    return PLACEMENT_UI_LAYOUT;
+  }
+
+  static getBuildingCardLayout(x, y) {
+    const layout = BUILDING_CARD_LAYOUT;
+    return {
+      card: { ...layout.card, x: x + layout.card.offsetX, y: y + layout.card.offsetY },
+      swatch: { ...layout.swatch, x: x + layout.swatch.offsetX, y: y + layout.swatch.offsetY },
+      title: { ...layout.title, x: x + layout.title.offsetX, y: y + layout.title.offsetY },
+      recommendationBadge: { ...layout.recommendationBadge, x: x + layout.recommendationBadge.offsetX, y: y + layout.recommendationBadge.offsetY },
+      detail: { ...layout.detail, x: x + layout.detail.offsetX, y: y + layout.detail.offsetY },
+      description: { ...layout.description, x: x + layout.description.offsetX, y: y + layout.description.offsetY },
+      placementHint: { ...layout.placementHint, x: x + layout.placementHint.offsetX, y: y + layout.placementHint.offsetY },
+      effect: { ...layout.effect, x: x + layout.effect.offsetX, y: y + layout.effect.offsetY },
+    };
+  }
+
+  static formatBuildingDetail(building) {
+    return `${building.footprint.width}×${building.footprint.height} | 비용 ${building.cost}`;
+  }
+
+  static formatPlacementHint(building) {
+    return `조건: ${building.placementHint}`;
+  }
 
   static getTileRenderStyle(tile) {
     return {

@@ -25,7 +25,7 @@ import ApiPayloadViewManager from '../src/systems/ApiPayloadViewManager.js';
 import MockApiClient, { MOCK_SUBMISSION_LOG_STORAGE_KEY } from '../src/systems/MockApiClient.js';
 import MockSubmissionLogViewManager from '../src/systems/MockSubmissionLogViewManager.js';
 import PlacementSystem from '../src/systems/PlacementSystem.js';
-import PlacementViewManager, { TILE_COLORS, TILE_STROKES, TILE_LABELS, ZONE_LABELS, REQUIRED_PLACEMENTS, PLACEMENT_DRAG_THRESHOLD, PLACEMENT_UI_BOUNDS, PREVIEW_STYLES } from '../src/systems/PlacementViewManager.js';
+import PlacementViewManager, { TILE_COLORS, TILE_STROKES, TILE_LABELS, ZONE_LABELS, REQUIRED_PLACEMENTS, PLACEMENT_DRAG_THRESHOLD, PLACEMENT_UI_BOUNDS, PREVIEW_STYLES, PLACEMENT_UI_LAYOUT, BUILDING_CARD_LAYOUT } from '../src/systems/PlacementViewManager.js';
 import SaveManager, { LEARNING_SAVE_STORAGE_KEY } from '../src/systems/SaveManager.js';
 import SavedDataViewManager from '../src/systems/SavedDataViewManager.js';
 import StorageSummaryManager from '../src/systems/StorageSummaryManager.js';
@@ -598,6 +598,8 @@ function testPlacementViewManager() {
   assert.equal(PLACEMENT_DRAG_THRESHOLD, 8);
   assert.equal(PLACEMENT_UI_BOUNDS.leftPanelRight, 430);
   assert.equal(PREVIEW_STYLES.valid.fillColor, 0x22c55e);
+  assert.equal(PLACEMENT_UI_LAYOUT.title.text, '건물 선택');
+  assert.equal(BUILDING_CARD_LAYOUT.card.width, 300);
   assert.equal(TILE_COLORS.empty, 0x2f855a);
   assert.equal(TILE_STROKES.buildable, 0x86efac);
   assert.equal(TILE_LABELS.river, '강');
@@ -620,6 +622,15 @@ function testPlacementViewManager() {
   assert.equal(PlacementViewManager.formatMapSelectMessage(), '지도 안쪽 타일을 선택하세요.');
   assert.equal(PlacementViewManager.formatInvalidPlacementMessage('도로 위입니다'), '배치 불가: 도로 위입니다');
   assert.equal(PlacementViewManager.formatBuildingSelectedMessage('청년센터'), '청년센터 선택됨');
+  assert.equal(PlacementViewManager.getUiLayout().legendTitle.text, '타일 범례');
+  assert.deepEqual(PlacementViewManager.getBuildingCardLayout(40, 185).card, {
+    ...BUILDING_CARD_LAYOUT.card,
+    x: 190,
+    y: 249,
+  });
+  assert.equal(PlacementViewManager.getBuildingCardLayout(40, 185).description.wrapWidth, 255);
+  assert.equal(PlacementViewManager.formatBuildingDetail(buildings.find((building) => building.id === 'youth_center')), '2×2 | 비용 180');
+  assert.match(PlacementViewManager.formatPlacementHint(buildings.find((building) => building.id === 'bus_station')), /^조건:/);
   assert.deepEqual(PlacementViewManager.formatCursorInfo(null), {
     text: '커서 타일: 지도 밖 또는 UI 영역',
     color: '#bfdbfe',
