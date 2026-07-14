@@ -28,6 +28,28 @@ export const ZONE_LABELS = {
 };
 
 export const REQUIRED_PLACEMENTS = 3;
+export const PLACEMENT_DRAG_THRESHOLD = 8;
+
+export const PLACEMENT_UI_BOUNDS = {
+  leftPanelRight: 430,
+  topBarBottom: 98,
+  bottomUiTop: 930,
+};
+
+export const PREVIEW_STYLES = {
+  valid: {
+    fillColor: 0x22c55e,
+    fillAlpha: 0.45,
+    strokeColor: 0xbbf7d0,
+    strokeWidth: 3,
+  },
+  invalid: {
+    fillColor: 0xef4444,
+    fillAlpha: 0.45,
+    strokeColor: 0xfecaca,
+    strokeWidth: 3,
+  },
+};
 
 export default class PlacementViewManager {
 
@@ -63,6 +85,30 @@ export default class PlacementViewManager {
       return { icon: '＋', label: '지역 활력', color: 0x38bdf8 };
     }
     return { icon: '✓', label: '시설 효과', color: 0x93c5fd };
+  }
+
+  static getPreviewStyle(validation) {
+    return validation.valid ? PREVIEW_STYLES.valid : PREVIEW_STYLES.invalid;
+  }
+
+  static isDragPlacementCandidate(dragDistance, sameTile, threshold = PLACEMENT_DRAG_THRESHOLD) {
+    return dragDistance <= threshold && Boolean(sameTile);
+  }
+
+  static isPointerOnUi(pointer, bounds = PLACEMENT_UI_BOUNDS) {
+    return pointer.x < bounds.leftPanelRight || pointer.y < bounds.topBarBottom || pointer.y > bounds.bottomUiTop;
+  }
+
+  static formatMapSelectMessage() {
+    return '지도 안쪽 타일을 선택하세요.';
+  }
+
+  static formatInvalidPlacementMessage(reason) {
+    return `배치 불가: ${reason}`;
+  }
+
+  static formatBuildingSelectedMessage(buildingName) {
+    return `${buildingName} 선택됨`;
   }
 
   static formatCursorInfo(tile, mapTile, validation, tileLabels, zoneLabels) {

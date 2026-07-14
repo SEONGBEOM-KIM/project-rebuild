@@ -25,7 +25,7 @@ import ApiPayloadViewManager from '../src/systems/ApiPayloadViewManager.js';
 import MockApiClient, { MOCK_SUBMISSION_LOG_STORAGE_KEY } from '../src/systems/MockApiClient.js';
 import MockSubmissionLogViewManager from '../src/systems/MockSubmissionLogViewManager.js';
 import PlacementSystem from '../src/systems/PlacementSystem.js';
-import PlacementViewManager, { TILE_COLORS, TILE_STROKES, TILE_LABELS, ZONE_LABELS, REQUIRED_PLACEMENTS } from '../src/systems/PlacementViewManager.js';
+import PlacementViewManager, { TILE_COLORS, TILE_STROKES, TILE_LABELS, ZONE_LABELS, REQUIRED_PLACEMENTS, PLACEMENT_DRAG_THRESHOLD, PLACEMENT_UI_BOUNDS, PREVIEW_STYLES } from '../src/systems/PlacementViewManager.js';
 import SaveManager, { LEARNING_SAVE_STORAGE_KEY } from '../src/systems/SaveManager.js';
 import SavedDataViewManager from '../src/systems/SavedDataViewManager.js';
 import StorageSummaryManager from '../src/systems/StorageSummaryManager.js';
@@ -595,6 +595,9 @@ function testMapData() {
 
 function testPlacementViewManager() {
   assert.equal(REQUIRED_PLACEMENTS, 3);
+  assert.equal(PLACEMENT_DRAG_THRESHOLD, 8);
+  assert.equal(PLACEMENT_UI_BOUNDS.leftPanelRight, 430);
+  assert.equal(PREVIEW_STYLES.valid.fillColor, 0x22c55e);
   assert.equal(TILE_COLORS.empty, 0x2f855a);
   assert.equal(TILE_STROKES.buildable, 0x86efac);
   assert.equal(TILE_LABELS.river, '강');
@@ -606,6 +609,17 @@ function testPlacementViewManager() {
   assert.equal(PlacementViewManager.getLegendItems().length, 4);
   assert.equal(PlacementViewManager.getLegendTextColor({ note: '배치 가능' }), '#bbf7d0');
   assert.equal(PlacementViewManager.getLegendTextColor({ note: '배치 불가' }), '#fecaca');
+  assert.equal(PlacementViewManager.getPreviewStyle({ valid: true }).strokeColor, 0xbbf7d0);
+  assert.equal(PlacementViewManager.getPreviewStyle({ valid: false }).strokeColor, 0xfecaca);
+  assert.equal(PlacementViewManager.isDragPlacementCandidate(8, true), true);
+  assert.equal(PlacementViewManager.isDragPlacementCandidate(9, true), false);
+  assert.equal(PlacementViewManager.isDragPlacementCandidate(0, false), false);
+  assert.equal(PlacementViewManager.isPointerOnUi({ x: 429, y: 200 }), true);
+  assert.equal(PlacementViewManager.isPointerOnUi({ x: 500, y: 97 }), true);
+  assert.equal(PlacementViewManager.isPointerOnUi({ x: 500, y: 500 }), false);
+  assert.equal(PlacementViewManager.formatMapSelectMessage(), '지도 안쪽 타일을 선택하세요.');
+  assert.equal(PlacementViewManager.formatInvalidPlacementMessage('도로 위입니다'), '배치 불가: 도로 위입니다');
+  assert.equal(PlacementViewManager.formatBuildingSelectedMessage('청년센터'), '청년센터 선택됨');
   assert.deepEqual(PlacementViewManager.formatCursorInfo(null), {
     text: '커서 타일: 지도 밖 또는 UI 영역',
     color: '#bfdbfe',

@@ -8,7 +8,7 @@ import CameraController from '../systems/CameraController.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import { formatEffect } from '../data/stateLabels.js';
 import PlacementViewManager from '../systems/PlacementViewManager.js';
-import { TILE_LABELS, ZONE_LABELS, REQUIRED_PLACEMENTS } from '../systems/PlacementViewManager.js';
+import { TILE_LABELS, ZONE_LABELS, REQUIRED_PLACEMENTS, PLACEMENT_DRAG_THRESHOLD } from '../systems/PlacementViewManager.js';
 
 export default class PlacementScene extends Phaser.Scene {
   constructor() {
@@ -74,7 +74,7 @@ export default class PlacementScene extends Phaser.Scene {
       minZoom: 0.8,
       maxZoom: 2.2,
       bounds,
-      ignoreDrag: (pointer) => this.isPointerOnUi(pointer),
+      ignoreDrag: (pointer) => PlacementViewManager.isPointerOnUi(pointer),
     }).enable();
   }
 
@@ -223,7 +223,7 @@ export default class PlacementScene extends Phaser.Scene {
     const selectBuilding = () => {
       this.selectedBuilding = building;
       this.updateSelectedBuildingUi();
-      this.showMessage(`${building.name} 선택됨`, '#bbf7d0');
+      this.showMessage(PlacementViewManager.formatBuildingSelectedMessage(building.name), '#bbf7d0');
     };
 
     card.on('pointerdown', selectBuilding);
@@ -288,7 +288,7 @@ export default class PlacementScene extends Phaser.Scene {
 
   registerPlacementInput() {
     this.input.on('pointermove', (pointer) => {
-      if (this.isPointerOnUi(pointer)) {
+      if (PlacementViewManager.isPointerOnUi(pointer)) {
         this.previewGraphics.clear();
         return;
       }
@@ -296,7 +296,7 @@ export default class PlacementScene extends Phaser.Scene {
     });
 
     this.input.on('pointerdown', (pointer, gameObjects) => {
-      if (gameObjects.length > 0 || this.isPointerOnUi(pointer)) {
+      if (gameObjects.length > 0 || PlacementViewManager.isPointerOnUi(pointer)) {
         this.pendingPlacementPointer = null;
         return;
       }
@@ -309,7 +309,7 @@ export default class PlacementScene extends Phaser.Scene {
     });
 
     this.input.on('pointerup', (pointer, gameObjects) => {
-      if (!this.pendingPlacementPointer || gameObjects.length > 0 || this.isPointerOnUi(pointer)) {
+      if (!this.pendingPlacementPointer || gameObjects.length > 0 || PlacementViewManager.isPointerOnUi(pointer)) {
         this.pendingPlacementPointer = null;
         return;
       }
@@ -328,7 +328,7 @@ export default class PlacementScene extends Phaser.Scene {
 
       this.pendingPlacementPointer = null;
 
-      if (dragDistance > 8 || !sameTile) {
+      if (!PlacementViewManager.isDragPlacementCandidate(dragDistance, sameTile, PLACEMENT_DRAG_THRESHOLD)) {
         return;
       }
 
@@ -345,11 +345,18 @@ export default class PlacementScene extends Phaser.Scene {
     }
 
     const validation = this.placementSystem.validatePlacement(tile.x, tile.y, this.selectedBuilding);
-    const color = validation.valid ? 0x22c55e : 0xef4444;
-    const stroke = validation.valid ? 0xbbf7d0 : 0xfecaca;
+    const previewStyle = PlacementViewManager.getPreviewStyle(validation);
 
     for (const footprintTile of validation.footprintTiles) {
-      this.drawDiamond(this.previewGraphics, footprintTile.x, footprintTile.y, color, 0.45, stroke, 3);
+      this.drawDiamond(
+        this.previewGraphics,
+        footprintTile.x,
+        footprintTile.y,
+        previewStyle.fillColor,
+        previewStyle.fillAlpha,
+        previewStyle.strokeColor,
+        previewStyle.strokeWidth,
+      );
     }
 
     this.updateCursorInfo(tile, validation);
@@ -358,13 +365,13 @@ export default class PlacementScene extends Phaser.Scene {
   tryPlace(pointer) {
     const tile = this.pointerToTile(pointer);
     if (!tile) {
-      this.showMessage('지도 안쪽 타일을 선택하세요.', '#fecaca');
+      this.showMessage(PlacementViewManager.formatMapSelectMessage(), '#fecaca');
       return;
     }
 
     const validation = this.placementSystem.validatePlacement(tile.x, tile.y, this.selectedBuilding);
     if (!validation.valid) {
-      this.showMessage(`배치 불가: ${validation.reason}`, '#fecaca');
+      this.showMessage(PlacementViewManager.formatInvalidPlacementMessage(validation.reason), '#fecaca');
       this.updateCursorInfo(tile, validation);
       return;
     }
@@ -587,7 +594,4 @@ export default class PlacementScene extends Phaser.Scene {
     this.messageText.setColor(color);
   }
 
-  isPointerOnUi(pointer) {
-    return pointer.x < 430 || pointer.y < 98 || pointer.y > 930;
-  }
 }
