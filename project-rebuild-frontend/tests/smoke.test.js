@@ -586,6 +586,22 @@ function testPlacementRules() {
 
 
 function testEndingSummaryManager() {
+  const panels = EndingSummaryManager.getPanelLayout();
+  assert.equal(panels.choice.title, '오늘의 선택 요약');
+  assert.equal(panels.nextMission.width, 360);
+  assert.deepEqual(EndingSummaryManager.getPanelTitlePosition(panels.choice), { x: 430, y: 195 });
+  assert.deepEqual(EndingSummaryManager.getPanelBodyPosition(panels.choice), { x: 175, y: 255 });
+  assert.equal(EndingSummaryManager.getPanelBodyStyle(panels.choice).wordWrap.width, 510);
+  assert.equal(EndingSummaryManager.getNextMissionBodyStyle(panels.nextMission).wordWrap.width, 296);
+  assert.deepEqual(EndingSummaryManager.getLearningRecordLayout(960).title, { x: 170, y: 737 });
+  assert.deepEqual(EndingSummaryManager.getControlLayout(960).restart, {
+    x: 1480,
+    y: 955,
+    label: '처음부터 다시',
+    target: 'BootScene',
+    backgroundColor: '#fde68a',
+  });
+
   const placedBuildings = [
     createPlacementRecord('youth_center'),
     createPlacementRecord('bus_station', { x: 3, y: 2 }),

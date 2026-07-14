@@ -33,42 +33,30 @@ export default class EndingScene extends Phaser.Scene {
       color: '#bfdbfe',
     }).setOrigin(0.5);
 
-    this.drawPanel(430, 430, 600, 560, '오늘의 선택 요약', EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings));
-    this.drawPanel(1110, 430, 600, 560, '지역 상태 요약', EndingSummaryManager.formatStateSummary(gameState, ending));
-    this.drawNextMissionPanel(1585, 430, 360, 560);
-    this.drawLearningRecordStrip(width / 2, 785, learningProgress, exploredPlaces, quizResult, reflectionChoice);
-
-    const retry = this.createButton(width / 2 - 520, 955, '배치 다시 조정', '#c4b5fd');
-    retry.on('pointerdown', () => this.scene.start('PlacementScene'));
-
-    const reportButton = this.createButton(width / 2 - 175, 955, '교사용 요약', '#93c5fd');
-    reportButton.on('pointerdown', () => this.scene.start('TeacherReportScene'));
-
-    const dataButton = this.createButton(width / 2 + 175, 955, '학습 데이터 보기', '#bbf7d0');
-    dataButton.on('pointerdown', () => this.scene.start('LearningDataScene'));
-
-    const restart = this.createButton(width / 2 + 520, 955, '처음부터 다시', '#fde68a');
-    restart.on('pointerdown', () => this.scene.start('BootScene'));
+    const panels = EndingSummaryManager.getPanelLayout();
+    this.drawPanel(panels.choice, EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings));
+    this.drawPanel(panels.state, EndingSummaryManager.formatStateSummary(gameState, ending));
+    this.drawNextMissionPanel(panels.nextMission);
+    this.drawLearningRecordStrip(width / 2, learningProgress, exploredPlaces, quizResult, reflectionChoice);
+    this.drawControls(width / 2);
   }
 
-  drawPanel(x, y, width, height, title, body) {
-    this.add.rectangle(x, y, width, height, 0xffffff, 0.96).setStrokeStyle(4, 0x60a5fa);
-    this.add.text(x, y - height / 2 + 45, title, {
+  drawPanel(panel, body) {
+    this.add.rectangle(panel.x, panel.y, panel.width, panel.height, 0xffffff, 0.96).setStrokeStyle(4, 0x60a5fa);
+    const titlePosition = EndingSummaryManager.getPanelTitlePosition(panel);
+    this.add.text(titlePosition.x, titlePosition.y, panel.title, {
       fontSize: '34px',
       color: '#172554',
       fontStyle: 'bold',
     }).setOrigin(0.5);
-    this.add.text(x - width / 2 + 45, y - height / 2 + 105, body, {
-      fontSize: '23px',
-      color: '#1e293b',
-      lineSpacing: 9,
-      wordWrap: { width: width - 90 },
-    });
+    const bodyPosition = EndingSummaryManager.getPanelBodyPosition(panel);
+    this.add.text(bodyPosition.x, bodyPosition.y, body, EndingSummaryManager.getPanelBodyStyle(panel));
   }
 
-  drawLearningRecordStrip(x, y, learningProgress, exploredPlaces, quizResult, reflectionChoice) {
-    this.add.rectangle(x, y, 1660, 140, 0x1e293b, 0.96).setStrokeStyle(4, 0xfde68a);
-    this.add.text(x - 790, y - 48, '학습 기록', {
+  drawLearningRecordStrip(centerX, learningProgress, exploredPlaces, quizResult, reflectionChoice) {
+    const layout = EndingSummaryManager.getLearningRecordLayout(centerX);
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0x1e293b, 0.96).setStrokeStyle(4, 0xfde68a);
+    this.add.text(layout.title.x, layout.title.y, '학습 기록', {
       fontSize: '28px',
       color: '#fde68a',
       fontStyle: 'bold',
@@ -76,27 +64,32 @@ export default class EndingScene extends Phaser.Scene {
 
     const rows = EndingSummaryManager.formatLearningRecordRows(learningProgress, exploredPlaces, quizResult, reflectionChoice);
 
-    this.add.text(x - 620, y - 50, rows.join('\n'), {
+    this.add.text(layout.body.x, layout.body.y, rows.join('\n'), {
       fontSize: '22px',
       color: '#ffffff',
       lineSpacing: 9,
-      wordWrap: { width: 1410 },
+      wordWrap: { width: layout.body.wordWrapWidth },
     });
   }
 
-  drawNextMissionPanel(x, y, width, height) {
-    this.add.rectangle(x, y, width, height, 0x1e293b, 0.98).setStrokeStyle(4, 0xbbf7d0);
-    this.add.text(x, y - height / 2 + 45, '다음 개발 목표', {
+  drawNextMissionPanel(panel) {
+    this.add.rectangle(panel.x, panel.y, panel.width, panel.height, 0x1e293b, 0.98).setStrokeStyle(4, 0xbbf7d0);
+    const titlePosition = EndingSummaryManager.getPanelTitlePosition(panel);
+    this.add.text(titlePosition.x, titlePosition.y, panel.title, {
       fontSize: '32px',
       color: '#ffffff',
       fontStyle: 'bold',
     }).setOrigin(0.5);
 
-    this.add.text(x - width / 2 + 32, y - height / 2 + 108, EP1_NEXT_DEVELOPMENT_GOALS.join('\n'), {
-      fontSize: '22px',
-      color: '#dbeafe',
-      lineSpacing: 11,
-      wordWrap: { width: width - 64 },
+    const bodyPosition = EndingSummaryManager.getPanelBodyPosition(panel, 32, 108);
+    this.add.text(bodyPosition.x, bodyPosition.y, EP1_NEXT_DEVELOPMENT_GOALS.join('\n'), EndingSummaryManager.getNextMissionBodyStyle(panel));
+  }
+
+  drawControls(centerX) {
+    const controls = EndingSummaryManager.getControlLayout(centerX);
+    Object.values(controls).forEach((control) => {
+      const button = this.createButton(control.x, control.y, control.label, control.backgroundColor);
+      button.on('pointerdown', () => this.scene.start(control.target));
     });
   }
 

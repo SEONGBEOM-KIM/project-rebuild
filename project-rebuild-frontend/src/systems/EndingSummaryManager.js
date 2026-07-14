@@ -4,6 +4,63 @@ import { RESULT_THRESHOLDS } from '../data/evaluationRules.js';
 import IssueDetector from './IssueDetector.js';
 
 export default class EndingSummaryManager {
+  static getPanelLayout() {
+    return {
+      choice: { x: 430, y: 430, width: 600, height: 560, title: '오늘의 선택 요약' },
+      state: { x: 1110, y: 430, width: 600, height: 560, title: '지역 상태 요약' },
+      nextMission: { x: 1585, y: 430, width: 360, height: 560, title: '다음 개발 목표' },
+    };
+  }
+
+  static getPanelTitlePosition(panel) {
+    return {
+      x: panel.x,
+      y: panel.y - panel.height / 2 + 45,
+    };
+  }
+
+  static getPanelBodyPosition(panel, xPadding = 45, yOffset = 105) {
+    return {
+      x: panel.x - panel.width / 2 + xPadding,
+      y: panel.y - panel.height / 2 + yOffset,
+    };
+  }
+
+  static getPanelBodyStyle(panel) {
+    return {
+      fontSize: '23px',
+      color: '#1e293b',
+      lineSpacing: 9,
+      wordWrap: { width: panel.width - 90 },
+    };
+  }
+
+  static getNextMissionBodyStyle(panel) {
+    return {
+      fontSize: '22px',
+      color: '#dbeafe',
+      lineSpacing: 11,
+      wordWrap: { width: panel.width - 64 },
+    };
+  }
+
+  static getLearningRecordLayout(centerX) {
+    return {
+      panel: { x: centerX, y: 785, width: 1660, height: 140 },
+      title: { x: centerX - 790, y: 737 },
+      body: { x: centerX - 620, y: 735, wordWrapWidth: 1410 },
+    };
+  }
+
+  static getControlLayout(centerX) {
+    return {
+      retry: { x: centerX - 520, y: 955, label: '배치 다시 조정', target: 'PlacementScene', backgroundColor: '#c4b5fd' },
+      report: { x: centerX - 175, y: 955, label: '교사용 요약', target: 'TeacherReportScene', backgroundColor: '#93c5fd' },
+      data: { x: centerX + 175, y: 955, label: '학습 데이터 보기', target: 'LearningDataScene', backgroundColor: '#bbf7d0' },
+      restart: { x: centerX + 520, y: 955, label: '처음부터 다시', target: 'BootScene', backgroundColor: '#fde68a' },
+    };
+  }
+
   static getEndingSummary(gameState, placedBuildings) {
     const uniqueBuildingTypes = new Set(placedBuildings.map((record) => record.building.id)).size;
     const balanced = uniqueBuildingTypes >= RESULT_THRESHOLDS.balancedMinimumBuildingTypes
