@@ -1,6 +1,74 @@
 import LearningDataManager from './LearningDataManager.js';
 
 export default class LearningDataViewManager {
+  static getDataPanelLayout() {
+    return {
+      panel: { x: 760, y: 560, width: 1120, height: 720, strokeColor: 0x60a5fa },
+      title: { x: 240, y: 235 },
+      body: { x: 245, y: 290, wordWrapWidth: 1030 },
+    };
+  }
+
+  static getValidationPanelLayout() {
+    return {
+      panel: { x: 1550, y: 560, width: 500, height: 720, strokeColor: 0xfde68a },
+      title: { x: 1550, y: 235 },
+      rows: { x: 1325, y: 290, wordWrapWidth: 440 },
+      summaryBox: { x: 1550, y: 620, width: 430, height: 190 },
+      summaryTitle: { x: 1355, y: 545 },
+      summaryBody: { x: 1355, y: 585, wordWrapWidth: 390 },
+    };
+  }
+
+  static getSavePanelLayout() {
+    return {
+      panel: { x: 1550, y: 815, width: 500, height: 150, strokeColor: 0xbbf7d0 },
+      title: { x: 1325, y: 760 },
+      body: { x: 1325, y: 800, wordWrapWidth: 440 },
+    };
+  }
+
+  static getControlLayout() {
+    return {
+      api: { x: 260, y: 960, label: 'API 미리보기', target: 'ApiPayloadScene' },
+      save: { x: 520, y: 960, label: '임시 저장' },
+      copy: { x: 760, y: 960, label: 'JSON 복사' },
+      download: { x: 1015, y: 960, label: 'JSON 다운로드' },
+      clear: { x: 1275, y: 960, label: '저장 삭제' },
+      ending: { x: 1545, y: 960, label: '마무리로', target: 'EndingScene' },
+    };
+  }
+
+  static getJsonTextStyle(wordWrapWidth) {
+    return {
+      fontSize: '20px',
+      color: '#dbeafe',
+      fontFamily: 'monospace',
+      lineSpacing: 4,
+      wordWrap: { width: wordWrapWidth },
+    };
+  }
+
+  static formatSaveCleared() {
+    return '저장된 학습 데이터를 삭제했습니다.';
+  }
+
+  static formatCopySuccess() {
+    return 'JSON을 클립보드에 복사했습니다.';
+  }
+
+  static formatCopyFailure() {
+    return '클립보드 복사에 실패했습니다. 브라우저 권한을 확인하세요.';
+  }
+
+  static formatDownloadSuccess() {
+    return 'JSON 다운로드를 시작했습니다.';
+  }
+
+  static formatDownloadFileName(learningData) {
+    return `project-rebuild-ep${learningData.episode}-learning-data.json`;
+  }
+
   static formatJson(learningData) {
     return JSON.stringify(learningData, null, 2);
   }

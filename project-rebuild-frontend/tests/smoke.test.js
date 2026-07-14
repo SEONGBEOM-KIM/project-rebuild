@@ -672,6 +672,22 @@ function testTeacherReportManager() {
 
 
 function testLearningDataViewManager() {
+  assert.equal(LearningDataViewManager.getDataPanelLayout().panel.width, 1120);
+  assert.equal(LearningDataViewManager.getValidationPanelLayout().summaryBody.wordWrapWidth, 390);
+  assert.equal(LearningDataViewManager.getSavePanelLayout().panel.height, 150);
+  assert.deepEqual(LearningDataViewManager.getControlLayout().api, {
+    x: 260,
+    y: 960,
+    label: 'API 미리보기',
+    target: 'ApiPayloadScene',
+  });
+  assert.equal(LearningDataViewManager.getJsonTextStyle(1030).fontFamily, 'monospace');
+  assert.equal(LearningDataViewManager.formatSaveCleared(), '저장된 학습 데이터를 삭제했습니다.');
+  assert.match(LearningDataViewManager.formatCopySuccess(), /클립보드/);
+  assert.match(LearningDataViewManager.formatCopyFailure(), /권한/);
+  assert.match(LearningDataViewManager.formatDownloadSuccess(), /다운로드/);
+  assert.equal(LearningDataViewManager.formatDownloadFileName({ episode: 1 }), 'project-rebuild-ep1-learning-data.json');
+
   const completeData = createCompleteLearningData({
     placements: [
       { buildingId: 'youth_center', buildingName: '청년센터', position: { x: 1, y: 1 }, effect: { population: 80, budget: -180 } },

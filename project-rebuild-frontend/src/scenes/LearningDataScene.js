@@ -39,105 +39,111 @@ export default class LearningDataScene extends Phaser.Scene {
     return LearningDataManager.build(this.registry);
   }
 
-  drawDataPanel(learningData) {
-    this.add.rectangle(760, 560, 1120, 720, 0x111827, 0.98).setStrokeStyle(5, 0x60a5fa);
-    this.add.text(240, 235, '저장 후보 데이터', {
+  drawDataPanel(_learningData) {
+    const layout = LearningDataViewManager.getDataPanelLayout();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0x111827, 0.98)
+      .setStrokeStyle(5, layout.panel.strokeColor);
+    this.add.text(layout.title.x, layout.title.y, '저장 후보 데이터', {
       fontSize: '34px',
       color: '#ffffff',
       fontStyle: 'bold',
     });
 
-    this.add.text(245, 290, this.learningDataJson, {
-      fontSize: '20px',
-      color: '#dbeafe',
-      fontFamily: 'monospace',
-      lineSpacing: 4,
-      wordWrap: { width: 1030 },
-    });
+    this.add.text(
+      layout.body.x,
+      layout.body.y,
+      this.learningDataJson,
+      LearningDataViewManager.getJsonTextStyle(layout.body.wordWrapWidth),
+    );
   }
 
   drawValidationPanel(learningData) {
-    this.add.rectangle(1550, 560, 500, 720, 0xffffff, 0.96).setStrokeStyle(5, 0xfde68a);
-    this.add.text(1550, 235, '데이터 검증', {
+    const layout = LearningDataViewManager.getValidationPanelLayout();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0xffffff, 0.96)
+      .setStrokeStyle(5, layout.panel.strokeColor);
+    this.add.text(layout.title.x, layout.title.y, '데이터 검증', {
       fontSize: '34px',
       color: '#172554',
       fontStyle: 'bold',
     }).setOrigin(0.5);
 
     const summary = LearningDataViewManager.getValidationSummary(learningData);
-    this.add.text(1325, 290, LearningDataViewManager.formatValidationRows(summary.rows), {
+    this.add.text(layout.rows.x, layout.rows.y, LearningDataViewManager.formatValidationRows(summary.rows), {
       fontSize: '21px',
       color: '#1e293b',
       lineSpacing: 9,
-      wordWrap: { width: 440 },
+      wordWrap: { width: layout.rows.wordWrapWidth },
     });
 
-    this.add.rectangle(1550, 620, 430, 190, summary.backgroundColor, 1)
+    this.add.rectangle(layout.summaryBox.x, layout.summaryBox.y, layout.summaryBox.width, layout.summaryBox.height, summary.backgroundColor, 1)
       .setStrokeStyle(3, summary.strokeColor);
-    this.add.text(1355, 545, summary.title, {
+    this.add.text(layout.summaryTitle.x, layout.summaryTitle.y, summary.title, {
       fontSize: '24px',
       color: summary.titleColor,
       fontStyle: 'bold',
     });
-    this.add.text(1355, 585, summary.body, {
+    this.add.text(layout.summaryBody.x, layout.summaryBody.y, summary.body, {
       fontSize: '20px',
       color: summary.bodyColor,
       lineSpacing: 8,
-      wordWrap: { width: 390 },
+      wordWrap: { width: layout.summaryBody.wordWrapWidth },
     });
   }
 
   drawSavePanel() {
     const saved = SaveManager.load();
-    this.add.rectangle(1550, 815, 500, 150, 0x1e293b, 0.98).setStrokeStyle(4, 0xbbf7d0);
-    this.add.text(1325, 760, '임시 저장 상태', {
+    const layout = LearningDataViewManager.getSavePanelLayout();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0x1e293b, 0.98)
+      .setStrokeStyle(4, layout.panel.strokeColor);
+    this.add.text(layout.title.x, layout.title.y, '임시 저장 상태', {
       fontSize: '25px',
       color: '#ffffff',
       fontStyle: 'bold',
     });
-    this.saveStatusText = this.add.text(1325, 800, LearningDataViewManager.formatSaveStatus(saved), {
+    this.saveStatusText = this.add.text(layout.body.x, layout.body.y, LearningDataViewManager.formatSaveStatus(saved), {
       fontSize: '20px',
       color: '#dbeafe',
       lineSpacing: 8,
-      wordWrap: { width: 440 },
+      wordWrap: { width: layout.body.wordWrapWidth },
     });
   }
 
   drawControls() {
-    const apiButton = this.createButton(260, 960, 'API 미리보기', '#fde68a', '#0f172a');
-    apiButton.on('pointerdown', () => this.scene.start('ApiPayloadScene'));
+    const layout = LearningDataViewManager.getControlLayout();
+    const apiButton = this.createButton(layout.api.x, layout.api.y, layout.api.label, '#fde68a', '#0f172a');
+    apiButton.on('pointerdown', () => this.scene.start(layout.api.target));
 
-    const saveButton = this.createButton(520, 960, '임시 저장', '#bbf7d0', '#123524');
+    const saveButton = this.createButton(layout.save.x, layout.save.y, layout.save.label, '#bbf7d0', '#123524');
     saveButton.on('pointerdown', () => {
       const saved = SaveManager.save(this.learningData);
       this.saveStatusText.setText(LearningDataViewManager.formatSaveStatus(saved));
       this.saveStatusText.setColor('#bbf7d0');
     });
 
-    const copyButton = this.createButton(760, 960, 'JSON 복사', '#93c5fd', '#0f172a');
+    const copyButton = this.createButton(layout.copy.x, layout.copy.y, layout.copy.label, '#93c5fd', '#0f172a');
     copyButton.on('pointerdown', () => this.copyJsonToClipboard());
 
-    const downloadButton = this.createButton(1015, 960, 'JSON 다운로드', '#a7f3d0', '#064e3b');
+    const downloadButton = this.createButton(layout.download.x, layout.download.y, layout.download.label, '#a7f3d0', '#064e3b');
     downloadButton.on('pointerdown', () => this.downloadJson());
 
-    const clearButton = this.createButton(1275, 960, '저장 삭제', '#fecaca', '#7f1d1d');
+    const clearButton = this.createButton(layout.clear.x, layout.clear.y, layout.clear.label, '#fecaca', '#7f1d1d');
     clearButton.on('pointerdown', () => {
       SaveManager.clear();
-      this.saveStatusText.setText('저장된 학습 데이터를 삭제했습니다.');
+      this.saveStatusText.setText(LearningDataViewManager.formatSaveCleared());
       this.saveStatusText.setColor('#fecaca');
     });
 
-    const backButton = this.createButton(1545, 960, '마무리로', '#c4b5fd', '#1e1b4b');
-    backButton.on('pointerdown', () => this.scene.start('EndingScene'));
+    const backButton = this.createButton(layout.ending.x, layout.ending.y, layout.ending.label, '#c4b5fd', '#1e1b4b');
+    backButton.on('pointerdown', () => this.scene.start(layout.ending.target));
   }
 
   async copyJsonToClipboard() {
     try {
       await navigator.clipboard.writeText(this.learningDataJson);
-      this.saveStatusText.setText('JSON을 클립보드에 복사했습니다.');
+      this.saveStatusText.setText(LearningDataViewManager.formatCopySuccess());
       this.saveStatusText.setColor('#bbf7d0');
     } catch (_error) {
-      this.saveStatusText.setText('클립보드 복사에 실패했습니다. 브라우저 권한을 확인하세요.');
+      this.saveStatusText.setText(LearningDataViewManager.formatCopyFailure());
       this.saveStatusText.setColor('#fecaca');
     }
   }
@@ -147,12 +153,12 @@ export default class LearningDataScene extends Phaser.Scene {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `project-rebuild-ep${this.learningData.episode}-learning-data.json`;
+    link.download = LearningDataViewManager.formatDownloadFileName(this.learningData);
     document.body.appendChild(link);
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
-    this.saveStatusText.setText('JSON 다운로드를 시작했습니다.');
+    this.saveStatusText.setText(LearningDataViewManager.formatDownloadSuccess());
     this.saveStatusText.setColor('#bbf7d0');
   }
 
