@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import ProgressStepper from '../ui/ProgressStepper.js';
 
 import { formatContractRequest, formatContractResponse } from '../data/apiContract.js';
+import ApiContractViewManager from '../systems/ApiContractViewManager.js';
 
 export default class ApiContractScene extends Phaser.Scene {
   constructor() {
@@ -24,51 +25,50 @@ export default class ApiContractScene extends Phaser.Scene {
       color: '#bfdbfe',
     }).setOrigin(0.5);
 
-    this.drawPanel(580, 525, 860, 660, '요청 Body 초안', formatContractRequest());
-    this.drawPanel(1370, 525, 620, 660, '응답 예시', formatContractResponse());
+    const panels = ApiContractViewManager.getPanelLayout();
+    this.drawPanel(panels.request, formatContractRequest());
+    this.drawPanel(panels.response, formatContractResponse());
     this.drawNotes();
     this.drawControls();
   }
 
-  drawPanel(x, y, width, height, title, body) {
-    this.add.rectangle(x, y, width, height, 0x111827, 0.98).setStrokeStyle(5, 0x60a5fa);
-    this.add.text(x - width / 2 + 35, y - height / 2 + 32, title, {
+  drawPanel(panel, body) {
+    this.add.rectangle(panel.x, panel.y, panel.width, panel.height, 0x111827, 0.98).setStrokeStyle(5, 0x60a5fa);
+    const titlePosition = ApiContractViewManager.getPanelTitlePosition(panel);
+    this.add.text(titlePosition.x, titlePosition.y, panel.title, {
       fontSize: '30px',
       color: '#ffffff',
       fontStyle: 'bold',
     });
-    this.add.text(x - width / 2 + 35, y - height / 2 + 85, body, {
-      fontSize: '17px',
-      color: '#dbeafe',
-      fontFamily: 'monospace',
-      lineSpacing: 3,
-      wordWrap: { width: width - 70 },
-    });
+    const bodyPosition = ApiContractViewManager.getPanelBodyPosition(panel);
+    this.add.text(bodyPosition.x, bodyPosition.y, body, ApiContractViewManager.getPanelBodyStyle(panel));
   }
 
   drawNotes() {
-    this.add.rectangle(960, 855, 1480, 76, 0x1e293b, 0.98).setStrokeStyle(3, 0xfde68a);
-    this.add.text(250, 834, '백엔드 구현 메모', {
+    const layout = ApiContractViewManager.getNotesLayout();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0x1e293b, 0.98).setStrokeStyle(3, 0xfde68a);
+    this.add.text(layout.title.x, layout.title.y, '백엔드 구현 메모', {
       fontSize: '23px',
       color: '#fde68a',
       fontStyle: 'bold',
     });
-    this.add.text(455, 834, '실제 연동 시 student/user, class_id, created_at은 서버에서 추가하는 편이 안전합니다. 프론트는 학습 결과 payload만 전송합니다.', {
+    this.add.text(layout.body.x, layout.body.y, ApiContractViewManager.formatBackendNote(), {
       fontSize: '22px',
       color: '#ffffff',
-      wordWrap: { width: 1200 },
+      wordWrap: { width: layout.body.width },
     });
   }
 
   drawControls() {
-    const payloadButton = this.createButton(650, 960, 'Payload 미리보기', '#bbf7d0', '#123524');
-    payloadButton.on('pointerdown', () => this.scene.start('ApiPayloadScene'));
+    const layout = ApiContractViewManager.getControlLayout();
+    const payloadButton = this.createButton(layout.payload.x, layout.payload.y, layout.payload.label, '#bbf7d0', '#123524');
+    payloadButton.on('pointerdown', () => this.scene.start(layout.payload.target));
 
-    const dataButton = this.createButton(970, 960, '학습 데이터로', '#c4b5fd', '#1e1b4b');
-    dataButton.on('pointerdown', () => this.scene.start('LearningDataScene'));
+    const dataButton = this.createButton(layout.data.x, layout.data.y, layout.data.label, '#c4b5fd', '#1e1b4b');
+    dataButton.on('pointerdown', () => this.scene.start(layout.data.target));
 
-    const endingButton = this.createButton(1280, 960, '마무리로', '#fde68a', '#0f172a');
-    endingButton.on('pointerdown', () => this.scene.start('EndingScene'));
+    const endingButton = this.createButton(layout.ending.x, layout.ending.y, layout.ending.label, '#fde68a', '#0f172a');
+    endingButton.on('pointerdown', () => this.scene.start(layout.ending.target));
   }
 
   createButton(x, y, label, backgroundColor, color) {

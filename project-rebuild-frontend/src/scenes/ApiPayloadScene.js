@@ -37,83 +37,87 @@ export default class ApiPayloadScene extends Phaser.Scene {
   }
 
   drawPayloadPanel() {
-    this.add.rectangle(760, 555, 1120, 710, 0x0f172a, 0.98).setStrokeStyle(5, 0x60a5fa);
-    this.add.text(240, 230, 'POST /api/learning-records/ 후보 body', {
+    const layout = ApiPayloadViewManager.getPayloadPanelLayout();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0x0f172a, 0.98)
+      .setStrokeStyle(5, layout.panel.strokeColor);
+    this.add.text(layout.title.x, layout.title.y, 'POST /api/learning-records/ 후보 body', {
       fontSize: '31px',
       color: '#ffffff',
       fontStyle: 'bold',
     });
-    this.add.text(245, 285, this.apiPayloadJson, {
-      fontSize: '20px',
-      color: '#dbeafe',
-      fontFamily: 'monospace',
-      lineSpacing: 4,
-      wordWrap: { width: 1030 },
-    });
+    this.add.text(
+      layout.body.x,
+      layout.body.y,
+      this.apiPayloadJson,
+      ApiPayloadViewManager.getPayloadTextStyle(layout.body.wordWrapWidth),
+    );
   }
 
   drawValidationPanel() {
     const summary = ApiPayloadViewManager.getValidationSummary(this.apiPayload);
 
-    this.add.rectangle(1550, 555, 500, 710, 0xffffff, 0.96).setStrokeStyle(5, summary.strokeColor);
-    this.add.text(1550, 230, 'API 구조 검증', {
+    const layout = ApiPayloadViewManager.getValidationPanelLayout();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0xffffff, 0.96).setStrokeStyle(5, summary.strokeColor);
+    this.add.text(layout.title.x, layout.title.y, 'API 구조 검증', {
       fontSize: '34px',
       color: '#172554',
       fontStyle: 'bold',
     }).setOrigin(0.5);
 
-    this.add.text(1325, 290, ApiPayloadViewManager.formatValidationRows(summary.rows), {
+    this.add.text(layout.rows.x, layout.rows.y, ApiPayloadViewManager.formatValidationRows(summary.rows), {
       fontSize: '21px',
       color: '#1e293b',
       lineSpacing: 9,
-      wordWrap: { width: 440 },
+      wordWrap: { width: layout.rows.wordWrapWidth },
     });
 
-    this.statusText = this.add.text(1325, 770, summary.statusText, {
+    this.statusText = this.add.text(layout.status.x, layout.status.y, summary.statusText, {
       fontSize: '21px',
       color: summary.statusColor,
       lineSpacing: 9,
-      wordWrap: { width: 440 },
+      wordWrap: { width: layout.status.wordWrapWidth },
     });
   }
 
   drawSubmissionLog() {
     const submissions = MockApiClient.listSubmissions();
-    this.add.rectangle(1550, 850, 500, 105, 0x1e293b, 0.98).setStrokeStyle(3, 0x93c5fd);
-    this.add.text(1325, 815, 'Mock 제출 로그', {
+    const layout = ApiPayloadViewManager.getSubmissionLogLayout();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0x1e293b, 0.98).setStrokeStyle(3, 0x93c5fd);
+    this.add.text(layout.title.x, layout.title.y, 'Mock 제출 로그', {
       fontSize: '22px',
       color: '#ffffff',
       fontStyle: 'bold',
     });
-    this.submissionLogText = this.add.text(1325, 848, ApiPayloadViewManager.formatSubmissionLog(submissions), {
+    this.submissionLogText = this.add.text(layout.body.x, layout.body.y, ApiPayloadViewManager.formatSubmissionLog(submissions), {
       fontSize: '18px',
       color: '#dbeafe',
       lineSpacing: 6,
-      wordWrap: { width: 440 },
+      wordWrap: { width: layout.body.wordWrapWidth },
     });
   }
 
   drawControls() {
-    const submitButton = this.createButton(350, 960, 'Mock 제출', '#bbf7d0', '#123524');
+    const layout = ApiPayloadViewManager.getControlLayout();
+    const submitButton = this.createButton(layout.submit.x, layout.submit.y, layout.submit.label, '#bbf7d0', '#123524');
     submitButton.on('pointerdown', () => this.submitMockPayload());
 
-    const copyButton = this.createButton(610, 960, 'Payload 복사', '#93c5fd', '#0f172a');
+    const copyButton = this.createButton(layout.copy.x, layout.copy.y, layout.copy.label, '#93c5fd', '#0f172a');
     copyButton.on('pointerdown', () => this.copyPayload());
 
-    const downloadButton = this.createButton(910, 960, 'Payload 다운로드', '#a7f3d0', '#064e3b');
+    const downloadButton = this.createButton(layout.download.x, layout.download.y, layout.download.label, '#a7f3d0', '#064e3b');
     downloadButton.on('pointerdown', () => this.downloadPayload());
 
-    const contractButton = this.createButton(1130, 960, 'API 계약', '#fde68a', '#0f172a');
-    contractButton.on('pointerdown', () => this.scene.start('ApiContractScene'));
+    const contractButton = this.createButton(layout.contract.x, layout.contract.y, layout.contract.label, '#fde68a', '#0f172a');
+    contractButton.on('pointerdown', () => this.scene.start(layout.contract.target));
 
-    const logButton = this.createButton(1335, 960, '제출 로그', '#bfdbfe', '#0f172a');
-    logButton.on('pointerdown', () => this.scene.start('MockSubmissionLogScene'));
+    const logButton = this.createButton(layout.log.x, layout.log.y, layout.log.label, '#bfdbfe', '#0f172a');
+    logButton.on('pointerdown', () => this.scene.start(layout.log.target));
 
-    const dataButton = this.createButton(1545, 960, '학습 데이터', '#c4b5fd', '#1e1b4b');
-    dataButton.on('pointerdown', () => this.scene.start('LearningDataScene'));
+    const dataButton = this.createButton(layout.data.x, layout.data.y, layout.data.label, '#c4b5fd', '#1e1b4b');
+    dataButton.on('pointerdown', () => this.scene.start(layout.data.target));
 
-    const endingButton = this.createButton(1745, 960, '마무리', '#fde68a', '#0f172a');
-    endingButton.on('pointerdown', () => this.scene.start('EndingScene'));
+    const endingButton = this.createButton(layout.ending.x, layout.ending.y, layout.ending.label, '#fde68a', '#0f172a');
+    endingButton.on('pointerdown', () => this.scene.start(layout.ending.target));
   }
 
   submitMockPayload() {
@@ -134,10 +138,10 @@ export default class ApiPayloadScene extends Phaser.Scene {
   async copyPayload() {
     try {
       await navigator.clipboard.writeText(this.apiPayloadJson);
-      this.statusText.setText('API payload를 클립보드에 복사했습니다.');
+      this.statusText.setText(ApiPayloadViewManager.formatCopySuccess());
       this.statusText.setColor('#166534');
     } catch (_error) {
-      this.statusText.setText('클립보드 복사에 실패했습니다. 브라우저 권한을 확인하세요.');
+      this.statusText.setText(ApiPayloadViewManager.formatCopyFailure());
       this.statusText.setColor('#991b1b');
     }
   }
@@ -147,12 +151,12 @@ export default class ApiPayloadScene extends Phaser.Scene {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `project-rebuild-ep${this.apiPayload.episode_id}-api-payload.json`;
+    link.download = ApiPayloadViewManager.formatDownloadFileName(this.apiPayload);
     document.body.appendChild(link);
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
-    this.statusText.setText('API payload 다운로드를 시작했습니다.');
+    this.statusText.setText(ApiPayloadViewManager.formatDownloadSuccess());
     this.statusText.setColor('#166534');
   }
 

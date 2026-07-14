@@ -15,6 +15,7 @@ import ExplorationViewManager from '../src/systems/ExplorationViewManager.js';
 import DataBriefingViewManager from '../src/systems/DataBriefingViewManager.js';
 import ReflectionViewManager from '../src/systems/ReflectionViewManager.js';
 import TitleViewManager from '../src/systems/TitleViewManager.js';
+import ApiContractViewManager from '../src/systems/ApiContractViewManager.js';
 import LearningDataManager from '../src/systems/LearningDataManager.js';
 import LearningDataViewManager from '../src/systems/LearningDataViewManager.js';
 import TeacherReportManager from '../src/systems/TeacherReportManager.js';
@@ -284,6 +285,23 @@ function testTitleViewManager() {
   assert.equal(TitleViewManager.getSecondaryButtonStyle().backgroundColor, '#bfdbfe');
   assert.equal(TitleViewManager.getStorageButtonStyle().backgroundColor, '#334155');
   assert.equal(TitleViewManager.getLoadButtonStyle().backgroundColor, '#1e293b');
+}
+
+function testApiContractViewManager() {
+  const panels = ApiContractViewManager.getPanelLayout();
+  assert.equal(panels.request.title, '요청 Body 초안');
+  assert.equal(panels.response.width, 620);
+  assert.deepEqual(ApiContractViewManager.getPanelTitlePosition(panels.request), { x: 185, y: 227 });
+  assert.deepEqual(ApiContractViewManager.getPanelBodyPosition(panels.request), { x: 185, y: 280 });
+  assert.equal(ApiContractViewManager.getPanelBodyStyle(panels.request).wordWrap.width, 790);
+  assert.equal(ApiContractViewManager.getNotesLayout().body.width, 1200);
+  assert.match(ApiContractViewManager.formatBackendNote(), /서버에서 추가/);
+  assert.deepEqual(ApiContractViewManager.getControlLayout().payload, {
+    x: 650,
+    y: 960,
+    label: 'Payload 미리보기',
+    target: 'ApiPayloadScene',
+  });
 }
 
 function testEpisodeContent() {
@@ -721,6 +739,20 @@ function testLearningDataManager() {
 function testApiPayloadViewManager() {
   const payload = LearningApiPayloadManager.build(createCompleteLearningData());
   assert.match(ApiPayloadViewManager.formatJson(payload), /"schema_version": 1/);
+  assert.equal(ApiPayloadViewManager.getPayloadPanelLayout().panel.width, 1120);
+  assert.equal(ApiPayloadViewManager.getValidationPanelLayout().rows.wordWrapWidth, 440);
+  assert.equal(ApiPayloadViewManager.getSubmissionLogLayout().panel.height, 105);
+  assert.deepEqual(ApiPayloadViewManager.getControlLayout().contract, {
+    x: 1130,
+    y: 960,
+    label: 'API 계약',
+    target: 'ApiContractScene',
+  });
+  assert.equal(ApiPayloadViewManager.getPayloadTextStyle(1030).fontFamily, 'monospace');
+  assert.equal(ApiPayloadViewManager.formatCopySuccess(), 'API payload를 클립보드에 복사했습니다.');
+  assert.match(ApiPayloadViewManager.formatCopyFailure(), /클립보드/);
+  assert.equal(ApiPayloadViewManager.formatDownloadSuccess(), 'API payload 다운로드를 시작했습니다.');
+  assert.equal(ApiPayloadViewManager.formatDownloadFileName(payload), 'project-rebuild-ep1-api-payload.json');
 
   const summary = ApiPayloadViewManager.getValidationSummary(payload);
   assert.equal(summary.ok, true);
@@ -1043,6 +1075,7 @@ function run() {
   testDataBriefingViewManager();
   testReflectionViewManager();
   testTitleViewManager();
+  testApiContractViewManager();
   testEvaluationRuleConstants();
   testEvaluationManager();
   testSideEffectViewManager();
