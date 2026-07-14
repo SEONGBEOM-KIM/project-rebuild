@@ -30,33 +30,35 @@ export default class ResultScene extends Phaser.Scene {
       fontStyle: 'bold',
     }).setOrigin(0.5);
 
-    this.drawStatePanel(width / 2 - 610, 270, '이전 → 현재', EvaluationManager.formatBeforeAfterRows(lastPlacementResult, gameState));
-    this.drawStatePanel(width / 2, 270, '종합 평가', EvaluationManager.formatEvaluationRows(evaluation, gameState, placedBuildings, selectedPolicy));
-    this.drawStatePanel(width / 2 + 610, 270, '선택 경향', EvaluationManager.formatChoiceTrendRows(placedBuildings));
-    this.drawResidentReactionStrip(width / 2, 830, EvaluationManager.formatResidentReactions(gameState, placedBuildings));
-
-    const retry = this.createButton(width / 2 - 310, 940, '배치 더 하기', '#c4b5fd');
-    retry.on('pointerdown', () => this.scene.start('PlacementScene'));
-
-    const next = this.createButton(width / 2, 940, '부작용 검토', '#bbf7d0');
-    next.on('pointerdown', () => this.scene.start('SideEffectScene'));
-
-    const restart = this.createButton(width / 2 + 310, 940, '처음부터 다시', '#fde68a');
-    restart.on('pointerdown', () => this.scene.start('BootScene'));
+    const panels = EvaluationManager.getResultPanelLayout(width / 2);
+    this.drawStatePanel(panels.beforeAfter, EvaluationManager.formatBeforeAfterRows(lastPlacementResult, gameState));
+    this.drawStatePanel(panels.evaluation, EvaluationManager.formatEvaluationRows(evaluation, gameState, placedBuildings, selectedPolicy));
+    this.drawStatePanel(panels.trend, EvaluationManager.formatChoiceTrendRows(placedBuildings));
+    this.drawResidentReactionStrip(width / 2, EvaluationManager.formatResidentReactions(gameState, placedBuildings));
+    this.drawControls(width / 2);
   }
 
-  drawResidentReactionStrip(x, y, rows) {
-    this.add.rectangle(x, y, 1660, 86, 0x0f172a, 0.9).setStrokeStyle(3, 0xfde68a);
-    this.add.text(x - 790, y - 24, '주민 반응', {
+  drawResidentReactionStrip(centerX, rows) {
+    const layout = EvaluationManager.getResidentReactionLayout(centerX);
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0x0f172a, 0.9).setStrokeStyle(3, 0xfde68a);
+    this.add.text(layout.title.x, layout.title.y, '주민 반응', {
       fontSize: '25px',
       color: '#fde68a',
       fontStyle: 'bold',
     });
-    this.add.text(x - 625, y - 25, rows, {
+    this.add.text(layout.body.x, layout.body.y, rows, {
       fontSize: '23px',
       color: '#ffffff',
       lineSpacing: 6,
-      wordWrap: { width: 1400 },
+      wordWrap: { width: layout.body.wordWrapWidth },
+    });
+  }
+
+  drawControls(centerX) {
+    const controls = EvaluationManager.getResultControlLayout(centerX);
+    Object.values(controls).forEach((control) => {
+      const button = this.createButton(control.x, control.y, control.label, control.backgroundColor);
+      button.on('pointerdown', () => this.scene.start(control.target));
     });
   }
 
@@ -69,21 +71,18 @@ export default class ResultScene extends Phaser.Scene {
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
   }
 
-  drawStatePanel(x, y, title, rows) {
-    this.add.rectangle(x, y + 230, 545, 575, 0xffffff, 0.95).setStrokeStyle(4, 0x818cf8);
-    this.add.text(x, y, title, {
+  drawStatePanel(panel, rows) {
+    this.add.rectangle(panel.x, panel.y + 230, panel.width, panel.height, 0xffffff, 0.95).setStrokeStyle(4, 0x818cf8);
+    const titlePosition = EvaluationManager.getResultPanelTitlePosition(panel);
+    this.add.text(titlePosition.x, titlePosition.y, panel.title, {
       fontSize: '32px',
       color: '#312e81',
       fontStyle: 'bold',
     }).setOrigin(0.5);
-    this.add.text(x, y + 70, rows, {
-      fontSize: '24px',
-      color: '#1e293b',
-      align: 'left',
-      lineSpacing: 8,
-      wordWrap: { width: 465 },
-    }).setOrigin(0.5, 0);
+    const bodyPosition = EvaluationManager.getResultPanelBodyPosition(panel);
+    this.add.text(bodyPosition.x, bodyPosition.y, rows, EvaluationManager.getResultPanelBodyStyle(panel)).setOrigin(0.5, 0);
   }
+
 
 
 }

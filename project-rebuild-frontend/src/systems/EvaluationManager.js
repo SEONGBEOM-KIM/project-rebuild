@@ -3,6 +3,54 @@ import { STATE_LABELS, formatSignedValue } from '../data/stateLabels.js';
 import IssueDetector from './IssueDetector.js';
 
 export default class EvaluationManager {
+  static getResultPanelLayout(centerX) {
+    return {
+      beforeAfter: { x: centerX - 610, y: 270, width: 545, height: 575, title: '이전 → 현재' },
+      evaluation: { x: centerX, y: 270, width: 545, height: 575, title: '종합 평가' },
+      trend: { x: centerX + 610, y: 270, width: 545, height: 575, title: '선택 경향' },
+    };
+  }
+
+  static getResultPanelTitlePosition(panel) {
+    return {
+      x: panel.x,
+      y: panel.y,
+    };
+  }
+
+  static getResultPanelBodyPosition(panel) {
+    return {
+      x: panel.x,
+      y: panel.y + 70,
+    };
+  }
+
+  static getResultPanelBodyStyle(panel) {
+    return {
+      fontSize: '24px',
+      color: '#1e293b',
+      align: 'left',
+      lineSpacing: 8,
+      wordWrap: { width: panel.width - 80 },
+    };
+  }
+
+  static getResidentReactionLayout(centerX) {
+    return {
+      panel: { x: centerX, y: 830, width: 1660, height: 86 },
+      title: { x: centerX - 790, y: 806 },
+      body: { x: centerX - 625, y: 805, wordWrapWidth: 1400 },
+    };
+  }
+
+  static getResultControlLayout(centerX) {
+    return {
+      retry: { x: centerX - 310, y: 940, label: '배치 더 하기', target: 'PlacementScene', backgroundColor: '#c4b5fd' },
+      sideEffect: { x: centerX, y: 940, label: '부작용 검토', target: 'SideEffectScene', backgroundColor: '#bbf7d0' },
+      restart: { x: centerX + 310, y: 940, label: '처음부터 다시', target: 'BootScene', backgroundColor: '#fde68a' },
+    };
+  }
+
   static calculateScore(gameState) {
     const scoreParts = [
       Math.min(SCORE_RULES.maxPartScore, Math.max(0, (gameState.population - SCORE_RULES.populationBase) / SCORE_RULES.populationDivisor)),
