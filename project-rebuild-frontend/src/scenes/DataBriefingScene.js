@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import { CURRENT_EPISODE } from '../data/episodes.js';
 import LearningProgress from '../systems/LearningProgress.js';
+import DataBriefingViewManager from '../systems/DataBriefingViewManager.js';
 
 import { EP1_CORE_CONCEPT, EP1_DATA_CARDS } from '../data/episodeContent.js';
 
@@ -21,13 +22,14 @@ export default class DataBriefingScene extends Phaser.Scene {
       fontStyle: 'bold',
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, 138, `탐색에서 본 ${CURRENT_EPISODE.regionName} 문제를 숫자 자료로 다시 확인합니다.`, {
+    this.add.text(width / 2, 138, DataBriefingViewManager.formatSubtitle(CURRENT_EPISODE.regionName), {
       fontSize: '28px',
       color: '#bfdbfe',
     }).setOrigin(0.5);
 
     EP1_DATA_CARDS.forEach((card, index) => {
-      this.drawDataCard(card, 390 + index * 570, 500);
+      const { x, y } = DataBriefingViewManager.getCardPosition(index);
+      this.drawDataCard(card, x, y);
     });
 
     this.drawConceptBox();
@@ -49,16 +51,15 @@ export default class DataBriefingScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     card.bars.forEach((bar, index) => {
-      const barY = y - 80 + index * 110;
-      const width = Math.max(24, Math.round((bar.value / bar.max) * 330));
-      this.add.text(x - 205, barY, bar.label, {
+      const barLayout = DataBriefingViewManager.getBarLayout(bar, x, y, index);
+      this.add.text(x - 205, barLayout.y, bar.label, {
         fontSize: '23px',
         color: '#1e293b',
         fontStyle: 'bold',
       }).setOrigin(0, 0.5);
-      this.add.rectangle(x - 20, barY, 340, 38, 0xe2e8f0).setOrigin(0, 0.5);
-      this.add.rectangle(x - 20, barY, width, 38, bar.color).setOrigin(0, 0.5);
-      this.add.text(x + 335, barY, `${bar.value.toLocaleString()}${bar.suffix ?? '명'}`, {
+      this.add.rectangle(barLayout.x, barLayout.y, barLayout.backgroundWidth, barLayout.height, 0xe2e8f0).setOrigin(0, 0.5);
+      this.add.rectangle(barLayout.x, barLayout.y, barLayout.width, barLayout.height, bar.color).setOrigin(0, 0.5);
+      this.add.text(x + 335, barLayout.y, DataBriefingViewManager.formatBarValue(bar), {
         fontSize: '23px',
         color: '#0f172a',
       }).setOrigin(1, 0.5);

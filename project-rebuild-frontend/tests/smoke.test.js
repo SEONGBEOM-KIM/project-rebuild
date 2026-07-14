@@ -12,6 +12,8 @@ import CauseQuizManager from '../src/systems/CauseQuizManager.js';
 import SelectionViewManager from '../src/systems/SelectionViewManager.js';
 import ProblemSummaryViewManager from '../src/systems/ProblemSummaryViewManager.js';
 import ExplorationViewManager from '../src/systems/ExplorationViewManager.js';
+import DataBriefingViewManager from '../src/systems/DataBriefingViewManager.js';
+import ReflectionViewManager from '../src/systems/ReflectionViewManager.js';
 import LearningDataManager from '../src/systems/LearningDataManager.js';
 import LearningDataViewManager from '../src/systems/LearningDataViewManager.js';
 import TeacherReportManager from '../src/systems/TeacherReportManager.js';
@@ -209,6 +211,54 @@ function testExplorationViewManager() {
     selected: false,
     strokeWidth: 5,
     strokeColor: 0xffffff,
+  });
+}
+
+function testDataBriefingViewManager() {
+  assert.deepEqual(DataBriefingViewManager.getCardPosition(0), { x: 390, y: 500 });
+  assert.deepEqual(DataBriefingViewManager.getCardPosition(2), { x: 1530, y: 500 });
+  assert.equal(DataBriefingViewManager.formatSubtitle(CURRENT_EPISODE.regionName), '탐색에서 본 푸른군 문제를 숫자 자료로 다시 확인합니다.');
+  assert.equal(DataBriefingViewManager.formatBarValue({ value: 4200 }), '4,200명');
+  assert.equal(DataBriefingViewManager.formatBarValue({ value: 39, suffix: '%' }), '39%');
+
+  assert.deepEqual(DataBriefingViewManager.getBarLayout({ value: 4200, max: 8000 }, 390, 500, 1), {
+    x: 370,
+    y: 530,
+    backgroundWidth: 340,
+    width: 173,
+    height: 38,
+  });
+  assert.equal(DataBriefingViewManager.getBarLayout({ value: 1, max: 8000 }, 390, 500, 0).width, 24);
+  assert.equal(DataBriefingViewManager.validateCards(EP1_DATA_CARDS).every((row) => row.ok), true);
+  assert.equal(DataBriefingViewManager.validateCards([{ id: 'broken', bars: [] }])[0].ok, false);
+}
+
+function testReflectionViewManager() {
+  const selectedChoice = EP1_REFLECTION_CHOICES[0];
+  const otherChoice = EP1_REFLECTION_CHOICES[1];
+
+  assert.deepEqual(ReflectionViewManager.getChoiceCardPosition(0), { col: 0, row: 0, x: 610, y: 385 });
+  assert.deepEqual(ReflectionViewManager.getChoiceCardPosition(3), { col: 1, row: 1, x: 1310, y: 635 });
+  assert.equal(ReflectionViewManager.formatInitialFeedback(), '하나를 선택하면 학습 기록에 저장됩니다.');
+  assert.match(ReflectionViewManager.formatSelectedFeedback(selectedChoice), new RegExp(`선택됨: ${selectedChoice.title}`));
+  assert.match(ReflectionViewManager.formatSelectedFeedback(selectedChoice), new RegExp(selectedChoice.description));
+  assert.equal(ReflectionViewManager.formatMissingChoiceFeedback(), '학습 기록에 남길 보완 방향을 하나 선택하세요.');
+  assert.deepEqual(ReflectionViewManager.getFeedbackStyle('initial'), { color: '#e0f2fe' });
+  assert.deepEqual(ReflectionViewManager.getFeedbackStyle('selected'), { color: '#bbf7d0' });
+  assert.deepEqual(ReflectionViewManager.getFeedbackStyle('missing'), { color: '#fecaca' });
+  assert.deepEqual(ReflectionViewManager.getChoiceCardStyle(selectedChoice.id, selectedChoice), {
+    selected: true,
+    strokeWidth: 7,
+    strokeColor: 0xfde68a,
+    fillColor: 0x1e293b,
+    fillAlpha: 0.96,
+  });
+  assert.deepEqual(ReflectionViewManager.getChoiceCardStyle(otherChoice.id, selectedChoice), {
+    selected: false,
+    strokeWidth: 4,
+    strokeColor: 0x475569,
+    fillColor: 0x0f172a,
+    fillAlpha: 0.96,
   });
 }
 
@@ -936,6 +986,8 @@ function run() {
   testSelectionViewManager();
   testProblemSummaryViewManager();
   testExplorationViewManager();
+  testDataBriefingViewManager();
+  testReflectionViewManager();
   testEvaluationRuleConstants();
   testEvaluationManager();
   testSideEffectViewManager();

@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import { EP1_REFLECTION_CHOICES } from '../data/episodeContent.js';
 import LearningProgress from '../systems/LearningProgress.js';
+import ReflectionViewManager from '../systems/ReflectionViewManager.js';
 
 export default class ReflectionScene extends Phaser.Scene {
   constructor() {
@@ -28,12 +29,11 @@ export default class ReflectionScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     EP1_REFLECTION_CHOICES.forEach((choice, index) => {
-      const col = index % 2;
-      const row = Math.floor(index / 2);
-      this.createChoiceCard(choice, 610 + col * 700, 385 + row * 250);
+      const { x, y } = ReflectionViewManager.getChoiceCardPosition(index);
+      this.createChoiceCard(choice, x, y);
     });
 
-    this.feedbackText = this.add.text(width / 2, 790, '하나를 선택하면 학습 기록에 저장됩니다.', {
+    this.feedbackText = this.add.text(width / 2, 790, ReflectionViewManager.formatInitialFeedback(), {
       fontSize: '28px',
       color: '#e0f2fe',
       align: 'center',
@@ -74,16 +74,16 @@ export default class ReflectionScene extends Phaser.Scene {
     this.selectedChoice = choice;
     this.registry.set('reflectionChoice', choice);
     LearningProgress.update(this.registry, { reflectionChoice: choice });
-    this.feedbackText.setText(`선택됨: ${choice.title}\n${choice.description}`);
-    this.feedbackText.setColor('#bbf7d0');
+    this.feedbackText.setText(ReflectionViewManager.formatSelectedFeedback(choice));
+    this.feedbackText.setColor(ReflectionViewManager.getFeedbackStyle('selected').color);
     this.updateSelectionUi();
   }
 
   updateSelectionUi() {
     for (const [choiceId, objects] of this.choiceObjects.entries()) {
-      const selected = this.selectedChoice?.id === choiceId;
-      objects.background.setStrokeStyle(selected ? 7 : 4, selected ? 0xfde68a : 0x475569);
-      objects.background.setFillStyle(selected ? 0x1e293b : 0x0f172a, 0.96);
+      const style = ReflectionViewManager.getChoiceCardStyle(choiceId, this.selectedChoice);
+      objects.background.setStrokeStyle(style.strokeWidth, style.strokeColor);
+      objects.background.setFillStyle(style.fillColor, style.fillAlpha);
     }
   }
 
@@ -94,8 +94,8 @@ export default class ReflectionScene extends Phaser.Scene {
     const nextButton = this.createButton(1160, 940, '학습 마무리', '#bbf7d0', '#123524');
     nextButton.on('pointerdown', () => {
       if (!this.selectedChoice) {
-        this.feedbackText.setText('학습 기록에 남길 보완 방향을 하나 선택하세요.');
-        this.feedbackText.setColor('#fecaca');
+        this.feedbackText.setText(ReflectionViewManager.formatMissingChoiceFeedback());
+        this.feedbackText.setColor(ReflectionViewManager.getFeedbackStyle('missing').color);
         return;
       }
       this.scene.start('EndingScene');
