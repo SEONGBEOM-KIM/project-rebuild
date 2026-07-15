@@ -13,16 +13,18 @@ export default class DataBriefingScene extends Phaser.Scene {
 
   create() {
     const { width, height } = this.scale;
-    this.add.rectangle(width / 2, height / 2, width, height, 0x172554);
-    ProgressStepper.render(this, 'data');
+    const layout = DataBriefingViewManager.getScreenLayout(width);
 
-    this.add.text(width / 2, 70, 'EP1. 자료 확인', {
+    this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
+    ProgressStepper.render(this, layout.progressStep);
+
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
       fontSize: '60px',
       color: '#ffffff',
       fontStyle: 'bold',
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, 138, DataBriefingViewManager.formatSubtitle(CURRENT_EPISODE.regionName), {
+    this.add.text(layout.subtitle.x, layout.subtitle.y, DataBriefingViewManager.formatSubtitle(CURRENT_EPISODE.regionName), {
       fontSize: '28px',
       color: '#bfdbfe',
     }).setOrigin(0.5);
@@ -37,70 +39,76 @@ export default class DataBriefingScene extends Phaser.Scene {
   }
 
   drawDataCard(card, x, y) {
-    this.add.rectangle(x, y, 500, 560, 0xffffff, 0.97).setStrokeStyle(5, 0x93c5fd);
-    this.add.text(x, y - 230, card.title, {
+    const layout = DataBriefingViewManager.getDataCardLayout(x, y);
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
+      .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
+    this.add.text(layout.title.x, layout.title.y, card.title, {
       fontSize: '33px',
       color: '#172554',
       fontStyle: 'bold',
       align: 'center',
-      wordWrap: { width: 440 },
+      wordWrap: { width: layout.title.wordWrapWidth },
     }).setOrigin(0.5);
-    this.add.text(x, y - 185, card.subtitle, {
+    this.add.text(layout.subtitle.x, layout.subtitle.y, card.subtitle, {
       fontSize: '22px',
       color: '#475569',
     }).setOrigin(0.5);
 
     card.bars.forEach((bar, index) => {
       const barLayout = DataBriefingViewManager.getBarLayout(bar, x, y, index);
-      this.add.text(x - 205, barLayout.y, bar.label, {
+      this.add.text(layout.barLabel.x, barLayout.y, bar.label, {
         fontSize: '23px',
         color: '#1e293b',
         fontStyle: 'bold',
       }).setOrigin(0, 0.5);
-      this.add.rectangle(barLayout.x, barLayout.y, barLayout.backgroundWidth, barLayout.height, 0xe2e8f0).setOrigin(0, 0.5);
+      this.add.rectangle(barLayout.x, barLayout.y, barLayout.backgroundWidth, barLayout.height, layout.barBackgroundColor).setOrigin(0, 0.5);
       this.add.rectangle(barLayout.x, barLayout.y, barLayout.width, barLayout.height, bar.color).setOrigin(0, 0.5);
-      this.add.text(x + 335, barLayout.y, DataBriefingViewManager.formatBarValue(bar), {
+      this.add.text(layout.barValue.x, barLayout.y, DataBriefingViewManager.formatBarValue(bar), {
         fontSize: '23px',
         color: '#0f172a',
       }).setOrigin(1, 0.5);
     });
 
-    this.add.rectangle(x, y + 170, 430, 150, 0xe0f2fe, 1).setStrokeStyle(3, 0x60a5fa);
-    this.add.text(x - 190, y + 112, '읽어야 할 점', {
+    this.add.rectangle(layout.takeawayPanel.x, layout.takeawayPanel.y, layout.takeawayPanel.width, layout.takeawayPanel.height, layout.takeawayPanel.fillColor, layout.takeawayPanel.fillAlpha)
+      .setStrokeStyle(layout.takeawayPanel.strokeWidth, layout.takeawayPanel.strokeColor);
+    this.add.text(layout.takeawayTitle.x, layout.takeawayTitle.y, layout.takeawayTitle.text, {
       fontSize: '23px',
       color: '#172554',
       fontStyle: 'bold',
     });
-    this.add.text(x - 190, y + 150, card.takeaway, {
+    this.add.text(layout.takeawayBody.x, layout.takeawayBody.y, card.takeaway, {
       fontSize: '21px',
       color: '#334155',
       lineSpacing: 7,
-      wordWrap: { width: 380 },
+      wordWrap: { width: layout.takeawayBody.wordWrapWidth },
     });
   }
 
   drawConceptBox() {
-    this.add.rectangle(960, 840, 1280, 110, 0x0f172a, 0.88).setStrokeStyle(3, 0xfde68a);
-    this.add.text(350, 810, '핵심 개념', {
+    const layout = DataBriefingViewManager.getConceptBoxLayout();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
+      .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
       fontSize: '27px',
       color: '#fde68a',
       fontStyle: 'bold',
     });
-    this.add.text(350, 848, EP1_CORE_CONCEPT, {
+    this.add.text(layout.body.x, layout.body.y, EP1_CORE_CONCEPT, {
       fontSize: '25px',
       color: '#ffffff',
-      wordWrap: { width: 1220 },
+      wordWrap: { width: layout.body.wordWrapWidth },
     });
   }
 
   drawControls() {
-    const backButton = this.createButton(760, 980, '탐색 다시 보기', '#93c5fd', '#0f172a');
-    backButton.on('pointerdown', () => this.scene.start('ExplorationScene'));
+    const layout = DataBriefingViewManager.getControlLayout();
+    const backButton = this.createButton(layout.back.x, layout.back.y, layout.back.label, layout.back.backgroundColor, layout.back.textColor);
+    backButton.on('pointerdown', () => this.scene.start(layout.back.target));
 
-    const nextButton = this.createButton(1160, 980, '원인 질문 풀기', '#bbf7d0', '#123524');
+    const nextButton = this.createButton(layout.next.x, layout.next.y, layout.next.label, layout.next.backgroundColor, layout.next.textColor);
     nextButton.on('pointerdown', () => {
       LearningProgress.update(this.registry, { dataViewed: true });
-      this.scene.start('CauseQuizScene');
+      this.scene.start(layout.next.target);
     });
   }
 

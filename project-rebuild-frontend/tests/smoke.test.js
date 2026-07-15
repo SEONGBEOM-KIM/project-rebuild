@@ -336,6 +336,33 @@ function testExplorationViewManager() {
 }
 
 function testDataBriefingViewManager() {
+  assert.deepEqual(DataBriefingViewManager.getScreenLayout(1920).title, {
+    x: 960,
+    y: 70,
+    text: 'EP1. 자료 확인',
+  });
+  assert.equal(DataBriefingViewManager.getScreenLayout(1920).progressStep, 'data');
+  assert.deepEqual(DataBriefingViewManager.getDataCardLayout(390, 500).panel, {
+    x: 390,
+    y: 500,
+    width: 500,
+    height: 560,
+    fillColor: 0xffffff,
+    fillAlpha: 0.97,
+    strokeWidth: 5,
+    strokeColor: 0x93c5fd,
+  });
+  assert.equal(DataBriefingViewManager.getDataCardLayout(390, 500).takeawayTitle.text, '읽어야 할 점');
+  assert.deepEqual(DataBriefingViewManager.getConceptBoxLayout().title, { x: 350, y: 810, text: '핵심 개념' });
+  assert.deepEqual(DataBriefingViewManager.getControlLayout().next, {
+    x: 1160,
+    y: 980,
+    label: '원인 질문 풀기',
+    target: 'CauseQuizScene',
+    backgroundColor: '#bbf7d0',
+    textColor: '#123524',
+  });
+  assert.equal(DataBriefingViewManager.getControlLayout().back.target, 'ExplorationScene');
   assert.deepEqual(DataBriefingViewManager.getCardPosition(0), { x: 390, y: 500 });
   assert.deepEqual(DataBriefingViewManager.getCardPosition(2), { x: 1530, y: 500 });
   assert.equal(DataBriefingViewManager.formatSubtitle(CURRENT_EPISODE.regionName), '탐색에서 본 푸른군 문제를 숫자 자료로 다시 확인합니다.');
