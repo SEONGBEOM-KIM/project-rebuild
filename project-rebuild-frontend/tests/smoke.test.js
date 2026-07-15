@@ -7,6 +7,7 @@ import BootFlowManager from '../src/systems/BootFlowManager.js';
 import IssueDetector from '../src/systems/IssueDetector.js';
 import SideEffectViewManager from '../src/systems/SideEffectViewManager.js';
 import EvaluationManager from '../src/systems/EvaluationManager.js';
+import ResultViewManager from '../src/systems/ResultViewManager.js';
 import EndingSummaryManager from '../src/systems/EndingSummaryManager.js';
 import LearningProgress from '../src/systems/LearningProgress.js';
 import CauseQuizManager from '../src/systems/CauseQuizManager.js';
@@ -32,6 +33,7 @@ import PlacementViewManager, { TILE_COLORS, TILE_STROKES, TILE_LABELS, ZONE_LABE
 import SaveManager, { LEARNING_SAVE_STORAGE_KEY } from '../src/systems/SaveManager.js';
 import SavedDataViewManager from '../src/systems/SavedDataViewManager.js';
 import StorageSummaryManager from '../src/systems/StorageSummaryManager.js';
+import StorageManagerViewManager from '../src/systems/StorageManagerViewManager.js';
 import { buildings } from '../src/data/buildings.js';
 import { policies } from '../src/data/policies.js';
 import { explorationPlaces } from '../src/data/explorationPlaces.js';
@@ -583,23 +585,23 @@ function createPlacementRecord(buildingId, position = { x: 1, y: 1 }) {
   return { building, position, delta: building.effect };
 }
 
-function testEvaluationManager() {
-  assert.deepEqual(EvaluationManager.getResultScreenLayout(1920).title, {
+function testResultViewManager() {
+  assert.deepEqual(ResultViewManager.getScreenLayout(1920).title, {
     x: 960,
     y: 82,
     text: '종합 결과',
   });
-  assert.equal(EvaluationManager.getResultScreenLayout(1920).progressStep, 'result');
-  assert.equal(EvaluationManager.getResultPanelStyle().yOffset, 230);
-  assert.equal(EvaluationManager.getResidentReactionStyle().title, '주민 반응');
-  const panels = EvaluationManager.getResultPanelLayout(960);
+  assert.equal(ResultViewManager.getScreenLayout(1920).progressStep, 'result');
+  assert.equal(ResultViewManager.getPanelStyle().yOffset, 230);
+  assert.equal(ResultViewManager.getResidentReactionStyle().title, '주민 반응');
+  const panels = ResultViewManager.getPanelLayout(960);
   assert.equal(panels.beforeAfter.title, '이전 → 현재');
   assert.equal(panels.trend.x, 1570);
-  assert.deepEqual(EvaluationManager.getResultPanelTitlePosition(panels.evaluation), { x: 960, y: 270 });
-  assert.deepEqual(EvaluationManager.getResultPanelBodyPosition(panels.evaluation), { x: 960, y: 340 });
-  assert.equal(EvaluationManager.getResultPanelBodyStyle(panels.evaluation).wordWrap.width, 465);
-  assert.deepEqual(EvaluationManager.getResidentReactionLayout(960).title, { x: 170, y: 806, text: '주민 반응' });
-  assert.deepEqual(EvaluationManager.getResultControlLayout(960).sideEffect, {
+  assert.deepEqual(ResultViewManager.getPanelTitlePosition(panels.evaluation), { x: 960, y: 270 });
+  assert.deepEqual(ResultViewManager.getPanelBodyPosition(panels.evaluation), { x: 960, y: 340 });
+  assert.equal(ResultViewManager.getPanelBodyStyle(panels.evaluation).wordWrap.width, 465);
+  assert.deepEqual(ResultViewManager.getResidentReactionLayout(960).title, { x: 170, y: 806, text: '주민 반응' });
+  assert.deepEqual(ResultViewManager.getControlLayout(960).sideEffect, {
     x: 960,
     y: 940,
     label: '부작용 검토',
@@ -607,8 +609,10 @@ function testEvaluationManager() {
     backgroundColor: '#bbf7d0',
     textColor: '#1e1b4b',
   });
-  assert.equal(EvaluationManager.getResultControlLayout(960).restart.target, 'BootScene');
+  assert.equal(ResultViewManager.getControlLayout(960).restart.target, 'BootScene');
+}
 
+function testEvaluationManager() {
   const placedBuildings = [
     createPlacementRecord('youth_center'),
     createPlacementRecord('bus_station', { x: 3, y: 2 }),
@@ -1450,13 +1454,13 @@ function testSavedDataViewManager() {
   assert.equal(SavedDataViewManager.getImportErrorMessage(null), 'JSON 가져오기에 실패했습니다.');
 }
 
-function testStorageSummaryManager() {
-  assert.deepEqual(StorageSummaryManager.getScreenLayout(1920).title, { y: 90, text: '브라우저 저장 관리', x: 960 });
-  assert.equal(StorageSummaryManager.getPanelLayout().saved.panel.x, 575);
-  assert.equal(StorageSummaryManager.getPanelLayout().saved.title.text, '학습 저장 데이터');
-  assert.equal(StorageSummaryManager.getPanelLayout().submissions.panel.strokeColor, 0xbbf7d0);
-  assert.equal(StorageSummaryManager.getPanelLayout().submissions.title.text, 'Mock 제출 로그');
-  assert.deepEqual(StorageSummaryManager.getControlLayout(), {
+function testStorageManagerViewManager() {
+  assert.deepEqual(StorageManagerViewManager.getScreenLayout(1920).title, { y: 90, text: '브라우저 저장 관리', x: 960 });
+  assert.equal(StorageManagerViewManager.getPanelLayout().saved.panel.x, 575);
+  assert.equal(StorageManagerViewManager.getPanelLayout().saved.title.text, '학습 저장 데이터');
+  assert.equal(StorageManagerViewManager.getPanelLayout().submissions.panel.strokeColor, 0xbbf7d0);
+  assert.equal(StorageManagerViewManager.getPanelLayout().submissions.title.text, 'Mock 제출 로그');
+  assert.deepEqual(StorageManagerViewManager.getControlLayout(), {
     status: { x: 960, y: 835 },
     clearSave: { x: 360, y: 930, label: '학습 저장 삭제', backgroundColor: '#fecaca', textColor: '#7f1d1d' },
     clearLog: { x: 710, y: 930, label: '제출 로그 삭제', backgroundColor: '#fed7aa', textColor: '#7c2d12' },
@@ -1464,7 +1468,10 @@ function testStorageSummaryManager() {
     title: { x: 1370, y: 930, label: '제목으로', backgroundColor: '#c4b5fd', textColor: '#1e1b4b', targetScene: 'TitleScene' },
     savedData: { x: 1640, y: 930, label: '저장 확인', backgroundColor: '#bbf7d0', textColor: '#123524', targetScene: 'SavedDataScene' },
   });
-  assert.equal(StorageSummaryManager.getBodyTextStyle().wordWrap.width, 640);
+  assert.equal(StorageManagerViewManager.getBodyTextStyle().wordWrap.width, 640);
+}
+
+function testStorageSummaryManager() {
   assert.match(StorageSummaryManager.formatStatusText(), /개별 삭제/);
   assert.equal(StorageSummaryManager.formatDate(null), '알 수 없음');
   assert.equal(StorageSummaryManager.formatDate('not-a-date'), 'not-a-date');
@@ -1631,6 +1638,7 @@ function run() {
   testStoryViewManager();
   testApiContractViewManager();
   testEvaluationRuleConstants();
+  testResultViewManager();
   testEvaluationManager();
   testSideEffectViewManager();
   testGameStateAndIssues();
@@ -1652,6 +1660,7 @@ function run() {
   testMockApiClientLogSafety();
   testLearningDataRestoreManager();
   testSavedDataViewManager();
+  testStorageManagerViewManager();
   testStorageSummaryManager();
   testSaveImport();
   testApiContract();

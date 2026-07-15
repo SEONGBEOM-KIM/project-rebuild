@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import SaveManager from '../systems/SaveManager.js';
 import MockApiClient from '../systems/MockApiClient.js';
 import StorageSummaryManager from '../systems/StorageSummaryManager.js';
+import StorageManagerViewManager from '../systems/StorageManagerViewManager.js';
 
 export default class StorageManagerScene extends Phaser.Scene {
   constructor() {
@@ -13,7 +14,7 @@ export default class StorageManagerScene extends Phaser.Scene {
     this.saved = SaveManager.load();
     this.submissions = MockApiClient.listSubmissions();
 
-    const layout = StorageSummaryManager.getScreenLayout(width);
+    const layout = StorageManagerViewManager.getScreenLayout(width);
     this.add.rectangle(width / 2, height / 2, width, height, layout.backgroundColor);
     this.add.text(layout.title.x, layout.title.y, layout.title.text, {
       fontSize: '60px',
@@ -32,7 +33,7 @@ export default class StorageManagerScene extends Phaser.Scene {
   }
 
   drawSavedDataPanel() {
-    const layout = StorageSummaryManager.getPanelLayout().saved;
+    const layout = StorageManagerViewManager.getPanelLayout().saved;
     this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0xffffff, 0.96)
       .setStrokeStyle(5, layout.panel.strokeColor);
     this.add.text(layout.title.x, layout.title.y, layout.title.text, {
@@ -43,11 +44,11 @@ export default class StorageManagerScene extends Phaser.Scene {
 
     const rows = StorageSummaryManager.formatSavedDataRows(this.saved);
 
-    this.add.text(layout.body.x, layout.body.y, rows.join('\n'), StorageSummaryManager.getBodyTextStyle());
+    this.add.text(layout.body.x, layout.body.y, rows.join('\n'), StorageManagerViewManager.getBodyTextStyle());
   }
 
   drawSubmissionPanel() {
-    const layout = StorageSummaryManager.getPanelLayout().submissions;
+    const layout = StorageManagerViewManager.getPanelLayout().submissions;
     this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0xffffff, 0.96)
       .setStrokeStyle(5, layout.panel.strokeColor);
     this.add.text(layout.title.x, layout.title.y, layout.title.text, {
@@ -58,11 +59,11 @@ export default class StorageManagerScene extends Phaser.Scene {
 
     const rows = StorageSummaryManager.formatSubmissionRows(this.submissions);
 
-    this.add.text(layout.body.x, layout.body.y, rows.join('\n'), StorageSummaryManager.getBodyTextStyle());
+    this.add.text(layout.body.x, layout.body.y, rows.join('\n'), StorageManagerViewManager.getBodyTextStyle());
   }
 
   drawControls() {
-    const layout = StorageSummaryManager.getControlLayout();
+    const layout = StorageManagerViewManager.getControlLayout();
     this.statusText = this.add.text(layout.status.x, layout.status.y, StorageSummaryManager.formatStatusText(), {
       fontSize: '24px',
       color: '#bfdbfe',
