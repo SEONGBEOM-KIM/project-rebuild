@@ -80,19 +80,10 @@ export default class EndingScene extends Phaser.Scene {
   drawControls(centerX) {
     const controls = EndingSummaryViewManager.getControlLayout(centerX);
     Object.values(controls).forEach((control) => {
-      const button = this.createButton(control.x, control.y, control.label, control.backgroundColor, control.textColor);
+      const button = createTextButton(this, control, EndingSummaryViewManager.getButtonStyle());
       button.on('pointerdown', () => this.scene.start(control.target));
     });
   }
 
-  createButton(x, y, label, backgroundColor, color) {
-    return createTextButton(this, {
-      x,
-      y,
-      label,
-      backgroundColor,
-      textColor: color,
-    }, EndingSummaryViewManager.getButtonStyle());
-  }
 
 }

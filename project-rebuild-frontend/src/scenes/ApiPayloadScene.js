@@ -106,25 +106,25 @@ export default class ApiPayloadScene extends Phaser.Scene {
 
   drawControls() {
     const layout = ApiPayloadViewManager.getControlLayout();
-    const submitButton = this.createButton(layout.submit.x, layout.submit.y, layout.submit.label, layout.submit.backgroundColor, layout.submit.textColor);
+    const submitButton = createTextButton(this, layout.submit, ApiPayloadViewManager.getButtonStyle());
     submitButton.on('pointerdown', () => this.submitMockPayload());
 
-    const copyButton = this.createButton(layout.copy.x, layout.copy.y, layout.copy.label, layout.copy.backgroundColor, layout.copy.textColor);
+    const copyButton = createTextButton(this, layout.copy, ApiPayloadViewManager.getButtonStyle());
     copyButton.on('pointerdown', () => this.copyPayload());
 
-    const downloadButton = this.createButton(layout.download.x, layout.download.y, layout.download.label, layout.download.backgroundColor, layout.download.textColor);
+    const downloadButton = createTextButton(this, layout.download, ApiPayloadViewManager.getButtonStyle());
     downloadButton.on('pointerdown', () => this.downloadPayload());
 
-    const contractButton = this.createButton(layout.contract.x, layout.contract.y, layout.contract.label, layout.contract.backgroundColor, layout.contract.textColor);
+    const contractButton = createTextButton(this, layout.contract, ApiPayloadViewManager.getButtonStyle());
     contractButton.on('pointerdown', () => this.scene.start(layout.contract.target));
 
-    const logButton = this.createButton(layout.log.x, layout.log.y, layout.log.label, layout.log.backgroundColor, layout.log.textColor);
+    const logButton = createTextButton(this, layout.log, ApiPayloadViewManager.getButtonStyle());
     logButton.on('pointerdown', () => this.scene.start(layout.log.target));
 
-    const dataButton = this.createButton(layout.data.x, layout.data.y, layout.data.label, layout.data.backgroundColor, layout.data.textColor);
+    const dataButton = createTextButton(this, layout.data, ApiPayloadViewManager.getButtonStyle());
     dataButton.on('pointerdown', () => this.scene.start(layout.data.target));
 
-    const endingButton = this.createButton(layout.ending.x, layout.ending.y, layout.ending.label, layout.ending.backgroundColor, layout.ending.textColor);
+    const endingButton = createTextButton(this, layout.ending, ApiPayloadViewManager.getButtonStyle());
     endingButton.on('pointerdown', () => this.scene.start(layout.ending.target));
   }
 
@@ -165,13 +165,4 @@ export default class ApiPayloadScene extends Phaser.Scene {
     this.statusText.setColor(ApiPayloadViewManager.getFeedbackColor('success'));
   }
 
-  createButton(x, y, label, backgroundColor, color) {
-    return createTextButton(this, {
-      x,
-      y,
-      label,
-      backgroundColor,
-      textColor: color,
-    }, ApiPayloadViewManager.getButtonStyle());
-  }
 }

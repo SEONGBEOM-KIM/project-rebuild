@@ -82,10 +82,10 @@ export default class ReflectionScene extends Phaser.Scene {
 
   drawControls() {
     const layout = ReflectionViewManager.getControlLayout();
-    const backButton = this.createButton(layout.back.x, layout.back.y, layout.back.label, layout.back.backgroundColor, layout.back.textColor);
+    const backButton = createTextButton(this, layout.back, ReflectionViewManager.getButtonStyle());
     backButton.on('pointerdown', () => this.scene.start(layout.back.target));
 
-    const nextButton = this.createButton(layout.next.x, layout.next.y, layout.next.label, layout.next.backgroundColor, layout.next.textColor);
+    const nextButton = createTextButton(this, layout.next, ReflectionViewManager.getButtonStyle());
     nextButton.on('pointerdown', () => {
       if (!this.selectedChoice) {
         this.feedbackText.setText(ReflectionViewManager.formatMissingChoiceFeedback());
@@ -96,13 +96,4 @@ export default class ReflectionScene extends Phaser.Scene {
     });
   }
 
-  createButton(x, y, label, backgroundColor, color) {
-    return createTextButton(this, {
-      x,
-      y,
-      label,
-      backgroundColor,
-      textColor: color,
-    }, ReflectionViewManager.getButtonStyle());
-  }
 }

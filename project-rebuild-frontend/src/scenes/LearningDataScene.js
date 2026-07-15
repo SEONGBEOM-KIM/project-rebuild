@@ -117,30 +117,30 @@ export default class LearningDataScene extends Phaser.Scene {
 
   drawControls() {
     const layout = LearningDataViewManager.getControlLayout();
-    const apiButton = this.createButton(layout.api.x, layout.api.y, layout.api.label, layout.api.backgroundColor, layout.api.textColor);
+    const apiButton = createTextButton(this, layout.api, LearningDataViewManager.getButtonStyle());
     apiButton.on('pointerdown', () => this.scene.start(layout.api.target));
 
-    const saveButton = this.createButton(layout.save.x, layout.save.y, layout.save.label, layout.save.backgroundColor, layout.save.textColor);
+    const saveButton = createTextButton(this, layout.save, LearningDataViewManager.getButtonStyle());
     saveButton.on('pointerdown', () => {
       const saved = SaveManager.save(this.learningData);
       this.saveStatusText.setText(LearningDataViewManager.formatSaveStatus(saved));
       this.saveStatusText.setColor(LearningDataViewManager.getFeedbackColor('success'));
     });
 
-    const copyButton = this.createButton(layout.copy.x, layout.copy.y, layout.copy.label, layout.copy.backgroundColor, layout.copy.textColor);
+    const copyButton = createTextButton(this, layout.copy, LearningDataViewManager.getButtonStyle());
     copyButton.on('pointerdown', () => this.copyJsonToClipboard());
 
-    const downloadButton = this.createButton(layout.download.x, layout.download.y, layout.download.label, layout.download.backgroundColor, layout.download.textColor);
+    const downloadButton = createTextButton(this, layout.download, LearningDataViewManager.getButtonStyle());
     downloadButton.on('pointerdown', () => this.downloadJson());
 
-    const clearButton = this.createButton(layout.clear.x, layout.clear.y, layout.clear.label, layout.clear.backgroundColor, layout.clear.textColor);
+    const clearButton = createTextButton(this, layout.clear, LearningDataViewManager.getButtonStyle());
     clearButton.on('pointerdown', () => {
       SaveManager.clear();
       this.saveStatusText.setText(LearningDataViewManager.formatSaveCleared());
       this.saveStatusText.setColor(LearningDataViewManager.getFeedbackColor('error'));
     });
 
-    const backButton = this.createButton(layout.ending.x, layout.ending.y, layout.ending.label, layout.ending.backgroundColor, layout.ending.textColor);
+    const backButton = createTextButton(this, layout.ending, LearningDataViewManager.getButtonStyle());
     backButton.on('pointerdown', () => this.scene.start(layout.ending.target));
   }
 
@@ -166,13 +166,4 @@ export default class LearningDataScene extends Phaser.Scene {
     this.saveStatusText.setColor(LearningDataViewManager.getFeedbackColor('success'));
   }
 
-  createButton(x, y, label, backgroundColor, color) {
-    return createTextButton(this, {
-      x,
-      y,
-      label,
-      backgroundColor,
-      textColor: color,
-    }, LearningDataViewManager.getButtonStyle());
-  }
 }

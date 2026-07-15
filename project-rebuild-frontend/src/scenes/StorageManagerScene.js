@@ -70,39 +70,30 @@ export default class StorageManagerScene extends Phaser.Scene {
     this.statusText = this.add.text(layout.status.x, layout.status.y, StorageSummaryManager.formatStatusText(), StorageManagerViewManager.getStatusTextStyle())
       .setOrigin(0.5);
 
-    const clearSaveButton = this.createButton(layout.clearSave.x, layout.clearSave.y, layout.clearSave.label, layout.clearSave.backgroundColor, layout.clearSave.textColor);
+    const clearSaveButton = createTextButton(this, layout.clearSave, StorageManagerViewManager.getButtonStyle());
     clearSaveButton.on('pointerdown', () => {
       SaveManager.clear();
       this.scene.restart();
     });
 
-    const clearLogButton = this.createButton(layout.clearLog.x, layout.clearLog.y, layout.clearLog.label, layout.clearLog.backgroundColor, layout.clearLog.textColor);
+    const clearLogButton = createTextButton(this, layout.clearLog, StorageManagerViewManager.getButtonStyle());
     clearLogButton.on('pointerdown', () => {
       MockApiClient.clearSubmissions();
       this.scene.restart();
     });
 
-    const clearAllButton = this.createButton(layout.clearAll.x, layout.clearAll.y, layout.clearAll.label, layout.clearAll.backgroundColor, layout.clearAll.textColor);
+    const clearAllButton = createTextButton(this, layout.clearAll, StorageManagerViewManager.getButtonStyle());
     clearAllButton.on('pointerdown', () => {
       SaveManager.clear();
       MockApiClient.clearSubmissions();
       this.scene.restart();
     });
 
-    const titleButton = this.createButton(layout.title.x, layout.title.y, layout.title.label, layout.title.backgroundColor, layout.title.textColor);
+    const titleButton = createTextButton(this, layout.title, StorageManagerViewManager.getButtonStyle());
     titleButton.on('pointerdown', () => this.scene.start(layout.title.targetScene));
 
-    const dataButton = this.createButton(layout.savedData.x, layout.savedData.y, layout.savedData.label, layout.savedData.backgroundColor, layout.savedData.textColor);
+    const dataButton = createTextButton(this, layout.savedData, StorageManagerViewManager.getButtonStyle());
     dataButton.on('pointerdown', () => this.scene.start(layout.savedData.targetScene));
   }
 
-  createButton(x, y, label, backgroundColor, color) {
-    return createTextButton(this, {
-      x,
-      y,
-      label,
-      backgroundColor,
-      textColor: color,
-    }, StorageManagerViewManager.getButtonStyle());
-  }
 }

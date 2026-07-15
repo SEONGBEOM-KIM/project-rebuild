@@ -54,20 +54,11 @@ export default class ResultScene extends Phaser.Scene {
   drawControls(centerX) {
     const controls = ResultViewManager.getControlLayout(centerX);
     Object.values(controls).forEach((control) => {
-      const button = this.createButton(control.x, control.y, control.label, control.backgroundColor, control.textColor);
+      const button = createTextButton(this, control, ResultViewManager.getButtonStyle());
       button.on('pointerdown', () => this.scene.start(control.target));
     });
   }
 
-  createButton(x, y, label, backgroundColor, color) {
-    return createTextButton(this, {
-      x,
-      y,
-      label,
-      backgroundColor,
-      textColor: color,
-    }, ResultViewManager.getButtonStyle());
-  }
 
   drawStatePanel(panel, rows) {
     const panelStyle = ResultViewManager.getPanelStyle();

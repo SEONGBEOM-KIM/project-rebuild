@@ -51,16 +51,16 @@ export default class TeacherReportScene extends Phaser.Scene {
       TeacherReportViewManager.getTextStyles().status,
     ).setOrigin(0.5);
 
-    const copyButton = this.createButton(layout.copy.x, layout.copy.y, layout.copy.label, layout.copy.backgroundColor, layout.copy.textColor);
+    const copyButton = createTextButton(this, layout.copy, TeacherReportViewManager.getButtonStyle());
     copyButton.on('pointerdown', () => this.copyReportToClipboard());
 
-    const downloadButton = this.createButton(layout.download.x, layout.download.y, layout.download.label, layout.download.backgroundColor, layout.download.textColor);
+    const downloadButton = createTextButton(this, layout.download, TeacherReportViewManager.getButtonStyle());
     downloadButton.on('pointerdown', () => this.downloadReport());
 
-    const endingButton = this.createButton(layout.ending.x, layout.ending.y, layout.ending.label, layout.ending.backgroundColor, layout.ending.textColor);
+    const endingButton = createTextButton(this, layout.ending, TeacherReportViewManager.getButtonStyle());
     endingButton.on('pointerdown', () => this.scene.start(layout.ending.target));
 
-    const dataButton = this.createButton(layout.data.x, layout.data.y, layout.data.label, layout.data.backgroundColor, layout.data.textColor);
+    const dataButton = createTextButton(this, layout.data, TeacherReportViewManager.getButtonStyle());
     dataButton.on('pointerdown', () => this.scene.start(layout.data.target));
   }
 
@@ -86,13 +86,4 @@ export default class TeacherReportScene extends Phaser.Scene {
     this.reportStatusText.setColor(TeacherReportViewManager.getStatusColor('success'));
   }
 
-  createButton(x, y, label, backgroundColor, color) {
-    return createTextButton(this, {
-      x,
-      y,
-      label,
-      backgroundColor,
-      textColor: color,
-    }, TeacherReportViewManager.getButtonStyle());
-  }
 }

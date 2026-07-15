@@ -77,23 +77,14 @@ export default class DataBriefingScene extends Phaser.Scene {
 
   drawControls() {
     const layout = DataBriefingViewManager.getControlLayout();
-    const backButton = this.createButton(layout.back.x, layout.back.y, layout.back.label, layout.back.backgroundColor, layout.back.textColor);
+    const backButton = createTextButton(this, layout.back, DataBriefingViewManager.getButtonStyle());
     backButton.on('pointerdown', () => this.scene.start(layout.back.target));
 
-    const nextButton = this.createButton(layout.next.x, layout.next.y, layout.next.label, layout.next.backgroundColor, layout.next.textColor);
+    const nextButton = createTextButton(this, layout.next, DataBriefingViewManager.getButtonStyle());
     nextButton.on('pointerdown', () => {
       LearningProgress.update(this.registry, { dataViewed: true });
       this.scene.start(layout.next.target);
     });
   }
 
-  createButton(x, y, label, backgroundColor, color) {
-    return createTextButton(this, {
-      x,
-      y,
-      label,
-      backgroundColor,
-      textColor: color,
-    }, DataBriefingViewManager.getButtonStyle());
-  }
 }

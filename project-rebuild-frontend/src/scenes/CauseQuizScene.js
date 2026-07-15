@@ -85,10 +85,10 @@ export default class CauseQuizScene extends Phaser.Scene {
 
   drawControls() {
     const layout = CauseQuizViewManager.getControlLayout();
-    const backButton = this.createButton(layout.back.x, layout.back.y, layout.back.label, layout.back.backgroundColor, layout.back.textColor);
+    const backButton = createTextButton(this, layout.back, CauseQuizViewManager.getButtonStyle());
     backButton.on('pointerdown', () => this.scene.start(layout.back.target));
 
-    this.nextButton = this.createButton(layout.nextDisabled.x, layout.nextDisabled.y, layout.nextDisabled.label, layout.nextDisabled.backgroundColor, layout.nextDisabled.textColor);
+    this.nextButton = createTextButton(this, layout.nextDisabled, CauseQuizViewManager.getButtonStyle());
     this.nextButton.on('pointerdown', () => {
       if (!this.selectedChoice) {
         this.feedbackText.setText(CauseQuizManager.formatMissingChoiceFeedback());
@@ -118,13 +118,4 @@ export default class CauseQuizScene extends Phaser.Scene {
     this.nextButton.setStyle({ backgroundColor: layout.nextEnabled.backgroundColor });
   }
 
-  createButton(x, y, label, backgroundColor, color) {
-    return createTextButton(this, {
-      x,
-      y,
-      label,
-      backgroundColor,
-      textColor: color,
-    }, CauseQuizViewManager.getButtonStyle());
-  }
 }

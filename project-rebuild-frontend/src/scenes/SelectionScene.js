@@ -34,10 +34,10 @@ export default class SelectionScene extends Phaser.Scene {
     }).setOrigin(0.5, 0);
 
     const controls = SelectionViewManager.getControlLayout(width / 2);
-    const backButton = this.createButton(controls.back.x, controls.back.y, controls.back.label, controls.back.backgroundColor, controls.back.textColor);
+    const backButton = createTextButton(this, controls.back, SelectionViewManager.getButtonStyle());
     backButton.on('pointerdown', () => this.scene.start(controls.back.target));
 
-    const startButton = this.createButton(controls.start.x, controls.start.y, controls.start.label, controls.start.backgroundColor, controls.start.textColor);
+    const startButton = createTextButton(this, controls.start, SelectionViewManager.getButtonStyle());
     startButton.on('pointerdown', () => {
       this.registry.set('selectedPolicy', this.selectedPolicy);
       LearningProgress.update(this.registry, { selectedPolicyId: this.selectedPolicy.id });
@@ -80,15 +80,6 @@ export default class SelectionScene extends Phaser.Scene {
     this.cardObjects.set(policy.id, { background, title });
   }
 
-  createButton(x, y, label, backgroundColor, textColor) {
-    return createTextButton(this, {
-      x,
-      y,
-      label,
-      backgroundColor,
-      textColor: textColor,
-    }, SelectionViewManager.getButtonStyle());
-  }
 
   updateSelectionUi() {
     for (const [policyId, objects] of this.cardObjects.entries()) {

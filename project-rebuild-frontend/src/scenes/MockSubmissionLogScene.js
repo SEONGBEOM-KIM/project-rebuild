@@ -82,22 +82,22 @@ export default class MockSubmissionLogScene extends Phaser.Scene {
     this.statusText = this.add.text(layout.status.x, layout.status.y, MockSubmissionLogViewManager.formatStatusText(), MockSubmissionLogViewManager.getStatusTextStyle())
       .setOrigin(0.5);
 
-    const copyButton = this.createButton(layout.copy.x, layout.copy.y, layout.copy.label, layout.copy.backgroundColor, layout.copy.textColor);
+    const copyButton = createTextButton(this, layout.copy, MockSubmissionLogViewManager.getButtonStyle());
     copyButton.on('pointerdown', () => this.copyLogs());
 
-    const downloadButton = this.createButton(layout.download.x, layout.download.y, layout.download.label, layout.download.backgroundColor, layout.download.textColor);
+    const downloadButton = createTextButton(this, layout.download, MockSubmissionLogViewManager.getButtonStyle());
     downloadButton.on('pointerdown', () => this.downloadLogs());
 
-    const clearButton = this.createButton(layout.clear.x, layout.clear.y, layout.clear.label, layout.clear.backgroundColor, layout.clear.textColor);
+    const clearButton = createTextButton(this, layout.clear, MockSubmissionLogViewManager.getButtonStyle());
     clearButton.on('pointerdown', () => {
       MockApiClient.clearSubmissions();
       this.scene.restart();
     });
 
-    const apiButton = this.createButton(layout.api.x, layout.api.y, layout.api.label, layout.api.backgroundColor, layout.api.textColor);
+    const apiButton = createTextButton(this, layout.api, MockSubmissionLogViewManager.getButtonStyle());
     apiButton.on('pointerdown', () => this.scene.start(layout.api.target));
 
-    const endingButton = this.createButton(layout.ending.x, layout.ending.y, layout.ending.label, layout.ending.backgroundColor, layout.ending.textColor);
+    const endingButton = createTextButton(this, layout.ending, MockSubmissionLogViewManager.getButtonStyle());
     endingButton.on('pointerdown', () => this.scene.start(layout.ending.target));
   }
 
@@ -123,13 +123,4 @@ export default class MockSubmissionLogScene extends Phaser.Scene {
     this.statusText.setColor(MockSubmissionLogViewManager.getFeedbackColor('success'));
   }
 
-  createButton(x, y, label, backgroundColor, color) {
-    return createTextButton(this, {
-      x,
-      y,
-      label,
-      backgroundColor,
-      textColor: color,
-    }, MockSubmissionLogViewManager.getButtonStyle());
-  }
 }

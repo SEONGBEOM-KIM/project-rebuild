@@ -44,13 +44,17 @@ export default class SavedDataScene extends Phaser.Scene {
     const buttonLayout = SavedDataViewManager.getButtonLayout(width);
     const continueButtonState = SavedDataViewManager.getContinueButtonState(saved);
 
-    const backButton = this.createButton(buttonLayout.back.x, buttonLayout.back.y, buttonLayout.back.label, buttonLayout.back.backgroundColor, buttonLayout.back.textColor);
+    const backButton = createTextButton(this, buttonLayout.back, SavedDataViewManager.getButtonStyle());
     backButton.on('pointerdown', () => this.scene.start(buttonLayout.back.targetScene));
 
-    const importButton = this.createButton(buttonLayout.import.x, buttonLayout.import.y, buttonLayout.import.label, buttonLayout.import.backgroundColor, buttonLayout.import.textColor);
+    const importButton = createTextButton(this, buttonLayout.import, SavedDataViewManager.getButtonStyle());
     importButton.on('pointerdown', () => this.openImportPicker());
 
-    const continueButton = this.createButton(buttonLayout.continue.x, buttonLayout.continue.y, buttonLayout.continue.label, continueButtonState.backgroundColor, continueButtonState.textColor);
+    const continueButton = createTextButton(this, {
+      ...buttonLayout.continue,
+      backgroundColor: continueButtonState.backgroundColor,
+      textColor: continueButtonState.textColor,
+    }, SavedDataViewManager.getButtonStyle());
     continueButton.on('pointerdown', () => {
       if (!continueButtonState.canContinue) {
         return;
@@ -59,7 +63,7 @@ export default class SavedDataScene extends Phaser.Scene {
       this.scene.start(buttonLayout.continue.targetScene);
     });
 
-    const clearButton = this.createButton(buttonLayout.clear.x, buttonLayout.clear.y, buttonLayout.clear.label, buttonLayout.clear.backgroundColor, buttonLayout.clear.textColor);
+    const clearButton = createTextButton(this, buttonLayout.clear, SavedDataViewManager.getButtonStyle());
     clearButton.on('pointerdown', () => {
       SaveManager.clear();
       this.scene.restart();
@@ -91,13 +95,4 @@ export default class SavedDataScene extends Phaser.Scene {
     LearningDataRestoreManager.restore(this.registry, data);
   }
 
-  createButton(x, y, label, backgroundColor, color) {
-    return createTextButton(this, {
-      x,
-      y,
-      label,
-      backgroundColor,
-      textColor: color,
-    }, SavedDataViewManager.getButtonStyle());
-  }
 }

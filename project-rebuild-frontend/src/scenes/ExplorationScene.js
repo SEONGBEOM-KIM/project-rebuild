@@ -94,10 +94,10 @@ export default class ExplorationScene extends Phaser.Scene {
 
   drawControls() {
     const layout = ExplorationViewManager.getControlLayout();
-    const backButton = this.createButton(layout.back.x, layout.back.y, layout.back.label, layout.back.backgroundColor, layout.back.textColor);
+    const backButton = createTextButton(this, layout.back, ExplorationViewManager.getButtonStyle());
     backButton.on('pointerdown', () => this.scene.start(layout.back.target));
 
-    this.nextButton = this.createButton(layout.next.x, layout.next.y, layout.next.label, layout.next.backgroundColor, layout.next.textColor);
+    this.nextButton = createTextButton(this, layout.next, ExplorationViewManager.getButtonStyle());
     this.nextButton.on('pointerdown', () => {
       if (this.exploredPlaces.size < CURRENT_EPISODE.requiredExploredCount) {
         this.showNeedMoreMessage();
@@ -152,13 +152,4 @@ export default class ExplorationScene extends Phaser.Scene {
     ));
   }
 
-  createButton(x, y, label, backgroundColor, color) {
-    return createTextButton(this, {
-      x,
-      y,
-      label,
-      backgroundColor,
-      textColor: color,
-    }, ExplorationViewManager.getButtonStyle());
-  }
 }

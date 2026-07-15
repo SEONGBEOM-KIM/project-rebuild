@@ -67,23 +67,14 @@ export default class ApiContractScene extends Phaser.Scene {
 
   drawControls() {
     const layout = ApiContractViewManager.getControlLayout();
-    const payloadButton = this.createButton(layout.payload.x, layout.payload.y, layout.payload.label, layout.payload.backgroundColor, layout.payload.textColor);
+    const payloadButton = createTextButton(this, layout.payload, ApiContractViewManager.getButtonStyle());
     payloadButton.on('pointerdown', () => this.scene.start(layout.payload.target));
 
-    const dataButton = this.createButton(layout.data.x, layout.data.y, layout.data.label, layout.data.backgroundColor, layout.data.textColor);
+    const dataButton = createTextButton(this, layout.data, ApiContractViewManager.getButtonStyle());
     dataButton.on('pointerdown', () => this.scene.start(layout.data.target));
 
-    const endingButton = this.createButton(layout.ending.x, layout.ending.y, layout.ending.label, layout.ending.backgroundColor, layout.ending.textColor);
+    const endingButton = createTextButton(this, layout.ending, ApiContractViewManager.getButtonStyle());
     endingButton.on('pointerdown', () => this.scene.start(layout.ending.target));
   }
 
-  createButton(x, y, label, backgroundColor, color) {
-    return createTextButton(this, {
-      x,
-      y,
-      label,
-      backgroundColor,
-      textColor: color,
-    }, ApiContractViewManager.getButtonStyle());
-  }
 }
