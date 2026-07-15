@@ -13,16 +13,18 @@ export default class MockSubmissionLogScene extends Phaser.Scene {
     this.submissions = MockApiClient.listSubmissions();
     this.submissionsJson = MockSubmissionLogViewManager.formatJson(this.submissions);
 
-    this.add.rectangle(width / 2, height / 2, width, height, 0x0f172a);
-    ProgressStepper.render(this, 'ending');
+    const layout = MockSubmissionLogViewManager.getScreenLayout(width);
 
-    this.add.text(width / 2, 78, 'Mock 제출 로그', {
+    this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
+    ProgressStepper.render(this, layout.progressStep);
+
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
       fontSize: '60px',
       color: '#ffffff',
       fontStyle: 'bold',
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, 145, '실제 백엔드 연결 전, API 제출 시뮬레이션 기록을 확인합니다.', {
+    this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, {
       fontSize: '26px',
       color: '#bfdbfe',
     }).setOrigin(0.5);
@@ -36,7 +38,7 @@ export default class MockSubmissionLogScene extends Phaser.Scene {
     const layout = MockSubmissionLogViewManager.getSummaryPanelLayout();
     this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0xffffff, 0.96)
       .setStrokeStyle(5, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, '제출 요약', {
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
       fontSize: '36px',
       color: '#172554',
       fontStyle: 'bold',
@@ -56,7 +58,7 @@ export default class MockSubmissionLogScene extends Phaser.Scene {
     const layout = MockSubmissionLogViewManager.getLogPanelLayout();
     this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0x111827, 0.98)
       .setStrokeStyle(5, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, '최근 제출 JSON', {
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
       fontSize: '34px',
       color: '#ffffff',
       fontStyle: 'bold',
@@ -79,22 +81,22 @@ export default class MockSubmissionLogScene extends Phaser.Scene {
       align: 'center',
     }).setOrigin(0.5);
 
-    const copyButton = this.createButton(layout.copy.x, layout.copy.y, layout.copy.label, '#93c5fd', '#0f172a');
+    const copyButton = this.createButton(layout.copy.x, layout.copy.y, layout.copy.label, layout.copy.backgroundColor, layout.copy.textColor);
     copyButton.on('pointerdown', () => this.copyLogs());
 
-    const downloadButton = this.createButton(layout.download.x, layout.download.y, layout.download.label, '#a7f3d0', '#064e3b');
+    const downloadButton = this.createButton(layout.download.x, layout.download.y, layout.download.label, layout.download.backgroundColor, layout.download.textColor);
     downloadButton.on('pointerdown', () => this.downloadLogs());
 
-    const clearButton = this.createButton(layout.clear.x, layout.clear.y, layout.clear.label, '#fecaca', '#7f1d1d');
+    const clearButton = this.createButton(layout.clear.x, layout.clear.y, layout.clear.label, layout.clear.backgroundColor, layout.clear.textColor);
     clearButton.on('pointerdown', () => {
       MockApiClient.clearSubmissions();
       this.scene.restart();
     });
 
-    const apiButton = this.createButton(layout.api.x, layout.api.y, layout.api.label, '#bbf7d0', '#123524');
+    const apiButton = this.createButton(layout.api.x, layout.api.y, layout.api.label, layout.api.backgroundColor, layout.api.textColor);
     apiButton.on('pointerdown', () => this.scene.start(layout.api.target));
 
-    const endingButton = this.createButton(layout.ending.x, layout.ending.y, layout.ending.label, '#fde68a', '#0f172a');
+    const endingButton = this.createButton(layout.ending.x, layout.ending.y, layout.ending.label, layout.ending.backgroundColor, layout.ending.textColor);
     endingButton.on('pointerdown', () => this.scene.start(layout.ending.target));
   }
 
@@ -110,7 +112,8 @@ export default class MockSubmissionLogScene extends Phaser.Scene {
   }
 
   downloadLogs() {
-    const blob = new Blob([this.submissionsJson], { type: 'application/json' });
+    const downloadConfig = MockSubmissionLogViewManager.getDownloadConfig();
+    const blob = new Blob([this.submissionsJson], { type: downloadConfig.mimeType });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;

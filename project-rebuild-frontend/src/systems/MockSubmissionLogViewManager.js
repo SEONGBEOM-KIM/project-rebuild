@@ -1,8 +1,32 @@
+const MOCK_SUBMISSION_LOG_SCREEN_LAYOUT = {
+  backgroundColor: 0x0f172a,
+  progressStep: 'ending',
+  title: { y: 78, text: 'Mock 제출 로그' },
+  subtitle: { y: 145, text: '실제 백엔드 연결 전, API 제출 시뮬레이션 기록을 확인합니다.' },
+};
+
+const MOCK_SUBMISSION_LOG_DOWNLOAD_CONFIG = {
+  mimeType: 'application/json',
+};
+
 export default class MockSubmissionLogViewManager {
+  static getScreenLayout(width) {
+    return {
+      background: { x: width / 2, y: null, color: MOCK_SUBMISSION_LOG_SCREEN_LAYOUT.backgroundColor },
+      progressStep: MOCK_SUBMISSION_LOG_SCREEN_LAYOUT.progressStep,
+      title: { x: width / 2, ...MOCK_SUBMISSION_LOG_SCREEN_LAYOUT.title },
+      subtitle: { x: width / 2, ...MOCK_SUBMISSION_LOG_SCREEN_LAYOUT.subtitle },
+    };
+  }
+
+  static getDownloadConfig() {
+    return { ...MOCK_SUBMISSION_LOG_DOWNLOAD_CONFIG };
+  }
+
   static getSummaryPanelLayout() {
     return {
       panel: { x: 420, y: 535, width: 520, height: 640, strokeColor: 0x93c5fd },
-      title: { x: 420, y: 260 },
+      title: { x: 420, y: 260, text: '제출 요약' },
       body: { x: 195, y: 325, wordWrapWidth: 450 },
     };
   }
@@ -10,7 +34,7 @@ export default class MockSubmissionLogViewManager {
   static getLogPanelLayout() {
     return {
       panel: { x: 1185, y: 535, width: 920, height: 640, strokeColor: 0x60a5fa },
-      title: { x: 760, y: 260 },
+      title: { x: 760, y: 260, text: '최근 제출 JSON' },
       body: { x: 760, y: 315, wordWrapWidth: 840 },
     };
   }
@@ -18,11 +42,11 @@ export default class MockSubmissionLogViewManager {
   static getControlLayout() {
     return {
       status: { x: 960, y: 855 },
-      copy: { x: 420, y: 940, label: '로그 복사' },
-      download: { x: 700, y: 940, label: '로그 다운로드' },
-      clear: { x: 1010, y: 940, label: '로그 삭제' },
-      api: { x: 1300, y: 940, label: 'API 미리보기', target: 'ApiPayloadScene' },
-      ending: { x: 1580, y: 940, label: '마무리로', target: 'EndingScene' },
+      copy: { x: 420, y: 940, label: '로그 복사', backgroundColor: '#93c5fd', textColor: '#0f172a' },
+      download: { x: 700, y: 940, label: '로그 다운로드', backgroundColor: '#a7f3d0', textColor: '#064e3b' },
+      clear: { x: 1010, y: 940, label: '로그 삭제', backgroundColor: '#fecaca', textColor: '#7f1d1d' },
+      api: { x: 1300, y: 940, label: 'API 미리보기', target: 'ApiPayloadScene', backgroundColor: '#bbf7d0', textColor: '#123524' },
+      ending: { x: 1580, y: 940, label: '마무리로', target: 'EndingScene', backgroundColor: '#fde68a', textColor: '#0f172a' },
     };
   }
 

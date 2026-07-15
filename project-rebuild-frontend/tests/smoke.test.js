@@ -1095,14 +1095,27 @@ function testLearningApiPayloadManager() {
 
 
 function testMockSubmissionLogViewManager() {
+  assert.deepEqual(MockSubmissionLogViewManager.getScreenLayout(1920).title, {
+    x: 960,
+    y: 78,
+    text: 'Mock 제출 로그',
+  });
+  assert.equal(MockSubmissionLogViewManager.getScreenLayout(1920).progressStep, 'ending');
+  assert.equal(MockSubmissionLogViewManager.getDownloadConfig().mimeType, 'application/json');
   assert.equal(MockSubmissionLogViewManager.getSummaryPanelLayout().panel.width, 520);
+  assert.equal(MockSubmissionLogViewManager.getSummaryPanelLayout().title.text, '제출 요약');
   assert.equal(MockSubmissionLogViewManager.getLogPanelLayout().body.wordWrapWidth, 840);
+  assert.equal(MockSubmissionLogViewManager.getLogPanelLayout().title.text, '최근 제출 JSON');
   assert.deepEqual(MockSubmissionLogViewManager.getControlLayout().api, {
     x: 1300,
     y: 940,
     label: 'API 미리보기',
     target: 'ApiPayloadScene',
+    backgroundColor: '#bbf7d0',
+    textColor: '#123524',
   });
+  assert.equal(MockSubmissionLogViewManager.getControlLayout().copy.backgroundColor, '#93c5fd');
+  assert.equal(MockSubmissionLogViewManager.getControlLayout().ending.target, 'EndingScene');
   assert.equal(MockSubmissionLogViewManager.getSummaryTextStyle(450).wordWrap.width, 450);
   assert.equal(MockSubmissionLogViewManager.getLogTextStyle(840).fontFamily, 'monospace');
   assert.match(MockSubmissionLogViewManager.formatStatusText(), /localStorage/);
