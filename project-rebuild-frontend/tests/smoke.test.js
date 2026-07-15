@@ -533,15 +533,29 @@ function testEvaluationManager() {
 
 
 function testSideEffectViewManager() {
+  assert.deepEqual(SideEffectViewManager.getScreenLayout(1920).title, {
+    x: 960,
+    y: 82,
+    text: '부작용 검토',
+  });
+  assert.equal(SideEffectViewManager.getScreenLayout(1920).progressStep, 'result');
+  assert.equal(SideEffectViewManager.getScreenLayout(1920).subtitle.wordWrapWidth, 1450);
+  assert.equal(SideEffectViewManager.getPanelStyle().hintFillColor, 0x1e293b);
+  assert.equal(SideEffectViewManager.getIssueCardStyle().markerStrokeColor, 0xffffff);
   assert.equal(SideEffectViewManager.getIssuePanelLayout().panel.width, 980);
+  assert.equal(SideEffectViewManager.getIssuePanelLayout().title.text, '감지된 주의 신호');
   assert.deepEqual(SideEffectViewManager.getIssueCardLayout(1).title, { x: 310, y: 478 });
   assert.equal(SideEffectViewManager.getHintPanelLayout().body.wordWrapWidth, 500);
+  assert.equal(SideEffectViewManager.getHintPanelLayout().title.text, '다음 선택 힌트');
   assert.deepEqual(SideEffectViewManager.getControlLayout().next, {
     x: 1160,
     y: 955,
     label: '생각 정리',
     target: 'ReflectionScene',
+    backgroundColor: '#bbf7d0',
+    textColor: '#123524',
   });
+  assert.equal(SideEffectViewManager.getControlLayout().back.target, 'ResultScene');
   assert.match(SideEffectViewManager.formatEmptyIssueMessage(), /현재 큰 부작용 신호는 없습니다/);
   assert.deepEqual(SideEffectViewManager.formatHintRows([]), [
     '• 균형 확인',
