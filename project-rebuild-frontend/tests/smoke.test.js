@@ -47,6 +47,7 @@ import { CURRENT_EPISODE, EPISODE_STEPS } from '../src/data/episodes.js';
 import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES } from '../src/data/episodeContent.js';
 import ProgressStepper from '../src/ui/ProgressStepper.js';
 import { getTextButtonColor } from '../src/ui/TextButton.js';
+import { copyTextToClipboard, downloadTextFile } from '../src/ui/BrowserFileActions.js';
 
 
 const PROJECT_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -1878,7 +1879,52 @@ function testSharedUiComponentStyles() {
   assert.equal(getTextButtonColor('#0f172a'), '#0f172a');
 }
 
-function run() {
+
+async function testBrowserFileActions() {
+  const copied = [];
+  await copyTextToClipboard('payload text', { writeText: async (text) => copied.push(text) });
+  assert.deepEqual(copied, ['payload text']);
+
+  const events = [];
+  const link = {
+    set href(value) { events.push(['href', value]); },
+    set download(value) { events.push(['download', value]); },
+    click: () => events.push(['click']),
+    remove: () => events.push(['remove']),
+  };
+  const environment = {
+    URL: {
+      createObjectURL: (blob) => {
+        events.push(['createObjectURL', blob.type]);
+        return 'blob:mock';
+      },
+      revokeObjectURL: (url) => events.push(['revokeObjectURL', url]),
+    },
+    document: {
+      createElement: (tagName) => {
+        events.push(['createElement', tagName]);
+        return link;
+      },
+      body: {
+        appendChild: (node) => events.push(['appendChild', node === link]),
+      },
+    },
+  };
+
+  downloadTextFile({ content: 'hello', fileName: 'report.txt', mimeType: 'text/plain' }, environment);
+  assert.deepEqual(events, [
+    ['createObjectURL', 'text/plain'],
+    ['createElement', 'a'],
+    ['href', 'blob:mock'],
+    ['download', 'report.txt'],
+    ['appendChild', true],
+    ['click'],
+    ['remove'],
+    ['revokeObjectURL', 'blob:mock'],
+  ]);
+}
+
+async function run() {
   testBootFlowManager();
   testEpisodeMetadata();
   testEpisodeContent();
@@ -1925,7 +1971,8 @@ function run() {
   testSceneManagerImports();
   testSceneReferences();
   testSharedUiComponentStyles();
+  await testBrowserFileActions();
   console.log('Smoke tests passed');
 }
 
-run();
+await run();

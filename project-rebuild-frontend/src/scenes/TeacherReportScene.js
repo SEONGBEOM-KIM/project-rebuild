@@ -3,6 +3,7 @@ import ProgressStepper from '../ui/ProgressStepper.js';
 import TeacherReportManager from '../systems/TeacherReportManager.js';
 import TeacherReportViewManager from '../systems/TeacherReportViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
+import { copyTextToClipboard, downloadTextFile } from '../ui/BrowserFileActions.js';
 
 export default class TeacherReportScene extends Phaser.Scene {
   constructor() {
@@ -65,7 +66,7 @@ export default class TeacherReportScene extends Phaser.Scene {
 
   async copyReportToClipboard() {
     try {
-      await navigator.clipboard.writeText(this.reportText);
+      await copyTextToClipboard(this.reportText);
       this.reportStatusText.setText(TeacherReportManager.formatCopySuccess());
       this.reportStatusText.setColor(TeacherReportViewManager.getStatusColor('success'));
     } catch (_error) {
@@ -76,15 +77,11 @@ export default class TeacherReportScene extends Phaser.Scene {
 
   downloadReport() {
     const downloadConfig = TeacherReportManager.getDownloadConfig();
-    const blob = new Blob([this.reportText], { type: downloadConfig.mimeType });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = TeacherReportManager.formatDownloadFileName();
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
+    downloadTextFile({
+      content: this.reportText,
+      fileName: TeacherReportManager.formatDownloadFileName(),
+      mimeType: downloadConfig.mimeType,
+    });
     this.reportStatusText.setText(TeacherReportManager.formatDownloadSuccess());
     this.reportStatusText.setColor(TeacherReportViewManager.getStatusColor('success'));
   }

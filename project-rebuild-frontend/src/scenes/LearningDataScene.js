@@ -4,6 +4,7 @@ import LearningDataManager from '../systems/LearningDataManager.js';
 import SaveManager from '../systems/SaveManager.js';
 import LearningDataViewManager from '../systems/LearningDataViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
+import { copyTextToClipboard, downloadTextFile } from '../ui/BrowserFileActions.js';
 
 export default class LearningDataScene extends Phaser.Scene {
   constructor() {
@@ -145,7 +146,7 @@ export default class LearningDataScene extends Phaser.Scene {
 
   async copyJsonToClipboard() {
     try {
-      await navigator.clipboard.writeText(this.learningDataJson);
+      await copyTextToClipboard(this.learningDataJson);
       this.saveStatusText.setText(LearningDataViewManager.formatCopySuccess());
       this.saveStatusText.setColor(LearningDataViewManager.getFeedbackColor('success'));
     } catch (_error) {
@@ -156,15 +157,11 @@ export default class LearningDataScene extends Phaser.Scene {
 
   downloadJson() {
     const downloadConfig = LearningDataViewManager.getDownloadConfig();
-    const blob = new Blob([this.learningDataJson], { type: downloadConfig.mimeType });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = LearningDataViewManager.formatDownloadFileName(this.learningData);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
+    downloadTextFile({
+      content: this.learningDataJson,
+      fileName: LearningDataViewManager.formatDownloadFileName(this.learningData),
+      mimeType: downloadConfig.mimeType,
+    });
     this.saveStatusText.setText(LearningDataViewManager.formatDownloadSuccess());
     this.saveStatusText.setColor(LearningDataViewManager.getFeedbackColor('success'));
   }

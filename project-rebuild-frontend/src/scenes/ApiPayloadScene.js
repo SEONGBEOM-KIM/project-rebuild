@@ -5,6 +5,7 @@ import LearningApiPayloadManager from '../systems/LearningApiPayloadManager.js';
 import MockApiClient from '../systems/MockApiClient.js';
 import ApiPayloadViewManager from '../systems/ApiPayloadViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
+import { copyTextToClipboard, downloadTextFile } from '../ui/BrowserFileActions.js';
 
 export default class ApiPayloadScene extends Phaser.Scene {
   constructor() {
@@ -144,7 +145,7 @@ export default class ApiPayloadScene extends Phaser.Scene {
 
   async copyPayload() {
     try {
-      await navigator.clipboard.writeText(this.apiPayloadJson);
+      await copyTextToClipboard(this.apiPayloadJson);
       this.statusText.setText(ApiPayloadViewManager.formatCopySuccess());
       this.statusText.setColor(ApiPayloadViewManager.getFeedbackColor('success'));
     } catch (_error) {
@@ -155,15 +156,11 @@ export default class ApiPayloadScene extends Phaser.Scene {
 
   downloadPayload() {
     const downloadConfig = ApiPayloadViewManager.getDownloadConfig();
-    const blob = new Blob([this.apiPayloadJson], { type: downloadConfig.mimeType });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = ApiPayloadViewManager.formatDownloadFileName(this.apiPayload);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
+    downloadTextFile({
+      content: this.apiPayloadJson,
+      fileName: ApiPayloadViewManager.formatDownloadFileName(this.apiPayload),
+      mimeType: downloadConfig.mimeType,
+    });
     this.statusText.setText(ApiPayloadViewManager.formatDownloadSuccess());
     this.statusText.setColor(ApiPayloadViewManager.getFeedbackColor('success'));
   }

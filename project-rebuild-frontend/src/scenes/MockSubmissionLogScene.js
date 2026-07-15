@@ -3,6 +3,7 @@ import ProgressStepper from '../ui/ProgressStepper.js';
 import MockApiClient from '../systems/MockApiClient.js';
 import MockSubmissionLogViewManager from '../systems/MockSubmissionLogViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
+import { copyTextToClipboard, downloadTextFile } from '../ui/BrowserFileActions.js';
 
 export default class MockSubmissionLogScene extends Phaser.Scene {
   constructor() {
@@ -102,7 +103,7 @@ export default class MockSubmissionLogScene extends Phaser.Scene {
 
   async copyLogs() {
     try {
-      await navigator.clipboard.writeText(this.submissionsJson);
+      await copyTextToClipboard(this.submissionsJson);
       this.statusText.setText(MockSubmissionLogViewManager.formatCopySuccess());
       this.statusText.setColor(MockSubmissionLogViewManager.getFeedbackColor('success'));
     } catch (_error) {
@@ -113,15 +114,11 @@ export default class MockSubmissionLogScene extends Phaser.Scene {
 
   downloadLogs() {
     const downloadConfig = MockSubmissionLogViewManager.getDownloadConfig();
-    const blob = new Blob([this.submissionsJson], { type: downloadConfig.mimeType });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = MockSubmissionLogViewManager.formatDownloadFileName();
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
+    downloadTextFile({
+      content: this.submissionsJson,
+      fileName: MockSubmissionLogViewManager.formatDownloadFileName(),
+      mimeType: downloadConfig.mimeType,
+    });
     this.statusText.setText(MockSubmissionLogViewManager.formatDownloadSuccess());
     this.statusText.setColor(MockSubmissionLogViewManager.getFeedbackColor('success'));
   }
