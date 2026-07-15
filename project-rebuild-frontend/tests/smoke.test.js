@@ -477,6 +477,9 @@ function testAuthViewManager() {
   const layout = AuthViewManager.getLayout();
   assert.equal(layout.title.text, '학습자 입장');
   assert.equal(layout.proceedButton.targetScene, 'StoryScene');
+  assert.equal(layout.title.fontSize, '68px');
+  assert.equal(layout.subtitle.color, '#93c5fd');
+  assert.equal(layout.proceedButton.backgroundColor, '#fde68a');
   assert.deepEqual(AuthViewManager.getPanelPositions(1920, 1080).map((panel) => panel.title), ['로그인', '회원가입']);
   assert.deepEqual(AuthViewManager.getPanelPositions(1920, 1080).map((panel) => ({ x: panel.x, y: panel.y })), [
     { x: 700, y: 580 },
@@ -487,6 +490,8 @@ function testAuthViewManager() {
     x: 960,
   });
   assert.deepEqual(layout.panel.fields.map((field) => field.label), ['이름', '비밀번호']);
+  assert.equal(layout.panel.strokeWidth, 4);
+  assert.equal(layout.panel.sampleButton.textColor, '#0f172a');
 }
 
 function testStoryViewManager() {
