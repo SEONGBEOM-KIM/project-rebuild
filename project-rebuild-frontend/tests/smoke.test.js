@@ -45,6 +45,11 @@ import { ISSUE_THRESHOLDS, REACTION_THRESHOLDS, RESULT_THRESHOLDS, SCORE_RULES }
 import { API_CONTRACT, formatContractRequest, formatContractResponse } from '../src/data/apiContract.js';
 import { CURRENT_EPISODE, EPISODE_STEPS } from '../src/data/episodes.js';
 import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES } from '../src/data/episodeContent.js';
+import ProgressStepper from '../src/ui/ProgressStepper.js';
+import StatusBar from '../src/ui/StatusBar.js';
+import PolicyCard from '../src/ui/PolicyCard.js';
+import DialogueBox from '../src/ui/DialogueBox.js';
+import ResultPanel from '../src/ui/ResultPanel.js';
 
 
 const PROJECT_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -1839,6 +1844,56 @@ function testSceneReferences() {
   assert.deepEqual(missingTargets, [], 'Every scene.start and manager targetScene target must be registered in main.js');
 }
 
+
+function testSharedUiComponentStyles() {
+  const progressStyle = ProgressStepper.getStyle();
+  assert.equal(progressStyle.spacing, 176);
+  assert.equal(progressStyle.circle.strokeWidth, 3);
+  assert.deepEqual(ProgressStepper.getStepVisualState(1, 2), {
+    completed: true,
+    active: false,
+    circleColor: 0xbbf7d0,
+    lineColor: 0xbbf7d0,
+    textColor: '#bbf7d0',
+    radius: 14,
+    strokeAlpha: 0.65,
+    fontSize: '18px',
+    fontStyle: 'normal',
+  });
+  assert.deepEqual(ProgressStepper.getStepVisualState(2, 2), {
+    completed: false,
+    active: true,
+    circleColor: 0xfde68a,
+    lineColor: 0xbbf7d0,
+    textColor: '#fde68a',
+    radius: 18,
+    strokeAlpha: 1,
+    fontSize: '20px',
+    fontStyle: 'bold',
+  });
+
+  assert.deepEqual(StatusBar.getStyle().text.padding, { x: 14, y: 10 });
+  assert.deepEqual(PolicyCard.getStyle().background, {
+    x: 0,
+    y: 0,
+    width: 240,
+    height: 110,
+    fillColor: 0xe0f2fe,
+    strokeWidth: 2,
+    strokeColor: 0x0284c7,
+  });
+  assert.equal(DialogueBox.getStyle().text.fontSize, '30px');
+  assert.equal(DialogueBox.getStyle().box.horizontalMargin, 220);
+  assert.deepEqual(ResultPanel.getStyle().panel, {
+    width: 720,
+    height: 480,
+    fillColor: 0xffffff,
+    fillAlpha: 0.95,
+    strokeWidth: 4,
+    strokeColor: 0x1d4ed8,
+  });
+}
+
 function run() {
   testBootFlowManager();
   testEpisodeMetadata();
@@ -1885,6 +1940,7 @@ function run() {
   testApiContract();
   testSceneManagerImports();
   testSceneReferences();
+  testSharedUiComponentStyles();
   console.log('Smoke tests passed');
 }
 
