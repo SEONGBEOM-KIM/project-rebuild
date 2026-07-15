@@ -3,8 +3,58 @@ import LearningDataManager from './LearningDataManager.js';
 export const LEARNING_DATA_SCREEN_LAYOUT = {
   backgroundColor: 0x0f172a,
   progressStep: 'ending',
-  title: { y: 78, text: '학습 데이터 확인' },
-  subtitle: { y: 145, text: '현재는 서버 저장 없이 registry에 쌓인 학습 기록을 화면에서 확인하는 UI 단계입니다.' },
+  title: { y: 78, text: '학습 데이터 확인', fontSize: '60px', color: '#ffffff', fontStyle: 'bold' },
+  subtitle: { y: 145, text: '현재는 서버 저장 없이 registry에 쌓인 학습 기록을 화면에서 확인하는 UI 단계입니다.', fontSize: '26px', color: '#bfdbfe' },
+};
+
+const LEARNING_DATA_DARK_PANEL_STYLE = {
+  fillColor: 0x111827,
+  fillAlpha: 0.98,
+  strokeWidth: 5,
+  titleFontSize: '34px',
+  titleColor: '#ffffff',
+  titleFontStyle: 'bold',
+};
+
+const LEARNING_DATA_LIGHT_PANEL_STYLE = {
+  fillColor: 0xffffff,
+  fillAlpha: 0.96,
+  strokeWidth: 5,
+  titleFontSize: '34px',
+  titleColor: '#172554',
+  titleFontStyle: 'bold',
+};
+
+const LEARNING_DATA_VALIDATION_TEXT_STYLE = {
+  fontSize: '21px',
+  color: '#1e293b',
+  lineSpacing: 9,
+};
+
+const LEARNING_DATA_SUMMARY_BOX_STYLE = {
+  fillAlpha: 1,
+  strokeWidth: 3,
+  titleFontSize: '24px',
+  titleFontStyle: 'bold',
+  bodyFontSize: '20px',
+  lineSpacing: 8,
+};
+
+const LEARNING_DATA_SAVE_PANEL_STYLE = {
+  fillColor: 0x1e293b,
+  fillAlpha: 0.98,
+  strokeWidth: 4,
+  titleFontSize: '25px',
+  titleColor: '#ffffff',
+  titleFontStyle: 'bold',
+  bodyFontSize: '20px',
+  bodyColor: '#dbeafe',
+  bodyLineSpacing: 8,
+};
+
+const LEARNING_DATA_BUTTON_STYLE = {
+  fontSize: '25px',
+  padding: { x: 22, y: 15 },
 };
 
 export const LEARNING_DATA_DOWNLOAD_CONFIG = {
@@ -24,6 +74,30 @@ export default class LearningDataViewManager {
 
   static getDownloadConfig() {
     return LEARNING_DATA_DOWNLOAD_CONFIG;
+  }
+
+  static getDarkPanelStyle() {
+    return { ...LEARNING_DATA_DARK_PANEL_STYLE };
+  }
+
+  static getLightPanelStyle() {
+    return { ...LEARNING_DATA_LIGHT_PANEL_STYLE };
+  }
+
+  static getValidationTextStyle(wordWrapWidth) {
+    return { ...LEARNING_DATA_VALIDATION_TEXT_STYLE, wordWrap: { width: wordWrapWidth } };
+  }
+
+  static getSummaryBoxStyle(wordWrapWidth) {
+    return { ...LEARNING_DATA_SUMMARY_BOX_STYLE, wordWrap: { width: wordWrapWidth } };
+  }
+
+  static getSavePanelStyle() {
+    return { ...LEARNING_DATA_SAVE_PANEL_STYLE };
+  }
+
+  static getButtonStyle() {
+    return { ...LEARNING_DATA_BUTTON_STYLE, padding: { ...LEARNING_DATA_BUTTON_STYLE.padding } };
   }
 
   static getDataPanelLayout() {

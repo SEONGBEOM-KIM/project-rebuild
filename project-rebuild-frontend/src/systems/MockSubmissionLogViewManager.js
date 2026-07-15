@@ -1,8 +1,37 @@
 const MOCK_SUBMISSION_LOG_SCREEN_LAYOUT = {
   backgroundColor: 0x0f172a,
   progressStep: 'ending',
-  title: { y: 78, text: 'Mock 제출 로그' },
-  subtitle: { y: 145, text: '실제 백엔드 연결 전, API 제출 시뮬레이션 기록을 확인합니다.' },
+  title: { y: 78, text: 'Mock 제출 로그', fontSize: '60px', color: '#ffffff', fontStyle: 'bold' },
+  subtitle: { y: 145, text: '실제 백엔드 연결 전, API 제출 시뮬레이션 기록을 확인합니다.', fontSize: '26px', color: '#bfdbfe' },
+};
+
+const MOCK_SUBMISSION_SUMMARY_PANEL_STYLE = {
+  fillColor: 0xffffff,
+  fillAlpha: 0.96,
+  strokeWidth: 5,
+  titleFontSize: '36px',
+  titleColor: '#172554',
+  titleFontStyle: 'bold',
+};
+
+const MOCK_SUBMISSION_LOG_PANEL_STYLE = {
+  fillColor: 0x111827,
+  fillAlpha: 0.98,
+  strokeWidth: 5,
+  titleFontSize: '34px',
+  titleColor: '#ffffff',
+  titleFontStyle: 'bold',
+};
+
+const MOCK_SUBMISSION_STATUS_STYLE = {
+  fontSize: '23px',
+  color: '#bfdbfe',
+  align: 'center',
+};
+
+const MOCK_SUBMISSION_BUTTON_STYLE = {
+  fontSize: '27px',
+  padding: { x: 22, y: 15 },
 };
 
 const MOCK_SUBMISSION_LOG_DOWNLOAD_CONFIG = {
@@ -21,6 +50,22 @@ export default class MockSubmissionLogViewManager {
 
   static getDownloadConfig() {
     return { ...MOCK_SUBMISSION_LOG_DOWNLOAD_CONFIG };
+  }
+
+  static getSummaryPanelStyle() {
+    return { ...MOCK_SUBMISSION_SUMMARY_PANEL_STYLE };
+  }
+
+  static getLogPanelStyle() {
+    return { ...MOCK_SUBMISSION_LOG_PANEL_STYLE };
+  }
+
+  static getStatusTextStyle() {
+    return { ...MOCK_SUBMISSION_STATUS_STYLE };
+  }
+
+  static getButtonStyle() {
+    return { ...MOCK_SUBMISSION_BUTTON_STYLE, padding: { ...MOCK_SUBMISSION_BUTTON_STYLE.padding } };
   }
 
   static getSummaryPanelLayout() {

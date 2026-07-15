@@ -1169,9 +1169,22 @@ function testTeacherReportManager() {
 
 
 function testLearningDataViewManager() {
-  assert.deepEqual(LearningDataViewManager.getScreenLayout(1920).title, { y: 78, text: '학습 데이터 확인', x: 960 });
+  assert.deepEqual(LearningDataViewManager.getScreenLayout(1920).title, {
+    y: 78,
+    text: '학습 데이터 확인',
+    fontSize: '60px',
+    color: '#ffffff',
+    fontStyle: 'bold',
+    x: 960,
+  });
   assert.equal(LearningDataViewManager.getScreenLayout(1920).progressStep, 'ending');
   assert.deepEqual(LearningDataViewManager.getDownloadConfig(), { mimeType: 'application/json' });
+  assert.equal(LearningDataViewManager.getDarkPanelStyle().strokeWidth, 5);
+  assert.equal(LearningDataViewManager.getLightPanelStyle().titleColor, '#172554');
+  assert.equal(LearningDataViewManager.getValidationTextStyle(440).wordWrap.width, 440);
+  assert.equal(LearningDataViewManager.getSummaryBoxStyle(390).bodyFontSize, '20px');
+  assert.equal(LearningDataViewManager.getSavePanelStyle().bodyColor, '#dbeafe');
+  assert.deepEqual(LearningDataViewManager.getButtonStyle().padding, { x: 22, y: 15 });
   assert.equal(LearningDataViewManager.getDataPanelLayout().panel.width, 1120);
   assert.equal(LearningDataViewManager.getDataPanelLayout().title.text, '저장 후보 데이터');
   assert.equal(LearningDataViewManager.getValidationPanelLayout().title.text, '데이터 검증');
@@ -1268,9 +1281,22 @@ function testLearningDataManager() {
 function testApiPayloadViewManager() {
   const payload = LearningApiPayloadManager.build(createCompleteLearningData());
   assert.match(ApiPayloadViewManager.formatJson(payload), /"schema_version": 1/);
-  assert.deepEqual(ApiPayloadViewManager.getScreenLayout(1920).title, { y: 78, text: 'API 저장 페이로드 미리보기', x: 960 });
+  assert.deepEqual(ApiPayloadViewManager.getScreenLayout(1920).title, {
+    y: 78,
+    text: 'API 저장 페이로드 미리보기',
+    fontSize: '56px',
+    color: '#ffffff',
+    fontStyle: 'bold',
+    x: 960,
+  });
   assert.equal(ApiPayloadViewManager.getScreenLayout(1920).progressStep, 'ending');
   assert.deepEqual(ApiPayloadViewManager.getDownloadConfig(), { mimeType: 'application/json' });
+  assert.equal(ApiPayloadViewManager.getDarkPanelStyle().titleFontSize, '31px');
+  assert.equal(ApiPayloadViewManager.getLightPanelStyle().fillColor, 0xffffff);
+  assert.equal(ApiPayloadViewManager.getValidationTextStyle(440).wordWrap.width, 440);
+  assert.equal(ApiPayloadViewManager.getStatusTextStyle(440, '#166534').color, '#166534');
+  assert.equal(ApiPayloadViewManager.getLogPanelStyle().strokeWidth, 3);
+  assert.deepEqual(ApiPayloadViewManager.getButtonStyle().padding, { x: 14, y: 13 });
   assert.equal(ApiPayloadViewManager.getPayloadPanelLayout().panel.width, 1120);
   assert.equal(ApiPayloadViewManager.getPayloadPanelLayout().title.text, 'POST /api/learning-records/ 후보 body');
   assert.equal(ApiPayloadViewManager.getValidationPanelLayout().title.text, 'API 구조 검증');
@@ -1333,9 +1359,16 @@ function testMockSubmissionLogViewManager() {
     x: 960,
     y: 78,
     text: 'Mock 제출 로그',
+    fontSize: '60px',
+    color: '#ffffff',
+    fontStyle: 'bold',
   });
   assert.equal(MockSubmissionLogViewManager.getScreenLayout(1920).progressStep, 'ending');
   assert.equal(MockSubmissionLogViewManager.getDownloadConfig().mimeType, 'application/json');
+  assert.equal(MockSubmissionLogViewManager.getSummaryPanelStyle().titleFontSize, '36px');
+  assert.equal(MockSubmissionLogViewManager.getLogPanelStyle().fillColor, 0x111827);
+  assert.equal(MockSubmissionLogViewManager.getStatusTextStyle().align, 'center');
+  assert.deepEqual(MockSubmissionLogViewManager.getButtonStyle().padding, { x: 22, y: 15 });
   assert.equal(MockSubmissionLogViewManager.getSummaryPanelLayout().panel.width, 520);
   assert.equal(MockSubmissionLogViewManager.getSummaryPanelLayout().title.text, '제출 요약');
   assert.equal(MockSubmissionLogViewManager.getLogPanelLayout().body.wordWrapWidth, 840);

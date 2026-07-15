@@ -21,14 +21,14 @@ export default class ApiPayloadScene extends Phaser.Scene {
     ProgressStepper.render(this, screenLayout.progressStep);
 
     this.add.text(screenLayout.title.x, screenLayout.title.y, screenLayout.title.text, {
-      fontSize: '56px',
-      color: '#ffffff',
-      fontStyle: 'bold',
+      fontSize: screenLayout.title.fontSize,
+      color: screenLayout.title.color,
+      fontStyle: screenLayout.title.fontStyle,
     }).setOrigin(0.5);
 
     this.add.text(screenLayout.subtitle.x, screenLayout.subtitle.y, screenLayout.subtitle.text, {
-      fontSize: '21px',
-      color: '#bfdbfe',
+      fontSize: screenLayout.subtitle.fontSize,
+      color: screenLayout.subtitle.color,
     }).setOrigin(0.5);
 
     this.drawPayloadPanel();
@@ -39,12 +39,13 @@ export default class ApiPayloadScene extends Phaser.Scene {
 
   drawPayloadPanel() {
     const layout = ApiPayloadViewManager.getPayloadPanelLayout();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0x0f172a, 0.98)
-      .setStrokeStyle(5, layout.panel.strokeColor);
+    const panelStyle = ApiPayloadViewManager.getDarkPanelStyle();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
+      .setStrokeStyle(panelStyle.strokeWidth, layout.panel.strokeColor);
     this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '31px',
-      color: '#ffffff',
-      fontStyle: 'bold',
+      fontSize: panelStyle.titleFontSize,
+      color: panelStyle.titleColor,
+      fontStyle: panelStyle.titleFontStyle,
     });
     this.add.text(
       layout.body.x,
@@ -58,43 +59,47 @@ export default class ApiPayloadScene extends Phaser.Scene {
     const summary = ApiPayloadViewManager.getValidationSummary(this.apiPayload);
 
     const layout = ApiPayloadViewManager.getValidationPanelLayout();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0xffffff, 0.96).setStrokeStyle(5, summary.strokeColor);
+    const panelStyle = ApiPayloadViewManager.getLightPanelStyle();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
+      .setStrokeStyle(panelStyle.strokeWidth, summary.strokeColor);
     this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '34px',
-      color: '#172554',
-      fontStyle: 'bold',
+      fontSize: panelStyle.titleFontSize,
+      color: panelStyle.titleColor,
+      fontStyle: panelStyle.titleFontStyle,
     }).setOrigin(0.5);
 
-    this.add.text(layout.rows.x, layout.rows.y, ApiPayloadViewManager.formatValidationRows(summary.rows), {
-      fontSize: '21px',
-      color: '#1e293b',
-      lineSpacing: 9,
-      wordWrap: { width: layout.rows.wordWrapWidth },
-    });
+    this.add.text(
+      layout.rows.x,
+      layout.rows.y,
+      ApiPayloadViewManager.formatValidationRows(summary.rows),
+      ApiPayloadViewManager.getValidationTextStyle(layout.rows.wordWrapWidth),
+    );
 
-    this.statusText = this.add.text(layout.status.x, layout.status.y, summary.statusText, {
-      fontSize: '21px',
-      color: summary.statusColor,
-      lineSpacing: 9,
-      wordWrap: { width: layout.status.wordWrapWidth },
-    });
+    this.statusText = this.add.text(
+      layout.status.x,
+      layout.status.y,
+      summary.statusText,
+      ApiPayloadViewManager.getStatusTextStyle(layout.status.wordWrapWidth, summary.statusColor),
+    );
   }
 
   drawSubmissionLog() {
     const submissions = MockApiClient.listSubmissions();
     const layout = ApiPayloadViewManager.getSubmissionLogLayout();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0x1e293b, 0.98).setStrokeStyle(3, layout.title.strokeColor);
+    const logStyle = ApiPayloadViewManager.getLogPanelStyle();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, logStyle.fillColor, logStyle.fillAlpha)
+      .setStrokeStyle(logStyle.strokeWidth, layout.title.strokeColor);
     this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '22px',
-      color: '#ffffff',
-      fontStyle: 'bold',
+      fontSize: logStyle.titleFontSize,
+      color: logStyle.titleColor,
+      fontStyle: logStyle.titleFontStyle,
     });
-    this.submissionLogText = this.add.text(layout.body.x, layout.body.y, ApiPayloadViewManager.formatSubmissionLog(submissions), {
-      fontSize: '18px',
-      color: '#dbeafe',
-      lineSpacing: 6,
-      wordWrap: { width: layout.body.wordWrapWidth },
-    });
+    this.submissionLogText = this.add.text(
+      layout.body.x,
+      layout.body.y,
+      ApiPayloadViewManager.formatSubmissionLog(submissions),
+      ApiPayloadViewManager.getLogTextStyle(layout.body.wordWrapWidth),
+    );
   }
 
   drawControls() {
@@ -163,11 +168,12 @@ export default class ApiPayloadScene extends Phaser.Scene {
   }
 
   createButton(x, y, label, backgroundColor, color) {
+    const buttonStyle = ApiPayloadViewManager.getButtonStyle();
     return this.add.text(x, y, label, {
-      fontSize: '21px',
+      fontSize: buttonStyle.fontSize,
       color,
       backgroundColor,
-      padding: { x: 14, y: 13 },
+      padding: buttonStyle.padding,
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
   }
 }

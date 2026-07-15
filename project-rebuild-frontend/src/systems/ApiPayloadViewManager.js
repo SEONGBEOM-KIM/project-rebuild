@@ -3,8 +3,57 @@ import LearningApiPayloadManager from './LearningApiPayloadManager.js';
 export const API_PAYLOAD_SCREEN_LAYOUT = {
   backgroundColor: 0x111827,
   progressStep: 'ending',
-  title: { y: 78, text: 'API 저장 페이로드 미리보기' },
-  subtitle: { y: 145, text: 'Django API 연동 전, 프론트엔드 학습 데이터를 서버 저장용 구조로 변환해 확인합니다.' },
+  title: { y: 78, text: 'API 저장 페이로드 미리보기', fontSize: '56px', color: '#ffffff', fontStyle: 'bold' },
+  subtitle: { y: 145, text: 'Django API 연동 전, 프론트엔드 학습 데이터를 서버 저장용 구조로 변환해 확인합니다.', fontSize: '21px', color: '#bfdbfe' },
+};
+
+const API_PAYLOAD_DARK_PANEL_STYLE = {
+  fillColor: 0x0f172a,
+  fillAlpha: 0.98,
+  strokeWidth: 5,
+  titleFontSize: '31px',
+  titleColor: '#ffffff',
+  titleFontStyle: 'bold',
+};
+
+const API_PAYLOAD_LIGHT_PANEL_STYLE = {
+  fillColor: 0xffffff,
+  fillAlpha: 0.96,
+  strokeWidth: 5,
+  titleFontSize: '34px',
+  titleColor: '#172554',
+  titleFontStyle: 'bold',
+};
+
+const API_PAYLOAD_VALIDATION_TEXT_STYLE = {
+  fontSize: '21px',
+  color: '#1e293b',
+  lineSpacing: 9,
+};
+
+const API_PAYLOAD_STATUS_TEXT_STYLE = {
+  fontSize: '21px',
+  lineSpacing: 9,
+};
+
+const API_PAYLOAD_LOG_PANEL_STYLE = {
+  fillColor: 0x1e293b,
+  fillAlpha: 0.98,
+  strokeWidth: 3,
+  titleFontSize: '22px',
+  titleColor: '#ffffff',
+  titleFontStyle: 'bold',
+};
+
+const API_PAYLOAD_LOG_TEXT_STYLE = {
+  fontSize: '18px',
+  color: '#dbeafe',
+  lineSpacing: 6,
+};
+
+const API_PAYLOAD_BUTTON_STYLE = {
+  fontSize: '21px',
+  padding: { x: 14, y: 13 },
 };
 
 export const API_PAYLOAD_DOWNLOAD_CONFIG = {
@@ -24,6 +73,34 @@ export default class ApiPayloadViewManager {
 
   static getDownloadConfig() {
     return API_PAYLOAD_DOWNLOAD_CONFIG;
+  }
+
+  static getDarkPanelStyle() {
+    return { ...API_PAYLOAD_DARK_PANEL_STYLE };
+  }
+
+  static getLightPanelStyle() {
+    return { ...API_PAYLOAD_LIGHT_PANEL_STYLE };
+  }
+
+  static getValidationTextStyle(wordWrapWidth) {
+    return { ...API_PAYLOAD_VALIDATION_TEXT_STYLE, wordWrap: { width: wordWrapWidth } };
+  }
+
+  static getStatusTextStyle(wordWrapWidth, color) {
+    return { ...API_PAYLOAD_STATUS_TEXT_STYLE, color, wordWrap: { width: wordWrapWidth } };
+  }
+
+  static getLogPanelStyle() {
+    return { ...API_PAYLOAD_LOG_PANEL_STYLE };
+  }
+
+  static getLogTextStyle(wordWrapWidth) {
+    return { ...API_PAYLOAD_LOG_TEXT_STYLE, wordWrap: { width: wordWrapWidth } };
+  }
+
+  static getButtonStyle() {
+    return { ...API_PAYLOAD_BUTTON_STYLE, padding: { ...API_PAYLOAD_BUTTON_STYLE.padding } };
   }
 
   static getPayloadPanelLayout() {

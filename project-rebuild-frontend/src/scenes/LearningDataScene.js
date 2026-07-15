@@ -18,14 +18,14 @@ export default class LearningDataScene extends Phaser.Scene {
     ProgressStepper.render(this, screenLayout.progressStep);
 
     this.add.text(screenLayout.title.x, screenLayout.title.y, screenLayout.title.text, {
-      fontSize: '60px',
-      color: '#ffffff',
-      fontStyle: 'bold',
+      fontSize: screenLayout.title.fontSize,
+      color: screenLayout.title.color,
+      fontStyle: screenLayout.title.fontStyle,
     }).setOrigin(0.5);
 
     this.add.text(screenLayout.subtitle.x, screenLayout.subtitle.y, screenLayout.subtitle.text, {
-      fontSize: '26px',
-      color: '#bfdbfe',
+      fontSize: screenLayout.subtitle.fontSize,
+      color: screenLayout.subtitle.color,
     }).setOrigin(0.5);
 
     this.learningData = learningData;
@@ -42,12 +42,13 @@ export default class LearningDataScene extends Phaser.Scene {
 
   drawDataPanel(_learningData) {
     const layout = LearningDataViewManager.getDataPanelLayout();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0x111827, 0.98)
-      .setStrokeStyle(5, layout.panel.strokeColor);
+    const panelStyle = LearningDataViewManager.getDarkPanelStyle();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
+      .setStrokeStyle(panelStyle.strokeWidth, layout.panel.strokeColor);
     this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '34px',
-      color: '#ffffff',
-      fontStyle: 'bold',
+      fontSize: panelStyle.titleFontSize,
+      color: panelStyle.titleColor,
+      fontStyle: panelStyle.titleFontStyle,
     });
 
     this.add.text(
@@ -60,51 +61,54 @@ export default class LearningDataScene extends Phaser.Scene {
 
   drawValidationPanel(learningData) {
     const layout = LearningDataViewManager.getValidationPanelLayout();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0xffffff, 0.96)
-      .setStrokeStyle(5, layout.panel.strokeColor);
+    const panelStyle = LearningDataViewManager.getLightPanelStyle();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
+      .setStrokeStyle(panelStyle.strokeWidth, layout.panel.strokeColor);
     this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '34px',
-      color: '#172554',
-      fontStyle: 'bold',
+      fontSize: panelStyle.titleFontSize,
+      color: panelStyle.titleColor,
+      fontStyle: panelStyle.titleFontStyle,
     }).setOrigin(0.5);
 
     const summary = LearningDataViewManager.getValidationSummary(learningData);
-    this.add.text(layout.rows.x, layout.rows.y, LearningDataViewManager.formatValidationRows(summary.rows), {
-      fontSize: '21px',
-      color: '#1e293b',
-      lineSpacing: 9,
-      wordWrap: { width: layout.rows.wordWrapWidth },
-    });
+    this.add.text(
+      layout.rows.x,
+      layout.rows.y,
+      LearningDataViewManager.formatValidationRows(summary.rows),
+      LearningDataViewManager.getValidationTextStyle(layout.rows.wordWrapWidth),
+    );
 
-    this.add.rectangle(layout.summaryBox.x, layout.summaryBox.y, layout.summaryBox.width, layout.summaryBox.height, summary.backgroundColor, 1)
-      .setStrokeStyle(3, summary.strokeColor);
+    const summaryStyle = LearningDataViewManager.getSummaryBoxStyle(layout.summaryBody.wordWrapWidth);
+    this.add.rectangle(layout.summaryBox.x, layout.summaryBox.y, layout.summaryBox.width, layout.summaryBox.height, summary.backgroundColor, summaryStyle.fillAlpha)
+      .setStrokeStyle(summaryStyle.strokeWidth, summary.strokeColor);
     this.add.text(layout.summaryTitle.x, layout.summaryTitle.y, summary.title, {
-      fontSize: '24px',
+      fontSize: summaryStyle.titleFontSize,
       color: summary.titleColor,
-      fontStyle: 'bold',
+      fontStyle: summaryStyle.titleFontStyle,
     });
     this.add.text(layout.summaryBody.x, layout.summaryBody.y, summary.body, {
-      fontSize: '20px',
+      fontSize: summaryStyle.bodyFontSize,
       color: summary.bodyColor,
-      lineSpacing: 8,
-      wordWrap: { width: layout.summaryBody.wordWrapWidth },
+      lineSpacing: summaryStyle.lineSpacing,
+      wordWrap: summaryStyle.wordWrap,
     });
   }
 
   drawSavePanel() {
     const saved = SaveManager.load();
     const layout = LearningDataViewManager.getSavePanelLayout();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0x1e293b, 0.98)
-      .setStrokeStyle(4, layout.panel.strokeColor);
+    const panelStyle = LearningDataViewManager.getSavePanelStyle();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
+      .setStrokeStyle(panelStyle.strokeWidth, layout.panel.strokeColor);
     this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '25px',
-      color: '#ffffff',
-      fontStyle: 'bold',
+      fontSize: panelStyle.titleFontSize,
+      color: panelStyle.titleColor,
+      fontStyle: panelStyle.titleFontStyle,
     });
     this.saveStatusText = this.add.text(layout.body.x, layout.body.y, LearningDataViewManager.formatSaveStatus(saved), {
-      fontSize: '20px',
-      color: '#dbeafe',
-      lineSpacing: 8,
+      fontSize: panelStyle.bodyFontSize,
+      color: panelStyle.bodyColor,
+      lineSpacing: panelStyle.bodyLineSpacing,
       wordWrap: { width: layout.body.wordWrapWidth },
     });
   }
@@ -165,11 +169,12 @@ export default class LearningDataScene extends Phaser.Scene {
   }
 
   createButton(x, y, label, backgroundColor, color) {
+    const buttonStyle = LearningDataViewManager.getButtonStyle();
     return this.add.text(x, y, label, {
-      fontSize: '25px',
+      fontSize: buttonStyle.fontSize,
       color,
       backgroundColor,
-      padding: { x: 22, y: 15 },
+      padding: buttonStyle.padding,
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
   }
 }

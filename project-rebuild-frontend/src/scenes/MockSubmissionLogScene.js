@@ -19,14 +19,14 @@ export default class MockSubmissionLogScene extends Phaser.Scene {
     ProgressStepper.render(this, layout.progressStep);
 
     this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '60px',
-      color: '#ffffff',
-      fontStyle: 'bold',
+      fontSize: layout.title.fontSize,
+      color: layout.title.color,
+      fontStyle: layout.title.fontStyle,
     }).setOrigin(0.5);
 
     this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, {
-      fontSize: '26px',
-      color: '#bfdbfe',
+      fontSize: layout.subtitle.fontSize,
+      color: layout.subtitle.color,
     }).setOrigin(0.5);
 
     this.drawSummaryPanel();
@@ -36,12 +36,13 @@ export default class MockSubmissionLogScene extends Phaser.Scene {
 
   drawSummaryPanel() {
     const layout = MockSubmissionLogViewManager.getSummaryPanelLayout();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0xffffff, 0.96)
-      .setStrokeStyle(5, layout.panel.strokeColor);
+    const panelStyle = MockSubmissionLogViewManager.getSummaryPanelStyle();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
+      .setStrokeStyle(panelStyle.strokeWidth, layout.panel.strokeColor);
     this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '36px',
-      color: '#172554',
-      fontStyle: 'bold',
+      fontSize: panelStyle.titleFontSize,
+      color: panelStyle.titleColor,
+      fontStyle: panelStyle.titleFontStyle,
     }).setOrigin(0.5);
 
     const rows = MockSubmissionLogViewManager.formatSummaryRows(this.submissions);
@@ -56,12 +57,13 @@ export default class MockSubmissionLogScene extends Phaser.Scene {
 
   drawLogPanel() {
     const layout = MockSubmissionLogViewManager.getLogPanelLayout();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0x111827, 0.98)
-      .setStrokeStyle(5, layout.panel.strokeColor);
+    const panelStyle = MockSubmissionLogViewManager.getLogPanelStyle();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
+      .setStrokeStyle(panelStyle.strokeWidth, layout.panel.strokeColor);
     this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '34px',
-      color: '#ffffff',
-      fontStyle: 'bold',
+      fontSize: panelStyle.titleFontSize,
+      color: panelStyle.titleColor,
+      fontStyle: panelStyle.titleFontStyle,
     });
 
     const body = MockSubmissionLogViewManager.formatLogBody(this.submissions);
@@ -75,11 +77,8 @@ export default class MockSubmissionLogScene extends Phaser.Scene {
 
   drawControls() {
     const layout = MockSubmissionLogViewManager.getControlLayout();
-    this.statusText = this.add.text(layout.status.x, layout.status.y, MockSubmissionLogViewManager.formatStatusText(), {
-      fontSize: '23px',
-      color: '#bfdbfe',
-      align: 'center',
-    }).setOrigin(0.5);
+    this.statusText = this.add.text(layout.status.x, layout.status.y, MockSubmissionLogViewManager.formatStatusText(), MockSubmissionLogViewManager.getStatusTextStyle())
+      .setOrigin(0.5);
 
     const copyButton = this.createButton(layout.copy.x, layout.copy.y, layout.copy.label, layout.copy.backgroundColor, layout.copy.textColor);
     copyButton.on('pointerdown', () => this.copyLogs());
@@ -127,11 +126,12 @@ export default class MockSubmissionLogScene extends Phaser.Scene {
   }
 
   createButton(x, y, label, backgroundColor, color) {
+    const buttonStyle = MockSubmissionLogViewManager.getButtonStyle();
     return this.add.text(x, y, label, {
-      fontSize: '27px',
+      fontSize: buttonStyle.fontSize,
       color,
       backgroundColor,
-      padding: { x: 22, y: 15 },
+      padding: buttonStyle.padding,
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
   }
 }
