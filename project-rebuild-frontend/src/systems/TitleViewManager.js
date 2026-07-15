@@ -1,7 +1,7 @@
 export const TITLE_LAYOUT = {
   backgroundColor: 0x10253f,
-  title: { y: 280, text: '프로젝트 리빌드' },
-  subtitle: { y: 380, text: '균형 있게 성장하는 지역을 위하여' },
+  title: { y: 280, text: '프로젝트 리빌드', fontSize: '92px', color: '#f7fbff', fontStyle: 'bold' },
+  subtitle: { y: 380, text: '균형 있게 성장하는 지역을 위하여', fontSize: '36px', color: '#b9d7ff' },
   buttons: {
     start: { y: 620, label: '시작하기', targetScene: 'AuthScene' },
     load: { savedY: 745, label: '저장 데이터 확인', targetScene: 'SavedDataScene' },
@@ -10,6 +10,7 @@ export const TITLE_LAYOUT = {
   },
   importStatus: { savedY: 975, emptyY: 885 },
   importFile: { type: 'file', accept: 'application/json,.json', successTargetScene: 'SavedDataScene' },
+  importStatusStyle: { fontSize: '22px', color: '#fecaca', align: 'center' },
 };
 
 export default class TitleViewManager {
@@ -49,6 +50,10 @@ export default class TitleViewManager {
 
   static getImportFileConfig() {
     return TITLE_LAYOUT.importFile;
+  }
+
+  static getImportStatusStyle() {
+    return { ...TITLE_LAYOUT.importStatusStyle };
   }
 
   static formatImportError(error) {

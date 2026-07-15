@@ -11,15 +11,8 @@ export default class TitleScene extends Phaser.Scene {
     const { width, height } = this.scale;
     const screenText = TitleViewManager.getScreenText();
     this.add.rectangle(width / 2, height / 2, width, height, screenText.backgroundColor);
-    this.add.text(width / 2, screenText.title.y, screenText.title.text, {
-      fontSize: '92px',
-      color: '#f7fbff',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
-    this.add.text(width / 2, screenText.subtitle.y, screenText.subtitle.text, {
-      fontSize: '36px',
-      color: '#b9d7ff',
-    }).setOrigin(0.5);
+    this.add.text(width / 2, screenText.title.y, screenText.title.text, screenText.title).setOrigin(0.5);
+    this.add.text(width / 2, screenText.subtitle.y, screenText.subtitle.text, screenText.subtitle).setOrigin(0.5);
 
     const hasSave = SaveManager.hasSave();
     const layout = TitleViewManager.getLayout(hasSave);
@@ -39,11 +32,7 @@ export default class TitleScene extends Phaser.Scene {
       .setInteractive({ useHandCursor: true });
     importButton.on('pointerdown', () => this.openImportPicker());
 
-    this.importStatusText = this.add.text(width / 2, layout.importStatusY, '', {
-      fontSize: '22px',
-      color: '#fecaca',
-      align: 'center',
-    }).setOrigin(0.5);
+    this.importStatusText = this.add.text(width / 2, layout.importStatusY, '', TitleViewManager.getImportStatusStyle()).setOrigin(0.5);
 
     const storageButton = this.add.text(width / 2, layout.storageButtonY, storageButtonConfig.label, TitleViewManager.getStorageButtonStyle())
       .setOrigin(0.5)

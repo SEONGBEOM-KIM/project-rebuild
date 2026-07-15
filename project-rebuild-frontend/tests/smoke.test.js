@@ -337,13 +337,24 @@ function testExplorationViewManager() {
   const school = explorationPlaces.find((place) => place.id === 'school');
 
   assert.equal(ExplorationViewManager.getScreenLayout().progressStep, 'exploration');
-  assert.deepEqual(ExplorationViewManager.getScreenLayout().title, { x: 80, y: 52 });
+  assert.deepEqual(ExplorationViewManager.getScreenLayout().title, {
+    x: 80,
+    y: 52,
+    fontSize: '54px',
+    color: '#ffffff',
+    fontStyle: 'bold',
+  });
   assert.equal(ExplorationViewManager.formatSubtitle(CURRENT_EPISODE.regionName), '장소를 클릭해 푸른군의 문제가 어디에서 드러나는지 확인하세요.');
   assert.equal(ExplorationViewManager.getMapLayout().backdrop.width, 1120);
   assert.equal(ExplorationViewManager.getMapLayout().roads.length, 2);
   assert.match(ExplorationViewManager.getMapLayout().note.text, /임시 지도 데이터/);
   assert.deepEqual(ExplorationViewManager.getPlaceMarkerLayout().check, { x: 43, y: -45, text: '✓' });
   assert.equal(ExplorationViewManager.getInfoPanelLayout().progress.wordWrapWidth, 500);
+  assert.equal(ExplorationViewManager.getTextStyles().panelBody.lineSpacing, 13);
+  assert.deepEqual(ExplorationViewManager.getButtonStyle(), {
+    fontSize: '32px',
+    padding: { x: 34, y: 18 },
+  });
   assert.deepEqual(ExplorationViewManager.getControlLayout().next, {
     x: 1600,
     y: 955,
@@ -503,8 +514,8 @@ function testReflectionViewManager() {
 function testTitleViewManager() {
   assert.deepEqual(TitleViewManager.getScreenText(), {
     backgroundColor: 0x10253f,
-    title: { y: 280, text: '프로젝트 리빌드' },
-    subtitle: { y: 380, text: '균형 있게 성장하는 지역을 위하여' },
+    title: { y: 280, text: '프로젝트 리빌드', fontSize: '92px', color: '#f7fbff', fontStyle: 'bold' },
+    subtitle: { y: 380, text: '균형 있게 성장하는 지역을 위하여', fontSize: '36px', color: '#b9d7ff' },
   });
   assert.deepEqual(TitleViewManager.getLayout(false), {
     startButtonY: 620,
@@ -531,6 +542,11 @@ function testTitleViewManager() {
   assert.equal(TitleViewManager.getSecondaryButtonStyle().backgroundColor, '#bfdbfe');
   assert.equal(TitleViewManager.getStorageButtonStyle().backgroundColor, '#334155');
   assert.equal(TitleViewManager.getLoadButtonStyle().backgroundColor, '#1e293b');
+  assert.deepEqual(TitleViewManager.getImportStatusStyle(), {
+    fontSize: '22px',
+    color: '#fecaca',
+    align: 'center',
+  });
 }
 
 

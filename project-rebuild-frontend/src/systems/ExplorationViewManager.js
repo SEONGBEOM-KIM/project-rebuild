@@ -1,8 +1,8 @@
 const EXPLORATION_SCREEN_LAYOUT = {
   backgroundColor: 0x0f2f3f,
   progressStep: 'exploration',
-  title: { x: 80, y: 52 },
-  subtitle: { x: 82, y: 118 },
+  title: { x: 80, y: 52, fontSize: '54px', color: '#ffffff', fontStyle: 'bold' },
+  subtitle: { x: 82, y: 118, fontSize: '26px', color: '#bfdbfe' },
 };
 
 const EXPLORATION_MAP_LAYOUT = {
@@ -32,6 +32,21 @@ const INFO_PANEL_LAYOUT = {
   title: { x: 1320, y: 185, wordWrapWidth: 500 },
   body: { x: 1320, y: 265, wordWrapWidth: 500 },
   progress: { x: 1320, y: 780, wordWrapWidth: 500 },
+};
+
+const EXPLORATION_TEXT_STYLES = {
+  mapNote: { fontSize: '21px', color: '#d1fae5' },
+  markerIcon: { fontSize: '38px' },
+  markerLabel: { fontSize: '22px', color: '#ffffff', fontStyle: 'bold' },
+  markerCheck: { fontSize: '30px', color: '#bbf7d0', fontStyle: 'bold' },
+  panelTitle: { fontSize: '38px', color: '#172554', fontStyle: 'bold' },
+  panelBody: { fontSize: '26px', color: '#1e293b', lineSpacing: 13 },
+  progress: { fontSize: '24px', color: '#172554', lineSpacing: 8 },
+};
+
+const EXPLORATION_BUTTON_STYLE = {
+  fontSize: '32px',
+  padding: { x: 34, y: 18 },
 };
 
 export default class ExplorationViewManager {
@@ -81,6 +96,25 @@ export default class ExplorationViewManager {
     return {
       back: { x: 1230, y: 955, label: '스토리 다시 보기', target: 'StoryScene', backgroundColor: '#93c5fd', textColor: '#0f172a' },
       next: { x: 1600, y: 955, label: '자료 확인', target: 'DataBriefingScene', backgroundColor: '#94a3b8', textColor: '#0f172a' },
+    };
+  }
+
+  static getTextStyles() {
+    return {
+      mapNote: { ...EXPLORATION_TEXT_STYLES.mapNote },
+      markerIcon: { ...EXPLORATION_TEXT_STYLES.markerIcon },
+      markerLabel: { ...EXPLORATION_TEXT_STYLES.markerLabel },
+      markerCheck: { ...EXPLORATION_TEXT_STYLES.markerCheck },
+      panelTitle: { ...EXPLORATION_TEXT_STYLES.panelTitle },
+      panelBody: { ...EXPLORATION_TEXT_STYLES.panelBody },
+      progress: { ...EXPLORATION_TEXT_STYLES.progress },
+    };
+  }
+
+  static getButtonStyle() {
+    return {
+      fontSize: EXPLORATION_BUTTON_STYLE.fontSize,
+      padding: { ...EXPLORATION_BUTTON_STYLE.padding },
     };
   }
 
