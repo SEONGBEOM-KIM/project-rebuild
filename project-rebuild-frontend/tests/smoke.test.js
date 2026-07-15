@@ -163,6 +163,25 @@ function testSelectionViewManager() {
   const selectedPolicy = policies[0];
   const otherPolicy = policies[1];
 
+  assert.deepEqual(SelectionViewManager.getScreenLayout(1920).title, {
+    x: 960,
+    y: 86,
+    text: '회복 방향 선택',
+  });
+  assert.equal(SelectionViewManager.getScreenLayout(1920).progressStep, 'selection');
+  assert.deepEqual(SelectionViewManager.getScreenLayout(1920).detail, { x: 960, y: 750, wordWrapWidth: 1180 });
+  assert.deepEqual(SelectionViewManager.getPolicyCardPosition(2), { x: 1490, y: 420 });
+  assert.deepEqual(SelectionViewManager.getPolicyCardLayout().background, { x: 0, y: 0, width: 450, height: 430 });
+  assert.equal(SelectionViewManager.getPolicyCardLayout().recommended.wordWrapWidth, 370);
+  assert.deepEqual(SelectionViewManager.getControlLayout(960).start, {
+    x: 1140,
+    y: 955,
+    label: '배치 연습 시작',
+    target: 'PlacementScene',
+    backgroundColor: 0xbbf7d0,
+    textColor: '#123524',
+  });
+  assert.equal(SelectionViewManager.getControlLayout(960).back.target, 'ExplorationScene');
   assert.match(SelectionViewManager.formatDetailText(selectedPolicy), new RegExp(`선택됨: ${selectedPolicy.name}`));
   assert.match(SelectionViewManager.formatDetailText(selectedPolicy), /건물 3개를 배치/);
   assert.deepEqual(SelectionViewManager.formatDetailRows(null), [

@@ -14,79 +14,85 @@ export default class SelectionScene extends Phaser.Scene {
     this.selectedPolicy = this.registry.get('selectedPolicy') ?? policies[0];
     this.cardObjects = new Map();
 
-    this.add.rectangle(width / 2, height / 2, width, height, 0x172554);
-    ProgressStepper.render(this, 'selection');
-    this.add.text(width / 2, 86, '회복 방향 선택', {
+    const layout = SelectionViewManager.getScreenLayout(width);
+
+    this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
+    ProgressStepper.render(this, layout.progressStep);
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
       fontSize: '60px',
       color: '#ffffff',
       fontStyle: 'bold',
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, 150, '정책 밸런싱은 아직 적용하지 않고, 배치 미션의 의도만 정하는 UI 단계입니다.', {
+    this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, {
       fontSize: '26px',
       color: '#bfdbfe',
       align: 'center',
     }).setOrigin(0.5);
 
     policies.forEach((policy, index) => {
-      this.createPolicyCard(policy, 430 + index * 530, 420);
+      const position = SelectionViewManager.getPolicyCardPosition(index);
+      this.createPolicyCard(policy, position.x, position.y);
     });
 
-    this.detailText = this.add.text(width / 2, 750, '', {
+    this.detailText = this.add.text(layout.detail.x, layout.detail.y, '', {
       fontSize: '27px',
       color: '#e0f2fe',
       align: 'center',
       lineSpacing: 10,
-      wordWrap: { width: 1180 },
+      wordWrap: { width: layout.detail.wordWrapWidth },
     }).setOrigin(0.5, 0);
 
-    const backButton = this.createButton(width / 2 - 180, 955, '탐색 다시 보기', 0x93c5fd, '#0f172a');
-    backButton.on('pointerdown', () => this.scene.start('ExplorationScene'));
+    const controls = SelectionViewManager.getControlLayout(width / 2);
+    const backButton = this.createButton(controls.back.x, controls.back.y, controls.back.label, controls.back.backgroundColor, controls.back.textColor);
+    backButton.on('pointerdown', () => this.scene.start(controls.back.target));
 
-    const startButton = this.createButton(width / 2 + 180, 955, '배치 연습 시작', 0xbbf7d0, '#123524');
+    const startButton = this.createButton(controls.start.x, controls.start.y, controls.start.label, controls.start.backgroundColor, controls.start.textColor);
     startButton.on('pointerdown', () => {
       this.registry.set('selectedPolicy', this.selectedPolicy);
       LearningProgress.update(this.registry, { selectedPolicyId: this.selectedPolicy.id });
-      this.scene.start('PlacementScene');
+      this.scene.start(controls.start.target);
     });
 
     this.updateSelectionUi();
   }
 
   createPolicyCard(policy, x, y) {
+    const layout = SelectionViewManager.getPolicyCardLayout();
+    const initialStyle = SelectionViewManager.getCardStyle(policy.id, this.selectedPolicy);
     const container = this.add.container(x, y);
-    const background = this.add.rectangle(0, 0, 450, 430, 0x0f172a, 0.96)
-      .setStrokeStyle(4, 0x475569)
+    const background = this.add.rectangle(layout.background.x, layout.background.y, layout.background.width, layout.background.height, initialStyle.fillColor, initialStyle.fillAlpha)
+      .setStrokeStyle(initialStyle.strokeWidth, initialStyle.strokeColor)
       .setInteractive({ useHandCursor: true });
-    const colorBar = this.add.rectangle(0, -194, 450, 42, policy.color, 1);
-    const title = this.add.text(0, -145, policy.name, {
+    const colorBar = this.add.rectangle(layout.colorBar.x, layout.colorBar.y, layout.colorBar.width, layout.colorBar.height, policy.color, 1);
+    const title = this.add.text(layout.title.x, layout.title.y, policy.name, {
       fontSize: '34px',
       color: '#ffffff',
       fontStyle: 'bold',
     }).setOrigin(0.5);
-    const tagline = this.add.text(0, -98, policy.tagline, {
+    const tagline = this.add.text(layout.tagline.x, layout.tagline.y, policy.tagline, {
       fontSize: '22px',
       color: '#fde68a',
       align: 'center',
-      wordWrap: { width: 370 },
+      wordWrap: { width: layout.tagline.wordWrapWidth },
     }).setOrigin(0.5);
-    const description = this.add.text(0, -10, policy.description, {
+    const description = this.add.text(layout.description.x, layout.description.y, policy.description, {
       fontSize: '22px',
       color: '#dbeafe',
       align: 'center',
       lineSpacing: 8,
-      wordWrap: { width: 365 },
+      wordWrap: { width: layout.description.wordWrapWidth },
     }).setOrigin(0.5);
-    const focus = this.add.text(0, 108, SelectionViewManager.formatFocusText(policy), {
+    const focus = this.add.text(layout.focus.x, layout.focus.y, SelectionViewManager.formatFocusText(policy), {
       fontSize: '21px',
       color: '#bbf7d0',
       align: 'center',
     }).setOrigin(0.5);
-    const recommended = this.add.text(0, 156, SelectionViewManager.formatRecommendedBuildings(policy), {
+    const recommended = this.add.text(layout.recommended.x, layout.recommended.y, SelectionViewManager.formatRecommendedBuildings(policy), {
       fontSize: '20px',
       color: '#bfdbfe',
       align: 'center',
-      wordWrap: { width: 370 },
+      wordWrap: { width: layout.recommended.wordWrapWidth },
     }).setOrigin(0.5);
 
     container.add([background, colorBar, title, tagline, description, focus, recommended]);
