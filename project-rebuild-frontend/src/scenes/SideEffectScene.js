@@ -18,16 +18,12 @@ export default class SideEffectScene extends Phaser.Scene {
     this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
     ProgressStepper.render(this, layout.progressStep);
 
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '60px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, layout.title).setOrigin(0.5);
 
     this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, {
-      fontSize: '26px',
-      color: '#bfdbfe',
-      align: 'center',
+      fontSize: layout.subtitle.fontSize,
+      color: layout.subtitle.color,
+      align: layout.subtitle.align,
       wordWrap: { width: layout.subtitle.wordWrapWidth },
     }).setOrigin(0.5);
 
@@ -39,19 +35,14 @@ export default class SideEffectScene extends Phaser.Scene {
   drawIssueArea(issues) {
     const layout = SideEffectViewManager.getIssuePanelLayout();
     const panelStyle = SideEffectViewManager.getPanelStyle();
+    const textStyles = SideEffectViewManager.getTextStyles();
     this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, panelStyle.issueFillColor, panelStyle.issueFillAlpha)
       .setStrokeStyle(panelStyle.issueStrokeWidth, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '38px',
-      color: '#172554',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, textStyles.issueTitle).setOrigin(0.5);
 
     if (!issues.length) {
       this.add.text(layout.emptyBody.x, layout.emptyBody.y, SideEffectViewManager.formatEmptyIssueMessage(), {
-        fontSize: '30px',
-        color: '#1e293b',
-        lineSpacing: 14,
+        ...textStyles.emptyBody,
         wordWrap: { width: layout.emptyBody.wordWrapWidth },
       });
       return;
@@ -64,14 +55,9 @@ export default class SideEffectScene extends Phaser.Scene {
         .setStrokeStyle(cardStyle.strokeWidth, issue.color);
       this.add.circle(card.marker.x, card.marker.y, card.marker.radius, issue.color, cardStyle.markerAlpha)
         .setStrokeStyle(cardStyle.markerStrokeWidth, cardStyle.markerStrokeColor);
-      this.add.text(card.title.x, card.title.y, issue.title, {
-        fontSize: '27px',
-        color: '#0f172a',
-        fontStyle: 'bold',
-      });
+      this.add.text(card.title.x, card.title.y, issue.title, textStyles.cardTitle);
       this.add.text(card.message.x, card.message.y, issue.message, {
-        fontSize: '22px',
-        color: '#334155',
+        ...textStyles.cardMessage,
         wordWrap: { width: card.message.wordWrapWidth },
       });
     });
@@ -80,20 +66,15 @@ export default class SideEffectScene extends Phaser.Scene {
   drawConceptPanel(issues) {
     const layout = SideEffectViewManager.getHintPanelLayout();
     const panelStyle = SideEffectViewManager.getPanelStyle();
+    const textStyles = SideEffectViewManager.getTextStyles();
     this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, panelStyle.hintFillColor, panelStyle.hintFillAlpha)
       .setStrokeStyle(panelStyle.hintStrokeWidth, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '36px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, textStyles.hintTitle).setOrigin(0.5);
 
     const rows = SideEffectViewManager.formatHintRows(issues);
 
     this.add.text(layout.body.x, layout.body.y, rows.join('\n'), {
-      fontSize: '22px',
-      color: '#dbeafe',
-      lineSpacing: 10,
+      ...textStyles.hintBody,
       wordWrap: { width: layout.body.wordWrapWidth },
     });
   }
@@ -109,10 +90,9 @@ export default class SideEffectScene extends Phaser.Scene {
 
   createButton(x, y, label, backgroundColor, color) {
     return this.add.text(x, y, label, {
-      fontSize: '32px',
+      ...SideEffectViewManager.getButtonStyle(),
       color,
       backgroundColor,
-      padding: { x: 34, y: 18 },
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
   }
 }

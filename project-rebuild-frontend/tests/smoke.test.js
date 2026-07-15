@@ -155,11 +155,23 @@ function testCauseQuizViewManager() {
     x: 960,
     y: 72,
     text: 'EP1. 문제 원인 생각하기',
+    fontSize: '58px',
+    color: '#ffffff',
+    fontStyle: 'bold',
   });
   assert.equal(CauseQuizViewManager.getScreenLayout(1920).progressStep, 'quiz');
   assert.equal(CauseQuizViewManager.getExplorationSummaryLayout().title.text, '탐색에서 확인한 단서');
   assert.equal(CauseQuizViewManager.getQuestionLayout().feedback.text, '답을 선택하면 피드백이 표시됩니다.');
   assert.deepEqual(CauseQuizViewManager.getChoiceLayout(1).text, { x: 820, y: 505, wordWrapWidth: 700 });
+  assert.deepEqual(CauseQuizViewManager.getTextStyles().feedback, {
+    fontSize: '25px',
+    color: '#334155',
+    lineSpacing: 10,
+  });
+  assert.deepEqual(CauseQuizViewManager.getButtonStyle(), {
+    fontSize: '32px',
+    padding: { x: 34, y: 18 },
+  });
   assert.deepEqual(CauseQuizViewManager.getControlLayout().back, {
     x: 760,
     y: 955,
@@ -212,12 +224,26 @@ function testSelectionViewManager() {
     x: 960,
     y: 86,
     text: '회복 방향 선택',
+    fontSize: '60px',
+    color: '#ffffff',
+    fontStyle: 'bold',
   });
   assert.equal(SelectionViewManager.getScreenLayout(1920).progressStep, 'selection');
   assert.deepEqual(SelectionViewManager.getScreenLayout(1920).detail, { x: 960, y: 750, wordWrapWidth: 1180 });
   assert.deepEqual(SelectionViewManager.getPolicyCardPosition(2), { x: 1490, y: 420 });
   assert.deepEqual(SelectionViewManager.getPolicyCardLayout().background, { x: 0, y: 0, width: 450, height: 430 });
   assert.equal(SelectionViewManager.getPolicyCardLayout().recommended.wordWrapWidth, 370);
+  assert.deepEqual(SelectionViewManager.getTextStyles().description, {
+    fontSize: '22px',
+    color: '#dbeafe',
+    align: 'center',
+    lineSpacing: 8,
+  });
+  assert.deepEqual(SelectionViewManager.getButtonStyle(), {
+    fontSize: '32px',
+    padding: { x: 34, y: 18 },
+  });
+  assert.equal(SelectionViewManager.formatHexColor(0xbbf7d0), '#bbf7d0');
   assert.deepEqual(SelectionViewManager.getControlLayout(960).start, {
     x: 1140,
     y: 955,
@@ -739,11 +765,23 @@ function testSideEffectViewManager() {
     x: 960,
     y: 82,
     text: '부작용 검토',
+    fontSize: '60px',
+    color: '#ffffff',
+    fontStyle: 'bold',
   });
   assert.equal(SideEffectViewManager.getScreenLayout(1920).progressStep, 'result');
   assert.equal(SideEffectViewManager.getScreenLayout(1920).subtitle.wordWrapWidth, 1450);
   assert.equal(SideEffectViewManager.getPanelStyle().hintFillColor, 0x1e293b);
   assert.equal(SideEffectViewManager.getIssueCardStyle().markerStrokeColor, 0xffffff);
+  assert.deepEqual(SideEffectViewManager.getTextStyles().hintBody, {
+    fontSize: '22px',
+    color: '#dbeafe',
+    lineSpacing: 10,
+  });
+  assert.deepEqual(SideEffectViewManager.getButtonStyle(), {
+    fontSize: '32px',
+    padding: { x: 34, y: 18 },
+  });
   assert.equal(SideEffectViewManager.getIssuePanelLayout().panel.width, 980);
   assert.equal(SideEffectViewManager.getIssuePanelLayout().title.text, '감지된 주의 신호');
   assert.deepEqual(SideEffectViewManager.getIssueCardLayout(1).title, { x: 310, y: 478 });

@@ -20,16 +20,9 @@ export default class CauseQuizScene extends Phaser.Scene {
 
     this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
     ProgressStepper.render(this, layout.progressStep);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '58px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, layout.title).setOrigin(0.5);
 
-    this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, {
-      fontSize: '27px',
-      color: '#bfdbfe',
-    }).setOrigin(0.5);
+    this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, layout.subtitle).setOrigin(0.5);
 
     this.drawExplorationSummary();
     this.drawQuestionPanel();
@@ -39,33 +32,26 @@ export default class CauseQuizScene extends Phaser.Scene {
   drawExplorationSummary() {
     const exploredCount = (this.registry.get('exploredPlaces') ?? []).length;
     const layout = CauseQuizViewManager.getExplorationSummaryLayout();
+    const textStyles = CauseQuizViewManager.getTextStyles();
     this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
       .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '34px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, textStyles.summaryTitle).setOrigin(0.5);
 
     const rows = CauseQuizManager.formatExplorationSummaryRows(exploredCount, EP1_EXPLORATION_CLUES);
 
     this.add.text(layout.body.x, layout.body.y, rows.join('\n'), {
-      fontSize: '24px',
-      color: '#dbeafe',
-      lineSpacing: 11,
+      ...textStyles.summaryBody,
       wordWrap: { width: layout.body.wordWrapWidth },
     });
   }
 
   drawQuestionPanel() {
     const layout = CauseQuizViewManager.getQuestionLayout();
+    const textStyles = CauseQuizViewManager.getTextStyles();
     this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
       .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
     this.add.text(layout.prompt.x, layout.prompt.y, EP1_CAUSE_QUESTION.prompt, {
-      fontSize: '36px',
-      color: '#172554',
-      fontStyle: 'bold',
-      align: 'center',
+      ...textStyles.prompt,
       wordWrap: { width: layout.prompt.wordWrapWidth },
     }).setOrigin(0.5);
 
@@ -74,21 +60,19 @@ export default class CauseQuizScene extends Phaser.Scene {
     });
 
     this.feedbackText = this.add.text(layout.feedback.x, layout.feedback.y, layout.feedback.text, {
-      fontSize: '25px',
-      color: '#334155',
-      lineSpacing: 10,
+      ...textStyles.feedback,
       wordWrap: { width: layout.feedback.wordWrapWidth },
     });
   }
 
   createChoice(choice, index, number) {
     const layout = CauseQuizViewManager.getChoiceLayout(index);
+    const textStyles = CauseQuizViewManager.getTextStyles();
     const background = this.add.rectangle(layout.background.x, layout.background.y, layout.background.width, layout.background.height, layout.background.fillColor, layout.background.fillAlpha)
       .setStrokeStyle(layout.background.strokeWidth, layout.background.strokeColor)
       .setInteractive({ useHandCursor: true });
     const text = this.add.text(layout.text.x, layout.text.y, `${number}. ${choice.text}`, {
-      fontSize: '25px',
-      color: '#0f172a',
+      ...textStyles.choice,
       wordWrap: { width: layout.text.wordWrapWidth },
     }).setOrigin(0, 0.5);
 
@@ -135,10 +119,9 @@ export default class CauseQuizScene extends Phaser.Scene {
 
   createButton(x, y, label, backgroundColor, color) {
     return this.add.text(x, y, label, {
-      fontSize: '32px',
+      ...CauseQuizViewManager.getButtonStyle(),
       color,
       backgroundColor,
-      padding: { x: 34, y: 18 },
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
   }
 }

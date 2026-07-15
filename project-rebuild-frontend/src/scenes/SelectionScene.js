@@ -18,17 +18,9 @@ export default class SelectionScene extends Phaser.Scene {
 
     this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
     ProgressStepper.render(this, layout.progressStep);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '60px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, layout.title).setOrigin(0.5);
 
-    this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, {
-      fontSize: '26px',
-      color: '#bfdbfe',
-      align: 'center',
-    }).setOrigin(0.5);
+    this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, layout.subtitle).setOrigin(0.5);
 
     policies.forEach((policy, index) => {
       const position = SelectionViewManager.getPolicyCardPosition(index);
@@ -36,10 +28,7 @@ export default class SelectionScene extends Phaser.Scene {
     });
 
     this.detailText = this.add.text(layout.detail.x, layout.detail.y, '', {
-      fontSize: '27px',
-      color: '#e0f2fe',
-      align: 'center',
-      lineSpacing: 10,
+      ...SelectionViewManager.getTextStyles().detail,
       wordWrap: { width: layout.detail.wordWrapWidth },
     }).setOrigin(0.5, 0);
 
@@ -60,38 +49,24 @@ export default class SelectionScene extends Phaser.Scene {
   createPolicyCard(policy, x, y) {
     const layout = SelectionViewManager.getPolicyCardLayout();
     const initialStyle = SelectionViewManager.getCardStyle(policy.id, this.selectedPolicy);
+    const textStyles = SelectionViewManager.getTextStyles();
     const container = this.add.container(x, y);
     const background = this.add.rectangle(layout.background.x, layout.background.y, layout.background.width, layout.background.height, initialStyle.fillColor, initialStyle.fillAlpha)
       .setStrokeStyle(initialStyle.strokeWidth, initialStyle.strokeColor)
       .setInteractive({ useHandCursor: true });
     const colorBar = this.add.rectangle(layout.colorBar.x, layout.colorBar.y, layout.colorBar.width, layout.colorBar.height, policy.color, 1);
-    const title = this.add.text(layout.title.x, layout.title.y, policy.name, {
-      fontSize: '34px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    const title = this.add.text(layout.title.x, layout.title.y, policy.name, textStyles.title).setOrigin(0.5);
     const tagline = this.add.text(layout.tagline.x, layout.tagline.y, policy.tagline, {
-      fontSize: '22px',
-      color: '#fde68a',
-      align: 'center',
+      ...textStyles.tagline,
       wordWrap: { width: layout.tagline.wordWrapWidth },
     }).setOrigin(0.5);
     const description = this.add.text(layout.description.x, layout.description.y, policy.description, {
-      fontSize: '22px',
-      color: '#dbeafe',
-      align: 'center',
-      lineSpacing: 8,
+      ...textStyles.description,
       wordWrap: { width: layout.description.wordWrapWidth },
     }).setOrigin(0.5);
-    const focus = this.add.text(layout.focus.x, layout.focus.y, SelectionViewManager.formatFocusText(policy), {
-      fontSize: '21px',
-      color: '#bbf7d0',
-      align: 'center',
-    }).setOrigin(0.5);
+    const focus = this.add.text(layout.focus.x, layout.focus.y, SelectionViewManager.formatFocusText(policy), textStyles.focus).setOrigin(0.5);
     const recommended = this.add.text(layout.recommended.x, layout.recommended.y, SelectionViewManager.formatRecommendedBuildings(policy), {
-      fontSize: '20px',
-      color: '#bfdbfe',
-      align: 'center',
+      ...textStyles.recommended,
       wordWrap: { width: layout.recommended.wordWrapWidth },
     }).setOrigin(0.5);
 
@@ -106,10 +81,9 @@ export default class SelectionScene extends Phaser.Scene {
 
   createButton(x, y, label, backgroundColor, textColor) {
     const button = this.add.text(x, y, label, {
-      fontSize: '32px',
+      ...SelectionViewManager.getButtonStyle(),
       color: textColor,
-      backgroundColor: `#${backgroundColor.toString(16).padStart(6, '0')}`,
-      padding: { x: 34, y: 18 },
+      backgroundColor: SelectionViewManager.formatHexColor(backgroundColor),
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
     return button;
   }

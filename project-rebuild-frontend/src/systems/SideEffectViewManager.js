@@ -1,11 +1,14 @@
 const SIDE_EFFECT_SCREEN_LAYOUT = {
   backgroundColor: 0x111827,
   progressStep: 'result',
-  title: { y: 82, text: '부작용 검토' },
+  title: { y: 82, text: '부작용 검토', fontSize: '60px', color: '#ffffff', fontStyle: 'bold' },
   subtitle: {
     y: 148,
     text: '좋은 선택에도 비용과 부작용이 생길 수 있습니다. 다음 선택 전에 주의 신호를 확인합니다.',
     wordWrapWidth: 1450,
+    fontSize: '26px',
+    color: '#bfdbfe',
+    align: 'center',
   },
 };
 
@@ -27,6 +30,20 @@ const SIDE_EFFECT_ISSUE_CARD_STYLE = {
   markerStrokeColor: 0xffffff,
 };
 
+const SIDE_EFFECT_TEXT_STYLES = {
+  issueTitle: { fontSize: '38px', color: '#172554', fontStyle: 'bold' },
+  emptyBody: { fontSize: '30px', color: '#1e293b', lineSpacing: 14 },
+  cardTitle: { fontSize: '27px', color: '#0f172a', fontStyle: 'bold' },
+  cardMessage: { fontSize: '22px', color: '#334155' },
+  hintTitle: { fontSize: '36px', color: '#ffffff', fontStyle: 'bold' },
+  hintBody: { fontSize: '22px', color: '#dbeafe', lineSpacing: 10 },
+};
+
+const SIDE_EFFECT_BUTTON_STYLE = {
+  fontSize: '32px',
+  padding: { x: 34, y: 18 },
+};
+
 export default class SideEffectViewManager {
   static getScreenLayout(width) {
     return {
@@ -43,6 +60,24 @@ export default class SideEffectViewManager {
 
   static getIssueCardStyle() {
     return { ...SIDE_EFFECT_ISSUE_CARD_STYLE };
+  }
+
+  static getTextStyles() {
+    return {
+      issueTitle: { ...SIDE_EFFECT_TEXT_STYLES.issueTitle },
+      emptyBody: { ...SIDE_EFFECT_TEXT_STYLES.emptyBody },
+      cardTitle: { ...SIDE_EFFECT_TEXT_STYLES.cardTitle },
+      cardMessage: { ...SIDE_EFFECT_TEXT_STYLES.cardMessage },
+      hintTitle: { ...SIDE_EFFECT_TEXT_STYLES.hintTitle },
+      hintBody: { ...SIDE_EFFECT_TEXT_STYLES.hintBody },
+    };
+  }
+
+  static getButtonStyle() {
+    return {
+      fontSize: SIDE_EFFECT_BUTTON_STYLE.fontSize,
+      padding: { ...SIDE_EFFECT_BUTTON_STYLE.padding },
+    };
   }
 
   static getIssuePanelLayout() {

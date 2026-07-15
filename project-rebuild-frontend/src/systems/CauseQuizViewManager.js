@@ -1,8 +1,8 @@
 const CAUSE_QUIZ_SCREEN_LAYOUT = {
   backgroundColor: 0x111827,
   progressStep: 'quiz',
-  title: { y: 72, text: 'EP1. 문제 원인 생각하기' },
-  subtitle: { y: 142, text: '탐색한 장소의 문제를 바탕으로 인구 감소의 원인을 골라보세요.' },
+  title: { y: 72, text: 'EP1. 문제 원인 생각하기', fontSize: '58px', color: '#ffffff', fontStyle: 'bold' },
+  subtitle: { y: 142, text: '탐색한 장소의 문제를 바탕으로 인구 감소의 원인을 골라보세요.', fontSize: '27px', color: '#bfdbfe' },
 };
 
 const EXPLORATION_SUMMARY_LAYOUT = {
@@ -16,6 +16,19 @@ const CAUSE_QUESTION_LAYOUT = {
   prompt: { x: 1170, y: 255, wordWrapWidth: 780 },
   choice: { x: 1170, startY: 390, gapY: 115, width: 760, height: 82, fillColor: 0xe0f2fe, fillAlpha: 1, strokeWidth: 3, strokeColor: 0x93c5fd, textOffsetX: -350, wordWrapWidth: 700 },
   feedback: { x: 760, y: 760, text: '답을 선택하면 피드백이 표시됩니다.', wordWrapWidth: 820 },
+};
+
+const CAUSE_QUIZ_TEXT_STYLES = {
+  summaryTitle: { fontSize: '34px', color: '#ffffff', fontStyle: 'bold' },
+  summaryBody: { fontSize: '24px', color: '#dbeafe', lineSpacing: 11 },
+  prompt: { fontSize: '36px', color: '#172554', fontStyle: 'bold', align: 'center' },
+  choice: { fontSize: '25px', color: '#0f172a' },
+  feedback: { fontSize: '25px', color: '#334155', lineSpacing: 10 },
+};
+
+const CAUSE_QUIZ_BUTTON_STYLE = {
+  fontSize: '32px',
+  padding: { x: 34, y: 18 },
 };
 
 export default class CauseQuizViewManager {
@@ -61,11 +74,28 @@ export default class CauseQuizViewManager {
     };
   }
 
+  static getTextStyles() {
+    return {
+      summaryTitle: { ...CAUSE_QUIZ_TEXT_STYLES.summaryTitle },
+      summaryBody: { ...CAUSE_QUIZ_TEXT_STYLES.summaryBody },
+      prompt: { ...CAUSE_QUIZ_TEXT_STYLES.prompt },
+      choice: { ...CAUSE_QUIZ_TEXT_STYLES.choice },
+      feedback: { ...CAUSE_QUIZ_TEXT_STYLES.feedback },
+    };
+  }
+
   static getControlLayout() {
     return {
       back: { x: 760, y: 955, label: '자료 다시 보기', target: 'DataBriefingScene', backgroundColor: '#93c5fd', textColor: '#0f172a' },
       nextDisabled: { x: 1160, y: 955, label: '답 선택 필요', backgroundColor: '#94a3b8', textColor: '#0f172a' },
       nextEnabled: { label: '문제 정리', target: 'ProblemSummaryScene', backgroundColor: '#bbf7d0' },
+    };
+  }
+
+  static getButtonStyle() {
+    return {
+      fontSize: CAUSE_QUIZ_BUTTON_STYLE.fontSize,
+      padding: { ...CAUSE_QUIZ_BUTTON_STYLE.padding },
     };
   }
 
