@@ -259,12 +259,24 @@ function testProblemSummaryViewManager() {
     x: 960,
     y: 72,
     text: 'EP1. 문제 정리',
+    fontSize: '60px',
+    color: '#ffffff',
+    fontStyle: 'bold',
   });
   assert.equal(ProblemSummaryViewManager.getScreenLayout(1920).progressStep, 'summary');
   assert.equal(ProblemSummaryViewManager.getProblemGridLayout().title.text, '확인한 지역 문제');
   assert.deepEqual(ProblemSummaryViewManager.getProblemItemCardLayout(210, 315).detail, { x: 272, y: 371, wordWrapWidth: 365 });
   assert.equal(ProblemSummaryViewManager.getLearningRecordLayout().title.text, '학습 기록');
   assert.equal(ProblemSummaryViewManager.getNextMissionLayout().body.wordWrapWidth, 510);
+  assert.deepEqual(ProblemSummaryViewManager.getTextStyles().itemDetail, {
+    fontSize: '20px',
+    color: '#334155',
+    lineSpacing: 5,
+  });
+  assert.deepEqual(ProblemSummaryViewManager.getButtonStyle(), {
+    fontSize: '32px',
+    padding: { x: 34, y: 18 },
+  });
   assert.deepEqual(ProblemSummaryViewManager.getControlLayout().next, {
     x: 1180,
     y: 955,
@@ -351,6 +363,9 @@ function testDataBriefingViewManager() {
     x: 960,
     y: 70,
     text: 'EP1. 자료 확인',
+    fontSize: '60px',
+    color: '#ffffff',
+    fontStyle: 'bold',
   });
   assert.equal(DataBriefingViewManager.getScreenLayout(1920).progressStep, 'data');
   assert.deepEqual(DataBriefingViewManager.getDataCardLayout(390, 500).panel, {
@@ -365,6 +380,12 @@ function testDataBriefingViewManager() {
   });
   assert.equal(DataBriefingViewManager.getDataCardLayout(390, 500).takeawayTitle.text, '읽어야 할 점');
   assert.deepEqual(DataBriefingViewManager.getConceptBoxLayout().title, { x: 350, y: 810, text: '핵심 개념' });
+  assert.equal(DataBriefingViewManager.getDataCardTextStyles().title.fontSize, '33px');
+  assert.equal(DataBriefingViewManager.getConceptBoxTextStyles().body.color, '#ffffff');
+  assert.deepEqual(DataBriefingViewManager.getButtonStyle(), {
+    fontSize: '32px',
+    padding: { x: 34, y: 18 },
+  });
   assert.deepEqual(DataBriefingViewManager.getControlLayout().next, {
     x: 1160,
     y: 980,
@@ -400,9 +421,23 @@ function testReflectionViewManager() {
     x: 960,
     y: 82,
     text: '생각 정리',
+    fontSize: '60px',
+    color: '#ffffff',
+    fontStyle: 'bold',
   });
   assert.equal(ReflectionViewManager.getScreenLayout(1920).progressStep, 'ending');
   assert.deepEqual(ReflectionViewManager.getScreenLayout(1920).feedback, { x: 960, y: 790, wordWrapWidth: 1150 });
+  assert.deepEqual(ReflectionViewManager.getFeedbackTextStyle('initial', 1150), {
+    fontSize: '28px',
+    align: 'center',
+    color: '#e0f2fe',
+    wordWrap: { width: 1150 },
+  });
+  assert.equal(ReflectionViewManager.getChoiceTextStyles().description.lineSpacing, 8);
+  assert.deepEqual(ReflectionViewManager.getButtonStyle(), {
+    fontSize: '32px',
+    padding: { x: 34, y: 18 },
+  });
   assert.deepEqual(ReflectionViewManager.getChoiceCardPosition(0), { col: 0, row: 0, x: 610, y: 385 });
   assert.deepEqual(ReflectionViewManager.getChoiceCardPosition(3), { col: 1, row: 1, x: 1310, y: 635 });
   assert.deepEqual(ReflectionViewManager.getChoiceCardLayout(610, 385).background, { x: 610, y: 385, width: 620, height: 190 });

@@ -1,8 +1,8 @@
 const REFLECTION_SCREEN_LAYOUT = {
   backgroundColor: 0x172554,
   progressStep: 'ending',
-  title: { y: 82, text: '생각 정리' },
-  subtitle: { y: 150, text: '이번 선택을 돌아보고, 다음 개발에서 가장 먼저 보완할 부분을 고르세요.' },
+  title: { y: 82, text: '생각 정리', fontSize: '60px', color: '#ffffff', fontStyle: 'bold' },
+  subtitle: { y: 150, text: '이번 선택을 돌아보고, 다음 개발에서 가장 먼저 보완할 부분을 고르세요.', fontSize: '27px', color: '#bfdbfe' },
   feedback: { y: 790, wordWrapWidth: 1150 },
 };
 
@@ -12,6 +12,22 @@ const REFLECTION_CHOICE_CARD_LAYOUT = {
   iconOffset: { x: -250, y: -35 },
   titleOffset: { x: -200, y: -62 },
   descriptionOffset: { x: -200, y: -12, wordWrapWidth: 470 },
+};
+
+const REFLECTION_FEEDBACK_TEXT_STYLE = {
+  fontSize: '28px',
+  align: 'center',
+};
+
+const REFLECTION_CHOICE_TEXT_STYLES = {
+  icon: { fontSize: '44px' },
+  title: { fontSize: '31px', color: '#ffffff', fontStyle: 'bold' },
+  description: { fontSize: '23px', color: '#dbeafe', lineSpacing: 8 },
+};
+
+const REFLECTION_BUTTON_STYLE = {
+  fontSize: '32px',
+  padding: { x: 34, y: 18 },
 };
 
 export default class ReflectionViewManager {
@@ -42,6 +58,29 @@ export default class ReflectionViewManager {
     return {
       back: { x: 760, y: 940, label: '부작용 다시 보기', target: 'SideEffectScene', backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
       next: { x: 1160, y: 940, label: '학습 마무리', target: 'EndingScene', backgroundColor: '#bbf7d0', textColor: '#123524' },
+    };
+  }
+
+  static getFeedbackTextStyle(state, wordWrapWidth) {
+    return {
+      ...REFLECTION_FEEDBACK_TEXT_STYLE,
+      color: ReflectionViewManager.getFeedbackStyle(state).color,
+      wordWrap: { width: wordWrapWidth },
+    };
+  }
+
+  static getChoiceTextStyles() {
+    return {
+      icon: { ...REFLECTION_CHOICE_TEXT_STYLES.icon },
+      title: { ...REFLECTION_CHOICE_TEXT_STYLES.title },
+      description: { ...REFLECTION_CHOICE_TEXT_STYLES.description },
+    };
+  }
+
+  static getButtonStyle() {
+    return {
+      fontSize: REFLECTION_BUTTON_STYLE.fontSize,
+      padding: { ...REFLECTION_BUTTON_STYLE.padding },
     };
   }
 

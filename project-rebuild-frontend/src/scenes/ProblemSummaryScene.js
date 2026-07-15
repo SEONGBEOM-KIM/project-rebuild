@@ -20,16 +20,9 @@ export default class ProblemSummaryScene extends Phaser.Scene {
 
     this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
     ProgressStepper.render(this, layout.progressStep);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '60px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, layout.title).setOrigin(0.5);
 
-    this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, {
-      fontSize: '27px',
-      color: '#bfdbfe',
-    }).setOrigin(0.5);
+    this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, layout.subtitle).setOrigin(0.5);
 
     this.drawProblemGrid();
     this.drawLearningRecord(exploredPlaces, quizResult);
@@ -39,29 +32,20 @@ export default class ProblemSummaryScene extends Phaser.Scene {
 
   drawProblemGrid() {
     const layout = ProblemSummaryViewManager.getProblemGridLayout();
+    const textStyles = ProblemSummaryViewManager.getTextStyles();
     this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
       .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '38px',
-      color: '#172554',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, textStyles.gridTitle).setOrigin(0.5);
 
     EP1_PROBLEM_ITEMS.forEach((item, index) => {
       const { x, y } = ProblemSummaryViewManager.getProblemItemLayout(index);
       const card = ProblemSummaryViewManager.getProblemItemCardLayout(x, y);
       this.add.rectangle(card.background.x, card.background.y, card.background.width, card.background.height, card.background.fillColor, card.background.fillAlpha)
         .setStrokeStyle(card.background.strokeWidth, card.background.strokeColor);
-      this.add.text(card.icon.x, card.icon.y, item.icon, { fontSize: '40px' }).setOrigin(0.5);
-      this.add.text(card.title.x, card.title.y, item.title, {
-        fontSize: '27px',
-        color: '#0f172a',
-        fontStyle: 'bold',
-      });
+      this.add.text(card.icon.x, card.icon.y, item.icon, textStyles.itemIcon).setOrigin(0.5);
+      this.add.text(card.title.x, card.title.y, item.title, textStyles.itemTitle);
       this.add.text(card.detail.x, card.detail.y, item.detail, {
-        fontSize: '20px',
-        color: '#334155',
-        lineSpacing: 5,
+        ...textStyles.itemDetail,
         wordWrap: { width: card.detail.wordWrapWidth },
       });
     });
@@ -69,13 +53,10 @@ export default class ProblemSummaryScene extends Phaser.Scene {
 
   drawLearningRecord(exploredPlaces, quizResult) {
     const layout = ProblemSummaryViewManager.getLearningRecordLayout();
+    const textStyles = ProblemSummaryViewManager.getTextStyles();
     this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
       .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '36px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, textStyles.learningTitle).setOrigin(0.5);
 
     this.add.text(layout.body.x, layout.body.y, ProblemSummaryViewManager.formatLearningRecordText(
       explorationPlaces,
@@ -83,26 +64,19 @@ export default class ProblemSummaryScene extends Phaser.Scene {
       quizResult,
       EP1_CORE_CAUSE_SUMMARY,
     ), {
-      fontSize: '23px',
-      color: '#dbeafe',
-      lineSpacing: 10,
+      ...textStyles.learningBody,
       wordWrap: { width: layout.body.wordWrapWidth },
     });
   }
 
   drawNextMission() {
     const layout = ProblemSummaryViewManager.getNextMissionLayout();
+    const textStyles = ProblemSummaryViewManager.getTextStyles();
     this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
       .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '34px',
-      color: '#14532d',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, textStyles.nextTitle).setOrigin(0.5);
     this.add.text(layout.body.x, layout.body.y, EP1_NEXT_MISSION.join('\n'), {
-      fontSize: '24px',
-      color: '#1e293b',
-      lineSpacing: 11,
+      ...textStyles.nextBody,
       wordWrap: { width: layout.body.wordWrapWidth },
     });
   }
@@ -121,10 +95,9 @@ export default class ProblemSummaryScene extends Phaser.Scene {
 
   createButton(x, y, label, backgroundColor, color) {
     return this.add.text(x, y, label, {
-      fontSize: '32px',
+      ...ProblemSummaryViewManager.getButtonStyle(),
       color,
       backgroundColor,
-      padding: { x: 34, y: 18 },
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
   }
 }

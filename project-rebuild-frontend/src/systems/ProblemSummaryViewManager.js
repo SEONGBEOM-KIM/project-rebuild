@@ -1,8 +1,8 @@
 const PROBLEM_SUMMARY_SCREEN_LAYOUT = {
   backgroundColor: 0x10253f,
   progressStep: 'summary',
-  title: { y: 72, text: 'EP1. 문제 정리' },
-  subtitle: { y: 140, text: '탐색과 질문을 통해 확인한 푸른군의 핵심 문제를 정리합니다.' },
+  title: { y: 72, text: 'EP1. 문제 정리', fontSize: '60px', color: '#ffffff', fontStyle: 'bold' },
+  subtitle: { y: 140, text: '탐색과 질문을 통해 확인한 푸른군의 핵심 문제를 정리합니다.', fontSize: '27px', color: '#bfdbfe' },
 };
 
 const PROBLEM_GRID_LAYOUT = {
@@ -24,6 +24,22 @@ const NEXT_MISSION_LAYOUT = {
   panel: { x: 1470, y: 735, width: 560, height: 260, fillColor: 0xffffff, fillAlpha: 0.96, strokeWidth: 4, strokeColor: 0xbbf7d0 },
   title: { x: 1470, y: 650, text: '다음 미션' },
   body: { x: 1215, y: 700, wordWrapWidth: 510 },
+};
+
+const PROBLEM_SUMMARY_TEXT_STYLES = {
+  gridTitle: { fontSize: '38px', color: '#172554', fontStyle: 'bold' },
+  itemIcon: { fontSize: '40px' },
+  itemTitle: { fontSize: '27px', color: '#0f172a', fontStyle: 'bold' },
+  itemDetail: { fontSize: '20px', color: '#334155', lineSpacing: 5 },
+  learningTitle: { fontSize: '36px', color: '#ffffff', fontStyle: 'bold' },
+  learningBody: { fontSize: '23px', color: '#dbeafe', lineSpacing: 10 },
+  nextTitle: { fontSize: '34px', color: '#14532d', fontStyle: 'bold' },
+  nextBody: { fontSize: '24px', color: '#1e293b', lineSpacing: 11 },
+};
+
+const PROBLEM_SUMMARY_BUTTON_STYLE = {
+  fontSize: '32px',
+  padding: { x: 34, y: 18 },
 };
 
 export default class ProblemSummaryViewManager {
@@ -81,6 +97,26 @@ export default class ProblemSummaryViewManager {
     return {
       back: { x: 750, y: 955, label: '원인 질문 다시 보기', target: 'CauseQuizScene', backgroundColor: '#93c5fd', textColor: '#0f172a' },
       next: { x: 1180, y: 955, label: '회복 방향 선택', target: 'SelectionScene', backgroundColor: '#bbf7d0', textColor: '#123524' },
+    };
+  }
+
+  static getTextStyles() {
+    return {
+      gridTitle: { ...PROBLEM_SUMMARY_TEXT_STYLES.gridTitle },
+      itemIcon: { ...PROBLEM_SUMMARY_TEXT_STYLES.itemIcon },
+      itemTitle: { ...PROBLEM_SUMMARY_TEXT_STYLES.itemTitle },
+      itemDetail: { ...PROBLEM_SUMMARY_TEXT_STYLES.itemDetail },
+      learningTitle: { ...PROBLEM_SUMMARY_TEXT_STYLES.learningTitle },
+      learningBody: { ...PROBLEM_SUMMARY_TEXT_STYLES.learningBody },
+      nextTitle: { ...PROBLEM_SUMMARY_TEXT_STYLES.nextTitle },
+      nextBody: { ...PROBLEM_SUMMARY_TEXT_STYLES.nextBody },
+    };
+  }
+
+  static getButtonStyle() {
+    return {
+      fontSize: PROBLEM_SUMMARY_BUTTON_STYLE.fontSize,
+      padding: { ...PROBLEM_SUMMARY_BUTTON_STYLE.padding },
     };
   }
 

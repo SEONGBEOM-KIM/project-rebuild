@@ -1,8 +1,8 @@
 const DATA_BRIEFING_SCREEN_LAYOUT = {
   backgroundColor: 0x172554,
   progressStep: 'data',
-  title: { y: 70, text: 'EP1. 자료 확인' },
-  subtitle: { y: 138 },
+  title: { y: 70, text: 'EP1. 자료 확인', fontSize: '60px', color: '#ffffff', fontStyle: 'bold' },
+  subtitle: { y: 138, fontSize: '28px', color: '#bfdbfe' },
 };
 
 const DATA_CARD_LAYOUT = {
@@ -26,6 +26,25 @@ const CONCEPT_BOX_LAYOUT = {
   panel: { x: 960, y: 840, width: 1280, height: 110, fillColor: 0x0f172a, fillAlpha: 0.88, strokeWidth: 3, strokeColor: 0xfde68a },
   title: { x: 350, y: 810, text: '핵심 개념' },
   body: { x: 350, y: 848, wordWrapWidth: 1220 },
+};
+
+const DATA_CARD_TEXT_STYLES = {
+  title: { fontSize: '33px', color: '#172554', fontStyle: 'bold', align: 'center' },
+  subtitle: { fontSize: '22px', color: '#475569' },
+  barLabel: { fontSize: '23px', color: '#1e293b', fontStyle: 'bold' },
+  barValue: { fontSize: '23px', color: '#0f172a' },
+  takeawayTitle: { fontSize: '23px', color: '#172554', fontStyle: 'bold' },
+  takeawayBody: { fontSize: '21px', color: '#334155', lineSpacing: 7 },
+};
+
+const CONCEPT_BOX_TEXT_STYLES = {
+  title: { fontSize: '27px', color: '#fde68a', fontStyle: 'bold' },
+  body: { fontSize: '25px', color: '#ffffff' },
+};
+
+const DATA_BRIEFING_BUTTON_STYLE = {
+  fontSize: '32px',
+  padding: { x: 34, y: 18 },
 };
 
 export default class DataBriefingViewManager {
@@ -60,10 +79,35 @@ export default class DataBriefingViewManager {
     };
   }
 
+  static getDataCardTextStyles() {
+    return {
+      title: { ...DATA_CARD_TEXT_STYLES.title },
+      subtitle: { ...DATA_CARD_TEXT_STYLES.subtitle },
+      barLabel: { ...DATA_CARD_TEXT_STYLES.barLabel },
+      barValue: { ...DATA_CARD_TEXT_STYLES.barValue },
+      takeawayTitle: { ...DATA_CARD_TEXT_STYLES.takeawayTitle },
+      takeawayBody: { ...DATA_CARD_TEXT_STYLES.takeawayBody },
+    };
+  }
+
+  static getConceptBoxTextStyles() {
+    return {
+      title: { ...CONCEPT_BOX_TEXT_STYLES.title },
+      body: { ...CONCEPT_BOX_TEXT_STYLES.body },
+    };
+  }
+
   static getControlLayout() {
     return {
       back: { x: 760, y: 980, label: '탐색 다시 보기', target: 'ExplorationScene', backgroundColor: '#93c5fd', textColor: '#0f172a' },
       next: { x: 1160, y: 980, label: '원인 질문 풀기', target: 'CauseQuizScene', backgroundColor: '#bbf7d0', textColor: '#123524' },
+    };
+  }
+
+  static getButtonStyle() {
+    return {
+      fontSize: DATA_BRIEFING_BUTTON_STYLE.fontSize,
+      padding: { ...DATA_BRIEFING_BUTTON_STYLE.padding },
     };
   }
 

@@ -19,28 +19,21 @@ export default class ReflectionScene extends Phaser.Scene {
     this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
     ProgressStepper.render(this, layout.progressStep);
 
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '60px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, layout.title).setOrigin(0.5);
 
-    this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, {
-      fontSize: '27px',
-      color: '#bfdbfe',
-    }).setOrigin(0.5);
+    this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, layout.subtitle).setOrigin(0.5);
 
     EP1_REFLECTION_CHOICES.forEach((choice, index) => {
       const { x, y } = ReflectionViewManager.getChoiceCardPosition(index);
       this.createChoiceCard(choice, x, y);
     });
 
-    this.feedbackText = this.add.text(layout.feedback.x, layout.feedback.y, ReflectionViewManager.formatInitialFeedback(), {
-      fontSize: '28px',
-      color: '#e0f2fe',
-      align: 'center',
-      wordWrap: { width: layout.feedback.wordWrapWidth },
-    }).setOrigin(0.5);
+    this.feedbackText = this.add.text(
+      layout.feedback.x,
+      layout.feedback.y,
+      ReflectionViewManager.formatInitialFeedback(),
+      ReflectionViewManager.getFeedbackTextStyle('initial', layout.feedback.wordWrapWidth),
+    ).setOrigin(0.5);
 
     this.drawControls();
     this.updateSelectionUi();
@@ -49,19 +42,14 @@ export default class ReflectionScene extends Phaser.Scene {
   createChoiceCard(choice, x, y) {
     const layout = ReflectionViewManager.getChoiceCardLayout(x, y);
     const initialStyle = ReflectionViewManager.getChoiceCardStyle(choice.id, this.selectedChoice);
+    const textStyles = ReflectionViewManager.getChoiceTextStyles();
     const background = this.add.rectangle(layout.background.x, layout.background.y, layout.background.width, layout.background.height, initialStyle.fillColor, initialStyle.fillAlpha)
       .setStrokeStyle(initialStyle.strokeWidth, initialStyle.strokeColor)
       .setInteractive({ useHandCursor: true });
-    const icon = this.add.text(layout.icon.x, layout.icon.y, choice.icon, { fontSize: '44px' }).setOrigin(0.5);
-    const title = this.add.text(layout.title.x, layout.title.y, choice.title, {
-      fontSize: '31px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-    });
+    const icon = this.add.text(layout.icon.x, layout.icon.y, choice.icon, textStyles.icon).setOrigin(0.5);
+    const title = this.add.text(layout.title.x, layout.title.y, choice.title, textStyles.title);
     const description = this.add.text(layout.description.x, layout.description.y, choice.description, {
-      fontSize: '23px',
-      color: '#dbeafe',
-      lineSpacing: 8,
+      ...textStyles.description,
       wordWrap: { width: layout.description.wordWrapWidth },
     });
 
@@ -109,10 +97,9 @@ export default class ReflectionScene extends Phaser.Scene {
 
   createButton(x, y, label, backgroundColor, color) {
     return this.add.text(x, y, label, {
-      fontSize: '32px',
+      ...ReflectionViewManager.getButtonStyle(),
       color,
       backgroundColor,
-      padding: { x: 34, y: 18 },
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
   }
 }

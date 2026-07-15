@@ -18,15 +18,11 @@ export default class DataBriefingScene extends Phaser.Scene {
     this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
     ProgressStepper.render(this, layout.progressStep);
 
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '60px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, layout.title).setOrigin(0.5);
 
     this.add.text(layout.subtitle.x, layout.subtitle.y, DataBriefingViewManager.formatSubtitle(CURRENT_EPISODE.regionName), {
-      fontSize: '28px',
-      color: '#bfdbfe',
+      fontSize: layout.subtitle.fontSize,
+      color: layout.subtitle.color,
     }).setOrigin(0.5);
 
     EP1_DATA_CARDS.forEach((card, index) => {
@@ -40,62 +36,40 @@ export default class DataBriefingScene extends Phaser.Scene {
 
   drawDataCard(card, x, y) {
     const layout = DataBriefingViewManager.getDataCardLayout(x, y);
+    const textStyles = DataBriefingViewManager.getDataCardTextStyles();
     this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
       .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
     this.add.text(layout.title.x, layout.title.y, card.title, {
-      fontSize: '33px',
-      color: '#172554',
-      fontStyle: 'bold',
-      align: 'center',
+      ...textStyles.title,
       wordWrap: { width: layout.title.wordWrapWidth },
     }).setOrigin(0.5);
-    this.add.text(layout.subtitle.x, layout.subtitle.y, card.subtitle, {
-      fontSize: '22px',
-      color: '#475569',
-    }).setOrigin(0.5);
+    this.add.text(layout.subtitle.x, layout.subtitle.y, card.subtitle, textStyles.subtitle).setOrigin(0.5);
 
     card.bars.forEach((bar, index) => {
       const barLayout = DataBriefingViewManager.getBarLayout(bar, x, y, index);
-      this.add.text(layout.barLabel.x, barLayout.y, bar.label, {
-        fontSize: '23px',
-        color: '#1e293b',
-        fontStyle: 'bold',
-      }).setOrigin(0, 0.5);
+      this.add.text(layout.barLabel.x, barLayout.y, bar.label, textStyles.barLabel).setOrigin(0, 0.5);
       this.add.rectangle(barLayout.x, barLayout.y, barLayout.backgroundWidth, barLayout.height, layout.barBackgroundColor).setOrigin(0, 0.5);
       this.add.rectangle(barLayout.x, barLayout.y, barLayout.width, barLayout.height, bar.color).setOrigin(0, 0.5);
-      this.add.text(layout.barValue.x, barLayout.y, DataBriefingViewManager.formatBarValue(bar), {
-        fontSize: '23px',
-        color: '#0f172a',
-      }).setOrigin(1, 0.5);
+      this.add.text(layout.barValue.x, barLayout.y, DataBriefingViewManager.formatBarValue(bar), textStyles.barValue).setOrigin(1, 0.5);
     });
 
     this.add.rectangle(layout.takeawayPanel.x, layout.takeawayPanel.y, layout.takeawayPanel.width, layout.takeawayPanel.height, layout.takeawayPanel.fillColor, layout.takeawayPanel.fillAlpha)
       .setStrokeStyle(layout.takeawayPanel.strokeWidth, layout.takeawayPanel.strokeColor);
-    this.add.text(layout.takeawayTitle.x, layout.takeawayTitle.y, layout.takeawayTitle.text, {
-      fontSize: '23px',
-      color: '#172554',
-      fontStyle: 'bold',
-    });
+    this.add.text(layout.takeawayTitle.x, layout.takeawayTitle.y, layout.takeawayTitle.text, textStyles.takeawayTitle);
     this.add.text(layout.takeawayBody.x, layout.takeawayBody.y, card.takeaway, {
-      fontSize: '21px',
-      color: '#334155',
-      lineSpacing: 7,
+      ...textStyles.takeawayBody,
       wordWrap: { width: layout.takeawayBody.wordWrapWidth },
     });
   }
 
   drawConceptBox() {
     const layout = DataBriefingViewManager.getConceptBoxLayout();
+    const textStyles = DataBriefingViewManager.getConceptBoxTextStyles();
     this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
       .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '27px',
-      color: '#fde68a',
-      fontStyle: 'bold',
-    });
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, textStyles.title);
     this.add.text(layout.body.x, layout.body.y, EP1_CORE_CONCEPT, {
-      fontSize: '25px',
-      color: '#ffffff',
+      ...textStyles.body,
       wordWrap: { width: layout.body.wordWrapWidth },
     });
   }
@@ -114,10 +88,9 @@ export default class DataBriefingScene extends Phaser.Scene {
 
   createButton(x, y, label, backgroundColor, color) {
     return this.add.text(x, y, label, {
-      fontSize: '32px',
+      ...DataBriefingViewManager.getButtonStyle(),
       color,
       backgroundColor,
-      padding: { x: 34, y: 18 },
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
   }
 }
