@@ -815,6 +815,15 @@ function testPlacementRules() {
 
 
 function testEndingSummaryManager() {
+  assert.deepEqual(EndingSummaryManager.getScreenLayout(1920).title, {
+    x: 960,
+    y: 78,
+    text: '학습 마무리',
+  });
+  assert.equal(EndingSummaryManager.getScreenLayout(1920).progressStep, 'ending');
+  assert.equal(EndingSummaryManager.getPanelStyle().strokeColor, 0x60a5fa);
+  assert.equal(EndingSummaryManager.getLearningRecordStyle().title, '학습 기록');
+  assert.equal(EndingSummaryManager.getNextMissionStyle().strokeColor, 0xbbf7d0);
   const panels = EndingSummaryManager.getPanelLayout();
   assert.equal(panels.choice.title, '오늘의 선택 요약');
   assert.equal(panels.nextMission.width, 360);
@@ -822,14 +831,16 @@ function testEndingSummaryManager() {
   assert.deepEqual(EndingSummaryManager.getPanelBodyPosition(panels.choice), { x: 175, y: 255 });
   assert.equal(EndingSummaryManager.getPanelBodyStyle(panels.choice).wordWrap.width, 510);
   assert.equal(EndingSummaryManager.getNextMissionBodyStyle(panels.nextMission).wordWrap.width, 296);
-  assert.deepEqual(EndingSummaryManager.getLearningRecordLayout(960).title, { x: 170, y: 737 });
+  assert.deepEqual(EndingSummaryManager.getLearningRecordLayout(960).title, { x: 170, y: 737, text: '학습 기록' });
   assert.deepEqual(EndingSummaryManager.getControlLayout(960).restart, {
     x: 1480,
     y: 955,
     label: '처음부터 다시',
     target: 'BootScene',
     backgroundColor: '#fde68a',
+    textColor: '#0f172a',
   });
+  assert.equal(EndingSummaryManager.getControlLayout(960).report.target, 'TeacherReportScene');
 
   const placedBuildings = [
     createPlacementRecord('youth_center'),

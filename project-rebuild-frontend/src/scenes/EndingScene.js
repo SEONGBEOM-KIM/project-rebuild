@@ -20,15 +20,17 @@ export default class EndingScene extends Phaser.Scene {
     const learningProgress = LearningProgress.update(this.registry, { completed: true });
     const ending = EndingSummaryManager.getEndingSummary(gameState, placedBuildings);
 
-    this.add.rectangle(width / 2, height / 2, width, height, 0x0f172a);
-    ProgressStepper.render(this, 'ending');
-    this.add.text(width / 2, 78, '학습 마무리', {
+    const layout = EndingSummaryManager.getScreenLayout(width);
+
+    this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
+    ProgressStepper.render(this, layout.progressStep);
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
       fontSize: '62px',
       color: '#ffffff',
       fontStyle: 'bold',
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, 145, 'EP1 탐색부터 시설 배치까지의 학습 기록을 요약합니다.', {
+    this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, {
       fontSize: '26px',
       color: '#bfdbfe',
     }).setOrigin(0.5);
@@ -42,7 +44,9 @@ export default class EndingScene extends Phaser.Scene {
   }
 
   drawPanel(panel, body) {
-    this.add.rectangle(panel.x, panel.y, panel.width, panel.height, 0xffffff, 0.96).setStrokeStyle(4, 0x60a5fa);
+    const panelStyle = EndingSummaryManager.getPanelStyle();
+    this.add.rectangle(panel.x, panel.y, panel.width, panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
+      .setStrokeStyle(panelStyle.strokeWidth, panelStyle.strokeColor);
     const titlePosition = EndingSummaryManager.getPanelTitlePosition(panel);
     this.add.text(titlePosition.x, titlePosition.y, panel.title, {
       fontSize: '34px',
@@ -55,8 +59,10 @@ export default class EndingScene extends Phaser.Scene {
 
   drawLearningRecordStrip(centerX, learningProgress, exploredPlaces, quizResult, reflectionChoice) {
     const layout = EndingSummaryManager.getLearningRecordLayout(centerX);
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0x1e293b, 0.96).setStrokeStyle(4, 0xfde68a);
-    this.add.text(layout.title.x, layout.title.y, '학습 기록', {
+    const recordStyle = EndingSummaryManager.getLearningRecordStyle();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, recordStyle.fillColor, recordStyle.fillAlpha)
+      .setStrokeStyle(recordStyle.strokeWidth, recordStyle.strokeColor);
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
       fontSize: '28px',
       color: '#fde68a',
       fontStyle: 'bold',
@@ -73,7 +79,9 @@ export default class EndingScene extends Phaser.Scene {
   }
 
   drawNextMissionPanel(panel) {
-    this.add.rectangle(panel.x, panel.y, panel.width, panel.height, 0x1e293b, 0.98).setStrokeStyle(4, 0xbbf7d0);
+    const panelStyle = EndingSummaryManager.getNextMissionStyle();
+    this.add.rectangle(panel.x, panel.y, panel.width, panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
+      .setStrokeStyle(panelStyle.strokeWidth, panelStyle.strokeColor);
     const titlePosition = EndingSummaryManager.getPanelTitlePosition(panel);
     this.add.text(titlePosition.x, titlePosition.y, panel.title, {
       fontSize: '32px',
@@ -88,15 +96,15 @@ export default class EndingScene extends Phaser.Scene {
   drawControls(centerX) {
     const controls = EndingSummaryManager.getControlLayout(centerX);
     Object.values(controls).forEach((control) => {
-      const button = this.createButton(control.x, control.y, control.label, control.backgroundColor);
+      const button = this.createButton(control.x, control.y, control.label, control.backgroundColor, control.textColor);
       button.on('pointerdown', () => this.scene.start(control.target));
     });
   }
 
-  createButton(x, y, label, backgroundColor) {
+  createButton(x, y, label, backgroundColor, color) {
     return this.add.text(x, y, label, {
       fontSize: '29px',
-      color: '#0f172a',
+      color,
       backgroundColor,
       padding: { x: 34, y: 18 },
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
