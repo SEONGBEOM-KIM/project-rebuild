@@ -295,6 +295,11 @@ function testReflectionViewManager() {
 }
 
 function testTitleViewManager() {
+  assert.deepEqual(TitleViewManager.getScreenText(), {
+    backgroundColor: 0x10253f,
+    title: { y: 280, text: '프로젝트 리빌드' },
+    subtitle: { y: 380, text: '균형 있게 성장하는 지역을 위하여' },
+  });
   assert.deepEqual(TitleViewManager.getLayout(false), {
     startButtonY: 620,
     loadButtonY: null,
@@ -309,6 +314,11 @@ function testTitleViewManager() {
     storageButtonY: 910,
     importStatusY: 975,
   });
+  assert.deepEqual(TitleViewManager.getStartButton(), { y: 620, label: '시작하기', targetScene: 'AuthScene' });
+  assert.deepEqual(TitleViewManager.getLoadButton(), { savedY: 745, label: '저장 데이터 확인', targetScene: 'SavedDataScene' });
+  assert.equal(TitleViewManager.getImportButton().label, 'JSON 가져오기');
+  assert.deepEqual(TitleViewManager.getStorageButton(), { savedY: 910, emptyY: 820, label: '브라우저 저장 관리', targetScene: 'StorageManagerScene' });
+  assert.deepEqual(TitleViewManager.getImportFileConfig(), { type: 'file', accept: 'application/json,.json', successTargetScene: 'SavedDataScene' });
   assert.equal(TitleViewManager.formatImportError(new Error('bad json')), 'bad json');
   assert.equal(TitleViewManager.formatImportError(null), 'JSON 가져오기에 실패했습니다.');
   assert.equal(TitleViewManager.getPrimaryButtonStyle().backgroundColor, '#a7f3d0');
@@ -1324,7 +1334,7 @@ function testSceneReferences() {
 
   const missingTargets = [];
   const sceneStartPattern = /scene\.start\('([^']+)'/g;
-  const managerTargetPattern = /(?:targetScene:\s*|BOOT_TARGET_SCENE\s*=\s*)'([^']+)'/g;
+  const managerTargetPattern = /(?:(?:targetScene|successTargetScene):\s*|BOOT_TARGET_SCENE\s*=\s*)'([^']+)'/g;
   for (const file of sceneFiles) {
     const source = readFileSync(join(SCENES_DIR, file), 'utf8');
     for (const match of source.matchAll(sceneStartPattern)) {

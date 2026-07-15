@@ -9,27 +9,32 @@ export default class TitleScene extends Phaser.Scene {
 
   create() {
     const { width, height } = this.scale;
-    this.add.rectangle(width / 2, height / 2, width, height, 0x10253f);
-    this.add.text(width / 2, 280, '프로젝트 리빌드', {
+    const screenText = TitleViewManager.getScreenText();
+    this.add.rectangle(width / 2, height / 2, width, height, screenText.backgroundColor);
+    this.add.text(width / 2, screenText.title.y, screenText.title.text, {
       fontSize: '92px',
       color: '#f7fbff',
       fontStyle: 'bold',
     }).setOrigin(0.5);
-    this.add.text(width / 2, 380, '균형 있게 성장하는 지역을 위하여', {
+    this.add.text(width / 2, screenText.subtitle.y, screenText.subtitle.text, {
       fontSize: '36px',
       color: '#b9d7ff',
     }).setOrigin(0.5);
 
     const hasSave = SaveManager.hasSave();
     const layout = TitleViewManager.getLayout(hasSave);
+    const startButtonConfig = TitleViewManager.getStartButton();
+    const importButtonConfig = TitleViewManager.getImportButton();
+    const storageButtonConfig = TitleViewManager.getStorageButton();
+    const loadButtonConfig = TitleViewManager.getLoadButton();
 
-    const startButton = this.add.text(width / 2, layout.startButtonY, '시작하기', TitleViewManager.getPrimaryButtonStyle())
+    const startButton = this.add.text(width / 2, layout.startButtonY, startButtonConfig.label, TitleViewManager.getPrimaryButtonStyle())
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
 
-    startButton.on('pointerdown', () => this.scene.start('AuthScene'));
+    startButton.on('pointerdown', () => this.scene.start(startButtonConfig.targetScene));
 
-    const importButton = this.add.text(width / 2, layout.importButtonY, 'JSON 가져오기', TitleViewManager.getSecondaryButtonStyle())
+    const importButton = this.add.text(width / 2, layout.importButtonY, importButtonConfig.label, TitleViewManager.getSecondaryButtonStyle())
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
     importButton.on('pointerdown', () => this.openImportPicker());
@@ -40,25 +45,26 @@ export default class TitleScene extends Phaser.Scene {
       align: 'center',
     }).setOrigin(0.5);
 
-    const storageButton = this.add.text(width / 2, layout.storageButtonY, '브라우저 저장 관리', TitleViewManager.getStorageButtonStyle())
+    const storageButton = this.add.text(width / 2, layout.storageButtonY, storageButtonConfig.label, TitleViewManager.getStorageButtonStyle())
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
-    storageButton.on('pointerdown', () => this.scene.start('StorageManagerScene'));
+    storageButton.on('pointerdown', () => this.scene.start(storageButtonConfig.targetScene));
 
 
     if (hasSave) {
-      const loadButton = this.add.text(width / 2, layout.loadButtonY, '저장 데이터 확인', TitleViewManager.getLoadButtonStyle())
+      const loadButton = this.add.text(width / 2, layout.loadButtonY, loadButtonConfig.label, TitleViewManager.getLoadButtonStyle())
         .setOrigin(0.5)
         .setInteractive({ useHandCursor: true });
 
-      loadButton.on('pointerdown', () => this.scene.start('SavedDataScene'));
+      loadButton.on('pointerdown', () => this.scene.start(loadButtonConfig.targetScene));
     }
   }
 
   openImportPicker() {
+    const inputConfig = TitleViewManager.getImportFileConfig();
     const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'application/json,.json';
+    input.type = inputConfig.type;
+    input.accept = inputConfig.accept;
     input.onchange = async () => {
       const file = input.files?.[0];
       if (!file) {
@@ -67,7 +73,7 @@ export default class TitleScene extends Phaser.Scene {
       try {
         const text = await file.text();
         SaveManager.importJsonText(text);
-        this.scene.start('SavedDataScene');
+        this.scene.start(inputConfig.successTargetScene);
       } catch (error) {
         this.importStatusText.setText(TitleViewManager.formatImportError(error));
       }
