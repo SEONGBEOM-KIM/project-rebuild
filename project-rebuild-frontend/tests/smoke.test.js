@@ -834,6 +834,11 @@ function testPlacementViewManager() {
   assert.equal(REQUIRED_PLACEMENTS, 3);
   assert.equal(PLACEMENT_DRAG_THRESHOLD, 8);
   assert.equal(PLACEMENT_UI_BOUNDS.leftPanelRight, 430);
+  assert.deepEqual(PlacementViewManager.getScreenLayout().mapOrigin, { x: 940, y: 260 });
+  assert.equal(PlacementViewManager.getScreenLayout().progressStep, 'placement');
+  assert.match(PlacementViewManager.getScreenLayout().topHint.text, /휠: 확대\/축소/);
+  assert.deepEqual(PlacementViewManager.getCameraConfig().bounds, { x: 0, y: 0, width: 1900, height: 1300 });
+  assert.equal(PlacementViewManager.getRecommendationBadgeLayout(10, 20).text.text, '추천');
   assert.equal(PREVIEW_STYLES.valid.fillColor, 0x22c55e);
   assert.equal(PLACEMENT_UI_LAYOUT.title.text, '건물 선택');
   assert.equal(BUILDING_CARD_LAYOUT.card.width, 300);
@@ -867,6 +872,16 @@ function testPlacementViewManager() {
   assert.equal(PlacementViewManager.formatInvalidPlacementMessage('도로 위입니다'), '배치 불가: 도로 위입니다');
   assert.equal(PlacementViewManager.formatBuildingSelectedMessage('청년센터'), '청년센터 선택됨');
   assert.equal(PlacementViewManager.getUiLayout().legendTitle.text, '타일 범례');
+  assert.equal(PlacementViewManager.getUiLayout().continueButton.target, 'ResultScene');
+  assert.equal(PlacementViewManager.getUiLayout().continueButton.backgroundColor, 0x94a3b8);
+
+  const placementSceneSource = readProjectFile('src', 'scenes', 'PlacementScene.js');
+  assert.match(placementSceneSource, /PlacementUiCamera/, 'placement scene should render fixed UI through a separate UI camera');
+  assert.match(placementSceneSource, /this\.cameras\.main\.ignore\(this\.uiObjects\)/, 'world camera should ignore fixed UI objects');
+  assert.match(placementSceneSource, /this\.uiCamera\.ignore\(this\.worldObjects\)/, 'UI camera should ignore zoomable map objects');
+
+  const cameraControllerSource = readProjectFile('src', 'systems', 'CameraController.js');
+  assert.match(cameraControllerSource, /this\.ignoreDrag\(pointer\)/, 'camera wheel zoom should ignore UI pointer regions');
   assert.deepEqual(PlacementViewManager.getBuildingCardLayout(40, 185).card, {
     ...BUILDING_CARD_LAYOUT.card,
     x: 190,

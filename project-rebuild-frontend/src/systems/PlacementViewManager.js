@@ -36,6 +36,33 @@ export const PLACEMENT_UI_BOUNDS = {
   bottomUiTop: 930,
 };
 
+export const PLACEMENT_SCREEN_LAYOUT = {
+  backgroundColor: 0x0f172a,
+  progressStep: 'placement',
+  topHint: {
+    x: 460,
+    y: 120,
+    text: '마우스 드래그: 지도 이동  |  휠: 확대/축소  |  초록: 배치 가능 / 빨강: 불가능',
+  },
+  mapOrigin: { x: 940, y: 260 },
+};
+
+export const PLACEMENT_CAMERA_CONFIG = {
+  minZoom: 0.8,
+  maxZoom: 2.2,
+  bounds: { x: 0, y: 0, width: 1900, height: 1300 },
+};
+
+export const RECOMMENDATION_BADGE_STYLE = {
+  width: 72,
+  height: 28,
+  fillColor: 0xfde68a,
+  fillAlpha: 1,
+  strokeColor: 0xf59e0b,
+  text: '추천',
+  textColor: '#78350f',
+};
+
 export const PREVIEW_STYLES = {
   valid: {
     fillColor: 0x22c55e,
@@ -61,7 +88,7 @@ export const PLACEMENT_UI_LAYOUT = {
   status: { x: 40, y: 690 },
   cursorInfo: { x: 40, y: 842, text: '커서 타일: 지도 위로 이동하세요.' },
   message: { x: 40, y: 925, text: '아직 배치된 건물이 없습니다.' },
-  continueButton: { x: 1615, y: 985, width: 300, height: 72, text: '시설 3개 더 배치' },
+  continueButton: { x: 1615, y: 985, width: 300, height: 72, text: '시설 3개 더 배치', target: 'ResultScene', backgroundColor: 0x94a3b8, alpha: 1, strokeColor: 0xe2e8f0 },
   legendPanel: { x: 1615, y: 150, width: 330, height: 190, fillColor: 0x111827, alpha: 0.88, strokeColor: 0x475569 },
   legendTitle: { x: 1480, y: 76, text: '타일 범례' },
   legendSwatch: { x: 1492, yOffset: 10, width: 26, height: 20 },
@@ -124,7 +151,37 @@ export const PLACEMENT_MAP_VISUALS = {
 };
 
 export default class PlacementViewManager {
+  static getScreenLayout() {
+    return {
+      background: { color: PLACEMENT_SCREEN_LAYOUT.backgroundColor },
+      progressStep: PLACEMENT_SCREEN_LAYOUT.progressStep,
+      topHint: { ...PLACEMENT_SCREEN_LAYOUT.topHint },
+      mapOrigin: { ...PLACEMENT_SCREEN_LAYOUT.mapOrigin },
+    };
+  }
 
+  static getCameraConfig() {
+    return {
+      minZoom: PLACEMENT_CAMERA_CONFIG.minZoom,
+      maxZoom: PLACEMENT_CAMERA_CONFIG.maxZoom,
+      bounds: { ...PLACEMENT_CAMERA_CONFIG.bounds },
+    };
+  }
+
+  static getRecommendationBadgeLayout(x, y) {
+    return {
+      background: {
+        x,
+        y,
+        width: RECOMMENDATION_BADGE_STYLE.width,
+        height: RECOMMENDATION_BADGE_STYLE.height,
+        fillColor: RECOMMENDATION_BADGE_STYLE.fillColor,
+        fillAlpha: RECOMMENDATION_BADGE_STYLE.fillAlpha,
+        strokeColor: RECOMMENDATION_BADGE_STYLE.strokeColor,
+      },
+      text: { x, y, text: RECOMMENDATION_BADGE_STYLE.text, color: RECOMMENDATION_BADGE_STYLE.textColor },
+    };
+  }
 
   static getUiLayout() {
     return PLACEMENT_UI_LAYOUT;

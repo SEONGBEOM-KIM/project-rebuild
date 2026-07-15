@@ -14,7 +14,11 @@ export default class CameraController {
     camera.setBounds(this.bounds.x, this.bounds.y, this.bounds.width, this.bounds.height);
     camera.setZoom(1);
 
-    this.scene.input.on('wheel', (_pointer, _objects, _deltaX, deltaY) => {
+    this.scene.input.on('wheel', (pointer, _objects, _deltaX, deltaY) => {
+      if (this.ignoreDrag(pointer)) {
+        return;
+      }
+
       const nextZoom = Phaser.Math.Clamp(camera.zoom - deltaY * 0.001, this.minZoom, this.maxZoom);
       camera.setZoom(nextZoom);
     });

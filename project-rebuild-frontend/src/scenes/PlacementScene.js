@@ -21,17 +21,19 @@ export default class PlacementScene extends Phaser.Scene {
     this.placementSystem = new PlacementSystem(this.cloneMapData(mapData));
     this.placedBuildings = [...(this.registry.get('placedBuildings') ?? [])];
     this.pendingPlacementPointer = null;
-    this.mapOrigin = { x: 940, y: 260 };
+    this.mapOrigin = PlacementViewManager.getScreenLayout().mapOrigin;
+    this.uiObjects = [];
+    this.worldObjects = [];
     this.tileWidth = mapData.tileWidth;
     this.tileHeight = mapData.tileHeight;
     this.halfTileWidth = this.tileWidth / 2;
     this.halfTileHeight = this.tileHeight / 2;
 
     this.drawBackground();
-    this.mapGraphics = this.add.graphics().setDepth(1);
-    this.buildingGraphics = this.add.graphics().setDepth(4);
-    this.previewGraphics = this.add.graphics().setDepth(6);
-    this.mapLabels = this.add.container(0, 0).setDepth(8);
+    this.mapGraphics = this.registerWorldObject(this.add.graphics().setDepth(1));
+    this.buildingGraphics = this.registerWorldObject(this.add.graphics().setDepth(4));
+    this.previewGraphics = this.registerWorldObject(this.add.graphics().setDepth(6));
+    this.mapLabels = this.registerWorldObject(this.add.container(0, 0).setDepth(8));
 
     this.drawMap();
     this.restorePlacedBuildings();
@@ -54,32 +56,51 @@ export default class PlacementScene extends Phaser.Scene {
 
   drawBackground() {
     const { width, height } = this.scale;
-    this.add.rectangle(width / 2, height / 2, width, height, 0x0f172a).setScrollFactor(0).setDepth(-10);
-    ProgressStepper.render(this, 'placement');
-    this.add.text(460, 120, '마우스 드래그: 지도 이동  |  휠: 확대/축소  |  초록: 배치 가능 / 빨강: 불가능', {
+    const layout = PlacementViewManager.getScreenLayout();
+    this.registerWorldObject(this.add.rectangle(width / 2, height / 2, width, height, layout.background.color).setScrollFactor(0).setDepth(-10));
+    this.registerUiObject(ProgressStepper.render(this, layout.progressStep));
+    this.registerUiObject(this.add.text(layout.topHint.x, layout.topHint.y, layout.topHint.text, {
       fontSize: '24px',
       color: '#bfdbfe',
-    }).setScrollFactor(0).setDepth(100);
+    }).setScrollFactor(0).setDepth(100));
   }
 
   setupCamera() {
-    const bounds = {
-      x: 0,
-      y: 0,
-      width: 1900,
-      height: 1300,
-    };
+    const cameraConfig = PlacementViewManager.getCameraConfig();
 
     new CameraController(this, {
-      minZoom: 0.8,
-      maxZoom: 2.2,
-      bounds,
+      ...cameraConfig,
       ignoreDrag: (pointer) => PlacementViewManager.isPointerOnUi(pointer),
     }).enable();
+
+    this.cameras.main.ignore(this.uiObjects);
+    this.uiCamera = this.cameras.add(0, 0, this.scale.width, this.scale.height, false, 'PlacementUiCamera');
+    this.uiCamera.setScroll(0, 0);
+    this.uiCamera.setZoom(1);
+    this.uiCamera.ignore(this.worldObjects);
+  }
+
+  registerWorldObject(object) {
+    this.worldObjects.push(object);
+
+    if (this.uiCamera) {
+      this.uiCamera.ignore(object);
+    }
+
+    return object;
+  }
+
+  registerUiObject(object) {
+    this.uiObjects.push(object);
+
+    if (this.cameras?.main) {
+      this.cameras.main.ignore(object);
+    }
+
+    return object;
   }
 
   createUi() {
-    this.uiObjects = [];
     this.cardObjects = new Map();
     const layout = PlacementViewManager.getUiLayout();
 
@@ -133,9 +154,9 @@ export default class PlacementScene extends Phaser.Scene {
       layout.continueButton.y,
       layout.continueButton.width,
       layout.continueButton.height,
-      0x94a3b8,
-      1,
-      0xe2e8f0,
+      layout.continueButton.backgroundColor,
+      layout.continueButton.alpha,
+      layout.continueButton.strokeColor,
     ).setInteractive({ useHandCursor: true });
     this.continueButton = this.createFixedText(layout.continueButton.x, layout.continueButton.y, layout.continueButton.text, {
       fontSize: '30px',
@@ -147,7 +168,7 @@ export default class PlacementScene extends Phaser.Scene {
         this.showMessage(PlacementViewManager.formatNeedMoreMessage(this.placedBuildings.length), '#fecaca');
         return;
       }
-      this.scene.start('ResultScene');
+      this.scene.start(layout.continueButton.target);
     };
     this.continueButtonBg.on('pointerdown', handleContinue);
     this.continueButton.on('pointerdown', handleContinue);
@@ -293,10 +314,19 @@ export default class PlacementScene extends Phaser.Scene {
       return null;
     }
 
-    const badgeBg = this.createFixedRectangle(x, y, 72, 28, 0xfde68a, 1, 0xf59e0b);
-    const badgeText = this.createFixedText(x, y, '추천', {
+    const layout = PlacementViewManager.getRecommendationBadgeLayout(x, y);
+    const badgeBg = this.createFixedRectangle(
+      layout.background.x,
+      layout.background.y,
+      layout.background.width,
+      layout.background.height,
+      layout.background.fillColor,
+      layout.background.fillAlpha,
+      layout.background.strokeColor,
+    );
+    const badgeText = this.createFixedText(layout.text.x, layout.text.y, layout.text.text, {
       fontSize: '16px',
-      color: '#78350f',
+      color: layout.text.color,
       fontStyle: 'bold',
     }).setOrigin(0.5);
     return { badgeBg, badgeText };
@@ -311,14 +341,12 @@ export default class PlacementScene extends Phaser.Scene {
     if (strokeColor !== null) {
       rectangle.setStrokeStyle(3, strokeColor);
     }
-    this.uiObjects.push(rectangle);
-    return rectangle;
+    return this.registerUiObject(rectangle);
   }
 
   createFixedText(x, y, text, style) {
     const textObject = this.add.text(x, y, text, style).setScrollFactor(0).setDepth(101);
-    this.uiObjects.push(textObject);
-    return textObject;
+    return this.registerUiObject(textObject);
   }
 
   updateSelectedBuildingUi() {
@@ -480,8 +508,8 @@ export default class PlacementScene extends Phaser.Scene {
     const center = this.getFootprintCenter(tileX, tileY, building.footprint);
     const markerData = PlacementViewManager.getImpactMarkerData(building);
     const markerLayout = PlacementViewManager.getImpactMarkerLayout(center, tileX, tileY);
-    const markerContainer = this.add.container(markerLayout.container.x, markerLayout.container.y)
-      .setDepth(markerLayout.container.depth);
+    const markerContainer = this.registerWorldObject(this.add.container(markerLayout.container.x, markerLayout.container.y)
+      .setDepth(markerLayout.container.depth));
 
     const bubble = this.add.circle(0, 0, markerLayout.bubble.radius, markerData.color, markerLayout.bubble.alpha)
       .setStrokeStyle(markerLayout.bubble.strokeWidth, markerLayout.bubble.strokeColor, markerLayout.bubble.strokeAlpha);
@@ -521,7 +549,7 @@ export default class PlacementScene extends Phaser.Scene {
 
   drawPlacedBuilding(building, tileX, tileY) {
     const buildingVisual = PlacementViewManager.getPlacedBuildingVisual(building, tileX, tileY);
-    const graphics = this.add.graphics().setDepth(buildingVisual.depth);
+    const graphics = this.registerWorldObject(this.add.graphics().setDepth(buildingVisual.depth));
     for (const tile of this.placementSystem.getFootprintTiles(tileX, tileY, building.footprint)) {
       this.drawDiamond(
         graphics,
@@ -544,10 +572,10 @@ export default class PlacementScene extends Phaser.Scene {
       labelLayout.background.height,
       labelLayout.background.radius,
     );
-    const label = this.add.text(labelLayout.text.x, labelLayout.text.y, building.name, {
+    const label = this.registerWorldObject(this.add.text(labelLayout.text.x, labelLayout.text.y, building.name, {
       fontSize: '18px',
       color: '#ffffff',
-    }).setOrigin(0.5).setDepth(labelLayout.text.depth);
+    }).setOrigin(0.5).setDepth(labelLayout.text.depth));
 
     this.mapLabels.add(label);
   }
