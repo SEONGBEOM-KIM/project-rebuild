@@ -5,6 +5,7 @@ import LearningProgress from '../systems/LearningProgress.js';
 import DataBriefingViewManager from '../systems/DataBriefingViewManager.js';
 
 import { EP1_CORE_CONCEPT, EP1_DATA_CARDS } from '../data/episodeContent.js';
+import { createTextButton } from '../ui/TextButton.js';
 
 export default class DataBriefingScene extends Phaser.Scene {
   constructor() {
@@ -87,10 +88,12 @@ export default class DataBriefingScene extends Phaser.Scene {
   }
 
   createButton(x, y, label, backgroundColor, color) {
-    return this.add.text(x, y, label, {
-      ...DataBriefingViewManager.getButtonStyle(),
-      color,
+    return createTextButton(this, {
+      x,
+      y,
+      label,
       backgroundColor,
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+      textColor: color,
+    }, DataBriefingViewManager.getButtonStyle());
   }
 }

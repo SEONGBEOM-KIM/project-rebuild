@@ -56,6 +56,12 @@ const API_PAYLOAD_BUTTON_STYLE = {
   padding: { x: 14, y: 13 },
 };
 
+const API_PAYLOAD_FEEDBACK_COLORS = {
+  success: '#166534',
+  error: '#991b1b',
+  logUpdated: '#bbf7d0',
+};
+
 export const API_PAYLOAD_DOWNLOAD_CONFIG = {
   mimeType: 'application/json',
 };
@@ -101,6 +107,10 @@ export default class ApiPayloadViewManager {
 
   static getButtonStyle() {
     return { ...API_PAYLOAD_BUTTON_STYLE, padding: { ...API_PAYLOAD_BUTTON_STYLE.padding } };
+  }
+
+  static getFeedbackColor(kind) {
+    return API_PAYLOAD_FEEDBACK_COLORS[kind];
   }
 
   static getPayloadPanelLayout() {

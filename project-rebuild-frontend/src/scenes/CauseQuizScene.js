@@ -5,6 +5,7 @@ import CauseQuizManager from '../systems/CauseQuizManager.js';
 import CauseQuizViewManager from '../systems/CauseQuizViewManager.js';
 
 import { EP1_CAUSE_QUESTION, EP1_EXPLORATION_CLUES } from '../data/episodeContent.js';
+import { createTextButton } from '../ui/TextButton.js';
 
 export default class CauseQuizScene extends Phaser.Scene {
   constructor() {
@@ -118,10 +119,12 @@ export default class CauseQuizScene extends Phaser.Scene {
   }
 
   createButton(x, y, label, backgroundColor, color) {
-    return this.add.text(x, y, label, {
-      ...CauseQuizViewManager.getButtonStyle(),
-      color,
+    return createTextButton(this, {
+      x,
+      y,
+      label,
       backgroundColor,
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+      textColor: color,
+    }, CauseQuizViewManager.getButtonStyle());
   }
 }

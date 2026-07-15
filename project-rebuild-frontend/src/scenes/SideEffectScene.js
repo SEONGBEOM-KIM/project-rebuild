@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import IssueDetector from '../systems/IssueDetector.js';
 import SideEffectViewManager from '../systems/SideEffectViewManager.js';
+import { createTextButton } from '../ui/TextButton.js';
 
 export default class SideEffectScene extends Phaser.Scene {
   constructor() {
@@ -89,10 +90,12 @@ export default class SideEffectScene extends Phaser.Scene {
   }
 
   createButton(x, y, label, backgroundColor, color) {
-    return this.add.text(x, y, label, {
-      ...SideEffectViewManager.getButtonStyle(),
-      color,
+    return createTextButton(this, {
+      x,
+      y,
+      label,
       backgroundColor,
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+      textColor: color,
+    }, SideEffectViewManager.getButtonStyle());
   }
 }

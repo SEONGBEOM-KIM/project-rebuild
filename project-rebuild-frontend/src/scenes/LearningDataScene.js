@@ -3,6 +3,7 @@ import ProgressStepper from '../ui/ProgressStepper.js';
 import LearningDataManager from '../systems/LearningDataManager.js';
 import SaveManager from '../systems/SaveManager.js';
 import LearningDataViewManager from '../systems/LearningDataViewManager.js';
+import { createTextButton } from '../ui/TextButton.js';
 
 export default class LearningDataScene extends Phaser.Scene {
   constructor() {
@@ -122,7 +123,7 @@ export default class LearningDataScene extends Phaser.Scene {
     saveButton.on('pointerdown', () => {
       const saved = SaveManager.save(this.learningData);
       this.saveStatusText.setText(LearningDataViewManager.formatSaveStatus(saved));
-      this.saveStatusText.setColor('#bbf7d0');
+      this.saveStatusText.setColor(LearningDataViewManager.getFeedbackColor('success'));
     });
 
     const copyButton = this.createButton(layout.copy.x, layout.copy.y, layout.copy.label, layout.copy.backgroundColor, layout.copy.textColor);
@@ -135,7 +136,7 @@ export default class LearningDataScene extends Phaser.Scene {
     clearButton.on('pointerdown', () => {
       SaveManager.clear();
       this.saveStatusText.setText(LearningDataViewManager.formatSaveCleared());
-      this.saveStatusText.setColor('#fecaca');
+      this.saveStatusText.setColor(LearningDataViewManager.getFeedbackColor('error'));
     });
 
     const backButton = this.createButton(layout.ending.x, layout.ending.y, layout.ending.label, layout.ending.backgroundColor, layout.ending.textColor);
@@ -146,10 +147,10 @@ export default class LearningDataScene extends Phaser.Scene {
     try {
       await navigator.clipboard.writeText(this.learningDataJson);
       this.saveStatusText.setText(LearningDataViewManager.formatCopySuccess());
-      this.saveStatusText.setColor('#bbf7d0');
+      this.saveStatusText.setColor(LearningDataViewManager.getFeedbackColor('success'));
     } catch (_error) {
       this.saveStatusText.setText(LearningDataViewManager.formatCopyFailure());
-      this.saveStatusText.setColor('#fecaca');
+      this.saveStatusText.setColor(LearningDataViewManager.getFeedbackColor('error'));
     }
   }
 
@@ -165,16 +166,16 @@ export default class LearningDataScene extends Phaser.Scene {
     link.remove();
     URL.revokeObjectURL(url);
     this.saveStatusText.setText(LearningDataViewManager.formatDownloadSuccess());
-    this.saveStatusText.setColor('#bbf7d0');
+    this.saveStatusText.setColor(LearningDataViewManager.getFeedbackColor('success'));
   }
 
   createButton(x, y, label, backgroundColor, color) {
-    const buttonStyle = LearningDataViewManager.getButtonStyle();
-    return this.add.text(x, y, label, {
-      fontSize: buttonStyle.fontSize,
-      color,
+    return createTextButton(this, {
+      x,
+      y,
+      label,
       backgroundColor,
-      padding: buttonStyle.padding,
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+      textColor: color,
+    }, LearningDataViewManager.getButtonStyle());
   }
 }

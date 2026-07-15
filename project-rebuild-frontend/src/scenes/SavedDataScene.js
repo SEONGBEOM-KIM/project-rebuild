@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import SaveManager from '../systems/SaveManager.js';
 import LearningDataRestoreManager from '../systems/LearningDataRestoreManager.js';
 import SavedDataViewManager from '../systems/SavedDataViewManager.js';
+import { createTextButton } from '../ui/TextButton.js';
 
 export default class SavedDataScene extends Phaser.Scene {
   constructor() {
@@ -91,12 +92,12 @@ export default class SavedDataScene extends Phaser.Scene {
   }
 
   createButton(x, y, label, backgroundColor, color) {
-    const buttonStyle = SavedDataViewManager.getButtonStyle();
-    return this.add.text(x, y, label, {
-      fontSize: buttonStyle.fontSize,
-      color,
+    return createTextButton(this, {
+      x,
+      y,
+      label,
       backgroundColor,
-      padding: buttonStyle.padding,
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+      textColor: color,
+    }, SavedDataViewManager.getButtonStyle());
   }
 }

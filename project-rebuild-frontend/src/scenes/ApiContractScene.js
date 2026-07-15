@@ -3,6 +3,7 @@ import ProgressStepper from '../ui/ProgressStepper.js';
 
 import { formatContractRequest, formatContractResponse } from '../data/apiContract.js';
 import ApiContractViewManager from '../systems/ApiContractViewManager.js';
+import { createTextButton } from '../ui/TextButton.js';
 
 export default class ApiContractScene extends Phaser.Scene {
   constructor() {
@@ -77,12 +78,12 @@ export default class ApiContractScene extends Phaser.Scene {
   }
 
   createButton(x, y, label, backgroundColor, color) {
-    const buttonStyle = ApiContractViewManager.getButtonStyle();
-    return this.add.text(x, y, label, {
-      fontSize: buttonStyle.fontSize,
-      color,
+    return createTextButton(this, {
+      x,
+      y,
+      label,
       backgroundColor,
-      padding: buttonStyle.padding,
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+      textColor: color,
+    }, ApiContractViewManager.getButtonStyle());
   }
 }

@@ -4,6 +4,7 @@ import { EP1_NEXT_DEVELOPMENT_GOALS } from '../data/episodeContent.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import EndingSummaryManager from '../systems/EndingSummaryManager.js';
 import EndingSummaryViewManager from '../systems/EndingSummaryViewManager.js';
+import { createTextButton } from '../ui/TextButton.js';
 
 export default class EndingScene extends Phaser.Scene {
   constructor() {
@@ -85,11 +86,13 @@ export default class EndingScene extends Phaser.Scene {
   }
 
   createButton(x, y, label, backgroundColor, color) {
-    return this.add.text(x, y, label, {
-      ...EndingSummaryViewManager.getButtonStyle(),
-      color,
+    return createTextButton(this, {
+      x,
+      y,
+      label,
       backgroundColor,
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+      textColor: color,
+    }, EndingSummaryViewManager.getButtonStyle());
   }
 
 }

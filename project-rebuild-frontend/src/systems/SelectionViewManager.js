@@ -89,10 +89,6 @@ export default class SelectionViewManager {
     };
   }
 
-  static formatHexColor(color) {
-    return `#${color.toString(16).padStart(6, '0')}`;
-  }
-
   static formatDetailRows(policy) {
     if (!policy) {
       return ['선택된 회복 방향이 없습니다.', '', '회복 방향을 선택한 뒤 배치 연습을 시작하세요.'];

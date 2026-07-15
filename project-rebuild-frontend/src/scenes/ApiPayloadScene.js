@@ -4,6 +4,7 @@ import LearningDataManager from '../systems/LearningDataManager.js';
 import LearningApiPayloadManager from '../systems/LearningApiPayloadManager.js';
 import MockApiClient from '../systems/MockApiClient.js';
 import ApiPayloadViewManager from '../systems/ApiPayloadViewManager.js';
+import { createTextButton } from '../ui/TextButton.js';
 
 export default class ApiPayloadScene extends Phaser.Scene {
   constructor() {
@@ -130,25 +131,25 @@ export default class ApiPayloadScene extends Phaser.Scene {
     const response = MockApiClient.submitLearningRecord(this.apiPayload);
     if (!response.ok) {
       this.statusText.setText(ApiPayloadViewManager.formatSubmitFailure(response));
-      this.statusText.setColor('#991b1b');
+      this.statusText.setColor(ApiPayloadViewManager.getFeedbackColor('error'));
       return;
     }
 
     const submissions = MockApiClient.listSubmissions();
     this.statusText.setText(ApiPayloadViewManager.formatSubmitSuccess(response));
-    this.statusText.setColor('#166534');
+    this.statusText.setColor(ApiPayloadViewManager.getFeedbackColor('success'));
     this.submissionLogText.setText(ApiPayloadViewManager.formatSubmissionLog(submissions));
-    this.submissionLogText.setColor('#bbf7d0');
+    this.submissionLogText.setColor(ApiPayloadViewManager.getFeedbackColor('logUpdated'));
   }
 
   async copyPayload() {
     try {
       await navigator.clipboard.writeText(this.apiPayloadJson);
       this.statusText.setText(ApiPayloadViewManager.formatCopySuccess());
-      this.statusText.setColor('#166534');
+      this.statusText.setColor(ApiPayloadViewManager.getFeedbackColor('success'));
     } catch (_error) {
       this.statusText.setText(ApiPayloadViewManager.formatCopyFailure());
-      this.statusText.setColor('#991b1b');
+      this.statusText.setColor(ApiPayloadViewManager.getFeedbackColor('error'));
     }
   }
 
@@ -164,16 +165,16 @@ export default class ApiPayloadScene extends Phaser.Scene {
     link.remove();
     URL.revokeObjectURL(url);
     this.statusText.setText(ApiPayloadViewManager.formatDownloadSuccess());
-    this.statusText.setColor('#166534');
+    this.statusText.setColor(ApiPayloadViewManager.getFeedbackColor('success'));
   }
 
   createButton(x, y, label, backgroundColor, color) {
-    const buttonStyle = ApiPayloadViewManager.getButtonStyle();
-    return this.add.text(x, y, label, {
-      fontSize: buttonStyle.fontSize,
-      color,
+    return createTextButton(this, {
+      x,
+      y,
+      label,
       backgroundColor,
-      padding: buttonStyle.padding,
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+      textColor: color,
+    }, ApiPayloadViewManager.getButtonStyle());
   }
 }

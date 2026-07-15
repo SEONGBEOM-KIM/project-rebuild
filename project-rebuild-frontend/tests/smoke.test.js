@@ -46,6 +46,7 @@ import { API_CONTRACT, formatContractRequest, formatContractResponse } from '../
 import { CURRENT_EPISODE, EPISODE_STEPS } from '../src/data/episodes.js';
 import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES } from '../src/data/episodeContent.js';
 import ProgressStepper from '../src/ui/ProgressStepper.js';
+import { getTextButtonColor } from '../src/ui/TextButton.js';
 
 
 const PROJECT_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -244,7 +245,6 @@ function testSelectionViewManager() {
     fontSize: '32px',
     padding: { x: 34, y: 18 },
   });
-  assert.equal(SelectionViewManager.formatHexColor(0xbbf7d0), '#bbf7d0');
   assert.deepEqual(SelectionViewManager.getControlLayout(960).start, {
     x: 1140,
     y: 955,
@@ -1316,6 +1316,8 @@ function testLearningDataViewManager() {
   assert.equal(LearningDataViewManager.getSummaryBoxStyle(390).bodyFontSize, '20px');
   assert.equal(LearningDataViewManager.getSavePanelStyle().bodyColor, '#dbeafe');
   assert.deepEqual(LearningDataViewManager.getButtonStyle().padding, { x: 22, y: 15 });
+  assert.equal(LearningDataViewManager.getFeedbackColor('success'), '#bbf7d0');
+  assert.equal(LearningDataViewManager.getFeedbackColor('error'), '#fecaca');
   assert.equal(LearningDataViewManager.getDataPanelLayout().panel.width, 1120);
   assert.equal(LearningDataViewManager.getDataPanelLayout().title.text, '저장 후보 데이터');
   assert.equal(LearningDataViewManager.getValidationPanelLayout().title.text, '데이터 검증');
@@ -1428,6 +1430,9 @@ function testApiPayloadViewManager() {
   assert.equal(ApiPayloadViewManager.getStatusTextStyle(440, '#166534').color, '#166534');
   assert.equal(ApiPayloadViewManager.getLogPanelStyle().strokeWidth, 3);
   assert.deepEqual(ApiPayloadViewManager.getButtonStyle().padding, { x: 14, y: 13 });
+  assert.equal(ApiPayloadViewManager.getFeedbackColor('success'), '#166534');
+  assert.equal(ApiPayloadViewManager.getFeedbackColor('error'), '#991b1b');
+  assert.equal(ApiPayloadViewManager.getFeedbackColor('logUpdated'), '#bbf7d0');
   assert.equal(ApiPayloadViewManager.getPayloadPanelLayout().panel.width, 1120);
   assert.equal(ApiPayloadViewManager.getPayloadPanelLayout().title.text, 'POST /api/learning-records/ 후보 body');
   assert.equal(ApiPayloadViewManager.getValidationPanelLayout().title.text, 'API 구조 검증');
@@ -1500,6 +1505,8 @@ function testMockSubmissionLogViewManager() {
   assert.equal(MockSubmissionLogViewManager.getLogPanelStyle().fillColor, 0x111827);
   assert.equal(MockSubmissionLogViewManager.getStatusTextStyle().align, 'center');
   assert.deepEqual(MockSubmissionLogViewManager.getButtonStyle().padding, { x: 22, y: 15 });
+  assert.equal(MockSubmissionLogViewManager.getFeedbackColor('success'), '#bbf7d0');
+  assert.equal(MockSubmissionLogViewManager.getFeedbackColor('error'), '#fecaca');
   assert.equal(MockSubmissionLogViewManager.getSummaryPanelLayout().panel.width, 520);
   assert.equal(MockSubmissionLogViewManager.getSummaryPanelLayout().title.text, '제출 요약');
   assert.equal(MockSubmissionLogViewManager.getLogPanelLayout().body.wordWrapWidth, 840);
@@ -1867,6 +1874,8 @@ function testSharedUiComponentStyles() {
     fontSize: '20px',
     fontStyle: 'bold',
   });
+  assert.equal(getTextButtonColor(0xbbf7d0), '#bbf7d0');
+  assert.equal(getTextButtonColor('#0f172a'), '#0f172a');
 }
 
 function run() {

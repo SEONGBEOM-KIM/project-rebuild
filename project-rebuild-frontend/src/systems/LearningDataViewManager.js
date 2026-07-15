@@ -57,6 +57,11 @@ const LEARNING_DATA_BUTTON_STYLE = {
   padding: { x: 22, y: 15 },
 };
 
+const LEARNING_DATA_FEEDBACK_COLORS = {
+  success: '#bbf7d0',
+  error: '#fecaca',
+};
+
 export const LEARNING_DATA_DOWNLOAD_CONFIG = {
   mimeType: 'application/json',
 };
@@ -98,6 +103,10 @@ export default class LearningDataViewManager {
 
   static getButtonStyle() {
     return { ...LEARNING_DATA_BUTTON_STYLE, padding: { ...LEARNING_DATA_BUTTON_STYLE.padding } };
+  }
+
+  static getFeedbackColor(kind) {
+    return LEARNING_DATA_FEEDBACK_COLORS[kind];
   }
 
   static getDataPanelLayout() {

@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import EvaluationManager from '../systems/EvaluationManager.js';
 import ResultViewManager from '../systems/ResultViewManager.js';
+import { createTextButton } from '../ui/TextButton.js';
 
 export default class ResultScene extends Phaser.Scene {
   constructor() {
@@ -59,11 +60,13 @@ export default class ResultScene extends Phaser.Scene {
   }
 
   createButton(x, y, label, backgroundColor, color) {
-    return this.add.text(x, y, label, {
-      ...ResultViewManager.getButtonStyle(),
-      color,
+    return createTextButton(this, {
+      x,
+      y,
+      label,
       backgroundColor,
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+      textColor: color,
+    }, ResultViewManager.getButtonStyle());
   }
 
   drawStatePanel(panel, rows) {

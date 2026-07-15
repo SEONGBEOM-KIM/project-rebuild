@@ -5,6 +5,7 @@ import LearningProgress from '../systems/LearningProgress.js';
 import ProblemSummaryViewManager from '../systems/ProblemSummaryViewManager.js';
 
 import { EP1_CORE_CAUSE_SUMMARY, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS } from '../data/episodeContent.js';
+import { createTextButton } from '../ui/TextButton.js';
 
 export default class ProblemSummaryScene extends Phaser.Scene {
   constructor() {
@@ -94,10 +95,12 @@ export default class ProblemSummaryScene extends Phaser.Scene {
   }
 
   createButton(x, y, label, backgroundColor, color) {
-    return this.add.text(x, y, label, {
-      ...ProblemSummaryViewManager.getButtonStyle(),
-      color,
+    return createTextButton(this, {
+      x,
+      y,
+      label,
       backgroundColor,
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+      textColor: color,
+    }, ProblemSummaryViewManager.getButtonStyle());
   }
 }

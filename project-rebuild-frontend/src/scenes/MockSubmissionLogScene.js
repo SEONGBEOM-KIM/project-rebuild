@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import MockApiClient from '../systems/MockApiClient.js';
 import MockSubmissionLogViewManager from '../systems/MockSubmissionLogViewManager.js';
+import { createTextButton } from '../ui/TextButton.js';
 
 export default class MockSubmissionLogScene extends Phaser.Scene {
   constructor() {
@@ -103,10 +104,10 @@ export default class MockSubmissionLogScene extends Phaser.Scene {
     try {
       await navigator.clipboard.writeText(this.submissionsJson);
       this.statusText.setText(MockSubmissionLogViewManager.formatCopySuccess());
-      this.statusText.setColor('#bbf7d0');
+      this.statusText.setColor(MockSubmissionLogViewManager.getFeedbackColor('success'));
     } catch (_error) {
       this.statusText.setText(MockSubmissionLogViewManager.formatCopyFailure());
-      this.statusText.setColor('#fecaca');
+      this.statusText.setColor(MockSubmissionLogViewManager.getFeedbackColor('error'));
     }
   }
 
@@ -122,16 +123,16 @@ export default class MockSubmissionLogScene extends Phaser.Scene {
     link.remove();
     URL.revokeObjectURL(url);
     this.statusText.setText(MockSubmissionLogViewManager.formatDownloadSuccess());
-    this.statusText.setColor('#bbf7d0');
+    this.statusText.setColor(MockSubmissionLogViewManager.getFeedbackColor('success'));
   }
 
   createButton(x, y, label, backgroundColor, color) {
-    const buttonStyle = MockSubmissionLogViewManager.getButtonStyle();
-    return this.add.text(x, y, label, {
-      fontSize: buttonStyle.fontSize,
-      color,
+    return createTextButton(this, {
+      x,
+      y,
+      label,
       backgroundColor,
-      padding: buttonStyle.padding,
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+      textColor: color,
+    }, MockSubmissionLogViewManager.getButtonStyle());
   }
 }

@@ -34,6 +34,11 @@ const MOCK_SUBMISSION_BUTTON_STYLE = {
   padding: { x: 22, y: 15 },
 };
 
+const MOCK_SUBMISSION_FEEDBACK_COLORS = {
+  success: '#bbf7d0',
+  error: '#fecaca',
+};
+
 const MOCK_SUBMISSION_LOG_DOWNLOAD_CONFIG = {
   mimeType: 'application/json',
 };
@@ -66,6 +71,10 @@ export default class MockSubmissionLogViewManager {
 
   static getButtonStyle() {
     return { ...MOCK_SUBMISSION_BUTTON_STYLE, padding: { ...MOCK_SUBMISSION_BUTTON_STYLE.padding } };
+  }
+
+  static getFeedbackColor(kind) {
+    return MOCK_SUBMISSION_FEEDBACK_COLORS[kind];
   }
 
   static getSummaryPanelLayout() {

@@ -3,6 +3,7 @@ import ProgressStepper from '../ui/ProgressStepper.js';
 import { EP1_REFLECTION_CHOICES } from '../data/episodeContent.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import ReflectionViewManager from '../systems/ReflectionViewManager.js';
+import { createTextButton } from '../ui/TextButton.js';
 
 export default class ReflectionScene extends Phaser.Scene {
   constructor() {
@@ -96,10 +97,12 @@ export default class ReflectionScene extends Phaser.Scene {
   }
 
   createButton(x, y, label, backgroundColor, color) {
-    return this.add.text(x, y, label, {
-      ...ReflectionViewManager.getButtonStyle(),
-      color,
+    return createTextButton(this, {
+      x,
+      y,
+      label,
       backgroundColor,
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+      textColor: color,
+    }, ReflectionViewManager.getButtonStyle());
   }
 }

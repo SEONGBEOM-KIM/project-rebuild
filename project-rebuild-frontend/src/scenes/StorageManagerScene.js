@@ -3,6 +3,7 @@ import SaveManager from '../systems/SaveManager.js';
 import MockApiClient from '../systems/MockApiClient.js';
 import StorageSummaryManager from '../systems/StorageSummaryManager.js';
 import StorageManagerViewManager from '../systems/StorageManagerViewManager.js';
+import { createTextButton } from '../ui/TextButton.js';
 
 export default class StorageManagerScene extends Phaser.Scene {
   constructor() {
@@ -96,12 +97,12 @@ export default class StorageManagerScene extends Phaser.Scene {
   }
 
   createButton(x, y, label, backgroundColor, color) {
-    const buttonStyle = StorageManagerViewManager.getButtonStyle();
-    return this.add.text(x, y, label, {
-      fontSize: buttonStyle.fontSize,
-      color,
+    return createTextButton(this, {
+      x,
+      y,
+      label,
       backgroundColor,
-      padding: buttonStyle.padding,
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+      textColor: color,
+    }, StorageManagerViewManager.getButtonStyle());
   }
 }

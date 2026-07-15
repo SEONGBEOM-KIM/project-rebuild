@@ -4,6 +4,7 @@ import { explorationPlaces } from '../data/explorationPlaces.js';
 import { CURRENT_EPISODE } from '../data/episodes.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import ExplorationViewManager from '../systems/ExplorationViewManager.js';
+import { createTextButton } from '../ui/TextButton.js';
 
 export default class ExplorationScene extends Phaser.Scene {
   constructor() {
@@ -152,10 +153,12 @@ export default class ExplorationScene extends Phaser.Scene {
   }
 
   createButton(x, y, label, backgroundColor, color) {
-    return this.add.text(x, y, label, {
-      ...ExplorationViewManager.getButtonStyle(),
-      color,
+    return createTextButton(this, {
+      x,
+      y,
+      label,
       backgroundColor,
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+      textColor: color,
+    }, ExplorationViewManager.getButtonStyle());
   }
 }

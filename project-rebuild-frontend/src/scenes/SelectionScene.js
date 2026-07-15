@@ -3,6 +3,7 @@ import ProgressStepper from '../ui/ProgressStepper.js';
 import { policies } from '../data/policies.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import SelectionViewManager from '../systems/SelectionViewManager.js';
+import { createTextButton } from '../ui/TextButton.js';
 
 export default class SelectionScene extends Phaser.Scene {
   constructor() {
@@ -80,12 +81,13 @@ export default class SelectionScene extends Phaser.Scene {
   }
 
   createButton(x, y, label, backgroundColor, textColor) {
-    const button = this.add.text(x, y, label, {
-      ...SelectionViewManager.getButtonStyle(),
-      color: textColor,
-      backgroundColor: SelectionViewManager.formatHexColor(backgroundColor),
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-    return button;
+    return createTextButton(this, {
+      x,
+      y,
+      label,
+      backgroundColor,
+      textColor: textColor,
+    }, SelectionViewManager.getButtonStyle());
   }
 
   updateSelectionUi() {

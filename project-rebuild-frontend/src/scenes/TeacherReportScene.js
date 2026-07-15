@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import TeacherReportManager from '../systems/TeacherReportManager.js';
 import TeacherReportViewManager from '../systems/TeacherReportViewManager.js';
+import { createTextButton } from '../ui/TextButton.js';
 
 export default class TeacherReportScene extends Phaser.Scene {
   constructor() {
@@ -89,10 +90,12 @@ export default class TeacherReportScene extends Phaser.Scene {
   }
 
   createButton(x, y, label, backgroundColor, color) {
-    return this.add.text(x, y, label, {
-      ...TeacherReportViewManager.getButtonStyle(),
-      color,
+    return createTextButton(this, {
+      x,
+      y,
+      label,
       backgroundColor,
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+      textColor: color,
+    }, TeacherReportViewManager.getButtonStyle());
   }
 }
