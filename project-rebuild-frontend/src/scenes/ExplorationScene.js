@@ -15,8 +15,10 @@ export default class ExplorationScene extends Phaser.Scene {
     this.exploredPlaces = new Set(this.registry.get('exploredPlaces') ?? []);
     this.placeObjects = new Map();
 
-    this.add.rectangle(width / 2, height / 2, width, height, 0x0f2f3f);
-    ProgressStepper.render(this, 'exploration');
+    const layout = ExplorationViewManager.getScreenLayout();
+
+    this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
+    ProgressStepper.render(this, layout.progressStep);
     this.drawMapBackdrop();
     this.drawHeader();
     this.drawPlaces();
@@ -29,26 +31,31 @@ export default class ExplorationScene extends Phaser.Scene {
   }
 
   drawHeader() {
-    this.add.text(80, 52, CURRENT_EPISODE.shortTitle, {
+    const layout = ExplorationViewManager.getScreenLayout();
+    this.add.text(layout.title.x, layout.title.y, CURRENT_EPISODE.shortTitle, {
       fontSize: '54px',
       color: '#ffffff',
       fontStyle: 'bold',
     });
-    this.add.text(82, 118, `장소를 클릭해 ${CURRENT_EPISODE.regionName}의 문제가 어디에서 드러나는지 확인하세요.`, {
+    this.add.text(layout.subtitle.x, layout.subtitle.y, ExplorationViewManager.formatSubtitle(CURRENT_EPISODE.regionName), {
       fontSize: '26px',
       color: '#bfdbfe',
     });
   }
 
   drawMapBackdrop() {
-    this.add.rectangle(825, 560, 1120, 760, 0x14532d, 0.95).setStrokeStyle(5, 0x86efac);
-    this.add.ellipse(680, 520, 520, 280, 0x166534, 0.9);
-    this.add.ellipse(1030, 680, 620, 260, 0x166534, 0.9);
-    this.add.rectangle(930, 545, 1040, 44, 0x64748b, 1).setAngle(-14);
-    this.add.rectangle(1010, 430, 760, 34, 0x64748b, 1).setAngle(28);
-    this.add.rectangle(1040, 260, 80, 760, 0x2563eb, 0.82).setAngle(36);
+    const layout = ExplorationViewManager.getMapLayout();
+    this.add.rectangle(layout.backdrop.x, layout.backdrop.y, layout.backdrop.width, layout.backdrop.height, layout.backdrop.fillColor, layout.backdrop.fillAlpha)
+      .setStrokeStyle(layout.backdrop.strokeWidth, layout.backdrop.strokeColor);
+    layout.hills.forEach((hill) => {
+      this.add.ellipse(hill.x, hill.y, hill.width, hill.height, hill.fillColor, hill.fillAlpha);
+    });
+    layout.roads.forEach((road) => {
+      this.add.rectangle(road.x, road.y, road.width, road.height, road.fillColor, road.fillAlpha).setAngle(road.angle);
+    });
+    this.add.rectangle(layout.river.x, layout.river.y, layout.river.width, layout.river.height, layout.river.fillColor, layout.river.fillAlpha).setAngle(layout.river.angle);
 
-    this.add.text(410, 875, '※ 임시 지도 데이터: 실제 아트가 아니라 EP1 탐색 흐름 검증용 도형입니다.', {
+    this.add.text(layout.note.x, layout.note.y, layout.note.text, {
       fontSize: '21px',
       color: '#d1fae5',
     });
@@ -56,18 +63,20 @@ export default class ExplorationScene extends Phaser.Scene {
 
   drawPlaces() {
     for (const place of explorationPlaces) {
+      const layout = ExplorationViewManager.getPlaceMarkerLayout();
       const container = this.add.container(place.position.x, place.position.y);
-      const marker = this.add.circle(0, 0, 56, place.color, 0.96)
-        .setStrokeStyle(5, 0xffffff)
+      const marker = this.add.circle(layout.marker.x, layout.marker.y, layout.marker.radius, place.color, layout.marker.fillAlpha)
+        .setStrokeStyle(layout.marker.strokeWidth, layout.marker.strokeColor)
         .setInteractive({ useHandCursor: true });
-      const icon = this.add.text(0, -7, place.icon, { fontSize: '38px' }).setOrigin(0.5);
-      const labelBg = this.add.rectangle(0, 72, 170, 38, 0x0f172a, 0.9).setStrokeStyle(2, place.color);
-      const label = this.add.text(0, 72, place.name, {
+      const icon = this.add.text(layout.icon.x, layout.icon.y, place.icon, { fontSize: '38px' }).setOrigin(0.5);
+      const labelBg = this.add.rectangle(layout.labelBackground.x, layout.labelBackground.y, layout.labelBackground.width, layout.labelBackground.height, layout.labelBackground.fillColor, layout.labelBackground.fillAlpha)
+        .setStrokeStyle(layout.labelBackground.strokeWidth, place.color);
+      const label = this.add.text(layout.label.x, layout.label.y, place.name, {
         fontSize: '22px',
         color: '#ffffff',
         fontStyle: 'bold',
       }).setOrigin(0.5);
-      const check = this.add.text(43, -45, '✓', {
+      const check = this.add.text(layout.check.x, layout.check.y, layout.check.text, {
         fontSize: '30px',
         color: '#bbf7d0',
         fontStyle: 'bold',
@@ -81,39 +90,42 @@ export default class ExplorationScene extends Phaser.Scene {
   }
 
   drawInfoPanel() {
-    this.add.rectangle(1570, 520, 560, 780, 0xffffff, 0.96).setStrokeStyle(5, 0x93c5fd);
-    this.panelTitle = this.add.text(1320, 185, '', {
+    const layout = ExplorationViewManager.getInfoPanelLayout();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
+      .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
+    this.panelTitle = this.add.text(layout.title.x, layout.title.y, '', {
       fontSize: '38px',
       color: '#172554',
       fontStyle: 'bold',
-      wordWrap: { width: 500 },
+      wordWrap: { width: layout.title.wordWrapWidth },
     });
-    this.panelBody = this.add.text(1320, 265, '', {
+    this.panelBody = this.add.text(layout.body.x, layout.body.y, '', {
       fontSize: '26px',
       color: '#1e293b',
       lineSpacing: 13,
-      wordWrap: { width: 500 },
+      wordWrap: { width: layout.body.wordWrapWidth },
     });
-    this.progressText = this.add.text(1320, 780, '', {
+    this.progressText = this.add.text(layout.progress.x, layout.progress.y, '', {
       fontSize: '24px',
       color: '#172554',
       lineSpacing: 8,
-      wordWrap: { width: 500 },
+      wordWrap: { width: layout.progress.wordWrapWidth },
     });
   }
 
   drawControls() {
-    const backButton = this.createButton(1230, 955, '스토리 다시 보기', '#93c5fd', '#0f172a');
-    backButton.on('pointerdown', () => this.scene.start('StoryScene'));
+    const layout = ExplorationViewManager.getControlLayout();
+    const backButton = this.createButton(layout.back.x, layout.back.y, layout.back.label, layout.back.backgroundColor, layout.back.textColor);
+    backButton.on('pointerdown', () => this.scene.start(layout.back.target));
 
-    this.nextButton = this.createButton(1600, 955, '자료 확인', '#94a3b8', '#0f172a');
+    this.nextButton = this.createButton(layout.next.x, layout.next.y, layout.next.label, layout.next.backgroundColor, layout.next.textColor);
     this.nextButton.on('pointerdown', () => {
       if (this.exploredPlaces.size < CURRENT_EPISODE.requiredExploredCount) {
         this.showNeedMoreMessage();
         return;
       }
       this.registry.set('exploredPlaces', [...this.exploredPlaces]);
-      this.scene.start('DataBriefingScene');
+      this.scene.start(layout.next.target);
     });
   }
 

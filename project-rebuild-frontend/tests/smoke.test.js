@@ -287,6 +287,23 @@ function testProblemSummaryViewManager() {
 function testExplorationViewManager() {
   const school = explorationPlaces.find((place) => place.id === 'school');
 
+  assert.equal(ExplorationViewManager.getScreenLayout().progressStep, 'exploration');
+  assert.deepEqual(ExplorationViewManager.getScreenLayout().title, { x: 80, y: 52 });
+  assert.equal(ExplorationViewManager.formatSubtitle(CURRENT_EPISODE.regionName), '장소를 클릭해 푸른군의 문제가 어디에서 드러나는지 확인하세요.');
+  assert.equal(ExplorationViewManager.getMapLayout().backdrop.width, 1120);
+  assert.equal(ExplorationViewManager.getMapLayout().roads.length, 2);
+  assert.match(ExplorationViewManager.getMapLayout().note.text, /임시 지도 데이터/);
+  assert.deepEqual(ExplorationViewManager.getPlaceMarkerLayout().check, { x: 43, y: -45, text: '✓' });
+  assert.equal(ExplorationViewManager.getInfoPanelLayout().progress.wordWrapWidth, 500);
+  assert.deepEqual(ExplorationViewManager.getControlLayout().next, {
+    x: 1600,
+    y: 955,
+    label: '자료 확인',
+    target: 'DataBriefingScene',
+    backgroundColor: '#94a3b8',
+    textColor: '#0f172a',
+  });
+  assert.equal(ExplorationViewManager.getControlLayout().back.target, 'StoryScene');
   assert.equal(ExplorationViewManager.canContinue(2, 3), false);
   assert.equal(ExplorationViewManager.canContinue(3, 3), true);
   assert.equal(ExplorationViewManager.formatPanelTitle(school), '🏫 초등학교');

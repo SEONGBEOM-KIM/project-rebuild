@@ -1,4 +1,89 @@
+const EXPLORATION_SCREEN_LAYOUT = {
+  backgroundColor: 0x0f2f3f,
+  progressStep: 'exploration',
+  title: { x: 80, y: 52 },
+  subtitle: { x: 82, y: 118 },
+};
+
+const EXPLORATION_MAP_LAYOUT = {
+  backdrop: { x: 825, y: 560, width: 1120, height: 760, fillColor: 0x14532d, fillAlpha: 0.95, strokeWidth: 5, strokeColor: 0x86efac },
+  hills: [
+    { x: 680, y: 520, width: 520, height: 280, fillColor: 0x166534, fillAlpha: 0.9 },
+    { x: 1030, y: 680, width: 620, height: 260, fillColor: 0x166534, fillAlpha: 0.9 },
+  ],
+  roads: [
+    { x: 930, y: 545, width: 1040, height: 44, fillColor: 0x64748b, fillAlpha: 1, angle: -14 },
+    { x: 1010, y: 430, width: 760, height: 34, fillColor: 0x64748b, fillAlpha: 1, angle: 28 },
+  ],
+  river: { x: 1040, y: 260, width: 80, height: 760, fillColor: 0x2563eb, fillAlpha: 0.82, angle: 36 },
+  note: { x: 410, y: 875, text: '※ 임시 지도 데이터: 실제 아트가 아니라 EP1 탐색 흐름 검증용 도형입니다.' },
+};
+
+const PLACE_MARKER_LAYOUT = {
+  marker: { x: 0, y: 0, radius: 56, fillAlpha: 0.96, strokeWidth: 5, strokeColor: 0xffffff },
+  icon: { x: 0, y: -7 },
+  labelBackground: { x: 0, y: 72, width: 170, height: 38, fillColor: 0x0f172a, fillAlpha: 0.9, strokeWidth: 2 },
+  label: { x: 0, y: 72 },
+  check: { x: 43, y: -45, text: '✓' },
+};
+
+const INFO_PANEL_LAYOUT = {
+  panel: { x: 1570, y: 520, width: 560, height: 780, fillColor: 0xffffff, fillAlpha: 0.96, strokeWidth: 5, strokeColor: 0x93c5fd },
+  title: { x: 1320, y: 185, wordWrapWidth: 500 },
+  body: { x: 1320, y: 265, wordWrapWidth: 500 },
+  progress: { x: 1320, y: 780, wordWrapWidth: 500 },
+};
+
 export default class ExplorationViewManager {
+  static getScreenLayout() {
+    return {
+      background: { color: EXPLORATION_SCREEN_LAYOUT.backgroundColor },
+      progressStep: EXPLORATION_SCREEN_LAYOUT.progressStep,
+      title: { ...EXPLORATION_SCREEN_LAYOUT.title },
+      subtitle: { ...EXPLORATION_SCREEN_LAYOUT.subtitle },
+    };
+  }
+
+  static formatSubtitle(regionName) {
+    return `장소를 클릭해 ${regionName}의 문제가 어디에서 드러나는지 확인하세요.`;
+  }
+
+  static getMapLayout() {
+    return {
+      backdrop: { ...EXPLORATION_MAP_LAYOUT.backdrop },
+      hills: EXPLORATION_MAP_LAYOUT.hills.map((hill) => ({ ...hill })),
+      roads: EXPLORATION_MAP_LAYOUT.roads.map((road) => ({ ...road })),
+      river: { ...EXPLORATION_MAP_LAYOUT.river },
+      note: { ...EXPLORATION_MAP_LAYOUT.note },
+    };
+  }
+
+  static getPlaceMarkerLayout() {
+    return {
+      marker: { ...PLACE_MARKER_LAYOUT.marker },
+      icon: { ...PLACE_MARKER_LAYOUT.icon },
+      labelBackground: { ...PLACE_MARKER_LAYOUT.labelBackground },
+      label: { ...PLACE_MARKER_LAYOUT.label },
+      check: { ...PLACE_MARKER_LAYOUT.check },
+    };
+  }
+
+  static getInfoPanelLayout() {
+    return {
+      panel: { ...INFO_PANEL_LAYOUT.panel },
+      title: { ...INFO_PANEL_LAYOUT.title },
+      body: { ...INFO_PANEL_LAYOUT.body },
+      progress: { ...INFO_PANEL_LAYOUT.progress },
+    };
+  }
+
+  static getControlLayout() {
+    return {
+      back: { x: 1230, y: 955, label: '스토리 다시 보기', target: 'StoryScene', backgroundColor: '#93c5fd', textColor: '#0f172a' },
+      next: { x: 1600, y: 955, label: '자료 확인', target: 'DataBriefingScene', backgroundColor: '#94a3b8', textColor: '#0f172a' },
+    };
+  }
+
   static canContinue(exploredCount, requiredCount) {
     return exploredCount >= requiredCount;
   }
