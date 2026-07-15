@@ -17,14 +17,14 @@ export default class StorageManagerScene extends Phaser.Scene {
     const layout = StorageManagerViewManager.getScreenLayout(width);
     this.add.rectangle(width / 2, height / 2, width, height, layout.backgroundColor);
     this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '60px',
-      color: '#ffffff',
-      fontStyle: 'bold',
+      fontSize: layout.title.fontSize,
+      color: layout.title.color,
+      fontStyle: layout.title.fontStyle,
     }).setOrigin(0.5);
 
     this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, {
-      fontSize: '26px',
-      color: '#bfdbfe',
+      fontSize: layout.subtitle.fontSize,
+      color: layout.subtitle.color,
     }).setOrigin(0.5);
 
     this.drawSavedDataPanel();
@@ -34,12 +34,13 @@ export default class StorageManagerScene extends Phaser.Scene {
 
   drawSavedDataPanel() {
     const layout = StorageManagerViewManager.getPanelLayout().saved;
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0xffffff, 0.96)
-      .setStrokeStyle(5, layout.panel.strokeColor);
+    const panelStyle = StorageManagerViewManager.getPanelStyle();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
+      .setStrokeStyle(panelStyle.strokeWidth, layout.panel.strokeColor);
     this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '36px',
+      fontSize: panelStyle.titleFontSize,
       color: layout.title.color,
-      fontStyle: 'bold',
+      fontStyle: panelStyle.titleFontStyle,
     }).setOrigin(0.5);
 
     const rows = StorageSummaryManager.formatSavedDataRows(this.saved);
@@ -49,12 +50,13 @@ export default class StorageManagerScene extends Phaser.Scene {
 
   drawSubmissionPanel() {
     const layout = StorageManagerViewManager.getPanelLayout().submissions;
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0xffffff, 0.96)
-      .setStrokeStyle(5, layout.panel.strokeColor);
+    const panelStyle = StorageManagerViewManager.getPanelStyle();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
+      .setStrokeStyle(panelStyle.strokeWidth, layout.panel.strokeColor);
     this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '36px',
+      fontSize: panelStyle.titleFontSize,
       color: layout.title.color,
-      fontStyle: 'bold',
+      fontStyle: panelStyle.titleFontStyle,
     }).setOrigin(0.5);
 
     const rows = StorageSummaryManager.formatSubmissionRows(this.submissions);
@@ -64,10 +66,8 @@ export default class StorageManagerScene extends Phaser.Scene {
 
   drawControls() {
     const layout = StorageManagerViewManager.getControlLayout();
-    this.statusText = this.add.text(layout.status.x, layout.status.y, StorageSummaryManager.formatStatusText(), {
-      fontSize: '24px',
-      color: '#bfdbfe',
-    }).setOrigin(0.5);
+    this.statusText = this.add.text(layout.status.x, layout.status.y, StorageSummaryManager.formatStatusText(), StorageManagerViewManager.getStatusTextStyle())
+      .setOrigin(0.5);
 
     const clearSaveButton = this.createButton(layout.clearSave.x, layout.clearSave.y, layout.clearSave.label, layout.clearSave.backgroundColor, layout.clearSave.textColor);
     clearSaveButton.on('pointerdown', () => {
@@ -96,11 +96,12 @@ export default class StorageManagerScene extends Phaser.Scene {
   }
 
   createButton(x, y, label, backgroundColor, color) {
+    const buttonStyle = StorageManagerViewManager.getButtonStyle();
     return this.add.text(x, y, label, {
-      fontSize: '28px',
+      fontSize: buttonStyle.fontSize,
       color,
       backgroundColor,
-      padding: { x: 24, y: 16 },
+      padding: buttonStyle.padding,
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
   }
 }

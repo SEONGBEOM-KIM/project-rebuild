@@ -1498,7 +1498,17 @@ function testSavedDataViewManager() {
 }
 
 function testStorageManagerViewManager() {
-  assert.deepEqual(StorageManagerViewManager.getScreenLayout(1920).title, { y: 90, text: '브라우저 저장 관리', x: 960 });
+  assert.deepEqual(StorageManagerViewManager.getScreenLayout(1920).title, {
+    y: 90,
+    text: '브라우저 저장 관리',
+    fontSize: '60px',
+    color: '#ffffff',
+    fontStyle: 'bold',
+    x: 960,
+  });
+  assert.equal(StorageManagerViewManager.getPanelStyle().strokeWidth, 5);
+  assert.equal(StorageManagerViewManager.getStatusTextStyle().fontSize, '24px');
+  assert.deepEqual(StorageManagerViewManager.getButtonStyle().padding, { x: 24, y: 16 });
   assert.equal(StorageManagerViewManager.getPanelLayout().saved.panel.x, 575);
   assert.equal(StorageManagerViewManager.getPanelLayout().saved.title.text, '학습 저장 데이터');
   assert.equal(StorageManagerViewManager.getPanelLayout().submissions.panel.strokeColor, 0xbbf7d0);
