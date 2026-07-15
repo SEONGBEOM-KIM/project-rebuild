@@ -1,4 +1,20 @@
+export const API_CONTRACT_SCREEN_LAYOUT = {
+  backgroundColor: 0x0f172a,
+  progressStep: 'ending',
+  title: { y: 78, text: 'API 계약 보기' },
+  subtitle: { y: 145, text: 'Django REST Framework 연동 시 사용할 저장 endpoint와 요청/응답 구조 초안입니다.' },
+};
+
 export default class ApiContractViewManager {
+  static getScreenLayout(width) {
+    return {
+      backgroundColor: API_CONTRACT_SCREEN_LAYOUT.backgroundColor,
+      progressStep: API_CONTRACT_SCREEN_LAYOUT.progressStep,
+      title: { ...API_CONTRACT_SCREEN_LAYOUT.title, x: width / 2 },
+      subtitle: { ...API_CONTRACT_SCREEN_LAYOUT.subtitle, x: width / 2 },
+    };
+  }
+
   static getPanelLayout() {
     return {
       request: { x: 580, y: 525, width: 860, height: 660, title: '요청 Body 초안' },
@@ -32,8 +48,8 @@ export default class ApiContractViewManager {
 
   static getNotesLayout() {
     return {
-      panel: { x: 960, y: 855, width: 1480, height: 76 },
-      title: { x: 250, y: 834 },
+      panel: { x: 960, y: 855, width: 1480, height: 76, strokeColor: 0xfde68a },
+      title: { x: 250, y: 834, text: '백엔드 구현 메모' },
       body: { x: 455, y: 834, width: 1200 },
     };
   }
@@ -44,9 +60,9 @@ export default class ApiContractViewManager {
 
   static getControlLayout() {
     return {
-      payload: { x: 650, y: 960, label: 'Payload 미리보기', target: 'ApiPayloadScene' },
-      data: { x: 970, y: 960, label: '학습 데이터로', target: 'LearningDataScene' },
-      ending: { x: 1280, y: 960, label: '마무리로', target: 'EndingScene' },
+      payload: { x: 650, y: 960, label: 'Payload 미리보기', target: 'ApiPayloadScene', backgroundColor: '#bbf7d0', textColor: '#123524' },
+      data: { x: 970, y: 960, label: '학습 데이터로', target: 'LearningDataScene', backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
+      ending: { x: 1280, y: 960, label: '마무리로', target: 'EndingScene', backgroundColor: '#fde68a', textColor: '#0f172a' },
     };
   }
 }

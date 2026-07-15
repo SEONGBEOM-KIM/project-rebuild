@@ -355,6 +355,8 @@ function testStoryViewManager() {
 }
 
 function testApiContractViewManager() {
+  assert.deepEqual(ApiContractViewManager.getScreenLayout(1920).title, { y: 78, text: 'API 계약 보기', x: 960 });
+  assert.equal(ApiContractViewManager.getScreenLayout(1920).progressStep, 'ending');
   const panels = ApiContractViewManager.getPanelLayout();
   assert.equal(panels.request.title, '요청 Body 초안');
   assert.equal(panels.response.width, 620);
@@ -362,12 +364,23 @@ function testApiContractViewManager() {
   assert.deepEqual(ApiContractViewManager.getPanelBodyPosition(panels.request), { x: 185, y: 280 });
   assert.equal(ApiContractViewManager.getPanelBodyStyle(panels.request).wordWrap.width, 790);
   assert.equal(ApiContractViewManager.getNotesLayout().body.width, 1200);
+  assert.equal(ApiContractViewManager.getNotesLayout().title.text, '백엔드 구현 메모');
   assert.match(ApiContractViewManager.formatBackendNote(), /서버에서 추가/);
   assert.deepEqual(ApiContractViewManager.getControlLayout().payload, {
     x: 650,
     y: 960,
     label: 'Payload 미리보기',
     target: 'ApiPayloadScene',
+    backgroundColor: '#bbf7d0',
+    textColor: '#123524',
+  });
+  assert.deepEqual(ApiContractViewManager.getControlLayout().ending, {
+    x: 1280,
+    y: 960,
+    label: '마무리로',
+    target: 'EndingScene',
+    backgroundColor: '#fde68a',
+    textColor: '#0f172a',
   });
 }
 
