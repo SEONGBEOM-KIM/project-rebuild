@@ -922,14 +922,30 @@ function testTeacherReportManager() {
 
 
 function testLearningDataViewManager() {
+  assert.deepEqual(LearningDataViewManager.getScreenLayout(1920).title, { y: 78, text: '학습 데이터 확인', x: 960 });
+  assert.equal(LearningDataViewManager.getScreenLayout(1920).progressStep, 'ending');
+  assert.deepEqual(LearningDataViewManager.getDownloadConfig(), { mimeType: 'application/json' });
   assert.equal(LearningDataViewManager.getDataPanelLayout().panel.width, 1120);
+  assert.equal(LearningDataViewManager.getDataPanelLayout().title.text, '저장 후보 데이터');
+  assert.equal(LearningDataViewManager.getValidationPanelLayout().title.text, '데이터 검증');
   assert.equal(LearningDataViewManager.getValidationPanelLayout().summaryBody.wordWrapWidth, 390);
   assert.equal(LearningDataViewManager.getSavePanelLayout().panel.height, 150);
+  assert.equal(LearningDataViewManager.getSavePanelLayout().title.text, '임시 저장 상태');
   assert.deepEqual(LearningDataViewManager.getControlLayout().api, {
     x: 260,
     y: 960,
     label: 'API 미리보기',
     target: 'ApiPayloadScene',
+    backgroundColor: '#fde68a',
+    textColor: '#0f172a',
+  });
+  assert.deepEqual(LearningDataViewManager.getControlLayout().ending, {
+    x: 1545,
+    y: 960,
+    label: '마무리로',
+    target: 'EndingScene',
+    backgroundColor: '#c4b5fd',
+    textColor: '#1e1b4b',
   });
   assert.equal(LearningDataViewManager.getJsonTextStyle(1030).fontFamily, 'monospace');
   assert.equal(LearningDataViewManager.formatSaveCleared(), '저장된 학습 데이터를 삭제했습니다.');

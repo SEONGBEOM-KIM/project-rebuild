@@ -13,16 +13,17 @@ export default class LearningDataScene extends Phaser.Scene {
     const { width, height } = this.scale;
     const learningData = this.buildLearningData();
 
-    this.add.rectangle(width / 2, height / 2, width, height, 0x0f172a);
-    ProgressStepper.render(this, 'ending');
+    const screenLayout = LearningDataViewManager.getScreenLayout(width);
+    this.add.rectangle(width / 2, height / 2, width, height, screenLayout.backgroundColor);
+    ProgressStepper.render(this, screenLayout.progressStep);
 
-    this.add.text(width / 2, 78, '학습 데이터 확인', {
+    this.add.text(screenLayout.title.x, screenLayout.title.y, screenLayout.title.text, {
       fontSize: '60px',
       color: '#ffffff',
       fontStyle: 'bold',
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, 145, '현재는 서버 저장 없이 registry에 쌓인 학습 기록을 화면에서 확인하는 UI 단계입니다.', {
+    this.add.text(screenLayout.subtitle.x, screenLayout.subtitle.y, screenLayout.subtitle.text, {
       fontSize: '26px',
       color: '#bfdbfe',
     }).setOrigin(0.5);
@@ -43,7 +44,7 @@ export default class LearningDataScene extends Phaser.Scene {
     const layout = LearningDataViewManager.getDataPanelLayout();
     this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0x111827, 0.98)
       .setStrokeStyle(5, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, '저장 후보 데이터', {
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
       fontSize: '34px',
       color: '#ffffff',
       fontStyle: 'bold',
@@ -61,7 +62,7 @@ export default class LearningDataScene extends Phaser.Scene {
     const layout = LearningDataViewManager.getValidationPanelLayout();
     this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0xffffff, 0.96)
       .setStrokeStyle(5, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, '데이터 검증', {
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
       fontSize: '34px',
       color: '#172554',
       fontStyle: 'bold',
@@ -95,7 +96,7 @@ export default class LearningDataScene extends Phaser.Scene {
     const layout = LearningDataViewManager.getSavePanelLayout();
     this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0x1e293b, 0.98)
       .setStrokeStyle(4, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, '임시 저장 상태', {
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
       fontSize: '25px',
       color: '#ffffff',
       fontStyle: 'bold',
@@ -110,30 +111,30 @@ export default class LearningDataScene extends Phaser.Scene {
 
   drawControls() {
     const layout = LearningDataViewManager.getControlLayout();
-    const apiButton = this.createButton(layout.api.x, layout.api.y, layout.api.label, '#fde68a', '#0f172a');
+    const apiButton = this.createButton(layout.api.x, layout.api.y, layout.api.label, layout.api.backgroundColor, layout.api.textColor);
     apiButton.on('pointerdown', () => this.scene.start(layout.api.target));
 
-    const saveButton = this.createButton(layout.save.x, layout.save.y, layout.save.label, '#bbf7d0', '#123524');
+    const saveButton = this.createButton(layout.save.x, layout.save.y, layout.save.label, layout.save.backgroundColor, layout.save.textColor);
     saveButton.on('pointerdown', () => {
       const saved = SaveManager.save(this.learningData);
       this.saveStatusText.setText(LearningDataViewManager.formatSaveStatus(saved));
       this.saveStatusText.setColor('#bbf7d0');
     });
 
-    const copyButton = this.createButton(layout.copy.x, layout.copy.y, layout.copy.label, '#93c5fd', '#0f172a');
+    const copyButton = this.createButton(layout.copy.x, layout.copy.y, layout.copy.label, layout.copy.backgroundColor, layout.copy.textColor);
     copyButton.on('pointerdown', () => this.copyJsonToClipboard());
 
-    const downloadButton = this.createButton(layout.download.x, layout.download.y, layout.download.label, '#a7f3d0', '#064e3b');
+    const downloadButton = this.createButton(layout.download.x, layout.download.y, layout.download.label, layout.download.backgroundColor, layout.download.textColor);
     downloadButton.on('pointerdown', () => this.downloadJson());
 
-    const clearButton = this.createButton(layout.clear.x, layout.clear.y, layout.clear.label, '#fecaca', '#7f1d1d');
+    const clearButton = this.createButton(layout.clear.x, layout.clear.y, layout.clear.label, layout.clear.backgroundColor, layout.clear.textColor);
     clearButton.on('pointerdown', () => {
       SaveManager.clear();
       this.saveStatusText.setText(LearningDataViewManager.formatSaveCleared());
       this.saveStatusText.setColor('#fecaca');
     });
 
-    const backButton = this.createButton(layout.ending.x, layout.ending.y, layout.ending.label, '#c4b5fd', '#1e1b4b');
+    const backButton = this.createButton(layout.ending.x, layout.ending.y, layout.ending.label, layout.ending.backgroundColor, layout.ending.textColor);
     backButton.on('pointerdown', () => this.scene.start(layout.ending.target));
   }
 
@@ -149,7 +150,8 @@ export default class LearningDataScene extends Phaser.Scene {
   }
 
   downloadJson() {
-    const blob = new Blob([this.learningDataJson], { type: 'application/json' });
+    const downloadConfig = LearningDataViewManager.getDownloadConfig();
+    const blob = new Blob([this.learningDataJson], { type: downloadConfig.mimeType });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
