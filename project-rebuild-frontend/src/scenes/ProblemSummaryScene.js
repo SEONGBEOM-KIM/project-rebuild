@@ -16,15 +16,17 @@ export default class ProblemSummaryScene extends Phaser.Scene {
     const exploredPlaces = this.registry.get('exploredPlaces') ?? [];
     const quizResult = this.registry.get('quizResult');
 
-    this.add.rectangle(width / 2, height / 2, width, height, 0x10253f);
-    ProgressStepper.render(this, 'summary');
-    this.add.text(width / 2, 72, 'EP1. 문제 정리', {
+    const layout = ProblemSummaryViewManager.getScreenLayout(width);
+
+    this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
+    ProgressStepper.render(this, layout.progressStep);
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
       fontSize: '60px',
       color: '#ffffff',
       fontStyle: 'bold',
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, 140, '탐색과 질문을 통해 확인한 푸른군의 핵심 문제를 정리합니다.', {
+    this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, {
       fontSize: '27px',
       color: '#bfdbfe',
     }).setOrigin(0.5);
@@ -36,8 +38,10 @@ export default class ProblemSummaryScene extends Phaser.Scene {
   }
 
   drawProblemGrid() {
-    this.add.rectangle(645, 540, 1050, 680, 0xffffff, 0.96).setStrokeStyle(5, 0x93c5fd);
-    this.add.text(645, 240, '확인한 지역 문제', {
+    const layout = ProblemSummaryViewManager.getProblemGridLayout();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
+      .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
       fontSize: '38px',
       color: '#172554',
       fontStyle: 'bold',
@@ -45,31 +49,35 @@ export default class ProblemSummaryScene extends Phaser.Scene {
 
     EP1_PROBLEM_ITEMS.forEach((item, index) => {
       const { x, y } = ProblemSummaryViewManager.getProblemItemLayout(index);
-      this.add.rectangle(x + 230, y + 55, 470, 126, 0xe0f2fe, 1).setStrokeStyle(3, 0x60a5fa);
-      this.add.text(x + 28, y + 32, item.icon, { fontSize: '40px' }).setOrigin(0.5);
-      this.add.text(x + 62, y + 16, item.title, {
+      const card = ProblemSummaryViewManager.getProblemItemCardLayout(x, y);
+      this.add.rectangle(card.background.x, card.background.y, card.background.width, card.background.height, card.background.fillColor, card.background.fillAlpha)
+        .setStrokeStyle(card.background.strokeWidth, card.background.strokeColor);
+      this.add.text(card.icon.x, card.icon.y, item.icon, { fontSize: '40px' }).setOrigin(0.5);
+      this.add.text(card.title.x, card.title.y, item.title, {
         fontSize: '27px',
         color: '#0f172a',
         fontStyle: 'bold',
       });
-      this.add.text(x + 62, y + 56, item.detail, {
+      this.add.text(card.detail.x, card.detail.y, item.detail, {
         fontSize: '20px',
         color: '#334155',
         lineSpacing: 5,
-        wordWrap: { width: 365 },
+        wordWrap: { width: card.detail.wordWrapWidth },
       });
     });
   }
 
   drawLearningRecord(exploredPlaces, quizResult) {
-    this.add.rectangle(1470, 390, 560, 380, 0x1e293b, 0.98).setStrokeStyle(4, 0xfde68a);
-    this.add.text(1470, 245, '학습 기록', {
+    const layout = ProblemSummaryViewManager.getLearningRecordLayout();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
+      .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
       fontSize: '36px',
       color: '#ffffff',
       fontStyle: 'bold',
     }).setOrigin(0.5);
 
-    this.add.text(1215, 305, ProblemSummaryViewManager.formatLearningRecordText(
+    this.add.text(layout.body.x, layout.body.y, ProblemSummaryViewManager.formatLearningRecordText(
       explorationPlaces,
       exploredPlaces,
       quizResult,
@@ -78,33 +86,36 @@ export default class ProblemSummaryScene extends Phaser.Scene {
       fontSize: '23px',
       color: '#dbeafe',
       lineSpacing: 10,
-      wordWrap: { width: 510 },
+      wordWrap: { width: layout.body.wordWrapWidth },
     });
   }
 
   drawNextMission() {
-    this.add.rectangle(1470, 735, 560, 260, 0xffffff, 0.96).setStrokeStyle(4, 0xbbf7d0);
-    this.add.text(1470, 650, '다음 미션', {
+    const layout = ProblemSummaryViewManager.getNextMissionLayout();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
+      .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
       fontSize: '34px',
       color: '#14532d',
       fontStyle: 'bold',
     }).setOrigin(0.5);
-    this.add.text(1215, 700, EP1_NEXT_MISSION.join('\n'), {
+    this.add.text(layout.body.x, layout.body.y, EP1_NEXT_MISSION.join('\n'), {
       fontSize: '24px',
       color: '#1e293b',
       lineSpacing: 11,
-      wordWrap: { width: 510 },
+      wordWrap: { width: layout.body.wordWrapWidth },
     });
   }
 
   drawControls() {
-    const backButton = this.createButton(750, 955, '원인 질문 다시 보기', '#93c5fd', '#0f172a');
-    backButton.on('pointerdown', () => this.scene.start('CauseQuizScene'));
+    const layout = ProblemSummaryViewManager.getControlLayout();
+    const backButton = this.createButton(layout.back.x, layout.back.y, layout.back.label, layout.back.backgroundColor, layout.back.textColor);
+    backButton.on('pointerdown', () => this.scene.start(layout.back.target));
 
-    const nextButton = this.createButton(1180, 955, '회복 방향 선택', '#bbf7d0', '#123524');
+    const nextButton = this.createButton(layout.next.x, layout.next.y, layout.next.label, layout.next.backgroundColor, layout.next.textColor);
     nextButton.on('pointerdown', () => {
       LearningProgress.update(this.registry, { problemSummaryCompleted: true });
-      this.scene.start('SelectionScene');
+      this.scene.start(layout.next.target);
     });
   }
 

@@ -210,6 +210,25 @@ function testSelectionViewManager() {
 
 function testProblemSummaryViewManager() {
   const exploredPlaceIds = ['school', 'bus_stop', 'unknown_place'];
+  assert.deepEqual(ProblemSummaryViewManager.getScreenLayout(1920).title, {
+    x: 960,
+    y: 72,
+    text: 'EP1. 문제 정리',
+  });
+  assert.equal(ProblemSummaryViewManager.getScreenLayout(1920).progressStep, 'summary');
+  assert.equal(ProblemSummaryViewManager.getProblemGridLayout().title.text, '확인한 지역 문제');
+  assert.deepEqual(ProblemSummaryViewManager.getProblemItemCardLayout(210, 315).detail, { x: 272, y: 371, wordWrapWidth: 365 });
+  assert.equal(ProblemSummaryViewManager.getLearningRecordLayout().title.text, '학습 기록');
+  assert.equal(ProblemSummaryViewManager.getNextMissionLayout().body.wordWrapWidth, 510);
+  assert.deepEqual(ProblemSummaryViewManager.getControlLayout().next, {
+    x: 1180,
+    y: 955,
+    label: '회복 방향 선택',
+    target: 'SelectionScene',
+    backgroundColor: '#bbf7d0',
+    textColor: '#123524',
+  });
+  assert.equal(ProblemSummaryViewManager.getControlLayout().back.target, 'CauseQuizScene');
   assert.equal(ProblemSummaryViewManager.formatExploredNames(explorationPlaces, exploredPlaceIds), '초등학교, 버스정류장');
   assert.equal(ProblemSummaryViewManager.formatExploredNames(explorationPlaces, []), '없음');
   assert.equal(ProblemSummaryViewManager.formatQuizStatus(null), '미응답');
