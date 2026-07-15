@@ -146,6 +146,28 @@ function testCauseQuizManager() {
   const correctChoice = EP1_CAUSE_QUESTION.choices.find((choice) => choice.correct);
   const wrongChoice = EP1_CAUSE_QUESTION.choices.find((choice) => !choice.correct);
 
+  assert.deepEqual(CauseQuizManager.getScreenLayout(1920).title, {
+    x: 960,
+    y: 72,
+    text: 'EP1. 문제 원인 생각하기',
+  });
+  assert.equal(CauseQuizManager.getScreenLayout(1920).progressStep, 'quiz');
+  assert.equal(CauseQuizManager.getExplorationSummaryLayout().title.text, '탐색에서 확인한 단서');
+  assert.deepEqual(CauseQuizManager.formatExplorationSummaryRows(2, ['단서 A']).slice(0, 3), ['확인한 장소: 2곳', '', '단서 A']);
+  assert.equal(CauseQuizManager.getQuestionLayout().feedback.text, '답을 선택하면 피드백이 표시됩니다.');
+  assert.deepEqual(CauseQuizManager.getChoiceLayout(1).text, { x: 820, y: 505, wordWrapWidth: 700 });
+  assert.deepEqual(CauseQuizManager.getControlLayout().back, {
+    x: 760,
+    y: 955,
+    label: '자료 다시 보기',
+    target: 'DataBriefingScene',
+    backgroundColor: '#93c5fd',
+    textColor: '#0f172a',
+  });
+  assert.equal(CauseQuizManager.getControlLayout().nextEnabled.target, 'ProblemSummaryScene');
+  assert.equal(CauseQuizManager.formatMissingChoiceFeedback(), '먼저 답을 하나 선택하세요.');
+  assert.equal(CauseQuizManager.getMissingChoiceFeedbackColor(), '#b91c1c');
+
   assert.deepEqual(CauseQuizManager.buildQuizResult(EP1_CAUSE_QUESTION, correctChoice), {
     questionId: EP1_CAUSE_QUESTION.id,
     selected: correctChoice.id,
@@ -157,6 +179,18 @@ function testCauseQuizManager() {
   assert.equal(CauseQuizManager.getFeedbackColor(wrongChoice), '#991b1b');
   assert.equal(CauseQuizManager.getSelectedStrokeColor(correctChoice), 0x22c55e);
   assert.equal(CauseQuizManager.getSelectedStrokeColor(wrongChoice), 0xef4444);
+  assert.deepEqual(CauseQuizManager.getChoiceVisualStyle(correctChoice.id, correctChoice, EP1_CAUSE_QUESTION), {
+    fillColor: 0xfef3c7,
+    fillAlpha: 1,
+    strokeWidth: 5,
+    strokeColor: 0x22c55e,
+  });
+  assert.deepEqual(CauseQuizManager.getChoiceVisualStyle(wrongChoice.id, correctChoice, EP1_CAUSE_QUESTION), {
+    fillColor: 0xe0f2fe,
+    fillAlpha: 1,
+    strokeWidth: 3,
+    strokeColor: 0x93c5fd,
+  });
 }
 
 function testSelectionViewManager() {
