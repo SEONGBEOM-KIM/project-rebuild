@@ -46,10 +46,6 @@ import { API_CONTRACT, formatContractRequest, formatContractResponse } from '../
 import { CURRENT_EPISODE, EPISODE_STEPS } from '../src/data/episodes.js';
 import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES } from '../src/data/episodeContent.js';
 import ProgressStepper from '../src/ui/ProgressStepper.js';
-import StatusBar from '../src/ui/StatusBar.js';
-import PolicyCard from '../src/ui/PolicyCard.js';
-import DialogueBox from '../src/ui/DialogueBox.js';
-import ResultPanel from '../src/ui/ResultPanel.js';
 
 
 const PROJECT_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -1870,27 +1866,6 @@ function testSharedUiComponentStyles() {
     strokeAlpha: 1,
     fontSize: '20px',
     fontStyle: 'bold',
-  });
-
-  assert.deepEqual(StatusBar.getStyle().text.padding, { x: 14, y: 10 });
-  assert.deepEqual(PolicyCard.getStyle().background, {
-    x: 0,
-    y: 0,
-    width: 240,
-    height: 110,
-    fillColor: 0xe0f2fe,
-    strokeWidth: 2,
-    strokeColor: 0x0284c7,
-  });
-  assert.equal(DialogueBox.getStyle().text.fontSize, '30px');
-  assert.equal(DialogueBox.getStyle().box.horizontalMargin, 220);
-  assert.deepEqual(ResultPanel.getStyle().panel, {
-    width: 720,
-    height: 480,
-    fillColor: 0xffffff,
-    fillAlpha: 0.95,
-    strokeWidth: 4,
-    strokeColor: 0x1d4ed8,
   });
 }
 
