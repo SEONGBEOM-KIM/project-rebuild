@@ -12,16 +12,18 @@ export default class TeacherReportScene extends Phaser.Scene {
     const report = TeacherReportManager.build(this.registry);
     this.reportText = TeacherReportManager.buildReportText(report);
 
-    this.add.rectangle(width / 2, height / 2, width, height, 0x0b1727);
-    ProgressStepper.render(this, 'ending');
+    const layout = TeacherReportManager.getScreenLayout(width);
 
-    this.add.text(width / 2, 78, '교사용 요약', {
+    this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
+    ProgressStepper.render(this, layout.progressStep);
+
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
       fontSize: '60px',
       color: '#ffffff',
       fontStyle: 'bold',
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, 145, '수업 중 학생 활동을 빠르게 확인하기 위한 임시 리포트 화면입니다.', {
+    this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, {
       fontSize: '26px',
       color: '#bfdbfe',
     }).setOrigin(0.5);
@@ -34,7 +36,9 @@ export default class TeacherReportScene extends Phaser.Scene {
   }
 
   drawPanel(panel, body) {
-    this.add.rectangle(panel.x, panel.y, panel.width, panel.height, 0xffffff, 0.96).setStrokeStyle(4, 0x60a5fa);
+    const panelStyle = TeacherReportManager.getPanelStyle();
+    this.add.rectangle(panel.x, panel.y, panel.width, panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
+      .setStrokeStyle(panelStyle.strokeWidth, panelStyle.strokeColor);
     const titlePosition = TeacherReportManager.getPanelTitlePosition(panel);
     this.add.text(titlePosition.x, titlePosition.y, panel.title, {
       fontSize: '34px',
@@ -53,16 +57,16 @@ export default class TeacherReportScene extends Phaser.Scene {
       align: 'center',
     }).setOrigin(0.5);
 
-    const copyButton = this.createButton(layout.copy.x, layout.copy.y, layout.copy.label, '#93c5fd', '#0f172a');
+    const copyButton = this.createButton(layout.copy.x, layout.copy.y, layout.copy.label, layout.copy.backgroundColor, layout.copy.textColor);
     copyButton.on('pointerdown', () => this.copyReportToClipboard());
 
-    const downloadButton = this.createButton(layout.download.x, layout.download.y, layout.download.label, '#a7f3d0', '#064e3b');
+    const downloadButton = this.createButton(layout.download.x, layout.download.y, layout.download.label, layout.download.backgroundColor, layout.download.textColor);
     downloadButton.on('pointerdown', () => this.downloadReport());
 
-    const endingButton = this.createButton(layout.ending.x, layout.ending.y, layout.ending.label, '#c4b5fd', '#1e1b4b');
+    const endingButton = this.createButton(layout.ending.x, layout.ending.y, layout.ending.label, layout.ending.backgroundColor, layout.ending.textColor);
     endingButton.on('pointerdown', () => this.scene.start(layout.ending.target));
 
-    const dataButton = this.createButton(layout.data.x, layout.data.y, layout.data.label, '#bbf7d0', '#123524');
+    const dataButton = this.createButton(layout.data.x, layout.data.y, layout.data.label, layout.data.backgroundColor, layout.data.textColor);
     dataButton.on('pointerdown', () => this.scene.start(layout.data.target));
   }
 
@@ -78,7 +82,8 @@ export default class TeacherReportScene extends Phaser.Scene {
   }
 
   downloadReport() {
-    const blob = new Blob([this.reportText], { type: 'text/plain;charset=utf-8' });
+    const downloadConfig = TeacherReportManager.getDownloadConfig();
+    const blob = new Blob([this.reportText], { type: downloadConfig.mimeType });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;

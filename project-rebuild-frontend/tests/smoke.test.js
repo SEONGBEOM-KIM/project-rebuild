@@ -870,6 +870,14 @@ function testEndingSummaryManager() {
 }
 
 function testTeacherReportManager() {
+  assert.deepEqual(TeacherReportManager.getScreenLayout(1920).title, {
+    x: 960,
+    y: 78,
+    text: '교사용 요약',
+  });
+  assert.equal(TeacherReportManager.getScreenLayout(1920).progressStep, 'ending');
+  assert.equal(TeacherReportManager.getPanelStyle().strokeColor, 0x60a5fa);
+  assert.equal(TeacherReportManager.getDownloadConfig().mimeType, 'text/plain;charset=utf-8');
   const panels = TeacherReportManager.getPanelLayout();
   assert.equal(panels.progress.title, '학습 진행');
   assert.equal(panels.teaching.width, 420);
@@ -881,7 +889,11 @@ function testTeacherReportManager() {
     y: 940,
     label: '학습 데이터 보기',
     target: 'LearningDataScene',
+    backgroundColor: '#bbf7d0',
+    textColor: '#123524',
   });
+  assert.equal(TeacherReportManager.getControlLayout().copy.backgroundColor, '#93c5fd');
+  assert.equal(TeacherReportManager.getControlLayout().ending.textColor, '#1e1b4b');
   assert.match(TeacherReportManager.formatStatusText(), /텍스트 파일/);
   assert.match(TeacherReportManager.formatCopySuccess(), /클립보드/);
   assert.match(TeacherReportManager.formatCopyFailure(), /권한/);
