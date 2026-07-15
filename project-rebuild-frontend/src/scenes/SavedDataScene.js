@@ -12,45 +12,53 @@ export default class SavedDataScene extends Phaser.Scene {
     const { width, height } = this.scale;
     const saved = SaveManager.load();
 
-    this.add.rectangle(width / 2, height / 2, width, height, 0x10253f);
-    this.add.text(width / 2, 90, '저장 데이터 확인', {
+    const layout = SavedDataViewManager.getLayout(width);
+    this.add.rectangle(width / 2, height / 2, width, height, layout.backgroundColor);
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
       fontSize: '60px',
       color: '#ffffff',
       fontStyle: 'bold',
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, 155, '브라우저 localStorage에 임시 저장된 학습 기록입니다.', {
+    this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, {
       fontSize: '26px',
       color: '#bfdbfe',
     }).setOrigin(0.5);
 
-    this.add.rectangle(width / 2, 535, 1320, 660, 0x111827, 0.98).setStrokeStyle(5, 0x60a5fa);
+    this.add.rectangle(
+      layout.bodyPanel.x,
+      layout.bodyPanel.y,
+      layout.bodyPanel.width,
+      layout.bodyPanel.height,
+      layout.bodyPanel.fillColor,
+      layout.bodyPanel.alpha,
+    ).setStrokeStyle(5, layout.bodyPanel.strokeColor);
 
     const body = SavedDataViewManager.formatBody(saved);
 
-    this.add.text(340, 245, body, SavedDataViewManager.getBodyTextStyle());
+    this.add.text(layout.bodyText.x, layout.bodyText.y, body, SavedDataViewManager.getBodyTextStyle());
 
-    this.importStatusText = this.add.text(width / 2, 865, '', SavedDataViewManager.getStatusTextStyle()).setOrigin(0.5);
+    this.importStatusText = this.add.text(layout.status.x, layout.status.y, '', SavedDataViewManager.getStatusTextStyle()).setOrigin(0.5);
 
     const buttonLayout = SavedDataViewManager.getButtonLayout(width);
     const continueButtonState = SavedDataViewManager.getContinueButtonState(saved);
 
-    const backButton = this.createButton(buttonLayout.back.x, buttonLayout.back.y, '제목으로', '#c4b5fd', '#1e1b4b');
-    backButton.on('pointerdown', () => this.scene.start('TitleScene'));
+    const backButton = this.createButton(buttonLayout.back.x, buttonLayout.back.y, buttonLayout.back.label, buttonLayout.back.backgroundColor, buttonLayout.back.textColor);
+    backButton.on('pointerdown', () => this.scene.start(buttonLayout.back.targetScene));
 
-    const importButton = this.createButton(buttonLayout.import.x, buttonLayout.import.y, 'JSON 가져오기', '#bfdbfe', '#0f172a');
+    const importButton = this.createButton(buttonLayout.import.x, buttonLayout.import.y, buttonLayout.import.label, buttonLayout.import.backgroundColor, buttonLayout.import.textColor);
     importButton.on('pointerdown', () => this.openImportPicker());
 
-    const continueButton = this.createButton(buttonLayout.continue.x, buttonLayout.continue.y, '이어보기', continueButtonState.backgroundColor, continueButtonState.textColor);
+    const continueButton = this.createButton(buttonLayout.continue.x, buttonLayout.continue.y, buttonLayout.continue.label, continueButtonState.backgroundColor, continueButtonState.textColor);
     continueButton.on('pointerdown', () => {
       if (!continueButtonState.canContinue) {
         return;
       }
       this.restoreSavedData(saved.data);
-      this.scene.start('EndingScene');
+      this.scene.start(buttonLayout.continue.targetScene);
     });
 
-    const clearButton = this.createButton(buttonLayout.clear.x, buttonLayout.clear.y, '저장 삭제', '#fecaca', '#7f1d1d');
+    const clearButton = this.createButton(buttonLayout.clear.x, buttonLayout.clear.y, buttonLayout.clear.label, buttonLayout.clear.backgroundColor, buttonLayout.clear.textColor);
     clearButton.on('pointerdown', () => {
       SaveManager.clear();
       this.scene.restart();
@@ -58,9 +66,10 @@ export default class SavedDataScene extends Phaser.Scene {
   }
 
   openImportPicker() {
+    const inputConfig = SavedDataViewManager.getLayout(this.scale.width).importFile;
     const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'application/json,.json';
+    input.type = inputConfig.type;
+    input.accept = inputConfig.accept;
     input.onchange = async () => {
       const file = input.files?.[0];
       if (!file) {

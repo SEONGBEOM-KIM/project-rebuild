@@ -1,12 +1,43 @@
+export const SAVED_DATA_LAYOUT = {
+  backgroundColor: 0x10253f,
+  title: { y: 90, text: '저장 데이터 확인' },
+  subtitle: { y: 155, text: '브라우저 localStorage에 임시 저장된 학습 기록입니다.' },
+  bodyPanel: { y: 535, width: 1320, height: 660, fillColor: 0x111827, alpha: 0.98, strokeColor: 0x60a5fa },
+  bodyText: { x: 340, y: 245 },
+  status: { y: 865 },
+  importFile: { type: 'file', accept: 'application/json,.json' },
+};
+
+export const SAVED_DATA_BUTTONS = {
+  back: { offsetX: -600, y: 940, label: '제목으로', backgroundColor: '#c4b5fd', textColor: '#1e1b4b', targetScene: 'TitleScene' },
+  import: { offsetX: -200, y: 940, label: 'JSON 가져오기', backgroundColor: '#bfdbfe', textColor: '#0f172a' },
+  continue: { offsetX: 175, y: 940, label: '이어보기', targetScene: 'EndingScene' },
+  clear: { offsetX: 560, y: 940, label: '저장 삭제', backgroundColor: '#fecaca', textColor: '#7f1d1d' },
+};
+
 export default class SavedDataViewManager {
+  static getLayout(width) {
+    return {
+      backgroundColor: SAVED_DATA_LAYOUT.backgroundColor,
+      title: { ...SAVED_DATA_LAYOUT.title, x: width / 2 },
+      subtitle: { ...SAVED_DATA_LAYOUT.subtitle, x: width / 2 },
+      bodyPanel: { ...SAVED_DATA_LAYOUT.bodyPanel, x: width / 2 },
+      bodyText: SAVED_DATA_LAYOUT.bodyText,
+      status: { ...SAVED_DATA_LAYOUT.status, x: width / 2 },
+      importFile: SAVED_DATA_LAYOUT.importFile,
+    };
+  }
 
   static getButtonLayout(width) {
-    return {
-      back: { x: width / 2 - 600, y: 940 },
-      import: { x: width / 2 - 200, y: 940 },
-      continue: { x: width / 2 + 175, y: 940 },
-      clear: { x: width / 2 + 560, y: 940 },
-    };
+    return Object.fromEntries(
+      Object.entries(SAVED_DATA_BUTTONS).map(([key, button]) => [
+        key,
+        {
+          ...button,
+          x: width / 2 + button.offsetX,
+        },
+      ]),
+    );
   }
 
   static getBodyTextStyle() {
@@ -35,6 +66,7 @@ export default class SavedDataViewManager {
       textColor: '#123524',
     };
   }
+
   static formatBody(saved) {
     return saved
       ? JSON.stringify(saved, null, 2)
