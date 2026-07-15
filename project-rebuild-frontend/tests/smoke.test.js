@@ -1456,7 +1456,16 @@ function testSavedDataViewManager() {
     backgroundColor: '#94a3b8',
     textColor: '#123524',
   });
-  assert.deepEqual(SavedDataViewManager.getLayout(1920).title, { y: 90, text: '저장 데이터 확인', x: 960 });
+  assert.deepEqual(SavedDataViewManager.getLayout(1920).title, {
+    y: 90,
+    text: '저장 데이터 확인',
+    fontSize: '60px',
+    color: '#ffffff',
+    fontStyle: 'bold',
+    x: 960,
+  });
+  assert.equal(SavedDataViewManager.getLayout(1920).bodyPanel.strokeWidth, 5);
+  assert.deepEqual(SavedDataViewManager.getButtonStyle().padding, { x: 34, y: 18 });
   assert.deepEqual(SavedDataViewManager.getLayout(1920).importFile, { type: 'file', accept: 'application/json,.json' });
   assert.deepEqual(SavedDataViewManager.getButtonLayout(1920), {
     back: { offsetX: -600, x: 360, y: 940, label: '제목으로', backgroundColor: '#c4b5fd', textColor: '#1e1b4b', targetScene: 'TitleScene' },

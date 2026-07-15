@@ -15,14 +15,14 @@ export default class SavedDataScene extends Phaser.Scene {
     const layout = SavedDataViewManager.getLayout(width);
     this.add.rectangle(width / 2, height / 2, width, height, layout.backgroundColor);
     this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '60px',
-      color: '#ffffff',
-      fontStyle: 'bold',
+      fontSize: layout.title.fontSize,
+      color: layout.title.color,
+      fontStyle: layout.title.fontStyle,
     }).setOrigin(0.5);
 
     this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, {
-      fontSize: '26px',
-      color: '#bfdbfe',
+      fontSize: layout.subtitle.fontSize,
+      color: layout.subtitle.color,
     }).setOrigin(0.5);
 
     this.add.rectangle(
@@ -32,7 +32,7 @@ export default class SavedDataScene extends Phaser.Scene {
       layout.bodyPanel.height,
       layout.bodyPanel.fillColor,
       layout.bodyPanel.alpha,
-    ).setStrokeStyle(5, layout.bodyPanel.strokeColor);
+    ).setStrokeStyle(layout.bodyPanel.strokeWidth, layout.bodyPanel.strokeColor);
 
     const body = SavedDataViewManager.formatBody(saved);
 
@@ -91,11 +91,12 @@ export default class SavedDataScene extends Phaser.Scene {
   }
 
   createButton(x, y, label, backgroundColor, color) {
+    const buttonStyle = SavedDataViewManager.getButtonStyle();
     return this.add.text(x, y, label, {
-      fontSize: '28px',
+      fontSize: buttonStyle.fontSize,
       color,
       backgroundColor,
-      padding: { x: 34, y: 18 },
+      padding: buttonStyle.padding,
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
   }
 }

@@ -1,11 +1,16 @@
 export const SAVED_DATA_LAYOUT = {
   backgroundColor: 0x10253f,
-  title: { y: 90, text: '저장 데이터 확인' },
-  subtitle: { y: 155, text: '브라우저 localStorage에 임시 저장된 학습 기록입니다.' },
-  bodyPanel: { y: 535, width: 1320, height: 660, fillColor: 0x111827, alpha: 0.98, strokeColor: 0x60a5fa },
+  title: { y: 90, text: '저장 데이터 확인', fontSize: '60px', color: '#ffffff', fontStyle: 'bold' },
+  subtitle: { y: 155, text: '브라우저 localStorage에 임시 저장된 학습 기록입니다.', fontSize: '26px', color: '#bfdbfe' },
+  bodyPanel: { y: 535, width: 1320, height: 660, fillColor: 0x111827, alpha: 0.98, strokeWidth: 5, strokeColor: 0x60a5fa },
   bodyText: { x: 340, y: 245 },
   status: { y: 865 },
   importFile: { type: 'file', accept: 'application/json,.json' },
+};
+
+export const SAVED_DATA_BUTTON_STYLE = {
+  fontSize: '28px',
+  padding: { x: 34, y: 18 },
 };
 
 export const SAVED_DATA_BUTTONS = {
@@ -38,6 +43,10 @@ export default class SavedDataViewManager {
         },
       ]),
     );
+  }
+
+  static getButtonStyle() {
+    return { ...SAVED_DATA_BUTTON_STYLE, padding: { ...SAVED_DATA_BUTTON_STYLE.padding } };
   }
 
   static getBodyTextStyle() {
