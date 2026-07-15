@@ -498,6 +498,10 @@ function testStoryViewManager() {
   const layout = StoryViewManager.getLayout();
   assert.equal(layout.startButton.label, '지역 탐색 시작');
   assert.equal(layout.startButton.targetScene, 'ExplorationScene');
+  assert.equal(layout.title.fontSize, '60px');
+  assert.equal(layout.intro.lineSpacing, 18);
+  assert.equal(layout.startButton.strokeWidth, 4);
+  assert.equal(layout.startButton.textColor, '#123524');
   assert.deepEqual(StoryViewManager.getStartButton(1920), {
     ...layout.startButton,
     x: 960,

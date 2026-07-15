@@ -11,17 +11,17 @@ export default class StoryScene extends Phaser.Scene {
     const { width, height } = this.scale;
     const layout = StoryViewManager.getLayout();
     this.add.rectangle(width / 2, height / 2, width, height, layout.backgroundColor);
-    this.add.text(width / 2, layout.titleY, CURRENT_EPISODE.title, {
-      fontSize: '60px',
-      color: '#ffffff',
-      fontStyle: 'bold',
+    this.add.text(width / 2, layout.title.y, CURRENT_EPISODE.title, {
+      fontSize: layout.title.fontSize,
+      color: layout.title.color,
+      fontStyle: layout.title.fontStyle,
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, layout.introY, CURRENT_EPISODE.intro, {
-      fontSize: '34px',
-      color: '#dcfce7',
-      align: 'center',
-      lineSpacing: 18,
+    this.add.text(width / 2, layout.intro.y, CURRENT_EPISODE.intro, {
+      fontSize: layout.intro.fontSize,
+      color: layout.intro.color,
+      align: layout.intro.align,
+      lineSpacing: layout.intro.lineSpacing,
     }).setOrigin(0.5);
 
     this.createStartPlacementButton(StoryViewManager.getStartButton(width));
@@ -29,12 +29,12 @@ export default class StoryScene extends Phaser.Scene {
 
   createStartPlacementButton(button) {
     const buttonBg = this.add.rectangle(button.x, button.y, button.width, button.height, button.fillColor)
-      .setStrokeStyle(4, button.strokeColor)
+      .setStrokeStyle(button.strokeWidth, button.strokeColor)
       .setInteractive({ useHandCursor: true });
     const buttonText = this.add.text(button.x, button.y, button.label, {
-      fontSize: '38px',
-      color: '#123524',
-      fontStyle: 'bold',
+      fontSize: button.fontSize,
+      color: button.textColor,
+      fontStyle: button.fontStyle,
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
     const goToPlacement = () => {
