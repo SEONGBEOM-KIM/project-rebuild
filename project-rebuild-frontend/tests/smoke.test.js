@@ -269,8 +269,26 @@ function testReflectionViewManager() {
   const selectedChoice = EP1_REFLECTION_CHOICES[0];
   const otherChoice = EP1_REFLECTION_CHOICES[1];
 
+  assert.deepEqual(ReflectionViewManager.getScreenLayout(1920).title, {
+    x: 960,
+    y: 82,
+    text: '생각 정리',
+  });
+  assert.equal(ReflectionViewManager.getScreenLayout(1920).progressStep, 'ending');
+  assert.deepEqual(ReflectionViewManager.getScreenLayout(1920).feedback, { x: 960, y: 790, wordWrapWidth: 1150 });
   assert.deepEqual(ReflectionViewManager.getChoiceCardPosition(0), { col: 0, row: 0, x: 610, y: 385 });
   assert.deepEqual(ReflectionViewManager.getChoiceCardPosition(3), { col: 1, row: 1, x: 1310, y: 635 });
+  assert.deepEqual(ReflectionViewManager.getChoiceCardLayout(610, 385).background, { x: 610, y: 385, width: 620, height: 190 });
+  assert.deepEqual(ReflectionViewManager.getChoiceCardLayout(610, 385).description, { x: 410, y: 373, wordWrapWidth: 470 });
+  assert.deepEqual(ReflectionViewManager.getControlLayout().next, {
+    x: 1160,
+    y: 940,
+    label: '학습 마무리',
+    target: 'EndingScene',
+    backgroundColor: '#bbf7d0',
+    textColor: '#123524',
+  });
+  assert.equal(ReflectionViewManager.getControlLayout().back.target, 'SideEffectScene');
   assert.equal(ReflectionViewManager.formatInitialFeedback(), '하나를 선택하면 학습 기록에 저장됩니다.');
   assert.match(ReflectionViewManager.formatSelectedFeedback(selectedChoice), new RegExp(`선택됨: ${selectedChoice.title}`));
   assert.match(ReflectionViewManager.formatSelectedFeedback(selectedChoice), new RegExp(selectedChoice.description));

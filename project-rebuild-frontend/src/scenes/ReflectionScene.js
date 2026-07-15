@@ -14,16 +14,18 @@ export default class ReflectionScene extends Phaser.Scene {
     this.selectedChoice = this.registry.get('reflectionChoice');
     this.choiceObjects = new Map();
 
-    this.add.rectangle(width / 2, height / 2, width, height, 0x172554);
-    ProgressStepper.render(this, 'ending');
+    const layout = ReflectionViewManager.getScreenLayout(width);
 
-    this.add.text(width / 2, 82, '생각 정리', {
+    this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
+    ProgressStepper.render(this, layout.progressStep);
+
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
       fontSize: '60px',
       color: '#ffffff',
       fontStyle: 'bold',
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, 150, '이번 선택을 돌아보고, 다음 개발에서 가장 먼저 보완할 부분을 고르세요.', {
+    this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, {
       fontSize: '27px',
       color: '#bfdbfe',
     }).setOrigin(0.5);
@@ -33,11 +35,11 @@ export default class ReflectionScene extends Phaser.Scene {
       this.createChoiceCard(choice, x, y);
     });
 
-    this.feedbackText = this.add.text(width / 2, 790, ReflectionViewManager.formatInitialFeedback(), {
+    this.feedbackText = this.add.text(layout.feedback.x, layout.feedback.y, ReflectionViewManager.formatInitialFeedback(), {
       fontSize: '28px',
       color: '#e0f2fe',
       align: 'center',
-      wordWrap: { width: 1150 },
+      wordWrap: { width: layout.feedback.wordWrapWidth },
     }).setOrigin(0.5);
 
     this.drawControls();
@@ -45,20 +47,22 @@ export default class ReflectionScene extends Phaser.Scene {
   }
 
   createChoiceCard(choice, x, y) {
-    const background = this.add.rectangle(x, y, 620, 190, 0x0f172a, 0.96)
-      .setStrokeStyle(4, 0x475569)
+    const layout = ReflectionViewManager.getChoiceCardLayout(x, y);
+    const initialStyle = ReflectionViewManager.getChoiceCardStyle(choice.id, this.selectedChoice);
+    const background = this.add.rectangle(layout.background.x, layout.background.y, layout.background.width, layout.background.height, initialStyle.fillColor, initialStyle.fillAlpha)
+      .setStrokeStyle(initialStyle.strokeWidth, initialStyle.strokeColor)
       .setInteractive({ useHandCursor: true });
-    const icon = this.add.text(x - 250, y - 35, choice.icon, { fontSize: '44px' }).setOrigin(0.5);
-    const title = this.add.text(x - 200, y - 62, choice.title, {
+    const icon = this.add.text(layout.icon.x, layout.icon.y, choice.icon, { fontSize: '44px' }).setOrigin(0.5);
+    const title = this.add.text(layout.title.x, layout.title.y, choice.title, {
       fontSize: '31px',
       color: '#ffffff',
       fontStyle: 'bold',
     });
-    const description = this.add.text(x - 200, y - 12, choice.description, {
+    const description = this.add.text(layout.description.x, layout.description.y, choice.description, {
       fontSize: '23px',
       color: '#dbeafe',
       lineSpacing: 8,
-      wordWrap: { width: 470 },
+      wordWrap: { width: layout.description.wordWrapWidth },
     });
 
     const select = () => this.selectChoice(choice);
@@ -88,17 +92,18 @@ export default class ReflectionScene extends Phaser.Scene {
   }
 
   drawControls() {
-    const backButton = this.createButton(760, 940, '부작용 다시 보기', '#c4b5fd', '#1e1b4b');
-    backButton.on('pointerdown', () => this.scene.start('SideEffectScene'));
+    const layout = ReflectionViewManager.getControlLayout();
+    const backButton = this.createButton(layout.back.x, layout.back.y, layout.back.label, layout.back.backgroundColor, layout.back.textColor);
+    backButton.on('pointerdown', () => this.scene.start(layout.back.target));
 
-    const nextButton = this.createButton(1160, 940, '학습 마무리', '#bbf7d0', '#123524');
+    const nextButton = this.createButton(layout.next.x, layout.next.y, layout.next.label, layout.next.backgroundColor, layout.next.textColor);
     nextButton.on('pointerdown', () => {
       if (!this.selectedChoice) {
         this.feedbackText.setText(ReflectionViewManager.formatMissingChoiceFeedback());
         this.feedbackText.setColor(ReflectionViewManager.getFeedbackStyle('missing').color);
         return;
       }
-      this.scene.start('EndingScene');
+      this.scene.start(layout.next.target);
     });
   }
 
