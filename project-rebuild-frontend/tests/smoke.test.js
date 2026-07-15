@@ -1021,14 +1021,29 @@ function testLearningDataManager() {
 function testApiPayloadViewManager() {
   const payload = LearningApiPayloadManager.build(createCompleteLearningData());
   assert.match(ApiPayloadViewManager.formatJson(payload), /"schema_version": 1/);
+  assert.deepEqual(ApiPayloadViewManager.getScreenLayout(1920).title, { y: 78, text: 'API 저장 페이로드 미리보기', x: 960 });
+  assert.equal(ApiPayloadViewManager.getScreenLayout(1920).progressStep, 'ending');
+  assert.deepEqual(ApiPayloadViewManager.getDownloadConfig(), { mimeType: 'application/json' });
   assert.equal(ApiPayloadViewManager.getPayloadPanelLayout().panel.width, 1120);
+  assert.equal(ApiPayloadViewManager.getPayloadPanelLayout().title.text, 'POST /api/learning-records/ 후보 body');
+  assert.equal(ApiPayloadViewManager.getValidationPanelLayout().title.text, 'API 구조 검증');
   assert.equal(ApiPayloadViewManager.getValidationPanelLayout().rows.wordWrapWidth, 440);
   assert.equal(ApiPayloadViewManager.getSubmissionLogLayout().panel.height, 105);
+  assert.equal(ApiPayloadViewManager.getSubmissionLogLayout().title.text, 'Mock 제출 로그');
   assert.deepEqual(ApiPayloadViewManager.getControlLayout().contract, {
     x: 1130,
     y: 960,
     label: 'API 계약',
     target: 'ApiContractScene',
+    backgroundColor: '#fde68a',
+    textColor: '#0f172a',
+  });
+  assert.deepEqual(ApiPayloadViewManager.getControlLayout().submit, {
+    x: 350,
+    y: 960,
+    label: 'Mock 제출',
+    backgroundColor: '#bbf7d0',
+    textColor: '#123524',
   });
   assert.equal(ApiPayloadViewManager.getPayloadTextStyle(1030).fontFamily, 'monospace');
   assert.equal(ApiPayloadViewManager.formatCopySuccess(), 'API payload를 클립보드에 복사했습니다.');

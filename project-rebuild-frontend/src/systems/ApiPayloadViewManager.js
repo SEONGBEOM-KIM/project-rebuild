@@ -1,10 +1,35 @@
 import LearningApiPayloadManager from './LearningApiPayloadManager.js';
 
+export const API_PAYLOAD_SCREEN_LAYOUT = {
+  backgroundColor: 0x111827,
+  progressStep: 'ending',
+  title: { y: 78, text: 'API 저장 페이로드 미리보기' },
+  subtitle: { y: 145, text: 'Django API 연동 전, 프론트엔드 학습 데이터를 서버 저장용 구조로 변환해 확인합니다.' },
+};
+
+export const API_PAYLOAD_DOWNLOAD_CONFIG = {
+  mimeType: 'application/json',
+};
+
+
 export default class ApiPayloadViewManager {
+  static getScreenLayout(width) {
+    return {
+      backgroundColor: API_PAYLOAD_SCREEN_LAYOUT.backgroundColor,
+      progressStep: API_PAYLOAD_SCREEN_LAYOUT.progressStep,
+      title: { ...API_PAYLOAD_SCREEN_LAYOUT.title, x: width / 2 },
+      subtitle: { ...API_PAYLOAD_SCREEN_LAYOUT.subtitle, x: width / 2 },
+    };
+  }
+
+  static getDownloadConfig() {
+    return API_PAYLOAD_DOWNLOAD_CONFIG;
+  }
+
   static getPayloadPanelLayout() {
     return {
       panel: { x: 760, y: 555, width: 1120, height: 710, strokeColor: 0x60a5fa },
-      title: { x: 240, y: 230 },
+      title: { x: 240, y: 230, text: 'POST /api/learning-records/ 후보 body' },
       body: { x: 245, y: 285, wordWrapWidth: 1030 },
     };
   }
@@ -12,7 +37,7 @@ export default class ApiPayloadViewManager {
   static getValidationPanelLayout() {
     return {
       panel: { x: 1550, y: 555, width: 500, height: 710 },
-      title: { x: 1550, y: 230 },
+      title: { x: 1550, y: 230, text: 'API 구조 검증' },
       rows: { x: 1325, y: 290, wordWrapWidth: 440 },
       status: { x: 1325, y: 770, wordWrapWidth: 440 },
     };
@@ -21,20 +46,20 @@ export default class ApiPayloadViewManager {
   static getSubmissionLogLayout() {
     return {
       panel: { x: 1550, y: 850, width: 500, height: 105 },
-      title: { x: 1325, y: 815 },
+      title: { x: 1325, y: 815, text: 'Mock 제출 로그', strokeColor: 0x93c5fd },
       body: { x: 1325, y: 848, wordWrapWidth: 440 },
     };
   }
 
   static getControlLayout() {
     return {
-      submit: { x: 350, y: 960, label: 'Mock 제출' },
-      copy: { x: 610, y: 960, label: 'Payload 복사' },
-      download: { x: 910, y: 960, label: 'Payload 다운로드' },
-      contract: { x: 1130, y: 960, label: 'API 계약', target: 'ApiContractScene' },
-      log: { x: 1335, y: 960, label: '제출 로그', target: 'MockSubmissionLogScene' },
-      data: { x: 1545, y: 960, label: '학습 데이터', target: 'LearningDataScene' },
-      ending: { x: 1745, y: 960, label: '마무리', target: 'EndingScene' },
+      submit: { x: 350, y: 960, label: 'Mock 제출', backgroundColor: '#bbf7d0', textColor: '#123524' },
+      copy: { x: 610, y: 960, label: 'Payload 복사', backgroundColor: '#93c5fd', textColor: '#0f172a' },
+      download: { x: 910, y: 960, label: 'Payload 다운로드', backgroundColor: '#a7f3d0', textColor: '#064e3b' },
+      contract: { x: 1130, y: 960, label: 'API 계약', target: 'ApiContractScene', backgroundColor: '#fde68a', textColor: '#0f172a' },
+      log: { x: 1335, y: 960, label: '제출 로그', target: 'MockSubmissionLogScene', backgroundColor: '#bfdbfe', textColor: '#0f172a' },
+      data: { x: 1545, y: 960, label: '학습 데이터', target: 'LearningDataScene', backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
+      ending: { x: 1745, y: 960, label: '마무리', target: 'EndingScene', backgroundColor: '#fde68a', textColor: '#0f172a' },
     };
   }
 
