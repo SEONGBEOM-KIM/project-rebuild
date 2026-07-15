@@ -43,6 +43,8 @@ export const PLACEMENT_SCREEN_LAYOUT = {
     x: 460,
     y: 120,
     text: '마우스 드래그: 지도 이동  |  휠: 확대/축소  |  초록: 배치 가능 / 빨강: 불가능',
+    fontSize: '24px',
+    color: '#bfdbfe',
   },
   mapOrigin: { x: 940, y: 260 },
 };
@@ -61,6 +63,8 @@ export const RECOMMENDATION_BADGE_STYLE = {
   strokeColor: 0xf59e0b,
   text: '추천',
   textColor: '#78350f',
+  textFontSize: '16px',
+  textFontStyle: 'bold',
 };
 
 export const PREVIEW_STYLES = {
@@ -125,6 +129,8 @@ export const PLACEMENT_MAP_VISUALS = {
     fillColor: 0x0f172a,
     fillAlpha: 0.82,
     depthBase: 30,
+    textFontSize: '18px',
+    textColor: '#ffffff',
   },
   impactMarker: {
     containerOffsetY: -92,
@@ -147,7 +153,38 @@ export const PLACEMENT_MAP_VISUALS = {
     initialAlpha: 0.2,
     tweenDuration: 280,
     tweenEase: 'Back.Out',
+    iconFontSize: '30px',
+    iconColor: '#ffffff',
+    iconFontStyle: 'bold',
+    labelFontSize: '17px',
+    labelColor: '#ffffff',
   },
+};
+
+export const PLACEMENT_FIXED_UI_STYLE = {
+  rectangleStrokeWidth: 3,
+};
+
+export const PLACEMENT_TEXT_STYLES = {
+  title: { fontSize: '34px', color: '#ffffff', fontStyle: 'bold' },
+  subtitle: { fontSize: '22px', color: '#bfdbfe', lineSpacing: 8 },
+  mission: { fontSize: '20px', color: '#fde68a', lineSpacing: 6 },
+  status: { fontSize: '20px', color: '#f8fafc', lineSpacing: 8 },
+  cursorInfo: { fontSize: '18px', color: '#bfdbfe', lineSpacing: 6 },
+  message: { fontSize: '20px', color: '#fde68a' },
+  continueButton: { fontSize: '30px', color: '#0f172a' },
+  panelTitle: { fontSize: '26px', color: '#ffffff', fontStyle: 'bold' },
+  legendText: { fontSize: '19px' },
+  panelBody: { fontSize: '18px', lineSpacing: 6 },
+  cardTitle: { fontSize: '25px', color: '#ffffff', fontStyle: 'bold' },
+  cardDetail: { fontSize: '18px', color: '#cbd5e1' },
+  cardDescription: { fontSize: '15px', color: '#bae6fd' },
+  cardPlacementHint: { fontSize: '14px', color: '#fef3c7' },
+  cardEffect: { fontSize: '14px', color: '#fde68a' },
+  recommendationBadge: { fontSize: RECOMMENDATION_BADGE_STYLE.textFontSize, color: RECOMMENDATION_BADGE_STYLE.textColor, fontStyle: RECOMMENDATION_BADGE_STYLE.textFontStyle },
+  impactIcon: { fontSize: PLACEMENT_MAP_VISUALS.impactMarker.iconFontSize, color: PLACEMENT_MAP_VISUALS.impactMarker.iconColor, fontStyle: PLACEMENT_MAP_VISUALS.impactMarker.iconFontStyle },
+  impactLabel: { fontSize: PLACEMENT_MAP_VISUALS.impactMarker.labelFontSize, color: PLACEMENT_MAP_VISUALS.impactMarker.labelColor },
+  buildingLabel: { fontSize: PLACEMENT_MAP_VISUALS.buildingLabel.textFontSize, color: PLACEMENT_MAP_VISUALS.buildingLabel.textColor },
 };
 
 export default class PlacementViewManager {
@@ -179,12 +216,40 @@ export default class PlacementViewManager {
         fillAlpha: RECOMMENDATION_BADGE_STYLE.fillAlpha,
         strokeColor: RECOMMENDATION_BADGE_STYLE.strokeColor,
       },
-      text: { x, y, text: RECOMMENDATION_BADGE_STYLE.text, color: RECOMMENDATION_BADGE_STYLE.textColor },
+      text: { x, y, text: RECOMMENDATION_BADGE_STYLE.text },
     };
   }
 
   static getUiLayout() {
     return PLACEMENT_UI_LAYOUT;
+  }
+
+  static getFixedUiStyle() {
+    return { ...PLACEMENT_FIXED_UI_STYLE };
+  }
+
+  static getTextStyles() {
+    return {
+      title: { ...PLACEMENT_TEXT_STYLES.title },
+      subtitle: { ...PLACEMENT_TEXT_STYLES.subtitle },
+      mission: { ...PLACEMENT_TEXT_STYLES.mission },
+      status: { ...PLACEMENT_TEXT_STYLES.status },
+      cursorInfo: { ...PLACEMENT_TEXT_STYLES.cursorInfo },
+      message: { ...PLACEMENT_TEXT_STYLES.message },
+      continueButton: { ...PLACEMENT_TEXT_STYLES.continueButton },
+      panelTitle: { ...PLACEMENT_TEXT_STYLES.panelTitle },
+      legendText: { ...PLACEMENT_TEXT_STYLES.legendText },
+      panelBody: { ...PLACEMENT_TEXT_STYLES.panelBody },
+      cardTitle: { ...PLACEMENT_TEXT_STYLES.cardTitle },
+      cardDetail: { ...PLACEMENT_TEXT_STYLES.cardDetail },
+      cardDescription: { ...PLACEMENT_TEXT_STYLES.cardDescription },
+      cardPlacementHint: { ...PLACEMENT_TEXT_STYLES.cardPlacementHint },
+      cardEffect: { ...PLACEMENT_TEXT_STYLES.cardEffect },
+      recommendationBadge: { ...PLACEMENT_TEXT_STYLES.recommendationBadge },
+      impactIcon: { ...PLACEMENT_TEXT_STYLES.impactIcon },
+      impactLabel: { ...PLACEMENT_TEXT_STYLES.impactLabel },
+      buildingLabel: { ...PLACEMENT_TEXT_STYLES.buildingLabel },
+    };
   }
 
   static getBuildingCardLayout(x, y) {

@@ -59,10 +59,7 @@ export default class PlacementScene extends Phaser.Scene {
     const layout = PlacementViewManager.getScreenLayout();
     this.registerWorldObject(this.add.rectangle(width / 2, height / 2, width, height, layout.background.color).setScrollFactor(0).setDepth(-10));
     this.registerUiObject(ProgressStepper.render(this, layout.progressStep));
-    this.registerUiObject(this.add.text(layout.topHint.x, layout.topHint.y, layout.topHint.text, {
-      fontSize: '24px',
-      color: '#bfdbfe',
-    }).setScrollFactor(0).setDepth(100));
+    this.registerUiObject(this.add.text(layout.topHint.x, layout.topHint.y, layout.topHint.text, layout.topHint).setScrollFactor(0).setDepth(100));
   }
 
   setupCamera() {
@@ -103,6 +100,7 @@ export default class PlacementScene extends Phaser.Scene {
   createUi() {
     this.cardObjects = new Map();
     const layout = PlacementViewManager.getUiLayout();
+    const textStyles = PlacementViewManager.getTextStyles();
 
     this.createFixedRectangle(
       layout.leftPanel.x,
@@ -113,39 +111,24 @@ export default class PlacementScene extends Phaser.Scene {
       layout.leftPanel.alpha,
       layout.leftPanel.strokeColor,
     );
-    this.createFixedText(layout.title.x, layout.title.y, layout.title.text, { fontSize: '34px', color: '#ffffff', fontStyle: 'bold' });
-    this.createFixedText(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, {
-      fontSize: '22px',
-      color: '#bfdbfe',
-      lineSpacing: 8,
-    });
+    this.createFixedText(layout.title.x, layout.title.y, layout.title.text, textStyles.title);
+    this.createFixedText(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, textStyles.subtitle);
 
-    this.missionText = this.createFixedText(layout.mission.x, layout.mission.y, '', {
-      fontSize: '20px',
-      color: '#fde68a',
-      lineSpacing: 6,
-    });
+    this.missionText = this.createFixedText(layout.mission.x, layout.mission.y, '', textStyles.mission);
 
     buildings.forEach((building, index) => {
       this.createBuildingCard(building, layout.buildingList.x, layout.buildingList.startY + index * layout.buildingList.gapY);
     });
 
-    this.statusText = this.createFixedText(layout.status.x, layout.status.y, '', {
-      fontSize: '20px',
-      color: '#f8fafc',
-      lineSpacing: 8,
-    });
+    this.statusText = this.createFixedText(layout.status.x, layout.status.y, '', textStyles.status);
 
     this.cursorInfoText = this.createFixedText(layout.cursorInfo.x, layout.cursorInfo.y, layout.cursorInfo.text, {
-      fontSize: '18px',
-      color: '#bfdbfe',
-      lineSpacing: 6,
+      ...textStyles.cursorInfo,
       wordWrap: { width: 320 },
     });
 
     this.messageText = this.createFixedText(layout.message.x, layout.message.y, layout.message.text, {
-      fontSize: '20px',
-      color: '#fde68a',
+      ...textStyles.message,
       wordWrap: { width: 325 },
     });
 
@@ -158,10 +141,9 @@ export default class PlacementScene extends Phaser.Scene {
       layout.continueButton.alpha,
       layout.continueButton.strokeColor,
     ).setInteractive({ useHandCursor: true });
-    this.continueButton = this.createFixedText(layout.continueButton.x, layout.continueButton.y, layout.continueButton.text, {
-      fontSize: '30px',
-      color: '#0f172a',
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    this.continueButton = this.createFixedText(layout.continueButton.x, layout.continueButton.y, layout.continueButton.text, textStyles.continueButton)
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true });
 
     const handleContinue = () => {
       if (this.placedBuildings.length < REQUIRED_PLACEMENTS) {
@@ -180,6 +162,7 @@ export default class PlacementScene extends Phaser.Scene {
   createLegend() {
     const legendItems = PlacementViewManager.getLegendItems();
     const layout = PlacementViewManager.getUiLayout();
+    const textStyles = PlacementViewManager.getTextStyles();
 
     this.createFixedRectangle(
       layout.legendPanel.x,
@@ -190,11 +173,7 @@ export default class PlacementScene extends Phaser.Scene {
       layout.legendPanel.alpha,
       layout.legendPanel.strokeColor,
     );
-    this.createFixedText(layout.legendTitle.x, layout.legendTitle.y, layout.legendTitle.text, {
-      fontSize: '26px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-    });
+    this.createFixedText(layout.legendTitle.x, layout.legendTitle.y, layout.legendTitle.text, textStyles.panelTitle);
 
     legendItems.forEach((item, index) => {
       const y = layout.legendText.startY + index * layout.legendText.gapY;
@@ -208,7 +187,7 @@ export default class PlacementScene extends Phaser.Scene {
         0xffffff,
       );
       this.createFixedText(layout.legendText.x, y, `${item.label} - ${item.note}`, {
-        fontSize: '19px',
+        ...textStyles.legendText,
         color: PlacementViewManager.getLegendTextColor(item),
       });
     });
@@ -217,6 +196,7 @@ export default class PlacementScene extends Phaser.Scene {
   createLastChangePanel() {
     const layout = PlacementViewManager.getUiLayout();
     const emptyState = PlacementViewManager.getEmptyLastChangeState();
+    const textStyles = PlacementViewManager.getTextStyles();
 
     this.createFixedRectangle(
       layout.lastChangePanel.x,
@@ -227,15 +207,10 @@ export default class PlacementScene extends Phaser.Scene {
       layout.lastChangePanel.alpha,
       layout.lastChangePanel.strokeColor,
     );
-    this.createFixedText(layout.lastChangeTitle.x, layout.lastChangeTitle.y, layout.lastChangeTitle.text, {
-      fontSize: '26px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-    });
+    this.createFixedText(layout.lastChangeTitle.x, layout.lastChangeTitle.y, layout.lastChangeTitle.text, textStyles.panelTitle);
     this.lastChangeText = this.createFixedText(layout.lastChangeBody.x, layout.lastChangeBody.y, emptyState.text, {
-      fontSize: '18px',
+      ...textStyles.panelBody,
       color: emptyState.color,
-      lineSpacing: 6,
       wordWrap: { width: 270 },
     });
   }
@@ -243,6 +218,7 @@ export default class PlacementScene extends Phaser.Scene {
   createPlacementHistoryPanel() {
     const layout = PlacementViewManager.getUiLayout();
     const emptyState = PlacementViewManager.getEmptyPlacementHistoryState();
+    const textStyles = PlacementViewManager.getTextStyles();
 
     this.createFixedRectangle(
       layout.historyPanel.x,
@@ -253,47 +229,33 @@ export default class PlacementScene extends Phaser.Scene {
       layout.historyPanel.alpha,
       layout.historyPanel.strokeColor,
     );
-    this.createFixedText(layout.historyTitle.x, layout.historyTitle.y, layout.historyTitle.text, {
-      fontSize: '26px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-    });
+    this.createFixedText(layout.historyTitle.x, layout.historyTitle.y, layout.historyTitle.text, textStyles.panelTitle);
     this.placementHistoryText = this.createFixedText(layout.historyBody.x, layout.historyBody.y, emptyState.text, {
-      fontSize: '18px',
+      ...textStyles.panelBody,
       color: emptyState.color,
-      lineSpacing: 6,
       wordWrap: { width: 280 },
     });
   }
 
   createBuildingCard(building, x, y) {
     const layout = PlacementViewManager.getBuildingCardLayout(x, y);
+    const textStyles = PlacementViewManager.getTextStyles();
     const card = this.createFixedRectangle(layout.card.x, layout.card.y, layout.card.width, layout.card.height, 0x1e293b, 1, 0x475569)
       .setInteractive({ useHandCursor: true });
     const swatch = this.createFixedRectangle(layout.swatch.x, layout.swatch.y, layout.swatch.width, layout.swatch.height, building.color, 1, 0xffffff);
-    const title = this.createFixedText(layout.title.x, layout.title.y, building.name, {
-      fontSize: '25px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-    });
+    const title = this.createFixedText(layout.title.x, layout.title.y, building.name, textStyles.cardTitle);
     const recommendationBadge = this.createRecommendationBadge(building, layout.recommendationBadge.x, layout.recommendationBadge.y);
-    const detail = this.createFixedText(layout.detail.x, layout.detail.y, PlacementViewManager.formatBuildingDetail(building), {
-      fontSize: '18px',
-      color: '#cbd5e1',
-    });
+    const detail = this.createFixedText(layout.detail.x, layout.detail.y, PlacementViewManager.formatBuildingDetail(building), textStyles.cardDetail);
     const description = this.createFixedText(layout.description.x, layout.description.y, building.description, {
-      fontSize: '15px',
-      color: '#bae6fd',
+      ...textStyles.cardDescription,
       wordWrap: { width: layout.description.wrapWidth },
     });
     const placementHint = this.createFixedText(layout.placementHint.x, layout.placementHint.y, PlacementViewManager.formatPlacementHint(building), {
-      fontSize: '14px',
-      color: '#fef3c7',
+      ...textStyles.cardPlacementHint,
       wordWrap: { width: layout.placementHint.wrapWidth },
     });
     const effect = this.createFixedText(layout.effect.x, layout.effect.y, formatEffect(building.effect), {
-      fontSize: '14px',
-      color: '#fde68a',
+      ...textStyles.cardEffect,
       wordWrap: { width: layout.effect.wrapWidth },
     });
 
@@ -324,11 +286,7 @@ export default class PlacementScene extends Phaser.Scene {
       layout.background.fillAlpha,
       layout.background.strokeColor,
     );
-    const badgeText = this.createFixedText(layout.text.x, layout.text.y, layout.text.text, {
-      fontSize: '16px',
-      color: layout.text.color,
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    const badgeText = this.createFixedText(layout.text.x, layout.text.y, layout.text.text, PlacementViewManager.getTextStyles().recommendationBadge).setOrigin(0.5);
     return { badgeBg, badgeText };
   }
 
@@ -339,7 +297,7 @@ export default class PlacementScene extends Phaser.Scene {
   createFixedRectangle(x, y, width, height, color, alpha = 1, strokeColor = null) {
     const rectangle = this.add.rectangle(x, y, width, height, color, alpha).setScrollFactor(0).setDepth(100);
     if (strokeColor !== null) {
-      rectangle.setStrokeStyle(3, strokeColor);
+      rectangle.setStrokeStyle(PlacementViewManager.getFixedUiStyle().rectangleStrokeWidth, strokeColor);
     }
     return this.registerUiObject(rectangle);
   }
@@ -513,11 +471,8 @@ export default class PlacementScene extends Phaser.Scene {
 
     const bubble = this.add.circle(0, 0, markerLayout.bubble.radius, markerData.color, markerLayout.bubble.alpha)
       .setStrokeStyle(markerLayout.bubble.strokeWidth, markerLayout.bubble.strokeColor, markerLayout.bubble.strokeAlpha);
-    const icon = this.add.text(markerLayout.icon.x, markerLayout.icon.y, markerData.icon, {
-      fontSize: '30px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    const textStyles = PlacementViewManager.getTextStyles();
+    const icon = this.add.text(markerLayout.icon.x, markerLayout.icon.y, markerData.icon, textStyles.impactIcon).setOrigin(0.5);
     const labelBg = this.add.rectangle(
       markerLayout.labelBackground.x,
       markerLayout.labelBackground.y,
@@ -526,10 +481,7 @@ export default class PlacementScene extends Phaser.Scene {
       markerLayout.labelBackground.fillColor,
       markerLayout.labelBackground.fillAlpha,
     ).setStrokeStyle(markerLayout.labelBackground.strokeWidth, markerData.color, markerLayout.labelBackground.strokeAlpha);
-    const label = this.add.text(markerLayout.label.x, markerLayout.label.y, markerData.label, {
-      fontSize: '17px',
-      color: '#ffffff',
-    }).setOrigin(0.5);
+    const label = this.add.text(markerLayout.label.x, markerLayout.label.y, markerData.label, textStyles.impactLabel).setOrigin(0.5);
 
     markerContainer.add([bubble, icon, labelBg, label]);
 
@@ -572,10 +524,12 @@ export default class PlacementScene extends Phaser.Scene {
       labelLayout.background.height,
       labelLayout.background.radius,
     );
-    const label = this.registerWorldObject(this.add.text(labelLayout.text.x, labelLayout.text.y, building.name, {
-      fontSize: '18px',
-      color: '#ffffff',
-    }).setOrigin(0.5).setDepth(labelLayout.text.depth));
+    const label = this.registerWorldObject(this.add.text(
+      labelLayout.text.x,
+      labelLayout.text.y,
+      building.name,
+      PlacementViewManager.getTextStyles().buildingLabel,
+    ).setOrigin(0.5).setDepth(labelLayout.text.depth));
 
     this.mapLabels.add(label);
   }
@@ -690,7 +644,7 @@ export default class PlacementScene extends Phaser.Scene {
 
     if (this.continueButtonBg) {
       this.continueButtonBg.setFillStyle(continueState.backgroundFillColor, continueState.backgroundAlpha);
-      this.continueButtonBg.setStrokeStyle(3, continueState.strokeColor);
+      this.continueButtonBg.setStrokeStyle(PlacementViewManager.getFixedUiStyle().rectangleStrokeWidth, continueState.strokeColor);
     }
   }
 

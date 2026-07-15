@@ -974,8 +974,15 @@ function testPlacementViewManager() {
   assert.deepEqual(PlacementViewManager.getScreenLayout().mapOrigin, { x: 940, y: 260 });
   assert.equal(PlacementViewManager.getScreenLayout().progressStep, 'placement');
   assert.match(PlacementViewManager.getScreenLayout().topHint.text, /휠: 확대\/축소/);
+  assert.equal(PlacementViewManager.getScreenLayout().topHint.fontSize, '24px');
   assert.deepEqual(PlacementViewManager.getCameraConfig().bounds, { x: 0, y: 0, width: 1900, height: 1300 });
   assert.equal(PlacementViewManager.getRecommendationBadgeLayout(10, 20).text.text, '추천');
+  assert.deepEqual(PlacementViewManager.getFixedUiStyle(), { rectangleStrokeWidth: 3 });
+  assert.equal(PlacementViewManager.getTextStyles().title.fontSize, '34px');
+  assert.equal(PlacementViewManager.getTextStyles().panelBody.lineSpacing, 6);
+  assert.equal(PlacementViewManager.getTextStyles().recommendationBadge.color, '#78350f');
+  assert.equal(PlacementViewManager.getTextStyles().impactIcon.fontStyle, 'bold');
+  assert.equal(PlacementViewManager.getTextStyles().buildingLabel.fontSize, '18px');
   assert.equal(PREVIEW_STYLES.valid.fillColor, 0x22c55e);
   assert.equal(PLACEMENT_UI_LAYOUT.title.text, '건물 선택');
   assert.equal(BUILDING_CARD_LAYOUT.card.width, 300);
