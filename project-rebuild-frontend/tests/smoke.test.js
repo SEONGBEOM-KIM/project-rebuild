@@ -1198,15 +1198,18 @@ function testSavedDataViewManager() {
 }
 
 function testStorageSummaryManager() {
+  assert.deepEqual(StorageSummaryManager.getScreenLayout(1920).title, { y: 90, text: '브라우저 저장 관리', x: 960 });
   assert.equal(StorageSummaryManager.getPanelLayout().saved.panel.x, 575);
+  assert.equal(StorageSummaryManager.getPanelLayout().saved.title.text, '학습 저장 데이터');
   assert.equal(StorageSummaryManager.getPanelLayout().submissions.panel.strokeColor, 0xbbf7d0);
+  assert.equal(StorageSummaryManager.getPanelLayout().submissions.title.text, 'Mock 제출 로그');
   assert.deepEqual(StorageSummaryManager.getControlLayout(), {
     status: { x: 960, y: 835 },
-    clearSave: { x: 360, y: 930 },
-    clearLog: { x: 710, y: 930 },
-    clearAll: { x: 1050, y: 930 },
-    title: { x: 1370, y: 930 },
-    savedData: { x: 1640, y: 930 },
+    clearSave: { x: 360, y: 930, label: '학습 저장 삭제', backgroundColor: '#fecaca', textColor: '#7f1d1d' },
+    clearLog: { x: 710, y: 930, label: '제출 로그 삭제', backgroundColor: '#fed7aa', textColor: '#7c2d12' },
+    clearAll: { x: 1050, y: 930, label: '전체 초기화', backgroundColor: '#fca5a5', textColor: '#7f1d1d' },
+    title: { x: 1370, y: 930, label: '제목으로', backgroundColor: '#c4b5fd', textColor: '#1e1b4b', targetScene: 'TitleScene' },
+    savedData: { x: 1640, y: 930, label: '저장 확인', backgroundColor: '#bbf7d0', textColor: '#123524', targetScene: 'SavedDataScene' },
   });
   assert.equal(StorageSummaryManager.getBodyTextStyle().wordWrap.width, 640);
   assert.match(StorageSummaryManager.formatStatusText(), /개별 삭제/);
