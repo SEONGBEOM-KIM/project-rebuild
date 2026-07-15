@@ -450,20 +450,30 @@ function createPlacementRecord(buildingId, position = { x: 1, y: 1 }) {
 }
 
 function testEvaluationManager() {
+  assert.deepEqual(EvaluationManager.getResultScreenLayout(1920).title, {
+    x: 960,
+    y: 82,
+    text: '종합 결과',
+  });
+  assert.equal(EvaluationManager.getResultScreenLayout(1920).progressStep, 'result');
+  assert.equal(EvaluationManager.getResultPanelStyle().yOffset, 230);
+  assert.equal(EvaluationManager.getResidentReactionStyle().title, '주민 반응');
   const panels = EvaluationManager.getResultPanelLayout(960);
   assert.equal(panels.beforeAfter.title, '이전 → 현재');
   assert.equal(panels.trend.x, 1570);
   assert.deepEqual(EvaluationManager.getResultPanelTitlePosition(panels.evaluation), { x: 960, y: 270 });
   assert.deepEqual(EvaluationManager.getResultPanelBodyPosition(panels.evaluation), { x: 960, y: 340 });
   assert.equal(EvaluationManager.getResultPanelBodyStyle(panels.evaluation).wordWrap.width, 465);
-  assert.deepEqual(EvaluationManager.getResidentReactionLayout(960).title, { x: 170, y: 806 });
+  assert.deepEqual(EvaluationManager.getResidentReactionLayout(960).title, { x: 170, y: 806, text: '주민 반응' });
   assert.deepEqual(EvaluationManager.getResultControlLayout(960).sideEffect, {
     x: 960,
     y: 940,
     label: '부작용 검토',
     target: 'SideEffectScene',
     backgroundColor: '#bbf7d0',
+    textColor: '#1e1b4b',
   });
+  assert.equal(EvaluationManager.getResultControlLayout(960).restart.target, 'BootScene');
 
   const placedBuildings = [
     createPlacementRecord('youth_center'),
