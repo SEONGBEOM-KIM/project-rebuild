@@ -1,7 +1,7 @@
 const RESULT_SCREEN_LAYOUT = {
   backgroundColor: 0x1e1b4b,
   progressStep: 'result',
-  title: { y: 82, text: '종합 결과' },
+  title: { y: 82, text: '종합 결과', fontSize: '60px', color: '#ffffff', fontStyle: 'bold' },
   evaluationTitle: { y: 150 },
 };
 
@@ -21,6 +21,18 @@ const RESIDENT_REACTION_STYLE = {
   title: '주민 반응',
 };
 
+const RESULT_TEXT_STYLES = {
+  evaluationTitle: { fontSize: '30px', align: 'center', fontStyle: 'bold' },
+  residentTitle: { fontSize: '25px', color: '#fde68a', fontStyle: 'bold' },
+  residentBody: { fontSize: '23px', color: '#ffffff', lineSpacing: 6 },
+  panelTitle: { fontSize: '32px', color: '#312e81', fontStyle: 'bold' },
+};
+
+const RESULT_BUTTON_STYLE = {
+  fontSize: '30px',
+  padding: { x: 28, y: 17 },
+};
+
 export default class ResultViewManager {
   static getScreenLayout(width) {
     return {
@@ -37,6 +49,24 @@ export default class ResultViewManager {
 
   static getResidentReactionStyle() {
     return { ...RESIDENT_REACTION_STYLE };
+  }
+
+  static getEvaluationTitleTextStyle(color) {
+    return {
+      ...RESULT_TEXT_STYLES.evaluationTitle,
+      color,
+    };
+  }
+
+  static getResidentReactionTextStyles() {
+    return {
+      title: { ...RESULT_TEXT_STYLES.residentTitle },
+      body: { ...RESULT_TEXT_STYLES.residentBody },
+    };
+  }
+
+  static getPanelTitleTextStyle() {
+    return { ...RESULT_TEXT_STYLES.panelTitle };
   }
 
   static getPanelLayout(centerX) {
@@ -84,6 +114,13 @@ export default class ResultViewManager {
       retry: { x: centerX - 310, y: 940, label: '배치 더 하기', target: 'PlacementScene', backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
       sideEffect: { x: centerX, y: 940, label: '부작용 검토', target: 'SideEffectScene', backgroundColor: '#bbf7d0', textColor: '#1e1b4b' },
       restart: { x: centerX + 310, y: 940, label: '처음부터 다시', target: 'BootScene', backgroundColor: '#fde68a', textColor: '#1e1b4b' },
+    };
+  }
+
+  static getButtonStyle() {
+    return {
+      fontSize: RESULT_BUTTON_STYLE.fontSize,
+      padding: { ...RESULT_BUTTON_STYLE.padding },
     };
   }
 }

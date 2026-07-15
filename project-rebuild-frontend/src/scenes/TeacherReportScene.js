@@ -18,16 +18,9 @@ export default class TeacherReportScene extends Phaser.Scene {
     this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
     ProgressStepper.render(this, layout.progressStep);
 
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '60px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, layout.title).setOrigin(0.5);
 
-    this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, {
-      fontSize: '26px',
-      color: '#bfdbfe',
-    }).setOrigin(0.5);
+    this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, layout.subtitle).setOrigin(0.5);
 
     const panels = TeacherReportViewManager.getPanelLayout();
     this.drawPanel(panels.progress, TeacherReportManager.formatProgressReport(report));
@@ -38,25 +31,23 @@ export default class TeacherReportScene extends Phaser.Scene {
 
   drawPanel(panel, body) {
     const panelStyle = TeacherReportViewManager.getPanelStyle();
+    const textStyles = TeacherReportViewManager.getTextStyles();
     this.add.rectangle(panel.x, panel.y, panel.width, panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
       .setStrokeStyle(panelStyle.strokeWidth, panelStyle.strokeColor);
     const titlePosition = TeacherReportViewManager.getPanelTitlePosition(panel);
-    this.add.text(titlePosition.x, titlePosition.y, panel.title, {
-      fontSize: '34px',
-      color: '#172554',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    this.add.text(titlePosition.x, titlePosition.y, panel.title, textStyles.panelTitle).setOrigin(0.5);
     const bodyPosition = TeacherReportViewManager.getPanelBodyPosition(panel);
     this.add.text(bodyPosition.x, bodyPosition.y, body, TeacherReportViewManager.getPanelBodyStyle(panel));
   }
 
   drawControls() {
     const layout = TeacherReportViewManager.getControlLayout();
-    this.reportStatusText = this.add.text(layout.status.x, layout.status.y, TeacherReportManager.formatStatusText(), {
-      fontSize: '24px',
-      color: '#bfdbfe',
-      align: 'center',
-    }).setOrigin(0.5);
+    this.reportStatusText = this.add.text(
+      layout.status.x,
+      layout.status.y,
+      TeacherReportManager.formatStatusText(),
+      TeacherReportViewManager.getTextStyles().status,
+    ).setOrigin(0.5);
 
     const copyButton = this.createButton(layout.copy.x, layout.copy.y, layout.copy.label, layout.copy.backgroundColor, layout.copy.textColor);
     copyButton.on('pointerdown', () => this.copyReportToClipboard());
@@ -75,10 +66,10 @@ export default class TeacherReportScene extends Phaser.Scene {
     try {
       await navigator.clipboard.writeText(this.reportText);
       this.reportStatusText.setText(TeacherReportManager.formatCopySuccess());
-      this.reportStatusText.setColor('#bbf7d0');
+      this.reportStatusText.setColor(TeacherReportViewManager.getStatusColor('success'));
     } catch (_error) {
       this.reportStatusText.setText(TeacherReportManager.formatCopyFailure());
-      this.reportStatusText.setColor('#fecaca');
+      this.reportStatusText.setColor(TeacherReportViewManager.getStatusColor('failure'));
     }
   }
 
@@ -94,15 +85,14 @@ export default class TeacherReportScene extends Phaser.Scene {
     link.remove();
     URL.revokeObjectURL(url);
     this.reportStatusText.setText(TeacherReportManager.formatDownloadSuccess());
-    this.reportStatusText.setColor('#bbf7d0');
+    this.reportStatusText.setColor(TeacherReportViewManager.getStatusColor('success'));
   }
 
   createButton(x, y, label, backgroundColor, color) {
     return this.add.text(x, y, label, {
-      fontSize: '29px',
+      ...TeacherReportViewManager.getButtonStyle(),
       color,
       backgroundColor,
-      padding: { x: 34, y: 18 },
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
   }
 }

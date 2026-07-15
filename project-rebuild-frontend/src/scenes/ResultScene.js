@@ -20,18 +20,14 @@ export default class ResultScene extends Phaser.Scene {
 
     this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
     ProgressStepper.render(this, layout.progressStep);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '60px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, layout.title).setOrigin(0.5);
 
-    this.add.text(layout.evaluationTitle.x, layout.evaluationTitle.y, evaluation.title, {
-      fontSize: '30px',
-      color: evaluation.color,
-      align: 'center',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    this.add.text(
+      layout.evaluationTitle.x,
+      layout.evaluationTitle.y,
+      evaluation.title,
+      ResultViewManager.getEvaluationTitleTextStyle(evaluation.color),
+    ).setOrigin(0.5);
 
     const panels = ResultViewManager.getPanelLayout(width / 2);
     this.drawStatePanel(panels.beforeAfter, EvaluationManager.formatBeforeAfterRows(lastPlacementResult, gameState));
@@ -44,17 +40,12 @@ export default class ResultScene extends Phaser.Scene {
   drawResidentReactionStrip(centerX, rows) {
     const layout = ResultViewManager.getResidentReactionLayout(centerX);
     const reactionStyle = ResultViewManager.getResidentReactionStyle();
+    const textStyles = ResultViewManager.getResidentReactionTextStyles();
     this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, reactionStyle.fillColor, reactionStyle.fillAlpha)
       .setStrokeStyle(reactionStyle.strokeWidth, reactionStyle.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '25px',
-      color: '#fde68a',
-      fontStyle: 'bold',
-    });
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, textStyles.title);
     this.add.text(layout.body.x, layout.body.y, rows, {
-      fontSize: '23px',
-      color: '#ffffff',
-      lineSpacing: 6,
+      ...textStyles.body,
       wordWrap: { width: layout.body.wordWrapWidth },
     });
   }
@@ -69,10 +60,9 @@ export default class ResultScene extends Phaser.Scene {
 
   createButton(x, y, label, backgroundColor, color) {
     return this.add.text(x, y, label, {
-      fontSize: '30px',
+      ...ResultViewManager.getButtonStyle(),
       color,
       backgroundColor,
-      padding: { x: 28, y: 17 },
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
   }
 
@@ -81,11 +71,7 @@ export default class ResultScene extends Phaser.Scene {
     this.add.rectangle(panel.x, panel.y + panelStyle.yOffset, panel.width, panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
       .setStrokeStyle(panelStyle.strokeWidth, panelStyle.strokeColor);
     const titlePosition = ResultViewManager.getPanelTitlePosition(panel);
-    this.add.text(titlePosition.x, titlePosition.y, panel.title, {
-      fontSize: '32px',
-      color: '#312e81',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    this.add.text(titlePosition.x, titlePosition.y, panel.title, ResultViewManager.getPanelTitleTextStyle()).setOrigin(0.5);
     const bodyPosition = ResultViewManager.getPanelBodyPosition(panel);
     this.add.text(bodyPosition.x, bodyPosition.y, rows, ResultViewManager.getPanelBodyStyle(panel)).setOrigin(0.5, 0);
   }

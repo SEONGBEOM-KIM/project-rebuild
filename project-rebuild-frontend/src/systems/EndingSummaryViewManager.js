@@ -1,8 +1,8 @@
 const ENDING_SCREEN_LAYOUT = {
   backgroundColor: 0x0f172a,
   progressStep: 'ending',
-  title: { y: 78, text: '학습 마무리' },
-  subtitle: { y: 145, text: 'EP1 탐색부터 시설 배치까지의 학습 기록을 요약합니다.' },
+  title: { y: 78, text: '학습 마무리', fontSize: '62px', color: '#ffffff', fontStyle: 'bold' },
+  subtitle: { y: 145, text: 'EP1 탐색부터 시설 배치까지의 학습 기록을 요약합니다.', fontSize: '26px', color: '#bfdbfe' },
 };
 
 const ENDING_PANEL_STYLE = {
@@ -27,6 +27,18 @@ const ENDING_NEXT_MISSION_STYLE = {
   strokeColor: 0xbbf7d0,
 };
 
+const ENDING_TEXT_STYLES = {
+  panelTitle: { fontSize: '34px', color: '#172554', fontStyle: 'bold' },
+  learningRecordTitle: { fontSize: '28px', color: '#fde68a', fontStyle: 'bold' },
+  learningRecordBody: { fontSize: '22px', color: '#ffffff', lineSpacing: 9 },
+  nextMissionTitle: { fontSize: '32px', color: '#ffffff', fontStyle: 'bold' },
+};
+
+const ENDING_BUTTON_STYLE = {
+  fontSize: '29px',
+  padding: { x: 34, y: 18 },
+};
+
 export default class EndingSummaryViewManager {
   static getScreenLayout(width) {
     return {
@@ -47,6 +59,22 @@ export default class EndingSummaryViewManager {
 
   static getNextMissionStyle() {
     return { ...ENDING_NEXT_MISSION_STYLE };
+  }
+
+  static getTextStyles() {
+    return {
+      panelTitle: { ...ENDING_TEXT_STYLES.panelTitle },
+      learningRecordTitle: { ...ENDING_TEXT_STYLES.learningRecordTitle },
+      learningRecordBody: { ...ENDING_TEXT_STYLES.learningRecordBody },
+      nextMissionTitle: { ...ENDING_TEXT_STYLES.nextMissionTitle },
+    };
+  }
+
+  static getButtonStyle() {
+    return {
+      fontSize: ENDING_BUTTON_STYLE.fontSize,
+      padding: { ...ENDING_BUTTON_STYLE.padding },
+    };
   }
 
   static getPanelLayout() {

@@ -680,6 +680,9 @@ function testResultViewManager() {
     x: 960,
     y: 82,
     text: '종합 결과',
+    fontSize: '60px',
+    color: '#ffffff',
+    fontStyle: 'bold',
   });
   assert.equal(ResultViewManager.getScreenLayout(1920).progressStep, 'result');
   assert.equal(ResultViewManager.getPanelStyle().yOffset, 230);
@@ -690,6 +693,18 @@ function testResultViewManager() {
   assert.deepEqual(ResultViewManager.getPanelTitlePosition(panels.evaluation), { x: 960, y: 270 });
   assert.deepEqual(ResultViewManager.getPanelBodyPosition(panels.evaluation), { x: 960, y: 340 });
   assert.equal(ResultViewManager.getPanelBodyStyle(panels.evaluation).wordWrap.width, 465);
+  assert.deepEqual(ResultViewManager.getEvaluationTitleTextStyle('#22c55e'), {
+    fontSize: '30px',
+    align: 'center',
+    fontStyle: 'bold',
+    color: '#22c55e',
+  });
+  assert.equal(ResultViewManager.getResidentReactionTextStyles().body.lineSpacing, 6);
+  assert.equal(ResultViewManager.getPanelTitleTextStyle().color, '#312e81');
+  assert.deepEqual(ResultViewManager.getButtonStyle(), {
+    fontSize: '30px',
+    padding: { x: 28, y: 17 },
+  });
   assert.deepEqual(ResultViewManager.getResidentReactionLayout(960).title, { x: 170, y: 806, text: '주민 반응' });
   assert.deepEqual(ResultViewManager.getControlLayout(960).sideEffect, {
     x: 960,
@@ -1098,6 +1113,9 @@ function testEndingSummaryViewManager() {
     x: 960,
     y: 78,
     text: '학습 마무리',
+    fontSize: '62px',
+    color: '#ffffff',
+    fontStyle: 'bold',
   });
   assert.equal(EndingSummaryViewManager.getScreenLayout(1920).progressStep, 'ending');
   assert.equal(EndingSummaryViewManager.getPanelStyle().strokeColor, 0x60a5fa);
@@ -1110,6 +1128,11 @@ function testEndingSummaryViewManager() {
   assert.deepEqual(EndingSummaryViewManager.getPanelBodyPosition(panels.choice), { x: 175, y: 255 });
   assert.equal(EndingSummaryViewManager.getPanelBodyStyle(panels.choice).wordWrap.width, 510);
   assert.equal(EndingSummaryViewManager.getNextMissionBodyStyle(panels.nextMission).wordWrap.width, 296);
+  assert.equal(EndingSummaryViewManager.getTextStyles().learningRecordBody.lineSpacing, 9);
+  assert.deepEqual(EndingSummaryViewManager.getButtonStyle(), {
+    fontSize: '29px',
+    padding: { x: 34, y: 18 },
+  });
   assert.deepEqual(EndingSummaryViewManager.getLearningRecordLayout(960).title, { x: 170, y: 737, text: '학습 기록' });
   assert.deepEqual(EndingSummaryViewManager.getControlLayout(960).restart, {
     x: 1480,
@@ -1166,6 +1189,9 @@ function testTeacherReportViewManager() {
     x: 960,
     y: 78,
     text: '교사용 요약',
+    fontSize: '60px',
+    color: '#ffffff',
+    fontStyle: 'bold',
   });
   assert.equal(TeacherReportViewManager.getScreenLayout(1920).progressStep, 'ending');
   assert.equal(TeacherReportViewManager.getPanelStyle().strokeColor, 0x60a5fa);
@@ -1175,6 +1201,14 @@ function testTeacherReportViewManager() {
   assert.deepEqual(TeacherReportViewManager.getPanelTitlePosition(panels.progress), { x: 400, y: 214 });
   assert.deepEqual(TeacherReportViewManager.getPanelBodyPosition(panels.progress), { x: 148, y: 270 });
   assert.equal(TeacherReportViewManager.getPanelBodyStyle(panels.progress).wordWrap.width, 504);
+  assert.equal(TeacherReportViewManager.getTextStyles().panelTitle.color, '#172554');
+  assert.equal(TeacherReportViewManager.getStatusColor('success'), '#bbf7d0');
+  assert.equal(TeacherReportViewManager.getStatusColor('failure'), '#fecaca');
+  assert.equal(TeacherReportViewManager.getStatusColor('unknown'), '#bfdbfe');
+  assert.deepEqual(TeacherReportViewManager.getButtonStyle(), {
+    fontSize: '29px',
+    padding: { x: 34, y: 18 },
+  });
   assert.deepEqual(TeacherReportViewManager.getControlLayout().data, {
     x: 1490,
     y: 940,

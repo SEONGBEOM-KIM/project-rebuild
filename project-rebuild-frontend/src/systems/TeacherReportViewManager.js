@@ -1,8 +1,8 @@
 const TEACHER_REPORT_SCREEN_LAYOUT = {
   backgroundColor: 0x0b1727,
   progressStep: 'ending',
-  title: { y: 78, text: '교사용 요약' },
-  subtitle: { y: 145, text: '수업 중 학생 활동을 빠르게 확인하기 위한 임시 리포트 화면입니다.' },
+  title: { y: 78, text: '교사용 요약', fontSize: '60px', color: '#ffffff', fontStyle: 'bold' },
+  subtitle: { y: 145, text: '수업 중 학생 활동을 빠르게 확인하기 위한 임시 리포트 화면입니다.', fontSize: '26px', color: '#bfdbfe' },
 };
 
 const TEACHER_REPORT_PANEL_STYLE = {
@@ -10,6 +10,21 @@ const TEACHER_REPORT_PANEL_STYLE = {
   fillAlpha: 0.96,
   strokeWidth: 4,
   strokeColor: 0x60a5fa,
+};
+
+const TEACHER_REPORT_TEXT_STYLES = {
+  panelTitle: { fontSize: '34px', color: '#172554', fontStyle: 'bold' },
+  status: { fontSize: '24px', color: '#bfdbfe', align: 'center' },
+};
+
+const TEACHER_REPORT_STATUS_COLORS = {
+  success: '#bbf7d0',
+  failure: '#fecaca',
+};
+
+const TEACHER_REPORT_BUTTON_STYLE = {
+  fontSize: '29px',
+  padding: { x: 34, y: 18 },
 };
 
 export default class TeacherReportViewManager {
@@ -24,6 +39,24 @@ export default class TeacherReportViewManager {
 
   static getPanelStyle() {
     return { ...TEACHER_REPORT_PANEL_STYLE };
+  }
+
+  static getTextStyles() {
+    return {
+      panelTitle: { ...TEACHER_REPORT_TEXT_STYLES.panelTitle },
+      status: { ...TEACHER_REPORT_TEXT_STYLES.status },
+    };
+  }
+
+  static getStatusColor(state) {
+    return TEACHER_REPORT_STATUS_COLORS[state] ?? TEACHER_REPORT_TEXT_STYLES.status.color;
+  }
+
+  static getButtonStyle() {
+    return {
+      fontSize: TEACHER_REPORT_BUTTON_STYLE.fontSize,
+      padding: { ...TEACHER_REPORT_BUTTON_STYLE.padding },
+    };
   }
 
   static getPanelLayout() {

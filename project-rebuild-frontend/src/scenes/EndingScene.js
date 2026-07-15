@@ -25,16 +25,9 @@ export default class EndingScene extends Phaser.Scene {
 
     this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
     ProgressStepper.render(this, layout.progressStep);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '62px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, layout.title).setOrigin(0.5);
 
-    this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, {
-      fontSize: '26px',
-      color: '#bfdbfe',
-    }).setOrigin(0.5);
+    this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, layout.subtitle).setOrigin(0.5);
 
     const panels = EndingSummaryViewManager.getPanelLayout();
     this.drawPanel(panels.choice, EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings));
@@ -46,14 +39,11 @@ export default class EndingScene extends Phaser.Scene {
 
   drawPanel(panel, body) {
     const panelStyle = EndingSummaryViewManager.getPanelStyle();
+    const textStyles = EndingSummaryViewManager.getTextStyles();
     this.add.rectangle(panel.x, panel.y, panel.width, panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
       .setStrokeStyle(panelStyle.strokeWidth, panelStyle.strokeColor);
     const titlePosition = EndingSummaryViewManager.getPanelTitlePosition(panel);
-    this.add.text(titlePosition.x, titlePosition.y, panel.title, {
-      fontSize: '34px',
-      color: '#172554',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    this.add.text(titlePosition.x, titlePosition.y, panel.title, textStyles.panelTitle).setOrigin(0.5);
     const bodyPosition = EndingSummaryViewManager.getPanelBodyPosition(panel);
     this.add.text(bodyPosition.x, bodyPosition.y, body, EndingSummaryViewManager.getPanelBodyStyle(panel));
   }
@@ -61,34 +51,26 @@ export default class EndingScene extends Phaser.Scene {
   drawLearningRecordStrip(centerX, learningProgress, exploredPlaces, quizResult, reflectionChoice) {
     const layout = EndingSummaryViewManager.getLearningRecordLayout(centerX);
     const recordStyle = EndingSummaryViewManager.getLearningRecordStyle();
+    const textStyles = EndingSummaryViewManager.getTextStyles();
     this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, recordStyle.fillColor, recordStyle.fillAlpha)
       .setStrokeStyle(recordStyle.strokeWidth, recordStyle.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '28px',
-      color: '#fde68a',
-      fontStyle: 'bold',
-    });
+    this.add.text(layout.title.x, layout.title.y, layout.title.text, textStyles.learningRecordTitle);
 
     const rows = EndingSummaryManager.formatLearningRecordRows(learningProgress, exploredPlaces, quizResult, reflectionChoice);
 
     this.add.text(layout.body.x, layout.body.y, rows.join('\n'), {
-      fontSize: '22px',
-      color: '#ffffff',
-      lineSpacing: 9,
+      ...textStyles.learningRecordBody,
       wordWrap: { width: layout.body.wordWrapWidth },
     });
   }
 
   drawNextMissionPanel(panel) {
     const panelStyle = EndingSummaryViewManager.getNextMissionStyle();
+    const textStyles = EndingSummaryViewManager.getTextStyles();
     this.add.rectangle(panel.x, panel.y, panel.width, panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
       .setStrokeStyle(panelStyle.strokeWidth, panelStyle.strokeColor);
     const titlePosition = EndingSummaryViewManager.getPanelTitlePosition(panel);
-    this.add.text(titlePosition.x, titlePosition.y, panel.title, {
-      fontSize: '32px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    this.add.text(titlePosition.x, titlePosition.y, panel.title, textStyles.nextMissionTitle).setOrigin(0.5);
 
     const bodyPosition = EndingSummaryViewManager.getPanelBodyPosition(panel, 32, 108);
     this.add.text(bodyPosition.x, bodyPosition.y, EP1_NEXT_DEVELOPMENT_GOALS.join('\n'), EndingSummaryViewManager.getNextMissionBodyStyle(panel));
@@ -104,10 +86,9 @@ export default class EndingScene extends Phaser.Scene {
 
   createButton(x, y, label, backgroundColor, color) {
     return this.add.text(x, y, label, {
-      fontSize: '29px',
+      ...EndingSummaryViewManager.getButtonStyle(),
       color,
       backgroundColor,
-      padding: { x: 34, y: 18 },
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
   }
 
