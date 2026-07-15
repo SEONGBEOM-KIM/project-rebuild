@@ -16,14 +16,14 @@ export default class ApiContractScene extends Phaser.Scene {
     ProgressStepper.render(this, screenLayout.progressStep);
 
     this.add.text(screenLayout.title.x, screenLayout.title.y, screenLayout.title.text, {
-      fontSize: '60px',
-      color: '#ffffff',
-      fontStyle: 'bold',
+      fontSize: screenLayout.title.fontSize,
+      color: screenLayout.title.color,
+      fontStyle: screenLayout.title.fontStyle,
     }).setOrigin(0.5);
 
     this.add.text(screenLayout.subtitle.x, screenLayout.subtitle.y, screenLayout.subtitle.text, {
-      fontSize: '25px',
-      color: '#bfdbfe',
+      fontSize: screenLayout.subtitle.fontSize,
+      color: screenLayout.subtitle.color,
     }).setOrigin(0.5);
 
     const panels = ApiContractViewManager.getPanelLayout();
@@ -34,12 +34,14 @@ export default class ApiContractScene extends Phaser.Scene {
   }
 
   drawPanel(panel, body) {
-    this.add.rectangle(panel.x, panel.y, panel.width, panel.height, 0x111827, 0.98).setStrokeStyle(5, 0x60a5fa);
+    const panelStyle = ApiContractViewManager.getPanelStyle();
+    this.add.rectangle(panel.x, panel.y, panel.width, panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
+      .setStrokeStyle(panelStyle.strokeWidth, panelStyle.strokeColor);
     const titlePosition = ApiContractViewManager.getPanelTitlePosition(panel);
     this.add.text(titlePosition.x, titlePosition.y, panel.title, {
-      fontSize: '30px',
-      color: '#ffffff',
-      fontStyle: 'bold',
+      fontSize: panelStyle.titleFontSize,
+      color: panelStyle.titleColor,
+      fontStyle: panelStyle.titleFontStyle,
     });
     const bodyPosition = ApiContractViewManager.getPanelBodyPosition(panel);
     this.add.text(bodyPosition.x, bodyPosition.y, body, ApiContractViewManager.getPanelBodyStyle(panel));
@@ -47,15 +49,17 @@ export default class ApiContractScene extends Phaser.Scene {
 
   drawNotes() {
     const layout = ApiContractViewManager.getNotesLayout();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, 0x1e293b, 0.98).setStrokeStyle(3, layout.panel.strokeColor);
+    const noteStyle = ApiContractViewManager.getNoteStyle();
+    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, noteStyle.fillColor, noteStyle.fillAlpha)
+      .setStrokeStyle(noteStyle.strokeWidth, layout.panel.strokeColor);
     this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: '23px',
-      color: '#fde68a',
-      fontStyle: 'bold',
+      fontSize: noteStyle.titleFontSize,
+      color: noteStyle.titleColor,
+      fontStyle: noteStyle.titleFontStyle,
     });
     this.add.text(layout.body.x, layout.body.y, ApiContractViewManager.formatBackendNote(), {
-      fontSize: '22px',
-      color: '#ffffff',
+      fontSize: noteStyle.bodyFontSize,
+      color: noteStyle.bodyColor,
       wordWrap: { width: layout.body.width },
     });
   }
@@ -73,11 +77,12 @@ export default class ApiContractScene extends Phaser.Scene {
   }
 
   createButton(x, y, label, backgroundColor, color) {
+    const buttonStyle = ApiContractViewManager.getButtonStyle();
     return this.add.text(x, y, label, {
-      fontSize: '29px',
+      fontSize: buttonStyle.fontSize,
       color,
       backgroundColor,
-      padding: { x: 28, y: 16 },
+      padding: buttonStyle.padding,
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
   }
 }

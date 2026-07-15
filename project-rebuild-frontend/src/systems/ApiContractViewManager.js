@@ -1,8 +1,34 @@
 export const API_CONTRACT_SCREEN_LAYOUT = {
   backgroundColor: 0x0f172a,
   progressStep: 'ending',
-  title: { y: 78, text: 'API 계약 보기' },
-  subtitle: { y: 145, text: 'Django REST Framework 연동 시 사용할 저장 endpoint와 요청/응답 구조 초안입니다.' },
+  title: { y: 78, text: 'API 계약 보기', fontSize: '60px', color: '#ffffff', fontStyle: 'bold' },
+  subtitle: { y: 145, text: 'Django REST Framework 연동 시 사용할 저장 endpoint와 요청/응답 구조 초안입니다.', fontSize: '25px', color: '#bfdbfe' },
+};
+
+const API_CONTRACT_PANEL_STYLE = {
+  fillColor: 0x111827,
+  fillAlpha: 0.98,
+  strokeWidth: 5,
+  strokeColor: 0x60a5fa,
+  titleFontSize: '30px',
+  titleColor: '#ffffff',
+  titleFontStyle: 'bold',
+};
+
+const API_CONTRACT_NOTE_STYLE = {
+  fillColor: 0x1e293b,
+  fillAlpha: 0.98,
+  strokeWidth: 3,
+  titleFontSize: '23px',
+  titleColor: '#fde68a',
+  titleFontStyle: 'bold',
+  bodyFontSize: '22px',
+  bodyColor: '#ffffff',
+};
+
+const API_CONTRACT_BUTTON_STYLE = {
+  fontSize: '29px',
+  padding: { x: 28, y: 16 },
 };
 
 export default class ApiContractViewManager {
@@ -13,6 +39,18 @@ export default class ApiContractViewManager {
       title: { ...API_CONTRACT_SCREEN_LAYOUT.title, x: width / 2 },
       subtitle: { ...API_CONTRACT_SCREEN_LAYOUT.subtitle, x: width / 2 },
     };
+  }
+
+  static getPanelStyle() {
+    return { ...API_CONTRACT_PANEL_STYLE };
+  }
+
+  static getNoteStyle() {
+    return { ...API_CONTRACT_NOTE_STYLE };
+  }
+
+  static getButtonStyle() {
+    return { ...API_CONTRACT_BUTTON_STYLE, padding: { ...API_CONTRACT_BUTTON_STYLE.padding } };
   }
 
   static getPanelLayout() {

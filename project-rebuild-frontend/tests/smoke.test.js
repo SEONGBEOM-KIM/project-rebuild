@@ -509,8 +509,19 @@ function testStoryViewManager() {
 }
 
 function testApiContractViewManager() {
-  assert.deepEqual(ApiContractViewManager.getScreenLayout(1920).title, { y: 78, text: 'API 계약 보기', x: 960 });
+  assert.deepEqual(ApiContractViewManager.getScreenLayout(1920).title, {
+    y: 78,
+    text: 'API 계약 보기',
+    fontSize: '60px',
+    color: '#ffffff',
+    fontStyle: 'bold',
+    x: 960,
+  });
   assert.equal(ApiContractViewManager.getScreenLayout(1920).progressStep, 'ending');
+  assert.equal(ApiContractViewManager.getScreenLayout(1920).title.fontSize, '60px');
+  assert.equal(ApiContractViewManager.getPanelStyle().strokeWidth, 5);
+  assert.equal(ApiContractViewManager.getNoteStyle().bodyFontSize, '22px');
+  assert.deepEqual(ApiContractViewManager.getButtonStyle().padding, { x: 28, y: 16 });
   const panels = ApiContractViewManager.getPanelLayout();
   assert.equal(panels.request.title, '요청 Body 초안');
   assert.equal(panels.response.width, 620);
