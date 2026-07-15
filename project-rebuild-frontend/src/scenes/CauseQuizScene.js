@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import CauseQuizManager from '../systems/CauseQuizManager.js';
+import CauseQuizViewManager from '../systems/CauseQuizViewManager.js';
 
 import { EP1_CAUSE_QUESTION, EP1_EXPLORATION_CLUES } from '../data/episodeContent.js';
 
@@ -15,7 +16,7 @@ export default class CauseQuizScene extends Phaser.Scene {
     this.selectedChoice = null;
     this.choiceObjects = new Map();
 
-    const layout = CauseQuizManager.getScreenLayout(width);
+    const layout = CauseQuizViewManager.getScreenLayout(width);
 
     this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
     ProgressStepper.render(this, layout.progressStep);
@@ -37,7 +38,7 @@ export default class CauseQuizScene extends Phaser.Scene {
 
   drawExplorationSummary() {
     const exploredCount = (this.registry.get('exploredPlaces') ?? []).length;
-    const layout = CauseQuizManager.getExplorationSummaryLayout();
+    const layout = CauseQuizViewManager.getExplorationSummaryLayout();
     this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
       .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
     this.add.text(layout.title.x, layout.title.y, layout.title.text, {
@@ -57,7 +58,7 @@ export default class CauseQuizScene extends Phaser.Scene {
   }
 
   drawQuestionPanel() {
-    const layout = CauseQuizManager.getQuestionLayout();
+    const layout = CauseQuizViewManager.getQuestionLayout();
     this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
       .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
     this.add.text(layout.prompt.x, layout.prompt.y, EP1_CAUSE_QUESTION.prompt, {
@@ -81,7 +82,7 @@ export default class CauseQuizScene extends Phaser.Scene {
   }
 
   createChoice(choice, index, number) {
-    const layout = CauseQuizManager.getChoiceLayout(index);
+    const layout = CauseQuizViewManager.getChoiceLayout(index);
     const background = this.add.rectangle(layout.background.x, layout.background.y, layout.background.width, layout.background.height, layout.background.fillColor, layout.background.fillAlpha)
       .setStrokeStyle(layout.background.strokeWidth, layout.background.strokeColor)
       .setInteractive({ useHandCursor: true });
@@ -98,7 +99,7 @@ export default class CauseQuizScene extends Phaser.Scene {
   }
 
   drawControls() {
-    const layout = CauseQuizManager.getControlLayout();
+    const layout = CauseQuizViewManager.getControlLayout();
     const backButton = this.createButton(layout.back.x, layout.back.y, layout.back.label, layout.back.backgroundColor, layout.back.textColor);
     backButton.on('pointerdown', () => this.scene.start(layout.back.target));
 
@@ -120,12 +121,12 @@ export default class CauseQuizScene extends Phaser.Scene {
     LearningProgress.update(this.registry, { quizResult });
 
     for (const [choiceId, objects] of this.choiceObjects.entries()) {
-      const style = CauseQuizManager.getChoiceVisualStyle(choiceId, choice, EP1_CAUSE_QUESTION);
+      const style = CauseQuizViewManager.getChoiceVisualStyle(choiceId, choice, EP1_CAUSE_QUESTION);
       objects.background.setFillStyle(style.fillColor, style.fillAlpha);
       objects.background.setStrokeStyle(style.strokeWidth, style.strokeColor);
     }
 
-    const layout = CauseQuizManager.getControlLayout();
+    const layout = CauseQuizViewManager.getControlLayout();
     this.feedbackText.setText(CauseQuizManager.formatFeedback(choice));
     this.feedbackText.setColor(CauseQuizManager.getFeedbackColor(choice));
     this.nextButton.setText(layout.nextEnabled.label);
