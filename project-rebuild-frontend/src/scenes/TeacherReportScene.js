@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import TeacherReportManager from '../systems/TeacherReportManager.js';
+import TeacherReportViewManager from '../systems/TeacherReportViewManager.js';
 
 export default class TeacherReportScene extends Phaser.Scene {
   constructor() {
@@ -12,7 +13,7 @@ export default class TeacherReportScene extends Phaser.Scene {
     const report = TeacherReportManager.build(this.registry);
     this.reportText = TeacherReportManager.buildReportText(report);
 
-    const layout = TeacherReportManager.getScreenLayout(width);
+    const layout = TeacherReportViewManager.getScreenLayout(width);
 
     this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
     ProgressStepper.render(this, layout.progressStep);
@@ -28,7 +29,7 @@ export default class TeacherReportScene extends Phaser.Scene {
       color: '#bfdbfe',
     }).setOrigin(0.5);
 
-    const panels = TeacherReportManager.getPanelLayout();
+    const panels = TeacherReportViewManager.getPanelLayout();
     this.drawPanel(panels.progress, TeacherReportManager.formatProgressReport(report));
     this.drawPanel(panels.choice, TeacherReportManager.formatChoiceReport(report));
     this.drawPanel(panels.teaching, TeacherReportManager.formatTeachingPointReport(report));
@@ -36,21 +37,21 @@ export default class TeacherReportScene extends Phaser.Scene {
   }
 
   drawPanel(panel, body) {
-    const panelStyle = TeacherReportManager.getPanelStyle();
+    const panelStyle = TeacherReportViewManager.getPanelStyle();
     this.add.rectangle(panel.x, panel.y, panel.width, panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
       .setStrokeStyle(panelStyle.strokeWidth, panelStyle.strokeColor);
-    const titlePosition = TeacherReportManager.getPanelTitlePosition(panel);
+    const titlePosition = TeacherReportViewManager.getPanelTitlePosition(panel);
     this.add.text(titlePosition.x, titlePosition.y, panel.title, {
       fontSize: '34px',
       color: '#172554',
       fontStyle: 'bold',
     }).setOrigin(0.5);
-    const bodyPosition = TeacherReportManager.getPanelBodyPosition(panel);
-    this.add.text(bodyPosition.x, bodyPosition.y, body, TeacherReportManager.getPanelBodyStyle(panel));
+    const bodyPosition = TeacherReportViewManager.getPanelBodyPosition(panel);
+    this.add.text(bodyPosition.x, bodyPosition.y, body, TeacherReportViewManager.getPanelBodyStyle(panel));
   }
 
   drawControls() {
-    const layout = TeacherReportManager.getControlLayout();
+    const layout = TeacherReportViewManager.getControlLayout();
     this.reportStatusText = this.add.text(layout.status.x, layout.status.y, TeacherReportManager.formatStatusText(), {
       fontSize: '24px',
       color: '#bfdbfe',

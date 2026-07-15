@@ -24,6 +24,7 @@ import ApiContractViewManager from '../src/systems/ApiContractViewManager.js';
 import LearningDataManager from '../src/systems/LearningDataManager.js';
 import LearningDataViewManager from '../src/systems/LearningDataViewManager.js';
 import TeacherReportManager from '../src/systems/TeacherReportManager.js';
+import TeacherReportViewManager from '../src/systems/TeacherReportViewManager.js';
 import LearningDataRestoreManager from '../src/systems/LearningDataRestoreManager.js';
 import LearningApiPayloadManager from '../src/systems/LearningApiPayloadManager.js';
 import ApiPayloadViewManager from '../src/systems/ApiPayloadViewManager.js';
@@ -1064,22 +1065,21 @@ function testEndingSummaryManager() {
   assert.match(rows[3], /생각 정리: 예산 균형 보완/);
 }
 
-function testTeacherReportManager() {
-  assert.deepEqual(TeacherReportManager.getScreenLayout(1920).title, {
+function testTeacherReportViewManager() {
+  assert.deepEqual(TeacherReportViewManager.getScreenLayout(1920).title, {
     x: 960,
     y: 78,
     text: '교사용 요약',
   });
-  assert.equal(TeacherReportManager.getScreenLayout(1920).progressStep, 'ending');
-  assert.equal(TeacherReportManager.getPanelStyle().strokeColor, 0x60a5fa);
-  assert.equal(TeacherReportManager.getDownloadConfig().mimeType, 'text/plain;charset=utf-8');
-  const panels = TeacherReportManager.getPanelLayout();
+  assert.equal(TeacherReportViewManager.getScreenLayout(1920).progressStep, 'ending');
+  assert.equal(TeacherReportViewManager.getPanelStyle().strokeColor, 0x60a5fa);
+  const panels = TeacherReportViewManager.getPanelLayout();
   assert.equal(panels.progress.title, '학습 진행');
   assert.equal(panels.teaching.width, 420);
-  assert.deepEqual(TeacherReportManager.getPanelTitlePosition(panels.progress), { x: 400, y: 214 });
-  assert.deepEqual(TeacherReportManager.getPanelBodyPosition(panels.progress), { x: 148, y: 270 });
-  assert.equal(TeacherReportManager.getPanelBodyStyle(panels.progress).wordWrap.width, 504);
-  assert.deepEqual(TeacherReportManager.getControlLayout().data, {
+  assert.deepEqual(TeacherReportViewManager.getPanelTitlePosition(panels.progress), { x: 400, y: 214 });
+  assert.deepEqual(TeacherReportViewManager.getPanelBodyPosition(panels.progress), { x: 148, y: 270 });
+  assert.equal(TeacherReportViewManager.getPanelBodyStyle(panels.progress).wordWrap.width, 504);
+  assert.deepEqual(TeacherReportViewManager.getControlLayout().data, {
     x: 1490,
     y: 940,
     label: '학습 데이터 보기',
@@ -1087,8 +1087,12 @@ function testTeacherReportManager() {
     backgroundColor: '#bbf7d0',
     textColor: '#123524',
   });
-  assert.equal(TeacherReportManager.getControlLayout().copy.backgroundColor, '#93c5fd');
-  assert.equal(TeacherReportManager.getControlLayout().ending.textColor, '#1e1b4b');
+  assert.equal(TeacherReportViewManager.getControlLayout().copy.backgroundColor, '#93c5fd');
+  assert.equal(TeacherReportViewManager.getControlLayout().ending.textColor, '#1e1b4b');
+}
+
+function testTeacherReportManager() {
+  assert.equal(TeacherReportManager.getDownloadConfig().mimeType, 'text/plain;charset=utf-8');
   assert.match(TeacherReportManager.formatStatusText(), /텍스트 파일/);
   assert.match(TeacherReportManager.formatCopySuccess(), /클립보드/);
   assert.match(TeacherReportManager.formatCopyFailure(), /권한/);
@@ -1658,6 +1662,7 @@ function run() {
   testPlacementViewManager();
   testPlacementRules();
   testEndingSummaryManager();
+  testTeacherReportViewManager();
   testTeacherReportManager();
   testLearningDataViewManager();
   testLearningDataManager();
