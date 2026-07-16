@@ -39,6 +39,7 @@ import PlacementResultManager from '../src/systems/PlacementResultManager.js';
 import PlacementUiStateManager from '../src/systems/PlacementUiStateManager.js';
 import PlacementSceneObjectRegistry from '../src/systems/PlacementSceneObjectRegistry.js';
 import PlacementInputController from '../src/systems/PlacementInputController.js';
+import PlacementWorldRenderer from '../src/systems/PlacementWorldRenderer.js';
 import SaveManager, { LEARNING_SAVE_STORAGE_KEY } from '../src/systems/SaveManager.js';
 import SavedDataViewManager from '../src/systems/SavedDataViewManager.js';
 import StorageSummaryManager from '../src/systems/StorageSummaryManager.js';
@@ -1180,6 +1181,127 @@ function testPlacementMapGeometry() {
 }
 
 
+function createWorldDisplayObjectSpy(type, args = []) {
+  return {
+    type,
+    args,
+    depth: null,
+    origin: null,
+    scale: null,
+    alpha: null,
+    children: [],
+    calls: [],
+    setDepth(value) {
+      this.depth = value;
+      this.calls.push(['setDepth', value]);
+      return this;
+    },
+    setOrigin(value) {
+      this.origin = value;
+      this.calls.push(['setOrigin', value]);
+      return this;
+    },
+    setStrokeStyle(...strokeArgs) {
+      this.stroke = strokeArgs;
+      this.calls.push(['setStrokeStyle', ...strokeArgs]);
+      return this;
+    },
+    fillStyle(...fillArgs) {
+      this.calls.push(['fillStyle', ...fillArgs]);
+      return this;
+    },
+    fillRoundedRect(...rectArgs) {
+      this.calls.push(['fillRoundedRect', ...rectArgs]);
+      return this;
+    },
+    setScale(value) {
+      this.scale = value;
+      this.calls.push(['setScale', value]);
+      return this;
+    },
+    setAlpha(value) {
+      this.alpha = value;
+      this.calls.push(['setAlpha', value]);
+      return this;
+    },
+    add(children) {
+      this.children.push(...children);
+      this.calls.push(['add', children.length]);
+      return this;
+    },
+  };
+}
+
+function createPlacementWorldRendererFixture() {
+  const registered = [];
+  const mapDrawCalls = [];
+  const labelAdds = [];
+  const placements = [];
+  const tweenCalls = [];
+  const scene = {
+    add: {
+      graphics: () => createWorldDisplayObjectSpy('graphics'),
+      text: (...args) => createWorldDisplayObjectSpy('text', args),
+      container: (...args) => createWorldDisplayObjectSpy('container', args),
+      circle: (...args) => createWorldDisplayObjectSpy('circle', args),
+      rectangle: (...args) => createWorldDisplayObjectSpy('rectangle', args),
+    },
+    tweens: {
+      add: (config) => tweenCalls.push(config),
+    },
+  };
+  const geometry = new PlacementMapGeometry({
+    origin: { x: 100, y: 100 },
+    tileWidth: mapData.tileWidth,
+    tileHeight: mapData.tileHeight,
+    mapWidth: mapData.width,
+    mapHeight: mapData.height,
+  });
+  const mapRenderer = {
+    drawTiles: (...args) => mapDrawCalls.push(args),
+  };
+  const objectRegistry = {
+    registerWorldObject: (object) => {
+      registered.push(object);
+      return object;
+    },
+  };
+  const placementSystem = {
+    place: (...args) => placements.push(args),
+    getFootprintTiles: (x, y, footprint) => [{ x, y }, { x: x + footprint.width - 1, y: y + footprint.height - 1 }],
+  };
+  const mapLabels = {
+    add: (label) => labelAdds.push(label),
+  };
+  const renderer = new PlacementWorldRenderer({ scene, geometry, mapRenderer, objectRegistry, placementSystem, mapLabels });
+  return { renderer, registered, mapDrawCalls, labelAdds, placements, tweenCalls };
+}
+
+function testPlacementWorldRenderer() {
+  const fixture = createPlacementWorldRendererFixture();
+  const youthCenter = buildings.find((building) => building.id === 'youth_center');
+
+  const placed = fixture.renderer.drawPlacedBuilding(youthCenter, 2, 7);
+  assert.equal(placed.graphics.type, 'graphics');
+  assert.equal(placed.label.type, 'text');
+  assert.equal(placed.label.args[2], '청년센터');
+  assert.equal(fixture.mapDrawCalls.length, 1);
+  assert.deepEqual(fixture.mapDrawCalls[0][1], [{ x: 2, y: 7 }, { x: 3, y: 8 }]);
+  assert.equal(fixture.labelAdds[0], placed.label);
+  assert.ok(placed.graphics.calls.some((call) => call[0] === 'fillRoundedRect'), 'building label background should be drawn');
+
+  const marker = fixture.renderer.drawImpactMarkers(youthCenter, 2, 7, true);
+  assert.equal(marker.markerContainer.type, 'container');
+  assert.equal(marker.markerContainer.children.length, 4);
+  assert.equal(fixture.tweenCalls.length, 1);
+  assert.equal(fixture.tweenCalls[0].targets, marker.markerContainer);
+  assert.equal(fixture.tweenCalls[0].scale, 1);
+
+  fixture.renderer.restorePlacedBuildings([{ building: youthCenter, position: { x: 4, y: 5 } }]);
+  assert.deepEqual(fixture.placements[0], [4, 5, youthCenter]);
+}
+
+
 function testPlacementMapRenderer() {
   const geometry = new PlacementMapGeometry({
     origin: PlacementViewManager.getScreenLayout().mapOrigin,
@@ -2314,6 +2436,7 @@ async function run() {
   testPlacementInputController();
   testPlacementMapGeometry();
   testPlacementMapRenderer();
+  testPlacementWorldRenderer();
   testPlacementViewManager();
   testPlacementResultManager();
   testPlacementRules();

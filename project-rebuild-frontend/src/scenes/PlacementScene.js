@@ -11,6 +11,7 @@ import PlacementResultManager from '../systems/PlacementResultManager.js';
 import PlacementUiStateManager from '../systems/PlacementUiStateManager.js';
 import PlacementSceneObjectRegistry from '../systems/PlacementSceneObjectRegistry.js';
 import PlacementInputController from '../systems/PlacementInputController.js';
+import PlacementWorldRenderer from '../systems/PlacementWorldRenderer.js';
 
 export default class PlacementScene extends Phaser.Scene {
   constructor() {
@@ -39,9 +40,17 @@ export default class PlacementScene extends Phaser.Scene {
     this.buildingGraphics = this.objectRegistry.registerWorldObject(this.add.graphics().setDepth(4));
     this.previewGraphics = this.objectRegistry.registerWorldObject(this.add.graphics().setDepth(6));
     this.mapLabels = this.objectRegistry.registerWorldObject(this.add.container(0, 0).setDepth(8));
+    this.worldRenderer = new PlacementWorldRenderer({
+      scene: this,
+      geometry: this.mapGeometry,
+      mapRenderer: this.mapRenderer,
+      objectRegistry: this.objectRegistry,
+      placementSystem: this.placementSystem,
+      mapLabels: this.mapLabels,
+    });
 
     this.drawMap();
-    this.restorePlacedBuildings();
+    this.worldRenderer.restorePlacedBuildings(this.placedBuildings);
     this.createUi();
     this.setupCamera();
     this.registerPlacementInput();
@@ -285,89 +294,14 @@ export default class PlacementScene extends Phaser.Scene {
     });
     this.placedBuildings = placementCommit.placedBuildings;
 
-    this.drawPlacedBuilding(this.selectedBuilding, tile.x, tile.y);
-    this.drawImpactMarkers(this.selectedBuilding, tile.x, tile.y);
+    this.worldRenderer.drawPlacedBuilding(this.selectedBuilding, tile.x, tile.y);
+    this.worldRenderer.drawImpactMarkers(this.selectedBuilding, tile.x, tile.y);
     this.updateStatusBar();
     this.updateLastChangePanel(this.registry.get('lastPlacementResult'));
     this.updatePlacementHistoryPanel();
     this.updateContinueButton();
     this.showMessage(PlacementUiStateManager.formatPlacementSuccessMessage(this.selectedBuilding.name, this.placedBuildings.length), '#bbf7d0');
     this.updatePreview(pointer);
-  }
-
-  restorePlacedBuildings() {
-    for (const record of this.placedBuildings) {
-      this.placementSystem.place(record.position.x, record.position.y, record.building);
-      this.drawPlacedBuilding(record.building, record.position.x, record.position.y);
-      this.drawImpactMarkers(record.building, record.position.x, record.position.y, false);
-    }
-  }
-
-
-  drawImpactMarkers(building, tileX, tileY, animate = true) {
-    const center = this.mapGeometry.getFootprintCenter(tileX, tileY, building.footprint);
-    const markerData = PlacementViewManager.getImpactMarkerData(building);
-    const markerLayout = PlacementViewManager.getImpactMarkerLayout(center, tileX, tileY);
-    const markerContainer = this.objectRegistry.registerWorldObject(this.add.container(markerLayout.container.x, markerLayout.container.y)
-      .setDepth(markerLayout.container.depth));
-
-    const bubble = this.add.circle(0, 0, markerLayout.bubble.radius, markerData.color, markerLayout.bubble.alpha)
-      .setStrokeStyle(markerLayout.bubble.strokeWidth, markerLayout.bubble.strokeColor, markerLayout.bubble.strokeAlpha);
-    const textStyles = PlacementViewManager.getTextStyles();
-    const icon = this.add.text(markerLayout.icon.x, markerLayout.icon.y, markerData.icon, textStyles.impactIcon).setOrigin(0.5);
-    const labelBg = this.add.rectangle(
-      markerLayout.labelBackground.x,
-      markerLayout.labelBackground.y,
-      markerLayout.labelBackground.width,
-      markerLayout.labelBackground.height,
-      markerLayout.labelBackground.fillColor,
-      markerLayout.labelBackground.fillAlpha,
-    ).setStrokeStyle(markerLayout.labelBackground.strokeWidth, markerData.color, markerLayout.labelBackground.strokeAlpha);
-    const label = this.add.text(markerLayout.label.x, markerLayout.label.y, markerData.label, textStyles.impactLabel).setOrigin(0.5);
-
-    markerContainer.add([bubble, icon, labelBg, label]);
-
-    if (animate) {
-      markerContainer.setScale(markerLayout.animation.initialScale);
-      markerContainer.setAlpha(markerLayout.animation.initialAlpha);
-      this.tweens.add({
-        targets: markerContainer,
-        scale: 1,
-        alpha: 1,
-        y: markerLayout.animation.targetY,
-        duration: markerLayout.animation.duration,
-        ease: markerLayout.animation.ease,
-      });
-    }
-  }
-
-  drawPlacedBuilding(building, tileX, tileY) {
-    const buildingVisual = PlacementViewManager.getPlacedBuildingVisual(building, tileX, tileY);
-    const graphics = this.objectRegistry.registerWorldObject(this.add.graphics().setDepth(buildingVisual.depth));
-    this.mapRenderer.drawTiles(
-      graphics,
-      this.placementSystem.getFootprintTiles(tileX, tileY, building.footprint),
-      buildingVisual,
-    );
-
-    const labelPosition = this.mapGeometry.getFootprintCenter(tileX, tileY, building.footprint);
-    const labelLayout = PlacementViewManager.getBuildingLabelLayout(labelPosition, tileX, tileY);
-    graphics.fillStyle(labelLayout.background.fillColor, labelLayout.background.fillAlpha);
-    graphics.fillRoundedRect(
-      labelLayout.background.x,
-      labelLayout.background.y,
-      labelLayout.background.width,
-      labelLayout.background.height,
-      labelLayout.background.radius,
-    );
-    const label = this.objectRegistry.registerWorldObject(this.add.text(
-      labelLayout.text.x,
-      labelLayout.text.y,
-      building.name,
-      PlacementViewManager.getTextStyles().buildingLabel,
-    ).setOrigin(0.5).setDepth(labelLayout.text.depth));
-
-    this.mapLabels.add(label);
   }
 
   pointerToTile(pointer) {
