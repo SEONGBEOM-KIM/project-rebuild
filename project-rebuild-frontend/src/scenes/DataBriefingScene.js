@@ -43,14 +43,36 @@ export default class DataBriefingScene extends Phaser.Scene {
     const textStyles = DataBriefingViewManager.getDataCardTextStyles();
     createPanelBackground(this, layout.panel, layout.panel);
     createPanelTitle(this, layout.title, textStyles.title, { text: card.title, origin: 0.5 });
-    this.add.text(layout.subtitle.x, layout.subtitle.y, card.subtitle, textStyles.subtitle).setOrigin(0.5);
+    createLayoutText(this, layout.subtitle, {
+      text: card.subtitle,
+      style: textStyles.subtitle,
+      origin: 0.5,
+    });
 
     card.bars.forEach((bar, index) => {
       const barLayout = DataBriefingViewManager.getBarLayout(bar, x, y, index);
-      this.add.text(layout.barLabel.x, barLayout.y, bar.label, textStyles.barLabel).setOrigin(0, 0.5);
-      this.add.rectangle(barLayout.x, barLayout.y, barLayout.backgroundWidth, barLayout.height, layout.barBackgroundColor).setOrigin(0, 0.5);
-      this.add.rectangle(barLayout.x, barLayout.y, barLayout.width, barLayout.height, bar.color).setOrigin(0, 0.5);
-      this.add.text(layout.barValue.x, barLayout.y, DataBriefingViewManager.formatBarValue(bar), textStyles.barValue).setOrigin(1, 0.5);
+      createLayoutText(this, { x: layout.barLabel.x, y: barLayout.y }, {
+        text: bar.label,
+        style: textStyles.barLabel,
+        origin: [0, 0.5],
+      });
+      createPanelBackground(this, {
+        x: barLayout.x,
+        y: barLayout.y,
+        width: barLayout.backgroundWidth,
+        height: barLayout.height,
+      }, { fillColor: layout.barBackgroundColor }).setOrigin(0, 0.5);
+      createPanelBackground(this, {
+        x: barLayout.x,
+        y: barLayout.y,
+        width: barLayout.width,
+        height: barLayout.height,
+      }, { fillColor: bar.color }).setOrigin(0, 0.5);
+      createLayoutText(this, { x: layout.barValue.x, y: barLayout.y }, {
+        text: DataBriefingViewManager.formatBarValue(bar),
+        style: textStyles.barValue,
+        origin: [1, 0.5],
+      });
     });
 
     createPanelBackground(this, layout.takeawayPanel, layout.takeawayPanel);

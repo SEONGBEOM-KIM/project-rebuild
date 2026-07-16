@@ -56,7 +56,10 @@ export default class SideEffectScene extends Phaser.Scene {
       createPanelBackground(this, card.background, cardStyle, { strokeColor: issue.color });
       this.add.circle(card.marker.x, card.marker.y, card.marker.radius, issue.color, cardStyle.markerAlpha)
         .setStrokeStyle(cardStyle.markerStrokeWidth, cardStyle.markerStrokeColor);
-      this.add.text(card.title.x, card.title.y, issue.title, textStyles.cardTitle);
+      createLayoutText(this, card.title, {
+        text: issue.title,
+        style: textStyles.cardTitle,
+      });
       createLayoutText(this, card.message, {
         text: issue.message,
         style: textStyles.cardMessage,

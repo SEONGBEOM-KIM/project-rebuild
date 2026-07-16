@@ -32,12 +32,11 @@ export default class ReflectionScene extends Phaser.Scene {
       this.createChoiceCard(choice, x, y);
     });
 
-    this.feedbackText = this.add.text(
-      layout.feedback.x,
-      layout.feedback.y,
-      ReflectionViewManager.formatInitialFeedback(),
-      ReflectionViewManager.getFeedbackTextStyle('initial', layout.feedback.wordWrapWidth),
-    ).setOrigin(0.5);
+    this.feedbackText = createLayoutText(this, layout.feedback, {
+      text: ReflectionViewManager.formatInitialFeedback(),
+      style: ReflectionViewManager.getFeedbackTextStyle('initial', layout.feedback.wordWrapWidth),
+      origin: 0.5,
+    });
 
     this.drawControls();
     this.updateSelectionUi();
@@ -49,7 +48,11 @@ export default class ReflectionScene extends Phaser.Scene {
     const textStyles = ReflectionViewManager.getChoiceTextStyles();
     const background = createPanelBackground(this, layout.background, initialStyle)
       .setInteractive({ useHandCursor: true });
-    const icon = this.add.text(layout.icon.x, layout.icon.y, choice.icon, textStyles.icon).setOrigin(0.5);
+    const icon = createLayoutText(this, layout.icon, {
+      text: choice.icon,
+      style: textStyles.icon,
+      origin: 0.5,
+    });
     const title = createPanelTitle(this, layout.title, textStyles.title, { text: choice.title });
     const description = createLayoutText(this, layout.description, {
       text: choice.description,

@@ -44,8 +44,15 @@ export default class ProblemSummaryScene extends Phaser.Scene {
       const { x, y } = ProblemSummaryViewManager.getProblemItemLayout(index);
       const card = ProblemSummaryViewManager.getProblemItemCardLayout(x, y);
       createPanelBackground(this, card.background, card.background);
-      this.add.text(card.icon.x, card.icon.y, item.icon, textStyles.itemIcon).setOrigin(0.5);
-      this.add.text(card.title.x, card.title.y, item.title, textStyles.itemTitle);
+      createLayoutText(this, card.icon, {
+        text: item.icon,
+        style: textStyles.itemIcon,
+        origin: 0.5,
+      });
+      createLayoutText(this, card.title, {
+        text: item.title,
+        style: textStyles.itemTitle,
+      });
       createLayoutText(this, card.detail, {
         text: item.detail,
         style: textStyles.itemDetail,
