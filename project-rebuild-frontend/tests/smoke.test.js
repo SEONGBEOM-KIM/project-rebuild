@@ -61,6 +61,7 @@ import { getTextButtonColor } from '../src/ui/TextButton.js';
 import { copyTextToClipboard, downloadTextFile } from '../src/ui/BrowserFileActions.js';
 import { getLayoutTextStyle } from '../src/ui/LayoutText.js';
 import { createPanelBackground, createPanelTitle, getPanelTitleStyle } from '../src/ui/PanelRenderer.js';
+import { createScreenBackground } from '../src/ui/ScreenBackground.js';
 
 
 const PROJECT_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -2758,6 +2759,19 @@ function testSharedUiComponentStyles() {
     ['text', 5, 6, '패널', { color: '#94a3b8', fontSize: '20px', fontStyle: 'bold' }],
     ['origin', 0.5],
   ]);
+
+  const screenCalls = [];
+  const screenScene = {
+    scale: { width: 1920, height: 1080 },
+    add: {
+      rectangle: (...args) => {
+        screenCalls.push(args);
+        return { type: 'rectangle' };
+      },
+    },
+  };
+  createScreenBackground(screenScene, 0x10253f);
+  assert.deepEqual(screenCalls, [[960, 540, 1920, 1080, 0x10253f]]);
 }
 
 

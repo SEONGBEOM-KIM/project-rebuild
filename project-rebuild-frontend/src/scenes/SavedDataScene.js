@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { createScreenBackground } from '../ui/ScreenBackground.js';
 import SaveManager from '../systems/SaveManager.js';
 import LearningDataRestoreManager from '../systems/LearningDataRestoreManager.js';
 import SavedDataViewManager from '../systems/SavedDataViewManager.js';
@@ -16,7 +17,7 @@ export default class SavedDataScene extends Phaser.Scene {
     const saved = SaveManager.load();
 
     const layout = SavedDataViewManager.getLayout(width);
-    this.add.rectangle(width / 2, height / 2, width, height, layout.backgroundColor);
+    createScreenBackground(this, layout.backgroundColor);
     createLayoutText(this, layout.title, { origin: 0.5 });
     createLayoutText(this, layout.subtitle, { origin: 0.5 });
 

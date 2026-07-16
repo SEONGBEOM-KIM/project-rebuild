@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import MockApiClient from '../systems/MockApiClient.js';
 import MockSubmissionLogViewManager from '../systems/MockSubmissionLogViewManager.js';
@@ -19,7 +20,7 @@ export default class MockSubmissionLogScene extends Phaser.Scene {
 
     const layout = MockSubmissionLogViewManager.getScreenLayout(width);
 
-    this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
+    createScreenBackground(this, layout.background.color);
     ProgressStepper.render(this, layout.progressStep);
 
     createLayoutText(this, layout.title, { origin: 0.5 });

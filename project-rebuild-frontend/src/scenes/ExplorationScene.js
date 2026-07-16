@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import { explorationPlaces } from '../data/explorationPlaces.js';
 import { CURRENT_EPISODE } from '../data/episodes.js';
@@ -20,7 +21,7 @@ export default class ExplorationScene extends Phaser.Scene {
 
     const layout = ExplorationViewManager.getScreenLayout();
 
-    this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
+    createScreenBackground(this, layout.background.color);
     ProgressStepper.render(this, layout.progressStep);
     this.drawMapBackdrop();
     this.drawHeader();

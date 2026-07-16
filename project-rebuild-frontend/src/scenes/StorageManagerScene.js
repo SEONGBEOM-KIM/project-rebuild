@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { createScreenBackground } from '../ui/ScreenBackground.js';
 import SaveManager from '../systems/SaveManager.js';
 import MockApiClient from '../systems/MockApiClient.js';
 import StorageSummaryManager from '../systems/StorageSummaryManager.js';
@@ -18,7 +19,7 @@ export default class StorageManagerScene extends Phaser.Scene {
     this.submissions = MockApiClient.listSubmissions();
 
     const layout = StorageManagerViewManager.getScreenLayout(width);
-    this.add.rectangle(width / 2, height / 2, width, height, layout.backgroundColor);
+    createScreenBackground(this, layout.backgroundColor);
     createLayoutText(this, layout.title, { origin: 0.5 });
     createLayoutText(this, layout.subtitle, { origin: 0.5 });
 

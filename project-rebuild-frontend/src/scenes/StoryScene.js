@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { createScreenBackground } from '../ui/ScreenBackground.js';
 import { CURRENT_EPISODE } from '../data/episodes.js';
 import StoryViewManager from '../systems/StoryViewManager.js';
 
@@ -10,7 +11,7 @@ export default class StoryScene extends Phaser.Scene {
   create() {
     const { width, height } = this.scale;
     const layout = StoryViewManager.getLayout();
-    this.add.rectangle(width / 2, height / 2, width, height, layout.backgroundColor);
+    createScreenBackground(this, layout.backgroundColor);
     this.add.text(width / 2, layout.title.y, CURRENT_EPISODE.title, {
       fontSize: layout.title.fontSize,
       color: layout.title.color,

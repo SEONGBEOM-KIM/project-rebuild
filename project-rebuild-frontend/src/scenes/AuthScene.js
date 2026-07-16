@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { createScreenBackground } from '../ui/ScreenBackground.js';
 import AuthViewManager from '../systems/AuthViewManager.js';
 
 export default class AuthScene extends Phaser.Scene {
@@ -9,7 +10,7 @@ export default class AuthScene extends Phaser.Scene {
   create() {
     const { width, height } = this.scale;
     const layout = AuthViewManager.getLayout();
-    this.add.rectangle(width / 2, height / 2, width, height, layout.backgroundColor);
+    createScreenBackground(this, layout.backgroundColor);
     this.add.text(width / 2, layout.title.y, layout.title.text, {
       fontSize: layout.title.fontSize,
       color: layout.title.color,

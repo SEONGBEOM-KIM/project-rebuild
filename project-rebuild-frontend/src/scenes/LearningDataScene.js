@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import LearningDataManager from '../systems/LearningDataManager.js';
 import SaveManager from '../systems/SaveManager.js';
@@ -18,7 +19,7 @@ export default class LearningDataScene extends Phaser.Scene {
     const learningData = this.buildLearningData();
 
     const screenLayout = LearningDataViewManager.getScreenLayout(width);
-    this.add.rectangle(width / 2, height / 2, width, height, screenLayout.backgroundColor);
+    createScreenBackground(this, screenLayout.backgroundColor);
     ProgressStepper.render(this, screenLayout.progressStep);
 
     createLayoutText(this, screenLayout.title, { origin: 0.5 });

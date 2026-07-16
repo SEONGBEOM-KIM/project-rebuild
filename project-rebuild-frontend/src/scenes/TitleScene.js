@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { createScreenBackground } from '../ui/ScreenBackground.js';
 import SaveManager from '../systems/SaveManager.js';
 import TitleViewManager from '../systems/TitleViewManager.js';
 
@@ -10,7 +11,7 @@ export default class TitleScene extends Phaser.Scene {
   create() {
     const { width, height } = this.scale;
     const screenText = TitleViewManager.getScreenText();
-    this.add.rectangle(width / 2, height / 2, width, height, screenText.backgroundColor);
+    createScreenBackground(this, screenText.backgroundColor);
     this.add.text(width / 2, screenText.title.y, screenText.title.text, screenText.title).setOrigin(0.5);
     this.add.text(width / 2, screenText.subtitle.y, screenText.subtitle.text, screenText.subtitle).setOrigin(0.5);
 
