@@ -1118,11 +1118,22 @@ function testPlacementViewManager() {
   assert.equal(PlacementViewManager.getContinueState(3, null).buttonText, '종합 결과 확인');
   assert.equal(PlacementViewManager.formatPlacementSuccessMessage('청년센터', 3), '청년센터 배치 완료: 종합 결과를 확인할 수 있습니다.');
   assert.equal(PlacementViewManager.formatNeedMoreMessage(1), '종합 결과를 보려면 시설 2개를 더 배치하세요.');
-  assert.deepEqual(PlacementViewManager.getBuildingCardStyle('youth_center', youthCenter, false), {
+  assert.equal(PlacementViewManager.isRecommendedBuilding(youthCenter, { recommendedBuildingIds: ['youth_center'] }), true);
+  assert.equal(PlacementViewManager.isRecommendedBuilding(youthCenter, { recommendedBuildingIds: ['bus_station'] }), false);
+  assert.deepEqual(PlacementViewManager.getBuildingCardStyle(youthCenter, youthCenter, null), {
     selected: true,
+    recommended: false,
     strokeWidth: 5,
     strokeColor: 0xfde68a,
     fillColor: 0x334155,
+    fillAlpha: 1,
+  });
+  assert.deepEqual(PlacementViewManager.getBuildingCardStyle(youthCenter, buildings.find((building) => building.id === 'bus_station'), { recommendedBuildingIds: ['youth_center'] }), {
+    selected: false,
+    recommended: true,
+    strokeWidth: 4,
+    strokeColor: 0xf59e0b,
+    fillColor: 0x2b250f,
     fillAlpha: 1,
   });
   assert.deepEqual(PlacementViewManager.getImpactMarkerData(buildings.find((building) => building.id === 'small_park')), {

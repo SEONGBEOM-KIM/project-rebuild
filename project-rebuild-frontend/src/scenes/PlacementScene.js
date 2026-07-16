@@ -226,11 +226,11 @@ export default class PlacementScene extends Phaser.Scene {
     card.on('pointerdown', selectBuilding);
     title.setInteractive({ useHandCursor: true }).on('pointerdown', selectBuilding);
 
-    this.cardObjects.set(building.id, { card, swatch, title, detail, description, placementHint, effect, recommendationBadge });
+    this.cardObjects.set(building.id, { building, card, swatch, title, detail, description, placementHint, effect, recommendationBadge });
   }
 
   createRecommendationBadge(building, x, y) {
-    if (!this.isRecommendedBuilding(building)) {
+    if (!PlacementViewManager.isRecommendedBuilding(building, this.selectedPolicy)) {
       return null;
     }
 
@@ -238,10 +238,6 @@ export default class PlacementScene extends Phaser.Scene {
     const badgeBg = this.createFixedRectangleFromLayout(layout.background);
     const badgeText = this.createFixedTextFromLayout(layout.text, PlacementViewManager.getTextStyles().recommendationBadge).setOrigin(0.5);
     return { badgeBg, badgeText };
-  }
-
-  isRecommendedBuilding(building) {
-    return this.selectedPolicy?.recommendedBuildingIds?.includes(building.id) ?? false;
   }
 
   createFixedRectangleFromLayout(layout, options = {}) {
@@ -284,9 +280,8 @@ export default class PlacementScene extends Phaser.Scene {
   }
 
   updateSelectedBuildingUi() {
-    for (const [buildingId, objects] of this.cardObjects.entries()) {
-      const recommended = this.isRecommendedBuilding(buildings.find((building) => building.id === buildingId));
-      const style = PlacementViewManager.getBuildingCardStyle(buildingId, this.selectedBuilding, recommended);
+    for (const objects of this.cardObjects.values()) {
+      const style = PlacementViewManager.getBuildingCardStyle(objects.building, this.selectedBuilding, this.selectedPolicy);
       objects.card.setStrokeStyle(style.strokeWidth, style.strokeColor);
       objects.card.setFillStyle(style.fillColor, style.fillAlpha);
     }

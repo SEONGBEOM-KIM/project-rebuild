@@ -569,11 +569,17 @@ export default class PlacementViewManager {
     };
   }
 
-  static getBuildingCardStyle(buildingId, selectedBuilding, recommended) {
-    const selected = buildingId === selectedBuilding.id;
+  static isRecommendedBuilding(building, selectedPolicy) {
+    return selectedPolicy?.recommendedBuildingIds?.includes(building.id) ?? false;
+  }
+
+  static getBuildingCardStyle(building, selectedBuilding, selectedPolicy) {
+    const selected = building.id === selectedBuilding.id;
+    const recommended = PlacementViewManager.isRecommendedBuilding(building, selectedPolicy);
     const strokeColor = selected ? 0xfde68a : recommended ? 0xf59e0b : 0x475569;
     return {
       selected,
+      recommended,
       strokeWidth: selected ? 5 : recommended ? 4 : 3,
       strokeColor,
       fillColor: selected ? 0x334155 : recommended ? 0x2b250f : 0x1e293b,
