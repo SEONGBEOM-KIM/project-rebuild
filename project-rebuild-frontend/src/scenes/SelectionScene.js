@@ -4,9 +4,9 @@ import ProgressStepper from '../ui/ProgressStepper.js';
 import { policies } from '../data/policies.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import SelectionViewManager from '../systems/SelectionViewManager.js';
+import SelectionPolicyCardRenderer from '../systems/SelectionPolicyCardRenderer.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
-import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
 
 export default class SelectionScene extends Phaser.Scene {
   constructor() {
@@ -51,45 +51,14 @@ export default class SelectionScene extends Phaser.Scene {
   }
 
   createPolicyCard(policy, x, y) {
-    const layout = SelectionViewManager.getPolicyCardLayout();
-    const initialStyle = SelectionViewManager.getCardStyle(policy.id, this.selectedPolicy);
-    const textStyles = SelectionViewManager.getTextStyles();
-    const container = this.add.container(x, y);
-    const background = createPanelBackground(this, layout.background, initialStyle)
-      .setInteractive({ useHandCursor: true });
-    const colorBar = createPanelBackground(this, layout.colorBar, { fillColor: policy.color, fillAlpha: 1 });
-    const title = createPanelTitle(this, layout.title, textStyles.title, {
-      text: policy.name,
-      origin: 0.5,
+    const cardObjects = SelectionPolicyCardRenderer.render(this, policy, this.selectedPolicy, { x, y }, {
+      onSelect: (selectedPolicy) => {
+        this.selectedPolicy = selectedPolicy;
+        this.registry.set('selectedPolicy', selectedPolicy);
+        this.updateSelectionUi();
+      },
     });
-    const tagline = createLayoutText(this, layout.tagline, {
-      text: policy.tagline,
-      style: textStyles.tagline,
-      origin: 0.5,
-    });
-    const description = createLayoutText(this, layout.description, {
-      text: policy.description,
-      style: textStyles.description,
-      origin: 0.5,
-    });
-    const focus = createLayoutText(this, layout.focus, {
-      text: SelectionViewManager.formatFocusText(policy),
-      style: textStyles.focus,
-      origin: 0.5,
-    });
-    const recommended = createLayoutText(this, layout.recommended, {
-      text: SelectionViewManager.formatRecommendedBuildings(policy),
-      style: textStyles.recommended,
-      origin: 0.5,
-    });
-
-    container.add([background, colorBar, title, tagline, description, focus, recommended]);
-    background.on('pointerdown', () => {
-      this.selectedPolicy = policy;
-      this.registry.set('selectedPolicy', policy);
-      this.updateSelectionUi();
-    });
-    this.cardObjects.set(policy.id, { background, title });
+    this.cardObjects.set(policy.id, cardObjects);
   }
 
 

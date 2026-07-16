@@ -3,6 +3,7 @@ import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import IssueDetector from '../systems/IssueDetector.js';
 import SideEffectViewManager from '../systems/SideEffectViewManager.js';
+import SideEffectIssueRenderer from '../systems/SideEffectIssueRenderer.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
@@ -51,19 +52,7 @@ export default class SideEffectScene extends Phaser.Scene {
     }
 
     issues.slice(0, 4).forEach((issue, index) => {
-      const card = SideEffectViewManager.getIssueCardLayout(index);
-      const cardStyle = SideEffectViewManager.getIssueCardStyle();
-      createPanelBackground(this, card.background, cardStyle, { strokeColor: issue.color });
-      this.add.circle(card.marker.x, card.marker.y, card.marker.radius, issue.color, cardStyle.markerAlpha)
-        .setStrokeStyle(cardStyle.markerStrokeWidth, cardStyle.markerStrokeColor);
-      createLayoutText(this, card.title, {
-        text: issue.title,
-        style: textStyles.cardTitle,
-      });
-      createLayoutText(this, card.message, {
-        text: issue.message,
-        style: textStyles.cardMessage,
-      });
+      SideEffectIssueRenderer.renderIssueCard(this, issue, index);
     });
   }
 

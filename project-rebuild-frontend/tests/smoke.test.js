@@ -14,6 +14,7 @@ import LearningProgress from '../src/systems/LearningProgress.js';
 import CauseQuizManager from '../src/systems/CauseQuizManager.js';
 import CauseQuizViewManager from '../src/systems/CauseQuizViewManager.js';
 import SelectionViewManager from '../src/systems/SelectionViewManager.js';
+import SelectionPolicyCardRenderer from '../src/systems/SelectionPolicyCardRenderer.js';
 import ProblemSummaryViewManager from '../src/systems/ProblemSummaryViewManager.js';
 import ExplorationViewManager from '../src/systems/ExplorationViewManager.js';
 import ExplorationMapRenderer from '../src/systems/ExplorationMapRenderer.js';
@@ -49,6 +50,7 @@ import SaveManager, { LEARNING_SAVE_STORAGE_KEY } from '../src/systems/SaveManag
 import SavedDataViewManager from '../src/systems/SavedDataViewManager.js';
 import StorageSummaryManager from '../src/systems/StorageSummaryManager.js';
 import StorageManagerViewManager from '../src/systems/StorageManagerViewManager.js';
+import SideEffectIssueRenderer from '../src/systems/SideEffectIssueRenderer.js';
 import { buildings } from '../src/data/buildings.js';
 import { policies } from '../src/data/policies.js';
 import { explorationPlaces } from '../src/data/explorationPlaces.js';
@@ -474,6 +476,21 @@ function testSelectionViewManager() {
     fillColor: 0x0f172a,
     fillAlpha: 0.96,
   });
+}
+
+function testSelectionPolicyCardRenderer() {
+  const fixture = createExplorationRendererSceneSpy();
+  const selected = [];
+  const policy = policies[0];
+  const cardObjects = SelectionPolicyCardRenderer.render(fixture.scene, policy, policy, { x: 300, y: 400 }, {
+    onSelect: (selectedPolicy) => selected.push(selectedPolicy.id),
+  });
+
+  assert.equal(cardObjects.container.type, 'container');
+  assert.equal(cardObjects.background.type, 'rectangle');
+  assert.ok(fixture.calls.some((call) => call[0] === 'container.add' && call[1].length === 7));
+  cardObjects.background.events.get('pointerdown')();
+  assert.deepEqual(selected, [policy.id]);
 }
 
 function testProblemSummaryViewManager() {
@@ -1131,6 +1148,26 @@ function testSideEffectViewManager() {
   assert.ok(rows.includes('• 예산 부족'));
   assert.ok(rows.includes('• 만족도 보완'));
   assert.match(SideEffectViewManager.formatHintText(issues), /대응:/);
+}
+
+function testSideEffectIssueRenderer() {
+  const fixture = createExplorationRendererSceneSpy();
+  const issue = {
+    title: '만족도 하락',
+    message: '일부 주민이 체감하는 생활 편의가 낮아졌습니다.',
+    color: 0xef4444,
+  };
+
+  const objects = SideEffectIssueRenderer.renderIssueCard(fixture.scene, issue, 1);
+
+  assert.equal(objects.background.type, 'rectangle');
+  assert.equal(objects.marker.type, 'circle');
+  assert.deepEqual(objects.marker.stroke, {
+    width: SideEffectViewManager.getIssueCardStyle().markerStrokeWidth,
+    color: SideEffectViewManager.getIssueCardStyle().markerStrokeColor,
+  });
+  assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3] === issue.title));
+  assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3] === issue.message));
 }
 
 function testGameStateAndIssues() {
@@ -2922,6 +2959,7 @@ async function run() {
   testCauseQuizViewManager();
   testCauseQuizManager();
   testSelectionViewManager();
+  testSelectionPolicyCardRenderer();
   testProblemSummaryViewManager();
   testExplorationViewManager();
   testExplorationMapRenderer();
@@ -2935,6 +2973,7 @@ async function run() {
   testResultViewManager();
   testEvaluationManager();
   testSideEffectViewManager();
+  testSideEffectIssueRenderer();
   testGameStateAndIssues();
   testLearningProgress();
   testBuildingData();
