@@ -104,16 +104,16 @@ export default class PlacementScene extends Phaser.Scene {
     const textStyles = PlacementViewManager.getTextStyles();
 
     this.createFixedRectangleFromLayout(layout.leftPanel);
-    this.createFixedText(layout.title.x, layout.title.y, layout.title.text, textStyles.title);
-    this.createFixedText(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, textStyles.subtitle);
+    this.createFixedTextFromLayout(layout.title, textStyles.title);
+    this.createFixedTextFromLayout(layout.subtitle, textStyles.subtitle);
 
-    this.missionText = this.createFixedText(layout.mission.x, layout.mission.y, '', textStyles.mission);
+    this.missionText = this.createFixedTextFromLayout(layout.mission, textStyles.mission);
 
     buildings.forEach((building, index) => {
       this.createBuildingCard(building, layout.buildingList.x, layout.buildingList.startY + index * layout.buildingList.gapY);
     });
 
-    this.statusText = this.createFixedText(layout.status.x, layout.status.y, '', textStyles.status);
+    this.statusText = this.createFixedTextFromLayout(layout.status, textStyles.status);
 
     this.cursorInfoText = this.createFixedLayoutText(layout.cursorInfo, {
       style: textStyles.cursorInfo,
@@ -126,7 +126,7 @@ export default class PlacementScene extends Phaser.Scene {
     this.continueButtonBg = this.createFixedRectangleFromLayout(layout.continueButton, {
       fillColor: layout.continueButton.backgroundColor,
     }).setInteractive({ useHandCursor: true });
-    this.continueButton = this.createFixedText(layout.continueButton.x, layout.continueButton.y, layout.continueButton.text, textStyles.continueButton)
+    this.continueButton = this.createFixedTextFromLayout(layout.continueButton, textStyles.continueButton)
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
 
@@ -150,16 +150,12 @@ export default class PlacementScene extends Phaser.Scene {
     const textStyles = PlacementViewManager.getTextStyles();
 
     this.createFixedRectangleFromLayout(layout.legendPanel);
-    this.createFixedText(layout.legendTitle.x, layout.legendTitle.y, layout.legendTitle.text, textStyles.panelTitle);
+    this.createFixedTextFromLayout(layout.legendTitle, textStyles.panelTitle);
 
     legendItems.forEach((item, index) => {
-      const y = layout.legendText.startY + index * layout.legendText.gapY;
-      this.createFixedRectangleFromLayout(layout.legendSwatch, {
-        y: y + layout.legendSwatch.yOffset,
-        fillColor: item.color,
-        strokeColor: 0xffffff,
-      });
-      this.createFixedText(layout.legendText.x, y, `${item.label} - ${item.note}`, {
+      const itemLayout = PlacementViewManager.getLegendItemLayout(index, item);
+      this.createFixedRectangleFromLayout(itemLayout.swatch);
+      this.createFixedTextFromLayout(itemLayout.text, {
         ...textStyles.legendText,
         color: PlacementViewManager.getLegendTextColor(item),
       });
@@ -172,7 +168,7 @@ export default class PlacementScene extends Phaser.Scene {
     const textStyles = PlacementViewManager.getTextStyles();
 
     this.createFixedRectangleFromLayout(layout.lastChangePanel);
-    this.createFixedText(layout.lastChangeTitle.x, layout.lastChangeTitle.y, layout.lastChangeTitle.text, textStyles.panelTitle);
+    this.createFixedTextFromLayout(layout.lastChangeTitle, textStyles.panelTitle);
     this.lastChangeText = this.createFixedLayoutText(layout.lastChangeBody, {
       text: emptyState.text,
       style: {
@@ -188,7 +184,7 @@ export default class PlacementScene extends Phaser.Scene {
     const textStyles = PlacementViewManager.getTextStyles();
 
     this.createFixedRectangleFromLayout(layout.historyPanel);
-    this.createFixedText(layout.historyTitle.x, layout.historyTitle.y, layout.historyTitle.text, textStyles.panelTitle);
+    this.createFixedTextFromLayout(layout.historyTitle, textStyles.panelTitle);
     this.placementHistoryText = this.createFixedLayoutText(layout.historyBody, {
       text: emptyState.text,
       style: {
@@ -205,9 +201,9 @@ export default class PlacementScene extends Phaser.Scene {
     const card = this.createFixedRectangleFromLayout(layout.card, visual.card)
       .setInteractive({ useHandCursor: true });
     const swatch = this.createFixedRectangleFromLayout(layout.swatch, visual.swatch);
-    const title = this.createFixedText(layout.title.x, layout.title.y, building.name, textStyles.cardTitle);
+    const title = this.createFixedTextFromLayout(layout.title, textStyles.cardTitle, { text: building.name });
     const recommendationBadge = this.createRecommendationBadge(building, layout.recommendationBadge.x, layout.recommendationBadge.y);
-    const detail = this.createFixedText(layout.detail.x, layout.detail.y, PlacementViewManager.formatBuildingDetail(building), textStyles.cardDetail);
+    const detail = this.createFixedTextFromLayout(layout.detail, textStyles.cardDetail, { text: PlacementViewManager.formatBuildingDetail(building) });
     const description = this.createFixedLayoutText(layout.description, {
       text: building.description,
       style: textStyles.cardDescription,
@@ -240,7 +236,7 @@ export default class PlacementScene extends Phaser.Scene {
 
     const layout = PlacementViewManager.getRecommendationBadgeLayout(x, y);
     const badgeBg = this.createFixedRectangleFromLayout(layout.background);
-    const badgeText = this.createFixedText(layout.text.x, layout.text.y, layout.text.text, PlacementViewManager.getTextStyles().recommendationBadge).setOrigin(0.5);
+    const badgeText = this.createFixedTextFromLayout(layout.text, PlacementViewManager.getTextStyles().recommendationBadge).setOrigin(0.5);
     return { badgeBg, badgeText };
   }
 
@@ -266,6 +262,15 @@ export default class PlacementScene extends Phaser.Scene {
       rectangle.setStrokeStyle(PlacementViewManager.getFixedUiStyle().rectangleStrokeWidth, strokeColor);
     }
     return this.registerUiObject(rectangle);
+  }
+
+  createFixedTextFromLayout(layout, style, options = {}) {
+    return this.createFixedText(
+      options.x ?? layout.x,
+      options.y ?? layout.y,
+      options.text ?? layout.text ?? '',
+      style,
+    );
   }
 
   createFixedText(x, y, text, style) {

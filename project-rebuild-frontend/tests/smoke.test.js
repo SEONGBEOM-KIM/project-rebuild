@@ -1006,6 +1006,10 @@ function testPlacementViewManager() {
     strokeWidth: 1.5,
   });
   assert.equal(PlacementViewManager.getLegendItems().length, 4);
+  assert.deepEqual(PlacementViewManager.getLegendItemLayout(1, { label: '숲', note: '배치 불가', color: 0x166534 }), {
+    swatch: { ...PLACEMENT_UI_LAYOUT.legendSwatch, y: 162, fillColor: 0x166534, strokeColor: 0xffffff },
+    text: { x: 1520, y: 152, text: '숲 - 배치 불가' },
+  });
   assert.equal(PlacementViewManager.getLegendTextColor({ note: '배치 가능' }), '#bbf7d0');
   assert.equal(PlacementViewManager.getLegendTextColor({ note: '배치 불가' }), '#fecaca');
   assert.equal(PlacementViewManager.getPreviewStyle({ valid: true }).strokeColor, 0xbbf7d0);

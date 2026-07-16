@@ -358,6 +358,25 @@ export default class PlacementViewManager {
     return item.note === '배치 가능' ? '#bbf7d0' : '#fecaca';
   }
 
+
+  static getLegendItemLayout(index, item) {
+    const layout = PLACEMENT_UI_LAYOUT;
+    const y = layout.legendText.startY + index * layout.legendText.gapY;
+    return {
+      swatch: {
+        ...layout.legendSwatch,
+        y: y + layout.legendSwatch.yOffset,
+        fillColor: item.color,
+        strokeColor: 0xffffff,
+      },
+      text: {
+        x: layout.legendText.x,
+        y,
+        text: `${item.label} - ${item.note}`,
+      },
+    };
+  }
+
   static getImpactMarkerData(building) {
     const effect = building.effect;
     if ((effect.environment ?? 0) > 0 || (effect.pollution ?? 0) < 0) {
