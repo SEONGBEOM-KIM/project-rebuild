@@ -33,6 +33,7 @@ import MockApiClient, { MOCK_SUBMISSION_LOG_STORAGE_KEY } from '../src/systems/M
 import MockSubmissionLogViewManager from '../src/systems/MockSubmissionLogViewManager.js';
 import PlacementSystem from '../src/systems/PlacementSystem.js';
 import PlacementViewManager, { TILE_COLORS, TILE_STROKES, TILE_LABELS, ZONE_LABELS, REQUIRED_PLACEMENTS, PLACEMENT_DRAG_THRESHOLD, PLACEMENT_UI_BOUNDS, PREVIEW_STYLES, PLACEMENT_UI_LAYOUT, BUILDING_CARD_LAYOUT, BUILDING_CARD_VISUALS, PLACEMENT_MAP_VISUALS } from '../src/systems/PlacementViewManager.js';
+import PlacementMapGeometry from '../src/systems/PlacementMapGeometry.js';
 import SaveManager, { LEARNING_SAVE_STORAGE_KEY } from '../src/systems/SaveManager.js';
 import SavedDataViewManager from '../src/systems/SavedDataViewManager.js';
 import StorageSummaryManager from '../src/systems/StorageSummaryManager.js';
@@ -968,6 +969,29 @@ function testMapData() {
   assert.equal(mapData.tiles[1][9].type, 'river', 'known river anchor should stay in place');
   assert.equal(mapData.tiles[1][1].zone, 'center', 'known center buildable tile should stay in place');
   assert.equal(mapData.tiles[6][1].zone, 'outskirts', 'known outskirts buildable tile should stay in place');
+}
+
+
+function testPlacementMapGeometry() {
+  const geometry = new PlacementMapGeometry({
+    origin: PlacementViewManager.getScreenLayout().mapOrigin,
+    tileWidth: mapData.tileWidth,
+    tileHeight: mapData.tileHeight,
+    mapWidth: mapData.width,
+    mapHeight: mapData.height,
+  });
+
+  assert.deepEqual(geometry.tileToWorld(0, 0), { x: 940, y: 260 });
+  assert.deepEqual(geometry.tileToWorld(2, 1), { x: 988, y: 332 });
+  assert.deepEqual(geometry.worldToTile(988, 332), { x: 2, y: 1 });
+  assert.equal(geometry.worldToTile(100, 100), null);
+  assert.deepEqual(geometry.getDiamondPoints(0, 0), [
+    { x: 940, y: 236 },
+    { x: 988, y: 260 },
+    { x: 940, y: 284 },
+    { x: 892, y: 260 },
+  ]);
+  assert.deepEqual(geometry.getFootprintCenter(1, 1, { width: 2, height: 2 }), { x: 940, y: 332 });
 }
 
 function testPlacementViewManager() {
@@ -2009,6 +2033,7 @@ async function run() {
   testPolicyData();
   testPolicyRecommendationMatchingUsesIds();
   testMapData();
+  testPlacementMapGeometry();
   testPlacementViewManager();
   testPlacementRules();
   testEndingSummaryViewManager();

@@ -7,6 +7,7 @@ import PlacementSystem from '../systems/PlacementSystem.js';
 import CameraController from '../systems/CameraController.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import PlacementViewManager from '../systems/PlacementViewManager.js';
+import PlacementMapGeometry from '../systems/PlacementMapGeometry.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 
 export default class PlacementScene extends Phaser.Scene {
@@ -20,13 +21,15 @@ export default class PlacementScene extends Phaser.Scene {
     this.placementSystem = new PlacementSystem(this.cloneMapData(mapData));
     this.placedBuildings = [...(this.registry.get('placedBuildings') ?? [])];
     this.pendingPlacementPointer = null;
-    this.mapOrigin = PlacementViewManager.getScreenLayout().mapOrigin;
+    this.mapGeometry = new PlacementMapGeometry({
+      origin: PlacementViewManager.getScreenLayout().mapOrigin,
+      tileWidth: mapData.tileWidth,
+      tileHeight: mapData.tileHeight,
+      mapWidth: mapData.width,
+      mapHeight: mapData.height,
+    });
     this.uiObjects = [];
     this.worldObjects = [];
-    this.tileWidth = mapData.tileWidth;
-    this.tileHeight = mapData.tileHeight;
-    this.halfTileWidth = this.tileWidth / 2;
-    this.halfTileHeight = this.tileHeight / 2;
 
     this.drawBackground();
     this.mapGraphics = this.registerWorldObject(this.add.graphics().setDepth(1));
@@ -433,7 +436,7 @@ export default class PlacementScene extends Phaser.Scene {
 
 
   drawImpactMarkers(building, tileX, tileY, animate = true) {
-    const center = this.getFootprintCenter(tileX, tileY, building.footprint);
+    const center = this.mapGeometry.getFootprintCenter(tileX, tileY, building.footprint);
     const markerData = PlacementViewManager.getImpactMarkerData(building);
     const markerLayout = PlacementViewManager.getImpactMarkerLayout(center, tileX, tileY);
     const markerContainer = this.registerWorldObject(this.add.container(markerLayout.container.x, markerLayout.container.y)
@@ -484,7 +487,7 @@ export default class PlacementScene extends Phaser.Scene {
       );
     }
 
-    const labelPosition = this.getFootprintCenter(tileX, tileY, building.footprint);
+    const labelPosition = this.mapGeometry.getFootprintCenter(tileX, tileY, building.footprint);
     const labelLayout = PlacementViewManager.getBuildingLabelLayout(labelPosition, tileX, tileY);
     graphics.fillStyle(labelLayout.background.fillColor, labelLayout.background.fillAlpha);
     graphics.fillRoundedRect(
@@ -505,13 +508,7 @@ export default class PlacementScene extends Phaser.Scene {
   }
 
   drawDiamond(graphics, tileX, tileY, fillColor, alpha, strokeColor, strokeWidth) {
-    const center = this.tileToWorld(tileX, tileY);
-    const points = [
-      new Phaser.Geom.Point(center.x, center.y - this.halfTileHeight),
-      new Phaser.Geom.Point(center.x + this.halfTileWidth, center.y),
-      new Phaser.Geom.Point(center.x, center.y + this.halfTileHeight),
-      new Phaser.Geom.Point(center.x - this.halfTileWidth, center.y),
-    ];
+    const points = this.mapGeometry.getDiamondPoints(tileX, tileY);
 
     graphics.fillStyle(fillColor, alpha);
     graphics.fillPoints(points, true);
@@ -519,36 +516,9 @@ export default class PlacementScene extends Phaser.Scene {
     graphics.strokePoints(points, true);
   }
 
-  tileToWorld(tileX, tileY) {
-    return {
-      x: this.mapOrigin.x + (tileX - tileY) * this.halfTileWidth,
-      y: this.mapOrigin.y + (tileX + tileY) * this.halfTileHeight,
-    };
-  }
-
   pointerToTile(pointer) {
     const worldPoint = pointer.positionToCamera(this.cameras.main);
-    const localX = worldPoint.x - this.mapOrigin.x;
-    const localY = worldPoint.y - this.mapOrigin.y;
-    const approximateX = (localX / this.halfTileWidth + localY / this.halfTileHeight) / 2;
-    const approximateY = (localY / this.halfTileHeight - localX / this.halfTileWidth) / 2;
-    const tileX = Math.floor(approximateX + 0.5);
-    const tileY = Math.floor(approximateY + 0.5);
-
-    if (tileX < 0 || tileY < 0 || tileX >= this.placementSystem.mapData.width || tileY >= this.placementSystem.mapData.height) {
-      return null;
-    }
-
-    return { x: tileX, y: tileY };
-  }
-
-  getFootprintCenter(tileX, tileY, footprint) {
-    const start = this.tileToWorld(tileX, tileY);
-    const end = this.tileToWorld(tileX + footprint.width - 1, tileY + footprint.height - 1);
-    return {
-      x: (start.x + end.x) / 2,
-      y: (start.y + end.y) / 2,
-    };
+    return this.mapGeometry.worldToTile(worldPoint.x, worldPoint.y);
   }
 
   updateCursorInfo(tile, validation = null) {
