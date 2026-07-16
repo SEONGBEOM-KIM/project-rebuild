@@ -8,6 +8,7 @@ import PlacementViewManager from '../systems/PlacementViewManager.js';
 import PlacementMapGeometry from '../systems/PlacementMapGeometry.js';
 import PlacementMapRenderer from '../systems/PlacementMapRenderer.js';
 import PlacementResultManager from '../systems/PlacementResultManager.js';
+import PlacementUiStateManager from '../systems/PlacementUiStateManager.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 
 export default class PlacementScene extends Phaser.Scene {
@@ -133,8 +134,8 @@ export default class PlacementScene extends Phaser.Scene {
       .setInteractive({ useHandCursor: true });
 
     const handleContinue = () => {
-      if (!PlacementViewManager.canContinue(this.placedBuildings.length)) {
-        this.showMessage(PlacementViewManager.formatNeedMoreMessage(this.placedBuildings.length), '#fecaca');
+      if (!PlacementUiStateManager.canContinue(this.placedBuildings.length)) {
+        this.showMessage(PlacementUiStateManager.formatNeedMoreMessage(this.placedBuildings.length), '#fecaca');
         return;
       }
       this.scene.start(layout.continueButton.target);
@@ -166,7 +167,7 @@ export default class PlacementScene extends Phaser.Scene {
 
   createLastChangePanel() {
     const layout = PlacementViewManager.getUiLayout();
-    const emptyState = PlacementViewManager.getEmptyLastChangeState();
+    const emptyState = PlacementUiStateManager.getEmptyLastChangeState();
     const textStyles = PlacementViewManager.getTextStyles();
 
     this.createFixedRectangleFromLayout(layout.lastChangePanel);
@@ -182,7 +183,7 @@ export default class PlacementScene extends Phaser.Scene {
 
   createPlacementHistoryPanel() {
     const layout = PlacementViewManager.getUiLayout();
-    const emptyState = PlacementViewManager.getEmptyPlacementHistoryState();
+    const emptyState = PlacementUiStateManager.getEmptyPlacementHistoryState();
     const textStyles = PlacementViewManager.getTextStyles();
 
     this.createFixedRectangleFromLayout(layout.historyPanel);
@@ -223,7 +224,7 @@ export default class PlacementScene extends Phaser.Scene {
     const selectBuilding = () => {
       this.selectedBuilding = building;
       this.updateSelectedBuildingUi();
-      this.showMessage(PlacementViewManager.formatBuildingSelectedMessage(building.name), '#bbf7d0');
+      this.showMessage(PlacementUiStateManager.formatBuildingSelectedMessage(building.name), '#bbf7d0');
     };
 
     card.on('pointerdown', selectBuilding);
@@ -363,13 +364,13 @@ export default class PlacementScene extends Phaser.Scene {
   tryPlace(pointer) {
     const tile = this.pointerToTile(pointer);
     if (!tile) {
-      this.showMessage(PlacementViewManager.formatMapSelectMessage(), '#fecaca');
+      this.showMessage(PlacementUiStateManager.formatMapSelectMessage(), '#fecaca');
       return;
     }
 
     const validation = this.placementSystem.validatePlacement(tile.x, tile.y, this.selectedBuilding);
     if (!validation.valid) {
-      this.showMessage(PlacementViewManager.formatInvalidPlacementMessage(validation.reason), '#fecaca');
+      this.showMessage(PlacementUiStateManager.formatInvalidPlacementMessage(validation.reason), '#fecaca');
       this.updateCursorInfo(tile, validation);
       return;
     }
@@ -390,7 +391,7 @@ export default class PlacementScene extends Phaser.Scene {
     this.updateLastChangePanel(this.registry.get('lastPlacementResult'));
     this.updatePlacementHistoryPanel();
     this.updateContinueButton();
-    this.showMessage(PlacementViewManager.formatPlacementSuccessMessage(this.selectedBuilding.name, this.placedBuildings.length), '#bbf7d0');
+    this.showMessage(PlacementUiStateManager.formatPlacementSuccessMessage(this.selectedBuilding.name, this.placedBuildings.length), '#bbf7d0');
     this.updatePreview(pointer);
   }
 
@@ -480,7 +481,7 @@ export default class PlacementScene extends Phaser.Scene {
     }
 
     if (!tile) {
-      const cursorState = PlacementViewManager.formatCursorInfo(null);
+      const cursorState = PlacementUiStateManager.formatCursorInfo(null);
       this.cursorInfoText.setText(cursorState.text);
       this.cursorInfoText.setColor(cursorState.color);
       return;
@@ -488,7 +489,7 @@ export default class PlacementScene extends Phaser.Scene {
 
     const mapTile = this.placementSystem.getTile(tile.x, tile.y);
     const status = validation ?? this.placementSystem.validatePlacement(tile.x, tile.y, this.selectedBuilding);
-    const cursorState = PlacementViewManager.formatCursorInfo(tile, mapTile, status);
+    const cursorState = PlacementUiStateManager.formatCursorInfo(tile, mapTile, status);
     this.cursorInfoText.setText(cursorState.text);
     this.cursorInfoText.setColor(cursorState.color);
 
@@ -499,7 +500,7 @@ export default class PlacementScene extends Phaser.Scene {
       return;
     }
     const state = this.registry.get('gameState');
-    this.statusText.setText(PlacementViewManager.formatStatusText(state));
+    this.statusText.setText(PlacementUiStateManager.formatStatusText(state));
 
   }
 
@@ -508,7 +509,7 @@ export default class PlacementScene extends Phaser.Scene {
       return;
     }
 
-    const lastChangeState = PlacementViewManager.formatLastChangeState(lastPlacementResult);
+    const lastChangeState = PlacementUiStateManager.formatLastChangeState(lastPlacementResult);
     this.lastChangeText.setText(lastChangeState.text);
     this.lastChangeText.setColor(lastChangeState.color);
   }
@@ -518,13 +519,13 @@ export default class PlacementScene extends Phaser.Scene {
       return;
     }
 
-    const historyState = PlacementViewManager.formatPlacementHistoryState(this.placedBuildings);
+    const historyState = PlacementUiStateManager.formatPlacementHistoryState(this.placedBuildings);
     this.placementHistoryText.setText(historyState.text);
     this.placementHistoryText.setColor(historyState.color);
   }
 
   updateContinueButton() {
-    const continueState = PlacementViewManager.getContinueState(this.placedBuildings.length, this.selectedPolicy);
+    const continueState = PlacementUiStateManager.getContinueState(this.placedBuildings.length, this.selectedPolicy);
 
     if (this.missionText) {
       this.missionText.setText(continueState.missionText);

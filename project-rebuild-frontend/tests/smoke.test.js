@@ -36,6 +36,7 @@ import PlacementViewManager, { TILE_COLORS, TILE_STROKES, TILE_LABELS, ZONE_LABE
 import PlacementMapGeometry from '../src/systems/PlacementMapGeometry.js';
 import PlacementMapRenderer from '../src/systems/PlacementMapRenderer.js';
 import PlacementResultManager from '../src/systems/PlacementResultManager.js';
+import PlacementUiStateManager from '../src/systems/PlacementUiStateManager.js';
 import SaveManager, { LEARNING_SAVE_STORAGE_KEY } from '../src/systems/SaveManager.js';
 import SavedDataViewManager from '../src/systems/SavedDataViewManager.js';
 import StorageSummaryManager from '../src/systems/StorageSummaryManager.js';
@@ -1117,9 +1118,9 @@ function testPlacementViewManager() {
   assert.equal(PlacementViewManager.isPointerOnUi({ x: 429, y: 200 }), true);
   assert.equal(PlacementViewManager.isPointerOnUi({ x: 500, y: 97 }), true);
   assert.equal(PlacementViewManager.isPointerOnUi({ x: 500, y: 500 }), false);
-  assert.equal(PlacementViewManager.formatMapSelectMessage(), '지도 안쪽 타일을 선택하세요.');
-  assert.equal(PlacementViewManager.formatInvalidPlacementMessage('도로 위입니다'), '배치 불가: 도로 위입니다');
-  assert.equal(PlacementViewManager.formatBuildingSelectedMessage('청년센터'), '청년센터 선택됨');
+  assert.equal(PlacementUiStateManager.formatMapSelectMessage(), '지도 안쪽 타일을 선택하세요.');
+  assert.equal(PlacementUiStateManager.formatInvalidPlacementMessage('도로 위입니다'), '배치 불가: 도로 위입니다');
+  assert.equal(PlacementUiStateManager.formatBuildingSelectedMessage('청년센터'), '청년센터 선택됨');
   assert.equal(PlacementViewManager.getUiLayout().legendTitle.text, '타일 범례');
   assert.equal(PlacementViewManager.getUiLayout().continueButton.target, 'ResultScene');
   assert.equal(PlacementViewManager.getUiLayout().continueButton.backgroundColor, 0x94a3b8);
@@ -1173,11 +1174,11 @@ function testPlacementViewManager() {
     duration: 280,
     ease: 'Back.Out',
   });
-  assert.deepEqual(PlacementViewManager.formatCursorInfo(null), {
+  assert.deepEqual(PlacementUiStateManager.formatCursorInfo(null), {
     text: '커서 타일: 지도 밖 또는 UI 영역',
     color: '#bfdbfe',
   });
-  assert.deepEqual(PlacementViewManager.formatCursorInfo(
+  assert.deepEqual(PlacementUiStateManager.formatCursorInfo(
     { x: 1, y: 2 },
     { type: 'empty', zone: 'center' },
     { valid: true },
@@ -1185,12 +1186,12 @@ function testPlacementViewManager() {
     text: '커서 타일: (1, 2)\n지형: 빈 땅 / 구역: 중심지\n판정: 배치 가능',
     color: '#bbf7d0',
   });
-  assert.match(PlacementViewManager.formatStatusText(GameState.createInitialState()), /현재 상태\n인구: 1000/);
-  assert.equal(PlacementViewManager.formatLastChangeState(null).color, '#fde68a');
-  assert.equal(PlacementViewManager.formatPlacementHistoryState([]).color, '#bfdbfe');
+  assert.match(PlacementUiStateManager.formatStatusText(GameState.createInitialState()), /현재 상태\n인구: 1000/);
+  assert.equal(PlacementUiStateManager.formatLastChangeState(null).color, '#fde68a');
+  assert.equal(PlacementUiStateManager.formatPlacementHistoryState([]).color, '#bfdbfe');
 
   const youthCenter = buildings.find((building) => building.id === 'youth_center');
-  const lastChange = PlacementViewManager.formatLastChangeState({
+  const lastChange = PlacementUiStateManager.formatLastChangeState({
     building: youthCenter,
     position: { x: 1, y: 1 },
     before: GameState.createInitialState(),
@@ -1200,21 +1201,21 @@ function testPlacementViewManager() {
   assert.match(lastChange.text, /청년센터 배치/);
   assert.match(lastChange.text, /인구: 1000 → 1080/);
 
-  const history = PlacementViewManager.formatPlacementHistoryState([
+  const history = PlacementUiStateManager.formatPlacementHistoryState([
     { building: youthCenter, position: { x: 1, y: 1 } },
   ]);
   assert.match(history.text, /총 배치: 1개/);
   assert.match(history.text, /1\. 청년센터 \(1, 1\)/);
 
-  const continueState = PlacementViewManager.getContinueState(2, { name: '녹색 회복 계획', recommendedBuildings: ['작은 공원'] });
+  const continueState = PlacementUiStateManager.getContinueState(2, { name: '녹색 회복 계획', recommendedBuildings: ['작은 공원'] });
   assert.equal(continueState.enabled, false);
   assert.equal(continueState.buttonText, '시설 1개 더 배치');
   assert.match(continueState.missionText, /추천 시설: 작은 공원/);
-  assert.equal(PlacementViewManager.canContinue(2), false);
-  assert.equal(PlacementViewManager.canContinue(3), true);
-  assert.equal(PlacementViewManager.getContinueState(3, null).buttonText, '종합 결과 확인');
-  assert.equal(PlacementViewManager.formatPlacementSuccessMessage('청년센터', 3), '청년센터 배치 완료: 종합 결과를 확인할 수 있습니다.');
-  assert.equal(PlacementViewManager.formatNeedMoreMessage(1), '종합 결과를 보려면 시설 2개를 더 배치하세요.');
+  assert.equal(PlacementUiStateManager.canContinue(2), false);
+  assert.equal(PlacementUiStateManager.canContinue(3), true);
+  assert.equal(PlacementUiStateManager.getContinueState(3, null).buttonText, '종합 결과 확인');
+  assert.equal(PlacementUiStateManager.formatPlacementSuccessMessage('청년센터', 3), '청년센터 배치 완료: 종합 결과를 확인할 수 있습니다.');
+  assert.equal(PlacementUiStateManager.formatNeedMoreMessage(1), '종합 결과를 보려면 시설 2개를 더 배치하세요.');
   assert.equal(PlacementViewManager.isRecommendedBuilding(youthCenter, { recommendedBuildingIds: ['youth_center'] }), true);
   assert.equal(PlacementViewManager.isRecommendedBuilding(youthCenter, { recommendedBuildingIds: ['bus_station'] }), false);
   assert.deepEqual(PlacementViewManager.getBuildingCardStyle(youthCenter, youthCenter, null), {
