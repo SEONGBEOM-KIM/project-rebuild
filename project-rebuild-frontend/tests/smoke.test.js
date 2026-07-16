@@ -16,6 +16,7 @@ import CauseQuizViewManager from '../src/systems/CauseQuizViewManager.js';
 import SelectionViewManager from '../src/systems/SelectionViewManager.js';
 import ProblemSummaryViewManager from '../src/systems/ProblemSummaryViewManager.js';
 import ExplorationViewManager from '../src/systems/ExplorationViewManager.js';
+import ExplorationMapRenderer from '../src/systems/ExplorationMapRenderer.js';
 import DataBriefingViewManager from '../src/systems/DataBriefingViewManager.js';
 import ReflectionViewManager from '../src/systems/ReflectionViewManager.js';
 import TitleViewManager from '../src/systems/TitleViewManager.js';
@@ -589,6 +590,101 @@ function testExplorationViewManager() {
     strokeWidth: 5,
     strokeColor: 0xffffff,
   });
+}
+
+function createExplorationRendererSceneSpy() {
+  const calls = [];
+  const createObject = (type, args) => ({
+    type,
+    args,
+    visible: true,
+    events: new Map(),
+    add(children) {
+      calls.push(['container.add', children.map((child) => child.type)]);
+      this.children = children;
+      return this;
+    },
+    setAngle(value) {
+      calls.push(['angle', type, value]);
+      this.angle = value;
+      return this;
+    },
+    setStrokeStyle(width, color) {
+      calls.push(['stroke', type, width, color]);
+      this.stroke = { width, color };
+      return this;
+    },
+    setOrigin(value) {
+      calls.push(['origin', type, value]);
+      this.origin = value;
+      return this;
+    },
+    setVisible(value) {
+      calls.push(['visible', type, value]);
+      this.visible = value;
+      return this;
+    },
+    setInteractive(config) {
+      calls.push(['interactive', type, config]);
+      this.interactive = config;
+      return this;
+    },
+    on(eventName, handler) {
+      calls.push(['on', type, eventName]);
+      this.events.set(eventName, handler);
+      return this;
+    },
+  });
+
+  return {
+    calls,
+    scene: {
+      add: {
+        rectangle: (...args) => {
+          calls.push(['rectangle', ...args]);
+          return createObject('rectangle', args);
+        },
+        ellipse: (...args) => {
+          calls.push(['ellipse', ...args]);
+          return createObject('ellipse', args);
+        },
+        circle: (...args) => {
+          calls.push(['circle', ...args]);
+          return createObject('circle', args);
+        },
+        text: (...args) => {
+          calls.push(['text', ...args]);
+          return createObject('text', args);
+        },
+        container: (...args) => {
+          calls.push(['container', ...args]);
+          return createObject('container', args);
+        },
+      },
+    },
+  };
+}
+
+function testExplorationMapRenderer() {
+  const backdropFixture = createExplorationRendererSceneSpy();
+  ExplorationMapRenderer.renderBackdrop(backdropFixture.scene);
+  assert.equal(backdropFixture.calls.filter((call) => call[0] === 'ellipse').length, 2);
+  assert.equal(backdropFixture.calls.filter((call) => call[0] === 'angle').length, 3);
+  assert.ok(backdropFixture.calls.some((call) => call[0] === 'text' && call[3].includes('임시 지도 데이터')));
+
+  const markerFixture = createExplorationRendererSceneSpy();
+  const selectedPlaces = [];
+  const place = explorationPlaces[0];
+  const markerObjects = ExplorationMapRenderer.renderPlaceMarker(markerFixture.scene, place, {
+    explored: true,
+    onSelect: (selectedPlace) => selectedPlaces.push(selectedPlace.id),
+  });
+
+  assert.equal(markerObjects.marker.type, 'circle');
+  assert.equal(markerObjects.check.visible, true);
+  assert.ok(markerFixture.calls.some((call) => call[0] === 'container.add'));
+  markerObjects.marker.events.get('pointerdown')();
+  assert.deepEqual(selectedPlaces, [place.id]);
 }
 
 function testDataBriefingViewManager() {
@@ -2828,6 +2924,7 @@ async function run() {
   testSelectionViewManager();
   testProblemSummaryViewManager();
   testExplorationViewManager();
+  testExplorationMapRenderer();
   testDataBriefingViewManager();
   testReflectionViewManager();
   testTitleViewManager();

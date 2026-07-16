@@ -5,6 +5,7 @@ import { explorationPlaces } from '../data/explorationPlaces.js';
 import { CURRENT_EPISODE } from '../data/episodes.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import ExplorationViewManager from '../systems/ExplorationViewManager.js';
+import ExplorationMapRenderer from '../systems/ExplorationMapRenderer.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 import { createPanelBackground } from '../ui/PanelRenderer.js';
@@ -43,49 +44,16 @@ export default class ExplorationScene extends Phaser.Scene {
   }
 
   drawMapBackdrop() {
-    const layout = ExplorationViewManager.getMapLayout();
-    createPanelBackground(this, layout.backdrop, layout.backdrop);
-    layout.hills.forEach((hill) => {
-      this.add.ellipse(hill.x, hill.y, hill.width, hill.height, hill.fillColor, hill.fillAlpha);
-    });
-    layout.roads.forEach((road) => {
-      createPanelBackground(this, road, road).setAngle(road.angle);
-    });
-    createPanelBackground(this, layout.river, layout.river).setAngle(layout.river.angle);
-
-    createLayoutText(this, layout.note, { style: ExplorationViewManager.getTextStyles().mapNote });
+    ExplorationMapRenderer.renderBackdrop(this);
   }
 
   drawPlaces() {
     for (const place of explorationPlaces) {
-      const layout = ExplorationViewManager.getPlaceMarkerLayout();
-      const textStyles = ExplorationViewManager.getTextStyles();
-      const container = this.add.container(place.position.x, place.position.y);
-      const marker = this.add.circle(layout.marker.x, layout.marker.y, layout.marker.radius, place.color, layout.marker.fillAlpha)
-        .setStrokeStyle(layout.marker.strokeWidth, layout.marker.strokeColor)
-        .setInteractive({ useHandCursor: true });
-      const icon = createLayoutText(this, layout.icon, {
-        text: place.icon,
-        style: textStyles.markerIcon,
-        origin: 0.5,
+      const markerObjects = ExplorationMapRenderer.renderPlaceMarker(this, place, {
+        explored: this.exploredPlaces.has(place.id),
+        onSelect: (selectedPlace) => this.selectPlace(selectedPlace),
       });
-      const labelBg = createPanelBackground(this, layout.labelBackground, layout.labelBackground, {
-        strokeColor: place.color,
-      });
-      const label = createLayoutText(this, layout.label, {
-        text: place.name,
-        style: textStyles.markerLabel,
-        origin: 0.5,
-      });
-      const check = createLayoutText(this, layout.check, {
-        style: textStyles.markerCheck,
-        origin: 0.5,
-      }).setVisible(this.exploredPlaces.has(place.id));
-
-      container.add([marker, icon, labelBg, label, check]);
-      marker.on('pointerdown', () => this.selectPlace(place));
-      icon.setInteractive({ useHandCursor: true }).on('pointerdown', () => this.selectPlace(place));
-      this.placeObjects.set(place.id, { marker, check });
+      this.placeObjects.set(place.id, markerObjects);
     }
   }
 
