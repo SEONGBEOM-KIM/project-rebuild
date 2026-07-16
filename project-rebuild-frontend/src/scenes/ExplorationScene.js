@@ -5,6 +5,7 @@ import { CURRENT_EPISODE } from '../data/episodes.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import ExplorationViewManager from '../systems/ExplorationViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
+import { createLayoutText } from '../ui/LayoutText.js';
 
 export default class ExplorationScene extends Phaser.Scene {
   constructor() {
@@ -78,17 +79,14 @@ export default class ExplorationScene extends Phaser.Scene {
     const textStyles = ExplorationViewManager.getTextStyles();
     this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
       .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
-    this.panelTitle = this.add.text(layout.title.x, layout.title.y, '', {
-      ...textStyles.panelTitle,
-      wordWrap: { width: layout.title.wordWrapWidth },
+    this.panelTitle = createLayoutText(this, layout.title, {
+      style: textStyles.panelTitle,
     });
-    this.panelBody = this.add.text(layout.body.x, layout.body.y, '', {
-      ...textStyles.panelBody,
-      wordWrap: { width: layout.body.wordWrapWidth },
+    this.panelBody = createLayoutText(this, layout.body, {
+      style: textStyles.panelBody,
     });
-    this.progressText = this.add.text(layout.progress.x, layout.progress.y, '', {
-      ...textStyles.progress,
-      wordWrap: { width: layout.progress.wordWrapWidth },
+    this.progressText = createLayoutText(this, layout.progress, {
+      style: textStyles.progress,
     });
   }
 

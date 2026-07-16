@@ -100,11 +100,13 @@ export default class LearningDataScene extends Phaser.Scene {
       color: panelStyle.titleColor,
       fontStyle: panelStyle.titleFontStyle,
     });
-    this.saveStatusText = this.add.text(layout.body.x, layout.body.y, LearningDataViewManager.formatSaveStatus(saved), {
-      fontSize: panelStyle.bodyFontSize,
-      color: panelStyle.bodyColor,
-      lineSpacing: panelStyle.bodyLineSpacing,
-      wordWrap: { width: layout.body.wordWrapWidth },
+    this.saveStatusText = createLayoutText(this, layout.body, {
+      text: LearningDataViewManager.formatSaveStatus(saved),
+      style: {
+        fontSize: panelStyle.bodyFontSize,
+        color: panelStyle.bodyColor,
+        lineSpacing: panelStyle.bodyLineSpacing,
+      },
     });
   }
 

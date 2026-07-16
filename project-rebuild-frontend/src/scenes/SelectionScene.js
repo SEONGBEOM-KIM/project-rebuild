@@ -29,10 +29,10 @@ export default class SelectionScene extends Phaser.Scene {
       this.createPolicyCard(policy, position.x, position.y);
     });
 
-    this.detailText = this.add.text(layout.detail.x, layout.detail.y, '', {
-      ...SelectionViewManager.getTextStyles().detail,
-      wordWrap: { width: layout.detail.wordWrapWidth },
-    }).setOrigin(0.5, 0);
+    this.detailText = createLayoutText(this, layout.detail, {
+      style: SelectionViewManager.getTextStyles().detail,
+      origin: [0.5, 0],
+    });
 
     const controls = SelectionViewManager.getControlLayout(width / 2);
     const backButton = createTextButton(this, controls.back, SelectionViewManager.getButtonStyle());
@@ -58,19 +58,22 @@ export default class SelectionScene extends Phaser.Scene {
       .setInteractive({ useHandCursor: true });
     const colorBar = this.add.rectangle(layout.colorBar.x, layout.colorBar.y, layout.colorBar.width, layout.colorBar.height, policy.color, 1);
     const title = this.add.text(layout.title.x, layout.title.y, policy.name, textStyles.title).setOrigin(0.5);
-    const tagline = this.add.text(layout.tagline.x, layout.tagline.y, policy.tagline, {
-      ...textStyles.tagline,
-      wordWrap: { width: layout.tagline.wordWrapWidth },
-    }).setOrigin(0.5);
-    const description = this.add.text(layout.description.x, layout.description.y, policy.description, {
-      ...textStyles.description,
-      wordWrap: { width: layout.description.wordWrapWidth },
-    }).setOrigin(0.5);
+    const tagline = createLayoutText(this, layout.tagline, {
+      text: policy.tagline,
+      style: textStyles.tagline,
+      origin: 0.5,
+    });
+    const description = createLayoutText(this, layout.description, {
+      text: policy.description,
+      style: textStyles.description,
+      origin: 0.5,
+    });
     const focus = this.add.text(layout.focus.x, layout.focus.y, SelectionViewManager.formatFocusText(policy), textStyles.focus).setOrigin(0.5);
-    const recommended = this.add.text(layout.recommended.x, layout.recommended.y, SelectionViewManager.formatRecommendedBuildings(policy), {
-      ...textStyles.recommended,
-      wordWrap: { width: layout.recommended.wordWrapWidth },
-    }).setOrigin(0.5);
+    const recommended = createLayoutText(this, layout.recommended, {
+      text: SelectionViewManager.formatRecommendedBuildings(policy),
+      style: textStyles.recommended,
+      origin: 0.5,
+    });
 
     container.add([background, colorBar, title, tagline, description, focus, recommended]);
     background.on('pointerdown', () => {

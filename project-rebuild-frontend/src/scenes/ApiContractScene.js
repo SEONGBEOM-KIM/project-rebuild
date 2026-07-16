@@ -51,10 +51,16 @@ export default class ApiContractScene extends Phaser.Scene {
       color: noteStyle.titleColor,
       fontStyle: noteStyle.titleFontStyle,
     });
-    this.add.text(layout.body.x, layout.body.y, ApiContractViewManager.formatBackendNote(), {
-      fontSize: noteStyle.bodyFontSize,
-      color: noteStyle.bodyColor,
-      wordWrap: { width: layout.body.width },
+    createLayoutText(this, {
+      x: layout.body.x,
+      y: layout.body.y,
+      wordWrapWidth: layout.body.width,
+    }, {
+      text: ApiContractViewManager.formatBackendNote(),
+      style: {
+        fontSize: noteStyle.bodyFontSize,
+        color: noteStyle.bodyColor,
+      },
     });
   }
 
