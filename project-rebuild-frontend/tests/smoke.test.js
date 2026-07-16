@@ -35,6 +35,7 @@ import PlacementSystem from '../src/systems/PlacementSystem.js';
 import PlacementViewManager, { TILE_COLORS, TILE_STROKES, TILE_LABELS, ZONE_LABELS, REQUIRED_PLACEMENTS, PLACEMENT_DRAG_THRESHOLD, PLACEMENT_UI_BOUNDS, PREVIEW_STYLES, PLACEMENT_UI_LAYOUT, BUILDING_CARD_LAYOUT, BUILDING_CARD_VISUALS, PLACEMENT_MAP_VISUALS } from '../src/systems/PlacementViewManager.js';
 import PlacementMapGeometry from '../src/systems/PlacementMapGeometry.js';
 import PlacementMapRenderer from '../src/systems/PlacementMapRenderer.js';
+import PlacementResultManager from '../src/systems/PlacementResultManager.js';
 import SaveManager, { LEARNING_SAVE_STORAGE_KEY } from '../src/systems/SaveManager.js';
 import SavedDataViewManager from '../src/systems/SavedDataViewManager.js';
 import StorageSummaryManager from '../src/systems/StorageSummaryManager.js';
@@ -1244,6 +1245,56 @@ function testPlacementViewManager() {
   });
 }
 
+
+function testPlacementResultManager() {
+  const registry = createMemoryRegistry();
+  const initialState = GameState.createInitialState();
+  const youthCenter = buildings.find((building) => building.id === 'youth_center');
+  const tile = { x: 2, y: 7 };
+  const occupiedTiles = [{ x: 2, y: 7 }, { x: 3, y: 7 }, { x: 2, y: 8 }, { x: 3, y: 8 }];
+
+  registry.set('gameState', initialState);
+  registry.set('learningProgress', LearningProgress.createInitialProgress());
+
+  const result = PlacementResultManager.createPlacementResult({
+    building: youthCenter,
+    tile,
+    occupiedTiles,
+    before: initialState,
+  });
+  assert.equal(result.building.id, 'youth_center');
+  assert.deepEqual(result.position, tile);
+  assert.equal(result.after.population, 1080);
+  assert.equal(result.after.budget, 820);
+  assert.deepEqual(result.delta, youthCenter.effect);
+
+  const record = PlacementResultManager.createPlacementRecord({
+    building: youthCenter,
+    tile,
+    occupiedTiles,
+    placedCount: 2,
+    now: 12345,
+  });
+  assert.equal(record.id, 'youth_center-12345-2');
+  assert.deepEqual(record.position, tile);
+  assert.deepEqual(record.occupiedTiles, occupiedTiles);
+
+  const commit = PlacementResultManager.commitPlacement({
+    registry,
+    building: youthCenter,
+    tile,
+    occupiedTiles,
+    placedBuildings: [],
+    now: 12345,
+  });
+  assert.equal(commit.placedBuildings.length, 1);
+  assert.equal(commit.record.id, 'youth_center-12345-0');
+  assert.equal(registry.get('gameState').population, 1080);
+  assert.equal(registry.get('lastPlacementResult').building.id, 'youth_center');
+  assert.equal(registry.get('placedBuildings')[0].id, 'youth_center-12345-0');
+  assert.deepEqual(LearningProgress.get(registry).placedBuildingIds, ['youth_center']);
+}
+
 function testPlacementRules() {
   const placementSystem = new PlacementSystem(cloneMapData(mapData));
   const youthCenter = buildings.find((building) => building.id === 'youth_center');
@@ -2108,6 +2159,7 @@ async function run() {
   testPlacementMapGeometry();
   testPlacementMapRenderer();
   testPlacementViewManager();
+  testPlacementResultManager();
   testPlacementRules();
   testEndingSummaryViewManager();
   testEndingSummaryManager();

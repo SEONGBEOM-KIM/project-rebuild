@@ -2,13 +2,12 @@ import Phaser from 'phaser';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import { buildings } from '../data/buildings.js';
 import { mapData } from '../data/mapData.js';
-import GameState from '../systems/GameState.js';
 import PlacementSystem from '../systems/PlacementSystem.js';
 import CameraController from '../systems/CameraController.js';
-import LearningProgress from '../systems/LearningProgress.js';
 import PlacementViewManager from '../systems/PlacementViewManager.js';
 import PlacementMapGeometry from '../systems/PlacementMapGeometry.js';
 import PlacementMapRenderer from '../systems/PlacementMapRenderer.js';
+import PlacementResultManager from '../systems/PlacementResultManager.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 
 export default class PlacementScene extends Phaser.Scene {
@@ -375,30 +374,15 @@ export default class PlacementScene extends Phaser.Scene {
       return;
     }
 
-    const before = this.registry.get('gameState');
-    const after = GameState.applyEffect(before, this.selectedBuilding.effect);
     const occupiedTiles = this.placementSystem.place(tile.x, tile.y, this.selectedBuilding);
-
-    this.registry.set('gameState', after);
-    this.registry.set('lastPlacementResult', {
+    const placementCommit = PlacementResultManager.commitPlacement({
+      registry: this.registry,
       building: this.selectedBuilding,
-      position: { x: tile.x, y: tile.y },
+      tile,
       occupiedTiles,
-      before,
-      after,
-      delta: this.selectedBuilding.effect,
+      placedBuildings: this.placedBuildings,
     });
-
-    const placementRecord = {
-      id: `${this.selectedBuilding.id}-${Date.now()}-${this.placedBuildings.length}`,
-      building: this.selectedBuilding,
-      position: { x: tile.x, y: tile.y },
-      occupiedTiles,
-      delta: this.selectedBuilding.effect,
-    };
-    this.placedBuildings = [...this.placedBuildings, placementRecord];
-    this.registry.set('placedBuildings', this.placedBuildings);
-    LearningProgress.addPlacedBuilding(this.registry, this.selectedBuilding.id);
+    this.placedBuildings = placementCommit.placedBuildings;
 
     this.drawPlacedBuilding(this.selectedBuilding, tile.x, tile.y);
     this.drawImpactMarkers(this.selectedBuilding, tile.x, tile.y);
