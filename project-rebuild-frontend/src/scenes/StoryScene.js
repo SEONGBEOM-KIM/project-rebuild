@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
+import { createLayoutText } from '../ui/LayoutText.js';
+import { createPanelBackground } from '../ui/PanelRenderer.js';
 import { CURRENT_EPISODE } from '../data/episodes.js';
 import StoryViewManager from '../systems/StoryViewManager.js';
 
@@ -12,31 +14,35 @@ export default class StoryScene extends Phaser.Scene {
     const { width, height } = this.scale;
     const layout = StoryViewManager.getLayout();
     createScreenBackground(this, layout.backgroundColor);
-    this.add.text(width / 2, layout.title.y, CURRENT_EPISODE.title, {
-      fontSize: layout.title.fontSize,
-      color: layout.title.color,
-      fontStyle: layout.title.fontStyle,
-    }).setOrigin(0.5);
+    createLayoutText(this, layout.title, {
+      x: width / 2,
+      text: CURRENT_EPISODE.title,
+      origin: 0.5,
+    });
 
-    this.add.text(width / 2, layout.intro.y, CURRENT_EPISODE.intro, {
-      fontSize: layout.intro.fontSize,
-      color: layout.intro.color,
-      align: layout.intro.align,
-      lineSpacing: layout.intro.lineSpacing,
-    }).setOrigin(0.5);
+    createLayoutText(this, layout.intro, {
+      x: width / 2,
+      text: CURRENT_EPISODE.intro,
+      origin: 0.5,
+    });
 
     this.createStartPlacementButton(StoryViewManager.getStartButton(width));
   }
 
   createStartPlacementButton(button) {
-    const buttonBg = this.add.rectangle(button.x, button.y, button.width, button.height, button.fillColor)
-      .setStrokeStyle(button.strokeWidth, button.strokeColor)
-      .setInteractive({ useHandCursor: true });
-    const buttonText = this.add.text(button.x, button.y, button.label, {
-      fontSize: button.fontSize,
-      color: button.textColor,
-      fontStyle: button.fontStyle,
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    const buttonBg = createPanelBackground(this, button, {
+      fillColor: button.fillColor,
+      strokeWidth: button.strokeWidth,
+      strokeColor: button.strokeColor,
+    }).setInteractive({ useHandCursor: true });
+    const buttonText = createLayoutText(this, { x: button.x, y: button.y, text: button.label }, {
+      style: {
+        fontSize: button.fontSize,
+        color: button.textColor,
+        fontStyle: button.fontStyle,
+      },
+      origin: 0.5,
+    }).setInteractive({ useHandCursor: true });
 
     const goToPlacement = () => {
       this.scene.start(button.targetScene);

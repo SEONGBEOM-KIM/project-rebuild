@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
+import { createLayoutText } from '../ui/LayoutText.js';
+import { createTextButton } from '../ui/TextButton.js';
 import SaveManager from '../systems/SaveManager.js';
 import TitleViewManager from '../systems/TitleViewManager.js';
 
@@ -12,8 +14,8 @@ export default class TitleScene extends Phaser.Scene {
     const { width, height } = this.scale;
     const screenText = TitleViewManager.getScreenText();
     createScreenBackground(this, screenText.backgroundColor);
-    this.add.text(width / 2, screenText.title.y, screenText.title.text, screenText.title).setOrigin(0.5);
-    this.add.text(width / 2, screenText.subtitle.y, screenText.subtitle.text, screenText.subtitle).setOrigin(0.5);
+    createLayoutText(this, screenText.title, { x: width / 2, origin: 0.5 });
+    createLayoutText(this, screenText.subtitle, { x: width / 2, origin: 0.5 });
 
     const hasSave = SaveManager.hasSave();
     const layout = TitleViewManager.getLayout(hasSave);
@@ -22,32 +24,34 @@ export default class TitleScene extends Phaser.Scene {
     const storageButtonConfig = TitleViewManager.getStorageButton();
     const loadButtonConfig = TitleViewManager.getLoadButton();
 
-    const startButton = this.add.text(width / 2, layout.startButtonY, startButtonConfig.label, TitleViewManager.getPrimaryButtonStyle())
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true });
+    this.createTitleButton(width / 2, layout.startButtonY, startButtonConfig, TitleViewManager.getPrimaryButtonStyle())
+      .on('pointerdown', () => this.scene.start(startButtonConfig.targetScene));
 
-    startButton.on('pointerdown', () => this.scene.start(startButtonConfig.targetScene));
+    this.createTitleButton(width / 2, layout.importButtonY, importButtonConfig, TitleViewManager.getSecondaryButtonStyle())
+      .on('pointerdown', () => this.openImportPicker());
 
-    const importButton = this.add.text(width / 2, layout.importButtonY, importButtonConfig.label, TitleViewManager.getSecondaryButtonStyle())
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true });
-    importButton.on('pointerdown', () => this.openImportPicker());
+    this.importStatusText = createLayoutText(this, { x: width / 2, y: layout.importStatusY }, {
+      style: TitleViewManager.getImportStatusStyle(),
+      origin: 0.5,
+    });
 
-    this.importStatusText = this.add.text(width / 2, layout.importStatusY, '', TitleViewManager.getImportStatusStyle()).setOrigin(0.5);
-
-    const storageButton = this.add.text(width / 2, layout.storageButtonY, storageButtonConfig.label, TitleViewManager.getStorageButtonStyle())
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true });
-    storageButton.on('pointerdown', () => this.scene.start(storageButtonConfig.targetScene));
-
+    this.createTitleButton(width / 2, layout.storageButtonY, storageButtonConfig, TitleViewManager.getStorageButtonStyle())
+      .on('pointerdown', () => this.scene.start(storageButtonConfig.targetScene));
 
     if (hasSave) {
-      const loadButton = this.add.text(width / 2, layout.loadButtonY, loadButtonConfig.label, TitleViewManager.getLoadButtonStyle())
-        .setOrigin(0.5)
-        .setInteractive({ useHandCursor: true });
-
-      loadButton.on('pointerdown', () => this.scene.start(loadButtonConfig.targetScene));
+      this.createTitleButton(width / 2, layout.loadButtonY, loadButtonConfig, TitleViewManager.getLoadButtonStyle())
+        .on('pointerdown', () => this.scene.start(loadButtonConfig.targetScene));
     }
+  }
+
+  createTitleButton(x, y, config, style) {
+    return createTextButton(this, {
+      x,
+      y,
+      label: config.label,
+      backgroundColor: style.backgroundColor,
+      textColor: style.color,
+    }, style);
   }
 
   openImportPicker() {
