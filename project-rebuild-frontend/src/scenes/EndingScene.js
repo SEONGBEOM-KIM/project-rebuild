@@ -60,9 +60,9 @@ export default class EndingScene extends Phaser.Scene {
 
     const rows = EndingSummaryManager.formatLearningRecordRows(learningProgress, exploredPlaces, quizResult, reflectionChoice);
 
-    this.add.text(layout.body.x, layout.body.y, rows.join('\n'), {
-      ...textStyles.learningRecordBody,
-      wordWrap: { width: layout.body.wordWrapWidth },
+    createLayoutText(this, layout.body, {
+      text: rows.join('\n'),
+      style: textStyles.learningRecordBody,
     });
   }
 

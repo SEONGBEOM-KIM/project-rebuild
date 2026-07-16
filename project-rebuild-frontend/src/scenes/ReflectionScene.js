@@ -50,9 +50,9 @@ export default class ReflectionScene extends Phaser.Scene {
       .setInteractive({ useHandCursor: true });
     const icon = this.add.text(layout.icon.x, layout.icon.y, choice.icon, textStyles.icon).setOrigin(0.5);
     const title = this.add.text(layout.title.x, layout.title.y, choice.title, textStyles.title);
-    const description = this.add.text(layout.description.x, layout.description.y, choice.description, {
-      ...textStyles.description,
-      wordWrap: { width: layout.description.wordWrapWidth },
+    const description = createLayoutText(this, layout.description, {
+      text: choice.description,
+      style: textStyles.description,
     });
 
     const select = () => this.selectChoice(choice);

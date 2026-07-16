@@ -38,9 +38,9 @@ export default class SideEffectScene extends Phaser.Scene {
     this.add.text(layout.title.x, layout.title.y, layout.title.text, textStyles.issueTitle).setOrigin(0.5);
 
     if (!issues.length) {
-      this.add.text(layout.emptyBody.x, layout.emptyBody.y, SideEffectViewManager.formatEmptyIssueMessage(), {
-        ...textStyles.emptyBody,
-        wordWrap: { width: layout.emptyBody.wordWrapWidth },
+      createLayoutText(this, layout.emptyBody, {
+        text: SideEffectViewManager.formatEmptyIssueMessage(),
+        style: textStyles.emptyBody,
       });
       return;
     }
@@ -53,9 +53,9 @@ export default class SideEffectScene extends Phaser.Scene {
       this.add.circle(card.marker.x, card.marker.y, card.marker.radius, issue.color, cardStyle.markerAlpha)
         .setStrokeStyle(cardStyle.markerStrokeWidth, cardStyle.markerStrokeColor);
       this.add.text(card.title.x, card.title.y, issue.title, textStyles.cardTitle);
-      this.add.text(card.message.x, card.message.y, issue.message, {
-        ...textStyles.cardMessage,
-        wordWrap: { width: card.message.wordWrapWidth },
+      createLayoutText(this, card.message, {
+        text: issue.message,
+        style: textStyles.cardMessage,
       });
     });
   }
@@ -70,9 +70,9 @@ export default class SideEffectScene extends Phaser.Scene {
 
     const rows = SideEffectViewManager.formatHintRows(issues);
 
-    this.add.text(layout.body.x, layout.body.y, rows.join('\n'), {
-      ...textStyles.hintBody,
-      wordWrap: { width: layout.body.wordWrapWidth },
+    createLayoutText(this, layout.body, {
+      text: rows.join('\n'),
+      style: textStyles.hintBody,
     });
   }
 

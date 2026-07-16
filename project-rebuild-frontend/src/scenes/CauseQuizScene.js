@@ -41,9 +41,9 @@ export default class CauseQuizScene extends Phaser.Scene {
 
     const rows = CauseQuizManager.formatExplorationSummaryRows(exploredCount, EP1_EXPLORATION_CLUES);
 
-    this.add.text(layout.body.x, layout.body.y, rows.join('\n'), {
-      ...textStyles.summaryBody,
-      wordWrap: { width: layout.body.wordWrapWidth },
+    createLayoutText(this, layout.body, {
+      text: rows.join('\n'),
+      style: textStyles.summaryBody,
     });
   }
 
@@ -52,18 +52,18 @@ export default class CauseQuizScene extends Phaser.Scene {
     const textStyles = CauseQuizViewManager.getTextStyles();
     this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
       .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
-    this.add.text(layout.prompt.x, layout.prompt.y, EP1_CAUSE_QUESTION.prompt, {
-      ...textStyles.prompt,
-      wordWrap: { width: layout.prompt.wordWrapWidth },
-    }).setOrigin(0.5);
+    createLayoutText(this, layout.prompt, {
+      text: EP1_CAUSE_QUESTION.prompt,
+      style: textStyles.prompt,
+      origin: 0.5,
+    });
 
     EP1_CAUSE_QUESTION.choices.forEach((choice, index) => {
       this.createChoice(choice, index, index + 1);
     });
 
-    this.feedbackText = this.add.text(layout.feedback.x, layout.feedback.y, layout.feedback.text, {
-      ...textStyles.feedback,
-      wordWrap: { width: layout.feedback.wordWrapWidth },
+    this.feedbackText = createLayoutText(this, layout.feedback, {
+      style: textStyles.feedback,
     });
   }
 
@@ -73,10 +73,11 @@ export default class CauseQuizScene extends Phaser.Scene {
     const background = this.add.rectangle(layout.background.x, layout.background.y, layout.background.width, layout.background.height, layout.background.fillColor, layout.background.fillAlpha)
       .setStrokeStyle(layout.background.strokeWidth, layout.background.strokeColor)
       .setInteractive({ useHandCursor: true });
-    const text = this.add.text(layout.text.x, layout.text.y, `${number}. ${choice.text}`, {
-      ...textStyles.choice,
-      wordWrap: { width: layout.text.wordWrapWidth },
-    }).setOrigin(0, 0.5);
+    const text = createLayoutText(this, layout.text, {
+      text: `${number}. ${choice.text}`,
+      style: textStyles.choice,
+      origin: [0, 0.5],
+    });
 
     const select = () => this.selectChoice(choice);
     background.on('pointerdown', select);

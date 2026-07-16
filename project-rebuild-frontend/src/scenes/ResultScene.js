@@ -46,9 +46,9 @@ export default class ResultScene extends Phaser.Scene {
     this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, reactionStyle.fillColor, reactionStyle.fillAlpha)
       .setStrokeStyle(reactionStyle.strokeWidth, reactionStyle.strokeColor);
     this.add.text(layout.title.x, layout.title.y, layout.title.text, textStyles.title);
-    this.add.text(layout.body.x, layout.body.y, rows, {
-      ...textStyles.body,
-      wordWrap: { width: layout.body.wordWrapWidth },
+    createLayoutText(this, layout.body, {
+      text: rows,
+      style: textStyles.body,
     });
   }
 

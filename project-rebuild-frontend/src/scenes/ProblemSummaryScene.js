@@ -46,9 +46,9 @@ export default class ProblemSummaryScene extends Phaser.Scene {
         .setStrokeStyle(card.background.strokeWidth, card.background.strokeColor);
       this.add.text(card.icon.x, card.icon.y, item.icon, textStyles.itemIcon).setOrigin(0.5);
       this.add.text(card.title.x, card.title.y, item.title, textStyles.itemTitle);
-      this.add.text(card.detail.x, card.detail.y, item.detail, {
-        ...textStyles.itemDetail,
-        wordWrap: { width: card.detail.wordWrapWidth },
+      createLayoutText(this, card.detail, {
+        text: item.detail,
+        style: textStyles.itemDetail,
       });
     });
   }
@@ -60,14 +60,14 @@ export default class ProblemSummaryScene extends Phaser.Scene {
       .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
     this.add.text(layout.title.x, layout.title.y, layout.title.text, textStyles.learningTitle).setOrigin(0.5);
 
-    this.add.text(layout.body.x, layout.body.y, ProblemSummaryViewManager.formatLearningRecordText(
-      explorationPlaces,
-      exploredPlaces,
-      quizResult,
-      EP1_CORE_CAUSE_SUMMARY,
-    ), {
-      ...textStyles.learningBody,
-      wordWrap: { width: layout.body.wordWrapWidth },
+    createLayoutText(this, layout.body, {
+      text: ProblemSummaryViewManager.formatLearningRecordText(
+        explorationPlaces,
+        exploredPlaces,
+        quizResult,
+        EP1_CORE_CAUSE_SUMMARY,
+      ),
+      style: textStyles.learningBody,
     });
   }
 
@@ -77,9 +77,9 @@ export default class ProblemSummaryScene extends Phaser.Scene {
     this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
       .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
     this.add.text(layout.title.x, layout.title.y, layout.title.text, textStyles.nextTitle).setOrigin(0.5);
-    this.add.text(layout.body.x, layout.body.y, EP1_NEXT_MISSION.join('\n'), {
-      ...textStyles.nextBody,
-      wordWrap: { width: layout.body.wordWrapWidth },
+    createLayoutText(this, layout.body, {
+      text: EP1_NEXT_MISSION.join('\n'),
+      style: textStyles.nextBody,
     });
   }
 
