@@ -8,6 +8,7 @@ import CameraController from '../systems/CameraController.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import PlacementViewManager from '../systems/PlacementViewManager.js';
 import PlacementMapGeometry from '../systems/PlacementMapGeometry.js';
+import PlacementMapRenderer from '../systems/PlacementMapRenderer.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 
 export default class PlacementScene extends Phaser.Scene {
@@ -28,6 +29,7 @@ export default class PlacementScene extends Phaser.Scene {
       mapWidth: mapData.width,
       mapHeight: mapData.height,
     });
+    this.mapRenderer = new PlacementMapRenderer({ geometry: this.mapGeometry });
     this.uiObjects = [];
     this.worldObjects = [];
 
@@ -290,15 +292,7 @@ export default class PlacementScene extends Phaser.Scene {
   }
 
   drawMap() {
-    this.mapGraphics.clear();
-
-    for (let y = 0; y < this.placementSystem.mapData.height; y += 1) {
-      for (let x = 0; x < this.placementSystem.mapData.width; x += 1) {
-        const tile = this.placementSystem.mapData.tiles[y][x];
-        const tileStyle = PlacementViewManager.getMapTileVisual(tile);
-        this.drawDiamond(this.mapGraphics, x, y, tileStyle.color, tileStyle.alpha, tileStyle.stroke, tileStyle.strokeWidth);
-      }
-    }
+    this.mapRenderer.drawMap(this.mapGraphics, this.placementSystem.mapData);
   }
 
   registerPlacementInput() {
@@ -362,17 +356,7 @@ export default class PlacementScene extends Phaser.Scene {
     const validation = this.placementSystem.validatePlacement(tile.x, tile.y, this.selectedBuilding);
     const previewStyle = PlacementViewManager.getPreviewStyle(validation);
 
-    for (const footprintTile of validation.footprintTiles) {
-      this.drawDiamond(
-        this.previewGraphics,
-        footprintTile.x,
-        footprintTile.y,
-        previewStyle.fillColor,
-        previewStyle.fillAlpha,
-        previewStyle.strokeColor,
-        previewStyle.strokeWidth,
-      );
-    }
+    this.mapRenderer.drawTiles(this.previewGraphics, validation.footprintTiles, previewStyle);
 
     this.updateCursorInfo(tile, validation);
   }
@@ -475,17 +459,11 @@ export default class PlacementScene extends Phaser.Scene {
   drawPlacedBuilding(building, tileX, tileY) {
     const buildingVisual = PlacementViewManager.getPlacedBuildingVisual(building, tileX, tileY);
     const graphics = this.registerWorldObject(this.add.graphics().setDepth(buildingVisual.depth));
-    for (const tile of this.placementSystem.getFootprintTiles(tileX, tileY, building.footprint)) {
-      this.drawDiamond(
-        graphics,
-        tile.x,
-        tile.y,
-        buildingVisual.fillColor,
-        buildingVisual.alpha,
-        buildingVisual.strokeColor,
-        buildingVisual.strokeWidth,
-      );
-    }
+    this.mapRenderer.drawTiles(
+      graphics,
+      this.placementSystem.getFootprintTiles(tileX, tileY, building.footprint),
+      buildingVisual,
+    );
 
     const labelPosition = this.mapGeometry.getFootprintCenter(tileX, tileY, building.footprint);
     const labelLayout = PlacementViewManager.getBuildingLabelLayout(labelPosition, tileX, tileY);
@@ -505,15 +483,6 @@ export default class PlacementScene extends Phaser.Scene {
     ).setOrigin(0.5).setDepth(labelLayout.text.depth));
 
     this.mapLabels.add(label);
-  }
-
-  drawDiamond(graphics, tileX, tileY, fillColor, alpha, strokeColor, strokeWidth) {
-    const points = this.mapGeometry.getDiamondPoints(tileX, tileY);
-
-    graphics.fillStyle(fillColor, alpha);
-    graphics.fillPoints(points, true);
-    graphics.lineStyle(strokeWidth, strokeColor, 0.9);
-    graphics.strokePoints(points, true);
   }
 
   pointerToTile(pointer) {

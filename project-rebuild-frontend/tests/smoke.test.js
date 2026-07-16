@@ -34,6 +34,7 @@ import MockSubmissionLogViewManager from '../src/systems/MockSubmissionLogViewMa
 import PlacementSystem from '../src/systems/PlacementSystem.js';
 import PlacementViewManager, { TILE_COLORS, TILE_STROKES, TILE_LABELS, ZONE_LABELS, REQUIRED_PLACEMENTS, PLACEMENT_DRAG_THRESHOLD, PLACEMENT_UI_BOUNDS, PREVIEW_STYLES, PLACEMENT_UI_LAYOUT, BUILDING_CARD_LAYOUT, BUILDING_CARD_VISUALS, PLACEMENT_MAP_VISUALS } from '../src/systems/PlacementViewManager.js';
 import PlacementMapGeometry from '../src/systems/PlacementMapGeometry.js';
+import PlacementMapRenderer from '../src/systems/PlacementMapRenderer.js';
 import SaveManager, { LEARNING_SAVE_STORAGE_KEY } from '../src/systems/SaveManager.js';
 import SavedDataViewManager from '../src/systems/SavedDataViewManager.js';
 import StorageSummaryManager from '../src/systems/StorageSummaryManager.js';
@@ -106,6 +107,35 @@ function createCompleteLearningData(overrides = {}) {
 }
 
 
+
+
+function createGraphicsSpy() {
+  const calls = [];
+  const graphics = {
+    calls,
+    clear() {
+      calls.push(['clear']);
+      return this;
+    },
+    fillStyle(color, alpha) {
+      calls.push(['fillStyle', color, alpha]);
+      return this;
+    },
+    fillPoints(points, closeShape) {
+      calls.push(['fillPoints', points, closeShape]);
+      return this;
+    },
+    lineStyle(width, color, alpha) {
+      calls.push(['lineStyle', width, color, alpha]);
+      return this;
+    },
+    strokePoints(points, closeShape) {
+      calls.push(['strokePoints', points, closeShape]);
+      return this;
+    },
+  };
+  return graphics;
+}
 
 function testBootFlowManager() {
   const entries = BootFlowManager.createInitialRegistryEntries();
@@ -992,6 +1022,48 @@ function testPlacementMapGeometry() {
     { x: 892, y: 260 },
   ]);
   assert.deepEqual(geometry.getFootprintCenter(1, 1, { width: 2, height: 2 }), { x: 940, y: 332 });
+}
+
+
+function testPlacementMapRenderer() {
+  const geometry = new PlacementMapGeometry({
+    origin: PlacementViewManager.getScreenLayout().mapOrigin,
+    tileWidth: mapData.tileWidth,
+    tileHeight: mapData.tileHeight,
+    mapWidth: mapData.width,
+    mapHeight: mapData.height,
+  });
+  const renderer = new PlacementMapRenderer({ geometry });
+  const graphics = createGraphicsSpy();
+
+  renderer.drawDiamond(graphics, 0, 0, {
+    fillColor: 0x123456,
+    fillAlpha: 0.5,
+    strokeColor: 0xffffff,
+    strokeWidth: 2,
+  });
+
+  assert.deepEqual(graphics.calls[0], ['fillStyle', 0x123456, 0.5]);
+  assert.deepEqual(graphics.calls[1], ['fillPoints', geometry.getDiamondPoints(0, 0), true]);
+  assert.deepEqual(graphics.calls[2], ['lineStyle', 2, 0xffffff, 0.9]);
+  assert.deepEqual(graphics.calls[3], ['strokePoints', geometry.getDiamondPoints(0, 0), true]);
+  assert.deepEqual(PlacementMapRenderer.normalizeDiamondVisual({ color: 0x2f855a, alpha: 0.88, stroke: 0x86efac, strokeWidth: 1.5 }), {
+    fillColor: 0x2f855a,
+    fillAlpha: 0.88,
+    strokeColor: 0x86efac,
+    strokeWidth: 1.5,
+    strokeAlpha: 0.9,
+  });
+
+  const previewGraphics = createGraphicsSpy();
+  renderer.drawTiles(previewGraphics, [{ x: 1, y: 1 }, { x: 2, y: 1 }], PREVIEW_STYLES.valid);
+  assert.equal(previewGraphics.calls.filter(([name]) => name === 'fillStyle').length, 2);
+  assert.equal(previewGraphics.calls.filter(([name]) => name === 'strokePoints').length, 2);
+
+  const mapGraphics = createGraphicsSpy();
+  renderer.drawMap(mapGraphics, mapData);
+  assert.deepEqual(mapGraphics.calls[0], ['clear']);
+  assert.equal(mapGraphics.calls.filter(([name]) => name === 'fillStyle').length, mapData.width * mapData.height);
 }
 
 function testPlacementViewManager() {
@@ -2034,6 +2106,7 @@ async function run() {
   testPolicyRecommendationMatchingUsesIds();
   testMapData();
   testPlacementMapGeometry();
+  testPlacementMapRenderer();
   testPlacementViewManager();
   testPlacementRules();
   testEndingSummaryViewManager();
