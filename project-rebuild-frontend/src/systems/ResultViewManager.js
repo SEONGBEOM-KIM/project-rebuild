@@ -93,10 +93,10 @@ export default class ResultViewManager {
 
   static getPanelBodyStyle(panel) {
     return {
-      fontSize: '24px',
+      fontSize: '22px',
       color: '#1e293b',
       align: 'left',
-      lineSpacing: 8,
+      lineSpacing: 6,
       wordWrap: { width: panel.width - 80 },
     };
   }

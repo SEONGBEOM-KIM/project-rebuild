@@ -1075,6 +1075,8 @@ function testEvaluationManager() {
   });
   assert.equal(EvaluationManager.getChoiceTrendMessage(totals, placedBuildings), '경향: 생활·환경을 함께 고려했습니다.');
   assert.ok(EvaluationManager.getTopEffectRows(totals)[0].includes('예산'), 'largest absolute effect should be shown first');
+  assert.match(EvaluationManager.formatKeyInterpretation(finalState), /인구 회복과 주민 체감/);
+  assert.match(EvaluationManager.formatKeyInterpretation({ ...finalState, budget: 300 }), /예산 부족 신호/);
   const trendRows = EvaluationManager.formatChoiceTrendRows(placedBuildings);
   assert.match(trendRows, /누적 효과 상위:/);
   assert.match(trendRows, /선택 유형 수: 3종/);
@@ -1095,6 +1097,7 @@ function testEvaluationManager() {
   assert.match(evaluationRows, /선택 방향: 청년 생활 지원/);
   assert.match(evaluationRows, /방향 일치: 2\/3개/);
   assert.match(evaluationRows, /균형 점수: 92\/100/);
+  assert.match(evaluationRows, /핵심 해석:/);
   assert.match(evaluationRows, /주의 신호:/);
   assert.match(evaluationRows, /학습 포인트:/);
   assert.deepEqual(EvaluationManager.formatIssueRows(finalState), ['• 현재 큰 부작용 신호는 없습니다.']);
