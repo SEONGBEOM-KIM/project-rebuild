@@ -41,17 +41,19 @@ export default class TeacherReportScene extends Phaser.Scene {
     const titlePosition = TeacherReportViewManager.getPanelTitlePosition(panel);
     createPanelTitle(this, titlePosition, textStyles.panelTitle, { text: panel.title, origin: 0.5 });
     const bodyPosition = TeacherReportViewManager.getPanelBodyPosition(panel);
-    this.add.text(bodyPosition.x, bodyPosition.y, body, TeacherReportViewManager.getPanelBodyStyle(panel));
+    createLayoutText(this, bodyPosition, {
+      text: body,
+      style: TeacherReportViewManager.getPanelBodyStyle(panel),
+    });
   }
 
   drawControls() {
     const layout = TeacherReportViewManager.getControlLayout();
-    this.reportStatusText = this.add.text(
-      layout.status.x,
-      layout.status.y,
-      TeacherReportManager.formatStatusText(),
-      TeacherReportViewManager.getTextStyles().status,
-    ).setOrigin(0.5);
+    this.reportStatusText = createLayoutText(this, layout.status, {
+      text: TeacherReportManager.formatStatusText(),
+      style: TeacherReportViewManager.getTextStyles().status,
+      origin: 0.5,
+    });
 
     const copyButton = createTextButton(this, layout.copy, TeacherReportViewManager.getButtonStyle());
     copyButton.on('pointerdown', () => this.copyReportToClipboard());

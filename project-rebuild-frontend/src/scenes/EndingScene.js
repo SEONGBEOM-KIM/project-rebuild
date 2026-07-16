@@ -48,7 +48,10 @@ export default class EndingScene extends Phaser.Scene {
     const titlePosition = EndingSummaryViewManager.getPanelTitlePosition(panel);
     createPanelTitle(this, titlePosition, textStyles.panelTitle, { text: panel.title, origin: 0.5 });
     const bodyPosition = EndingSummaryViewManager.getPanelBodyPosition(panel);
-    this.add.text(bodyPosition.x, bodyPosition.y, body, EndingSummaryViewManager.getPanelBodyStyle(panel));
+    createLayoutText(this, bodyPosition, {
+      text: body,
+      style: EndingSummaryViewManager.getPanelBodyStyle(panel),
+    });
   }
 
   drawLearningRecordStrip(centerX, learningProgress, exploredPlaces, quizResult, reflectionChoice) {
@@ -74,7 +77,10 @@ export default class EndingScene extends Phaser.Scene {
     createPanelTitle(this, titlePosition, textStyles.nextMissionTitle, { text: panel.title, origin: 0.5 });
 
     const bodyPosition = EndingSummaryViewManager.getPanelBodyPosition(panel, 32, 108);
-    this.add.text(bodyPosition.x, bodyPosition.y, EP1_NEXT_DEVELOPMENT_GOALS.join('\n'), EndingSummaryViewManager.getNextMissionBodyStyle(panel));
+    createLayoutText(this, bodyPosition, {
+      text: EP1_NEXT_DEVELOPMENT_GOALS.join('\n'),
+      style: EndingSummaryViewManager.getNextMissionBodyStyle(panel),
+    });
   }
 
   drawControls(centerX) {

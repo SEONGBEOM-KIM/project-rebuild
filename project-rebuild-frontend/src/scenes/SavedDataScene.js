@@ -30,9 +30,15 @@ export default class SavedDataScene extends Phaser.Scene {
 
     const body = SavedDataViewManager.formatBody(saved);
 
-    this.add.text(layout.bodyText.x, layout.bodyText.y, body, SavedDataViewManager.getBodyTextStyle());
+    createLayoutText(this, layout.bodyText, {
+      text: body,
+      style: SavedDataViewManager.getBodyTextStyle(),
+    });
 
-    this.importStatusText = this.add.text(layout.status.x, layout.status.y, '', SavedDataViewManager.getStatusTextStyle()).setOrigin(0.5);
+    this.importStatusText = createLayoutText(this, layout.status, {
+      style: SavedDataViewManager.getStatusTextStyle(),
+      origin: 0.5,
+    });
 
     const buttonLayout = SavedDataViewManager.getButtonLayout(width);
     const continueButtonState = SavedDataViewManager.getContinueButtonState(saved);

@@ -35,7 +35,10 @@ export default class ApiContractScene extends Phaser.Scene {
     const titlePosition = ApiContractViewManager.getPanelTitlePosition(panel);
     createPanelTitle(this, titlePosition, panelStyle, { text: panel.title });
     const bodyPosition = ApiContractViewManager.getPanelBodyPosition(panel);
-    this.add.text(bodyPosition.x, bodyPosition.y, body, ApiContractViewManager.getPanelBodyStyle(panel));
+    createLayoutText(this, bodyPosition, {
+      text: body,
+      style: ApiContractViewManager.getPanelBodyStyle(panel),
+    });
   }
 
   drawNotes() {

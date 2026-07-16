@@ -36,7 +36,10 @@ export default class StorageManagerScene extends Phaser.Scene {
 
     const rows = StorageSummaryManager.formatSavedDataRows(this.saved);
 
-    this.add.text(layout.body.x, layout.body.y, rows.join('\n'), StorageManagerViewManager.getBodyTextStyle());
+    createLayoutText(this, layout.body, {
+      text: rows.join('\n'),
+      style: StorageManagerViewManager.getBodyTextStyle(),
+    });
   }
 
   drawSubmissionPanel() {
@@ -47,13 +50,19 @@ export default class StorageManagerScene extends Phaser.Scene {
 
     const rows = StorageSummaryManager.formatSubmissionRows(this.submissions);
 
-    this.add.text(layout.body.x, layout.body.y, rows.join('\n'), StorageManagerViewManager.getBodyTextStyle());
+    createLayoutText(this, layout.body, {
+      text: rows.join('\n'),
+      style: StorageManagerViewManager.getBodyTextStyle(),
+    });
   }
 
   drawControls() {
     const layout = StorageManagerViewManager.getControlLayout();
-    this.statusText = this.add.text(layout.status.x, layout.status.y, StorageSummaryManager.formatStatusText(), StorageManagerViewManager.getStatusTextStyle())
-      .setOrigin(0.5);
+    this.statusText = createLayoutText(this, layout.status, {
+      text: StorageSummaryManager.formatStatusText(),
+      style: StorageManagerViewManager.getStatusTextStyle(),
+      origin: 0.5,
+    });
 
     const clearSaveButton = createTextButton(this, layout.clearSave, StorageManagerViewManager.getButtonStyle());
     clearSaveButton.on('pointerdown', () => {

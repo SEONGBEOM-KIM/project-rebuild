@@ -26,12 +26,11 @@ export default class ResultScene extends Phaser.Scene {
     ProgressStepper.render(this, layout.progressStep);
     createLayoutText(this, layout.title, { origin: 0.5 });
 
-    this.add.text(
-      layout.evaluationTitle.x,
-      layout.evaluationTitle.y,
-      evaluation.title,
-      ResultViewManager.getEvaluationTitleTextStyle(evaluation.color),
-    ).setOrigin(0.5);
+    createLayoutText(this, layout.evaluationTitle, {
+      text: evaluation.title,
+      style: ResultViewManager.getEvaluationTitleTextStyle(evaluation.color),
+      origin: 0.5,
+    });
 
     const panels = ResultViewManager.getPanelLayout(width / 2);
     this.drawStatePanel(panels.beforeAfter, EvaluationManager.formatBeforeAfterRows(lastPlacementResult, gameState));
@@ -68,7 +67,11 @@ export default class ResultScene extends Phaser.Scene {
     const titlePosition = ResultViewManager.getPanelTitlePosition(panel);
     createPanelTitle(this, titlePosition, ResultViewManager.getPanelTitleTextStyle(), { text: panel.title, origin: 0.5 });
     const bodyPosition = ResultViewManager.getPanelBodyPosition(panel);
-    this.add.text(bodyPosition.x, bodyPosition.y, rows, ResultViewManager.getPanelBodyStyle(panel)).setOrigin(0.5, 0);
+    createLayoutText(this, bodyPosition, {
+      text: rows,
+      style: ResultViewManager.getPanelBodyStyle(panel),
+      origin: [0.5, 0],
+    });
   }
 
 
