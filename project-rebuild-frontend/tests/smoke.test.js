@@ -40,6 +40,7 @@ import PlacementUiStateManager from '../src/systems/PlacementUiStateManager.js';
 import PlacementSceneObjectRegistry from '../src/systems/PlacementSceneObjectRegistry.js';
 import PlacementInputController from '../src/systems/PlacementInputController.js';
 import PlacementWorldRenderer from '../src/systems/PlacementWorldRenderer.js';
+import PlacementUiUpdater from '../src/systems/PlacementUiUpdater.js';
 import SaveManager, { LEARNING_SAVE_STORAGE_KEY } from '../src/systems/SaveManager.js';
 import SavedDataViewManager from '../src/systems/SavedDataViewManager.js';
 import StorageSummaryManager from '../src/systems/StorageSummaryManager.js';
@@ -1302,6 +1303,90 @@ function testPlacementWorldRenderer() {
 }
 
 
+function createUiTextSpy() {
+  return {
+    text: '',
+    color: '',
+    alpha: null,
+    fillStyle: null,
+    strokeStyle: null,
+    setText(value) {
+      this.text = value;
+      return this;
+    },
+    setColor(value) {
+      this.color = value;
+      return this;
+    },
+    setAlpha(value) {
+      this.alpha = value;
+      return this;
+    },
+    setFillStyle(...args) {
+      this.fillStyle = args;
+      return this;
+    },
+    setStrokeStyle(...args) {
+      this.strokeStyle = args;
+      return this;
+    },
+  };
+}
+
+function testPlacementUiUpdater() {
+  const missionText = createUiTextSpy();
+  const statusText = createUiTextSpy();
+  const cursorInfoText = createUiTextSpy();
+  const messageText = createUiTextSpy();
+  const lastChangeText = createUiTextSpy();
+  const placementHistoryText = createUiTextSpy();
+  const continueButton = createUiTextSpy();
+  const continueButtonBg = createUiTextSpy();
+  const updater = new PlacementUiUpdater({
+    missionText,
+    statusText,
+    cursorInfoText,
+    messageText,
+    lastChangeText,
+    placementHistoryText,
+    continueButton,
+    continueButtonBg,
+  });
+
+  updater.updateCursorInfo({ x: 1, y: 2 }, { type: 'empty', zone: 'center' }, { valid: true });
+  assert.match(cursorInfoText.text, /커서 타일: \(1, 2\)/);
+  assert.equal(cursorInfoText.color, '#bbf7d0');
+
+  updater.updateStatusBar(GameState.createInitialState());
+  assert.match(statusText.text, /현재 상태\n인구: 1000/);
+
+  const youthCenter = buildings.find((building) => building.id === 'youth_center');
+  updater.updateLastChangePanel({
+    building: youthCenter,
+    position: { x: 1, y: 1 },
+    before: GameState.createInitialState(),
+    after: GameState.applyEffect(GameState.createInitialState(), youthCenter.effect),
+    delta: youthCenter.effect,
+  });
+  assert.match(lastChangeText.text, /청년센터 배치/);
+  assert.equal(lastChangeText.color, '#fef3c7');
+
+  updater.updatePlacementHistoryPanel([{ building: youthCenter, position: { x: 1, y: 1 } }]);
+  assert.match(placementHistoryText.text, /총 배치: 1개/);
+  assert.equal(placementHistoryText.color, '#e0f2fe');
+
+  updater.updateContinueButton(3, null);
+  assert.match(missionText.text, /종합 결과 확인 가능/);
+  assert.equal(continueButton.text, '종합 결과 확인');
+  assert.equal(continueButton.alpha, 1);
+  assert.deepEqual(continueButtonBg.strokeStyle, [PlacementViewManager.getFixedUiStyle().rectangleStrokeWidth, 0xbfdbfe]);
+
+  updater.showMessage('배치 완료', '#bbf7d0');
+  assert.equal(messageText.text, '배치 완료');
+  assert.equal(messageText.color, '#bbf7d0');
+}
+
+
 function testPlacementMapRenderer() {
   const geometry = new PlacementMapGeometry({
     origin: PlacementViewManager.getScreenLayout().mapOrigin,
@@ -2437,6 +2522,7 @@ async function run() {
   testPlacementMapGeometry();
   testPlacementMapRenderer();
   testPlacementWorldRenderer();
+  testPlacementUiUpdater();
   testPlacementViewManager();
   testPlacementResultManager();
   testPlacementRules();

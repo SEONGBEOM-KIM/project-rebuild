@@ -12,6 +12,7 @@ import PlacementUiStateManager from '../systems/PlacementUiStateManager.js';
 import PlacementSceneObjectRegistry from '../systems/PlacementSceneObjectRegistry.js';
 import PlacementInputController from '../systems/PlacementInputController.js';
 import PlacementWorldRenderer from '../systems/PlacementWorldRenderer.js';
+import PlacementUiUpdater from '../systems/PlacementUiUpdater.js';
 
 export default class PlacementScene extends Phaser.Scene {
   constructor() {
@@ -52,13 +53,23 @@ export default class PlacementScene extends Phaser.Scene {
     this.drawMap();
     this.worldRenderer.restorePlacedBuildings(this.placedBuildings);
     this.createUi();
+    this.uiUpdater = new PlacementUiUpdater({
+      missionText: this.missionText,
+      statusText: this.statusText,
+      cursorInfoText: this.cursorInfoText,
+      messageText: this.messageText,
+      lastChangeText: this.lastChangeText,
+      placementHistoryText: this.placementHistoryText,
+      continueButton: this.continueButton,
+      continueButtonBg: this.continueButtonBg,
+    });
     this.setupCamera();
     this.registerPlacementInput();
-    this.updateStatusBar();
-    this.updateLastChangePanel();
-    this.updatePlacementHistoryPanel();
+    this.uiUpdater.updateStatusBar(this.registry.get('gameState'));
+    this.uiUpdater.updateLastChangePanel(this.registry.get('lastPlacementResult'));
+    this.uiUpdater.updatePlacementHistoryPanel(this.placedBuildings);
     this.updateSelectedBuildingUi();
-    this.updateContinueButton();
+    this.uiUpdater.updateContinueButton(this.placedBuildings.length, this.selectedPolicy);
   }
 
   cloneMapData(source) {
@@ -122,7 +133,7 @@ export default class PlacementScene extends Phaser.Scene {
 
     const handleContinue = () => {
       if (!PlacementUiStateManager.canContinue(this.placedBuildings.length)) {
-        this.showMessage(PlacementUiStateManager.formatNeedMoreMessage(this.placedBuildings.length), '#fecaca');
+        this.uiUpdater.showMessage(PlacementUiStateManager.formatNeedMoreMessage(this.placedBuildings.length), '#fecaca');
         return;
       }
       this.scene.start(layout.continueButton.target);
@@ -211,7 +222,7 @@ export default class PlacementScene extends Phaser.Scene {
     const selectBuilding = () => {
       this.selectedBuilding = building;
       this.updateSelectedBuildingUi();
-      this.showMessage(PlacementUiStateManager.formatBuildingSelectedMessage(building.name), '#bbf7d0');
+      this.uiUpdater.showMessage(PlacementUiStateManager.formatBuildingSelectedMessage(building.name), '#bbf7d0');
     };
 
     card.on('pointerdown', selectBuilding);
@@ -258,7 +269,7 @@ export default class PlacementScene extends Phaser.Scene {
     this.previewGraphics.clear();
     const tile = this.pointerToTile(pointer);
     if (!tile) {
-      this.updateCursorInfo(null);
+      this.uiUpdater.updateCursorInfo(null);
       return;
     }
 
@@ -267,20 +278,20 @@ export default class PlacementScene extends Phaser.Scene {
 
     this.mapRenderer.drawTiles(this.previewGraphics, validation.footprintTiles, previewStyle);
 
-    this.updateCursorInfo(tile, validation);
+    this.uiUpdater.updateCursorInfo(tile, this.placementSystem.getTile(tile.x, tile.y), validation);
   }
 
   tryPlace(pointer) {
     const tile = this.pointerToTile(pointer);
     if (!tile) {
-      this.showMessage(PlacementUiStateManager.formatMapSelectMessage(), '#fecaca');
+      this.uiUpdater.showMessage(PlacementUiStateManager.formatMapSelectMessage(), '#fecaca');
       return;
     }
 
     const validation = this.placementSystem.validatePlacement(tile.x, tile.y, this.selectedBuilding);
     if (!validation.valid) {
-      this.showMessage(PlacementUiStateManager.formatInvalidPlacementMessage(validation.reason), '#fecaca');
-      this.updateCursorInfo(tile, validation);
+      this.uiUpdater.showMessage(PlacementUiStateManager.formatInvalidPlacementMessage(validation.reason), '#fecaca');
+      this.uiUpdater.updateCursorInfo(tile, this.placementSystem.getTile(tile.x, tile.y), validation);
       return;
     }
 
@@ -296,11 +307,11 @@ export default class PlacementScene extends Phaser.Scene {
 
     this.worldRenderer.drawPlacedBuilding(this.selectedBuilding, tile.x, tile.y);
     this.worldRenderer.drawImpactMarkers(this.selectedBuilding, tile.x, tile.y);
-    this.updateStatusBar();
-    this.updateLastChangePanel(this.registry.get('lastPlacementResult'));
-    this.updatePlacementHistoryPanel();
-    this.updateContinueButton();
-    this.showMessage(PlacementUiStateManager.formatPlacementSuccessMessage(this.selectedBuilding.name, this.placedBuildings.length), '#bbf7d0');
+    this.uiUpdater.updateStatusBar(this.registry.get('gameState'));
+    this.uiUpdater.updateLastChangePanel(this.registry.get('lastPlacementResult'));
+    this.uiUpdater.updatePlacementHistoryPanel(this.placedBuildings);
+    this.uiUpdater.updateContinueButton(this.placedBuildings.length, this.selectedPolicy);
+    this.uiUpdater.showMessage(PlacementUiStateManager.formatPlacementSuccessMessage(this.selectedBuilding.name, this.placedBuildings.length), '#bbf7d0');
     this.updatePreview(pointer);
   }
 
@@ -309,79 +320,6 @@ export default class PlacementScene extends Phaser.Scene {
     return this.mapGeometry.worldToTile(worldPoint.x, worldPoint.y);
   }
 
-  updateCursorInfo(tile, validation = null) {
-    if (!this.cursorInfoText) {
-      return;
-    }
 
-    if (!tile) {
-      const cursorState = PlacementUiStateManager.formatCursorInfo(null);
-      this.cursorInfoText.setText(cursorState.text);
-      this.cursorInfoText.setColor(cursorState.color);
-      return;
-    }
-
-    const mapTile = this.placementSystem.getTile(tile.x, tile.y);
-    const status = validation ?? this.placementSystem.validatePlacement(tile.x, tile.y, this.selectedBuilding);
-    const cursorState = PlacementUiStateManager.formatCursorInfo(tile, mapTile, status);
-    this.cursorInfoText.setText(cursorState.text);
-    this.cursorInfoText.setColor(cursorState.color);
-
-  }
-
-  updateStatusBar() {
-    if (!this.statusText) {
-      return;
-    }
-    const state = this.registry.get('gameState');
-    this.statusText.setText(PlacementUiStateManager.formatStatusText(state));
-
-  }
-
-  updateLastChangePanel(lastPlacementResult = this.registry.get('lastPlacementResult')) {
-    if (!this.lastChangeText) {
-      return;
-    }
-
-    const lastChangeState = PlacementUiStateManager.formatLastChangeState(lastPlacementResult);
-    this.lastChangeText.setText(lastChangeState.text);
-    this.lastChangeText.setColor(lastChangeState.color);
-  }
-
-  updatePlacementHistoryPanel() {
-    if (!this.placementHistoryText) {
-      return;
-    }
-
-    const historyState = PlacementUiStateManager.formatPlacementHistoryState(this.placedBuildings);
-    this.placementHistoryText.setText(historyState.text);
-    this.placementHistoryText.setColor(historyState.color);
-  }
-
-  updateContinueButton() {
-    const continueState = PlacementUiStateManager.getContinueState(this.placedBuildings.length, this.selectedPolicy);
-
-    if (this.missionText) {
-      this.missionText.setText(continueState.missionText);
-    }
-
-    if (this.continueButton) {
-      this.continueButton.setText(continueState.buttonText);
-      this.continueButton.setAlpha(continueState.buttonAlpha);
-    }
-
-    if (this.continueButtonBg) {
-      this.continueButtonBg.setFillStyle(continueState.backgroundFillColor, continueState.backgroundAlpha);
-      this.continueButtonBg.setStrokeStyle(PlacementViewManager.getFixedUiStyle().rectangleStrokeWidth, continueState.strokeColor);
-    }
-  }
-
-  showMessage(message, color = '#fde68a') {
-    if (!this.messageText) {
-      return;
-    }
-    this.messageText.setText(message);
-    this.messageText.setColor(color);
-  }
 
 }
