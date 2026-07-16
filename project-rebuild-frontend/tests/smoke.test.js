@@ -2773,6 +2773,29 @@ function testSceneReferences() {
   assert.deepEqual(missingTargets, [], 'Every scene.start and manager targetScene target must be registered in main.js');
 }
 
+function testSceneRenderingBoundaries() {
+  const directCreationPatterns = [
+    /\bthis\.add\./,
+    /\bscene\.add\./,
+  ];
+  const violations = [];
+
+  for (const file of readdirSync(SCENES_DIR).filter((name) => name.endsWith('Scene.js'))) {
+    const source = readFileSync(join(SCENES_DIR, file), 'utf8');
+    for (const pattern of directCreationPatterns) {
+      if (pattern.test(source)) {
+        violations.push(`${file} contains direct Phaser creation: ${pattern.source}`);
+      }
+    }
+  }
+
+  assert.deepEqual(
+    violations,
+    [],
+    'Scene files should delegate Phaser object creation to ui helpers or renderer/system modules',
+  );
+}
+
 
 function testSharedUiComponentStyles() {
   const progressStyle = ProgressStepper.getStyle();
@@ -3011,6 +3034,7 @@ async function run() {
   testApiContract();
   testSceneManagerImports();
   testSceneReferences();
+  testSceneRenderingBoundaries();
   testSharedUiComponentStyles();
   await testBrowserFileActions();
   console.log('Smoke tests passed');

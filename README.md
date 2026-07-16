@@ -60,6 +60,7 @@ npm run verify
 - 임시 맵 크기/타일 타입/zone/buildable 규칙 정합성
 - 샘플 건물 3종의 비용/효과/footprint/인접 조건 정합성
 - 회복 방향 정책과 추천 건물 ID/name 정합성
+- Scene 파일이 직접 Phaser 오브젝트를 생성하지 않고 UI helper/renderer/system으로 위임하는 구조 경계
 
 ## 현재 수동 확인이 필요한 범위
 
@@ -79,6 +80,13 @@ npm run verify
 - `docs/QA_CHECKLIST.md`: 브라우저 수동 QA 체크리스트
 - `docs/EVALUATION_RULES.md`: 상태값/결과 평가/부작용 감지 기준
 
+## 화면 코드 구조 원칙
+
+- `src/scenes/*Scene.js`: 화면 전환, registry 상태 갱신, 사용자 입력 흐름만 담당합니다.
+- `src/systems/*ViewManager.js`: layout, style, 표시 문구, target scene 같은 순수 설정과 포맷팅만 담당합니다.
+- `src/systems/*Renderer.js`, `src/ui/*`: Phaser 오브젝트 생성과 시각 요소 조립을 담당합니다.
+- 새 화면이나 카드 UI를 추가할 때 Scene 안에서 `this.add.*`를 직접 호출하지 않습니다. 필요하면 renderer 또는 `ui` helper를 먼저 추가합니다.
+- 이 구조 경계는 `npm test`의 `testSceneRenderingBoundaries`에서 자동 검증합니다.
 
 ## 브라우저 임시 저장 키
 
