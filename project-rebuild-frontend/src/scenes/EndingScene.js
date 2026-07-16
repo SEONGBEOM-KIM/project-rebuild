@@ -6,6 +6,7 @@ import EndingSummaryManager from '../systems/EndingSummaryManager.js';
 import EndingSummaryViewManager from '../systems/EndingSummaryViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
+import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
 
 export default class EndingScene extends Phaser.Scene {
   constructor() {
@@ -42,10 +43,9 @@ export default class EndingScene extends Phaser.Scene {
   drawPanel(panel, body) {
     const panelStyle = EndingSummaryViewManager.getPanelStyle();
     const textStyles = EndingSummaryViewManager.getTextStyles();
-    this.add.rectangle(panel.x, panel.y, panel.width, panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
-      .setStrokeStyle(panelStyle.strokeWidth, panelStyle.strokeColor);
+    createPanelBackground(this, panel, panelStyle);
     const titlePosition = EndingSummaryViewManager.getPanelTitlePosition(panel);
-    this.add.text(titlePosition.x, titlePosition.y, panel.title, textStyles.panelTitle).setOrigin(0.5);
+    createPanelTitle(this, titlePosition, textStyles.panelTitle, { text: panel.title, origin: 0.5 });
     const bodyPosition = EndingSummaryViewManager.getPanelBodyPosition(panel);
     this.add.text(bodyPosition.x, bodyPosition.y, body, EndingSummaryViewManager.getPanelBodyStyle(panel));
   }
@@ -54,9 +54,8 @@ export default class EndingScene extends Phaser.Scene {
     const layout = EndingSummaryViewManager.getLearningRecordLayout(centerX);
     const recordStyle = EndingSummaryViewManager.getLearningRecordStyle();
     const textStyles = EndingSummaryViewManager.getTextStyles();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, recordStyle.fillColor, recordStyle.fillAlpha)
-      .setStrokeStyle(recordStyle.strokeWidth, recordStyle.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, textStyles.learningRecordTitle);
+    createPanelBackground(this, layout.panel, recordStyle);
+    createPanelTitle(this, layout.title, textStyles.learningRecordTitle);
 
     const rows = EndingSummaryManager.formatLearningRecordRows(learningProgress, exploredPlaces, quizResult, reflectionChoice);
 
@@ -69,10 +68,9 @@ export default class EndingScene extends Phaser.Scene {
   drawNextMissionPanel(panel) {
     const panelStyle = EndingSummaryViewManager.getNextMissionStyle();
     const textStyles = EndingSummaryViewManager.getTextStyles();
-    this.add.rectangle(panel.x, panel.y, panel.width, panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
-      .setStrokeStyle(panelStyle.strokeWidth, panelStyle.strokeColor);
+    createPanelBackground(this, panel, panelStyle);
     const titlePosition = EndingSummaryViewManager.getPanelTitlePosition(panel);
-    this.add.text(titlePosition.x, titlePosition.y, panel.title, textStyles.nextMissionTitle).setOrigin(0.5);
+    createPanelTitle(this, titlePosition, textStyles.nextMissionTitle, { text: panel.title, origin: 0.5 });
 
     const bodyPosition = EndingSummaryViewManager.getPanelBodyPosition(panel, 32, 108);
     this.add.text(bodyPosition.x, bodyPosition.y, EP1_NEXT_DEVELOPMENT_GOALS.join('\n'), EndingSummaryViewManager.getNextMissionBodyStyle(panel));

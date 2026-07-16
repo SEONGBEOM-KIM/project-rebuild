@@ -4,6 +4,7 @@ import TeacherReportManager from '../systems/TeacherReportManager.js';
 import TeacherReportViewManager from '../systems/TeacherReportViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
+import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
 import { copyTextToClipboard, downloadTextFile } from '../ui/BrowserFileActions.js';
 
 export default class TeacherReportScene extends Phaser.Scene {
@@ -35,10 +36,9 @@ export default class TeacherReportScene extends Phaser.Scene {
   drawPanel(panel, body) {
     const panelStyle = TeacherReportViewManager.getPanelStyle();
     const textStyles = TeacherReportViewManager.getTextStyles();
-    this.add.rectangle(panel.x, panel.y, panel.width, panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
-      .setStrokeStyle(panelStyle.strokeWidth, panelStyle.strokeColor);
+    createPanelBackground(this, panel, panelStyle);
     const titlePosition = TeacherReportViewManager.getPanelTitlePosition(panel);
-    this.add.text(titlePosition.x, titlePosition.y, panel.title, textStyles.panelTitle).setOrigin(0.5);
+    createPanelTitle(this, titlePosition, textStyles.panelTitle, { text: panel.title, origin: 0.5 });
     const bodyPosition = TeacherReportViewManager.getPanelBodyPosition(panel);
     this.add.text(bodyPosition.x, bodyPosition.y, body, TeacherReportViewManager.getPanelBodyStyle(panel));
   }

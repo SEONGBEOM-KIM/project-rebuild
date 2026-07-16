@@ -7,6 +7,7 @@ import ApiPayloadViewManager from '../systems/ApiPayloadViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { copyTextToClipboard, downloadTextFile } from '../ui/BrowserFileActions.js';
 import { createLayoutText } from '../ui/LayoutText.js';
+import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
 
 export default class ApiPayloadScene extends Phaser.Scene {
   constructor() {
@@ -35,13 +36,8 @@ export default class ApiPayloadScene extends Phaser.Scene {
   drawPayloadPanel() {
     const layout = ApiPayloadViewManager.getPayloadPanelLayout();
     const panelStyle = ApiPayloadViewManager.getDarkPanelStyle();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
-      .setStrokeStyle(panelStyle.strokeWidth, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: panelStyle.titleFontSize,
-      color: panelStyle.titleColor,
-      fontStyle: panelStyle.titleFontStyle,
-    });
+    createPanelBackground(this, layout.panel, panelStyle);
+    createPanelTitle(this, layout.title, panelStyle);
     this.add.text(
       layout.body.x,
       layout.body.y,
@@ -55,13 +51,8 @@ export default class ApiPayloadScene extends Phaser.Scene {
 
     const layout = ApiPayloadViewManager.getValidationPanelLayout();
     const panelStyle = ApiPayloadViewManager.getLightPanelStyle();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
-      .setStrokeStyle(panelStyle.strokeWidth, summary.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: panelStyle.titleFontSize,
-      color: panelStyle.titleColor,
-      fontStyle: panelStyle.titleFontStyle,
-    }).setOrigin(0.5);
+    createPanelBackground(this, layout.panel, panelStyle, { strokeColor: summary.strokeColor });
+    createPanelTitle(this, layout.title, panelStyle, { origin: 0.5 });
 
     this.add.text(
       layout.rows.x,
@@ -82,13 +73,8 @@ export default class ApiPayloadScene extends Phaser.Scene {
     const submissions = MockApiClient.listSubmissions();
     const layout = ApiPayloadViewManager.getSubmissionLogLayout();
     const logStyle = ApiPayloadViewManager.getLogPanelStyle();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, logStyle.fillColor, logStyle.fillAlpha)
-      .setStrokeStyle(logStyle.strokeWidth, layout.title.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: logStyle.titleFontSize,
-      color: logStyle.titleColor,
-      fontStyle: logStyle.titleFontStyle,
-    });
+    createPanelBackground(this, layout.panel, logStyle, { strokeColor: layout.title.strokeColor });
+    createPanelTitle(this, layout.title, logStyle);
     this.submissionLogText = this.add.text(
       layout.body.x,
       layout.body.y,

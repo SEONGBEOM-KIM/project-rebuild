@@ -5,6 +5,7 @@ import MockSubmissionLogViewManager from '../systems/MockSubmissionLogViewManage
 import { createTextButton } from '../ui/TextButton.js';
 import { copyTextToClipboard, downloadTextFile } from '../ui/BrowserFileActions.js';
 import { createLayoutText } from '../ui/LayoutText.js';
+import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
 
 export default class MockSubmissionLogScene extends Phaser.Scene {
   constructor() {
@@ -32,13 +33,8 @@ export default class MockSubmissionLogScene extends Phaser.Scene {
   drawSummaryPanel() {
     const layout = MockSubmissionLogViewManager.getSummaryPanelLayout();
     const panelStyle = MockSubmissionLogViewManager.getSummaryPanelStyle();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
-      .setStrokeStyle(panelStyle.strokeWidth, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: panelStyle.titleFontSize,
-      color: panelStyle.titleColor,
-      fontStyle: panelStyle.titleFontStyle,
-    }).setOrigin(0.5);
+    createPanelBackground(this, layout.panel, panelStyle);
+    createPanelTitle(this, layout.title, panelStyle, { origin: 0.5 });
 
     const rows = MockSubmissionLogViewManager.formatSummaryRows(this.submissions);
 
@@ -53,13 +49,8 @@ export default class MockSubmissionLogScene extends Phaser.Scene {
   drawLogPanel() {
     const layout = MockSubmissionLogViewManager.getLogPanelLayout();
     const panelStyle = MockSubmissionLogViewManager.getLogPanelStyle();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
-      .setStrokeStyle(panelStyle.strokeWidth, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: panelStyle.titleFontSize,
-      color: panelStyle.titleColor,
-      fontStyle: panelStyle.titleFontStyle,
-    });
+    createPanelBackground(this, layout.panel, panelStyle);
+    createPanelTitle(this, layout.title, panelStyle);
 
     const body = MockSubmissionLogViewManager.formatLogBody(this.submissions);
     this.add.text(

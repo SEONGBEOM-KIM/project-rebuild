@@ -21,9 +21,9 @@ export function createPanelBackground(scene, layout, style, options = {}) {
 
 export function getPanelTitleStyle(style, extraStyle = {}) {
   const titleStyle = {};
-  if (style.titleFontSize !== undefined) titleStyle.fontSize = style.titleFontSize;
-  if (style.titleColor !== undefined) titleStyle.color = style.titleColor;
-  if (style.titleFontStyle !== undefined) titleStyle.fontStyle = style.titleFontStyle;
+  if (style.titleFontSize !== undefined || style.fontSize !== undefined) titleStyle.fontSize = style.titleFontSize ?? style.fontSize;
+  if (style.titleColor !== undefined || style.color !== undefined) titleStyle.color = style.titleColor ?? style.color;
+  if (style.titleFontStyle !== undefined || style.fontStyle !== undefined) titleStyle.fontStyle = style.titleFontStyle ?? style.fontStyle;
   return {
     ...titleStyle,
     ...extraStyle,

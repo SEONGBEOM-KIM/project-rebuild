@@ -2716,6 +2716,15 @@ function testSharedUiComponentStyles() {
     fontStyle: 'bold',
     color: '#172554',
   });
+  assert.deepEqual(getPanelTitleStyle({
+    fontSize: '22px',
+    color: '#1e293b',
+    fontStyle: 'bold',
+  }), {
+    fontSize: '22px',
+    color: '#1e293b',
+    fontStyle: 'bold',
+  });
 
   const calls = [];
   const scene = {
