@@ -38,6 +38,7 @@ import PlacementMapRenderer from '../src/systems/PlacementMapRenderer.js';
 import PlacementResultManager from '../src/systems/PlacementResultManager.js';
 import PlacementUiStateManager from '../src/systems/PlacementUiStateManager.js';
 import PlacementSceneObjectRegistry from '../src/systems/PlacementSceneObjectRegistry.js';
+import PlacementInputController from '../src/systems/PlacementInputController.js';
 import SaveManager, { LEARNING_SAVE_STORAGE_KEY } from '../src/systems/SaveManager.js';
 import SavedDataViewManager from '../src/systems/SavedDataViewManager.js';
 import StorageSummaryManager from '../src/systems/StorageSummaryManager.js';
@@ -222,6 +223,72 @@ function testPlacementSceneObjectRegistry() {
   const nextWorldObject = createDisplayObjectSpy();
   registry.registerWorldObject(nextWorldObject);
   assert.equal(fixture.ignoredByUi.at(-1), nextWorldObject);
+}
+
+function createPlacementInputControllerFixture({ isPointerOnUi = () => false, pointerToTile = () => ({ x: 2, y: 7 }) } = {}) {
+  const handlers = new Map();
+  const calls = [];
+  const scene = {
+    input: {
+      on: (eventName, handler) => handlers.set(eventName, handler),
+    },
+  };
+  const controller = new PlacementInputController({
+    scene,
+    isPointerOnUi,
+    pointerToTile,
+    clearPreview: () => calls.push(['clearPreview']),
+    updatePreview: (pointer) => calls.push(['updatePreview', pointer.x, pointer.y]),
+    tryPlace: (pointer) => calls.push(['tryPlace', pointer.x, pointer.y]),
+  }).enable();
+
+  return { controller, handlers, calls };
+}
+
+function testPlacementInputController() {
+  assert.equal(PlacementInputController.shouldIgnorePointer({ x: 500, y: 500 }, [], () => false), false);
+  assert.equal(PlacementInputController.shouldIgnorePointer({ x: 50, y: 500 }, [], () => true), true);
+  assert.equal(PlacementInputController.shouldIgnorePointer({ x: 500, y: 500 }, [{}], () => false), true);
+  assert.deepEqual(PlacementInputController.createPendingPointer({ x: 10, y: 20 }, { x: 2, y: 7 }), {
+    x: 10,
+    y: 20,
+    tile: { x: 2, y: 7 },
+  });
+  assert.deepEqual(PlacementInputController.getReleaseDecision(
+    { x: 10, y: 20, tile: { x: 2, y: 7 } },
+    { x: 14, y: 23 },
+    { x: 2, y: 7 },
+  ), {
+    dragDistance: 5,
+    sameTile: true,
+    shouldPlace: true,
+  });
+  assert.equal(PlacementInputController.getReleaseDecision(
+    { x: 10, y: 20, tile: { x: 2, y: 7 } },
+    { x: 40, y: 20 },
+    { x: 2, y: 7 },
+  ).shouldPlace, false);
+  assert.equal(PlacementInputController.getReleaseDecision(
+    { x: 10, y: 20, tile: { x: 2, y: 7 } },
+    { x: 12, y: 20 },
+    { x: 3, y: 7 },
+  ).shouldPlace, false);
+
+  const fixture = createPlacementInputControllerFixture();
+  fixture.handlers.get('pointermove')({ x: 500, y: 500 });
+  assert.deepEqual(fixture.calls, [['updatePreview', 500, 500]]);
+
+  fixture.handlers.get('pointerdown')({ x: 500, y: 500 }, []);
+  assert.deepEqual(fixture.controller.pendingPlacementPointer, { x: 500, y: 500, tile: { x: 2, y: 7 } });
+  fixture.handlers.get('pointerup')({ x: 504, y: 503 }, []);
+  assert.deepEqual(fixture.calls.at(-1), ['tryPlace', 504, 503]);
+  assert.equal(fixture.controller.pendingPlacementPointer, null);
+
+  const uiFixture = createPlacementInputControllerFixture({ isPointerOnUi: () => true });
+  uiFixture.handlers.get('pointermove')({ x: 40, y: 500 });
+  assert.deepEqual(uiFixture.calls, [['clearPreview']]);
+  uiFixture.handlers.get('pointerdown')({ x: 40, y: 500 }, []);
+  assert.equal(uiFixture.controller.pendingPlacementPointer, null);
 }
 
 
@@ -2244,6 +2311,7 @@ async function run() {
   testPolicyRecommendationMatchingUsesIds();
   testMapData();
   testPlacementSceneObjectRegistry();
+  testPlacementInputController();
   testPlacementMapGeometry();
   testPlacementMapRenderer();
   testPlacementViewManager();

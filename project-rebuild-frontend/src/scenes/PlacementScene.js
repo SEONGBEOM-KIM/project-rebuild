@@ -10,6 +10,7 @@ import PlacementMapRenderer from '../systems/PlacementMapRenderer.js';
 import PlacementResultManager from '../systems/PlacementResultManager.js';
 import PlacementUiStateManager from '../systems/PlacementUiStateManager.js';
 import PlacementSceneObjectRegistry from '../systems/PlacementSceneObjectRegistry.js';
+import PlacementInputController from '../systems/PlacementInputController.js';
 
 export default class PlacementScene extends Phaser.Scene {
   constructor() {
@@ -21,7 +22,6 @@ export default class PlacementScene extends Phaser.Scene {
     this.selectedPolicy = this.registry.get('selectedPolicy');
     this.placementSystem = new PlacementSystem(this.cloneMapData(mapData));
     this.placedBuildings = [...(this.registry.get('placedBuildings') ?? [])];
-    this.pendingPlacementPointer = null;
     this.mapGeometry = new PlacementMapGeometry({
       origin: PlacementViewManager.getScreenLayout().mapOrigin,
       tileWidth: mapData.tileWidth,
@@ -234,54 +234,15 @@ export default class PlacementScene extends Phaser.Scene {
     this.mapRenderer.drawMap(this.mapGraphics, this.placementSystem.mapData);
   }
 
+
   registerPlacementInput() {
-    this.input.on('pointermove', (pointer) => {
-      if (PlacementViewManager.isPointerOnUi(pointer)) {
-        this.previewGraphics.clear();
-        return;
-      }
-      this.updatePreview(pointer);
-    });
-
-    this.input.on('pointerdown', (pointer, gameObjects) => {
-      if (gameObjects.length > 0 || PlacementViewManager.isPointerOnUi(pointer)) {
-        this.pendingPlacementPointer = null;
-        return;
-      }
-
-      this.pendingPlacementPointer = {
-        x: pointer.x,
-        y: pointer.y,
-        tile: this.pointerToTile(pointer),
-      };
-    });
-
-    this.input.on('pointerup', (pointer, gameObjects) => {
-      if (!this.pendingPlacementPointer || gameObjects.length > 0 || PlacementViewManager.isPointerOnUi(pointer)) {
-        this.pendingPlacementPointer = null;
-        return;
-      }
-
-      const dragDistance = Phaser.Math.Distance.Between(
-        this.pendingPlacementPointer.x,
-        this.pendingPlacementPointer.y,
-        pointer.x,
-        pointer.y,
-      );
-      const releaseTile = this.pointerToTile(pointer);
-      const sameTile = releaseTile
-        && this.pendingPlacementPointer.tile
-        && releaseTile.x === this.pendingPlacementPointer.tile.x
-        && releaseTile.y === this.pendingPlacementPointer.tile.y;
-
-      this.pendingPlacementPointer = null;
-
-      if (!PlacementViewManager.isDragPlacementCandidate(dragDistance, sameTile)) {
-        return;
-      }
-
-      this.tryPlace(pointer);
-    });
+    this.placementInputController = new PlacementInputController({
+      scene: this,
+      pointerToTile: (pointer) => this.pointerToTile(pointer),
+      clearPreview: () => this.previewGraphics.clear(),
+      updatePreview: (pointer) => this.updatePreview(pointer),
+      tryPlace: (pointer) => this.tryPlace(pointer),
+    }).enable();
   }
 
   updatePreview(pointer) {
