@@ -52,8 +52,7 @@ export default class SideEffectScene extends Phaser.Scene {
     issues.slice(0, 4).forEach((issue, index) => {
       const card = SideEffectViewManager.getIssueCardLayout(index);
       const cardStyle = SideEffectViewManager.getIssueCardStyle();
-      this.add.rectangle(card.background.x, card.background.y, card.background.width, card.background.height, cardStyle.fillColor, cardStyle.fillAlpha)
-        .setStrokeStyle(cardStyle.strokeWidth, issue.color);
+      createPanelBackground(this, card.background, cardStyle, { strokeColor: issue.color });
       this.add.circle(card.marker.x, card.marker.y, card.marker.radius, issue.color, cardStyle.markerAlpha)
         .setStrokeStyle(cardStyle.markerStrokeWidth, cardStyle.markerStrokeColor);
       this.add.text(card.title.x, card.title.y, issue.title, textStyles.cardTitle);

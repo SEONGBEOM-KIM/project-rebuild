@@ -69,8 +69,7 @@ export default class CauseQuizScene extends Phaser.Scene {
   createChoice(choice, index, number) {
     const layout = CauseQuizViewManager.getChoiceLayout(index);
     const textStyles = CauseQuizViewManager.getTextStyles();
-    const background = this.add.rectangle(layout.background.x, layout.background.y, layout.background.width, layout.background.height, layout.background.fillColor, layout.background.fillAlpha)
-      .setStrokeStyle(layout.background.strokeWidth, layout.background.strokeColor)
+    const background = createPanelBackground(this, layout.background, layout.background)
       .setInteractive({ useHandCursor: true });
     const text = createLayoutText(this, layout.text, {
       text: `${number}. ${choice.text}`,

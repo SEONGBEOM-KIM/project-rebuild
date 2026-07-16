@@ -5,6 +5,7 @@ import LearningProgress from '../systems/LearningProgress.js';
 import SelectionViewManager from '../systems/SelectionViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
+import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
 
 export default class SelectionScene extends Phaser.Scene {
   constructor() {
@@ -53,11 +54,13 @@ export default class SelectionScene extends Phaser.Scene {
     const initialStyle = SelectionViewManager.getCardStyle(policy.id, this.selectedPolicy);
     const textStyles = SelectionViewManager.getTextStyles();
     const container = this.add.container(x, y);
-    const background = this.add.rectangle(layout.background.x, layout.background.y, layout.background.width, layout.background.height, initialStyle.fillColor, initialStyle.fillAlpha)
-      .setStrokeStyle(initialStyle.strokeWidth, initialStyle.strokeColor)
+    const background = createPanelBackground(this, layout.background, initialStyle)
       .setInteractive({ useHandCursor: true });
     const colorBar = this.add.rectangle(layout.colorBar.x, layout.colorBar.y, layout.colorBar.width, layout.colorBar.height, policy.color, 1);
-    const title = this.add.text(layout.title.x, layout.title.y, policy.name, textStyles.title).setOrigin(0.5);
+    const title = createPanelTitle(this, layout.title, textStyles.title, {
+      text: policy.name,
+      origin: 0.5,
+    });
     const tagline = createLayoutText(this, layout.tagline, {
       text: policy.tagline,
       style: textStyles.tagline,

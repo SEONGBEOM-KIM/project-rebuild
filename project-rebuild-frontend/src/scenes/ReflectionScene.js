@@ -5,6 +5,7 @@ import LearningProgress from '../systems/LearningProgress.js';
 import ReflectionViewManager from '../systems/ReflectionViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
+import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
 
 export default class ReflectionScene extends Phaser.Scene {
   constructor() {
@@ -45,11 +46,10 @@ export default class ReflectionScene extends Phaser.Scene {
     const layout = ReflectionViewManager.getChoiceCardLayout(x, y);
     const initialStyle = ReflectionViewManager.getChoiceCardStyle(choice.id, this.selectedChoice);
     const textStyles = ReflectionViewManager.getChoiceTextStyles();
-    const background = this.add.rectangle(layout.background.x, layout.background.y, layout.background.width, layout.background.height, initialStyle.fillColor, initialStyle.fillAlpha)
-      .setStrokeStyle(initialStyle.strokeWidth, initialStyle.strokeColor)
+    const background = createPanelBackground(this, layout.background, initialStyle)
       .setInteractive({ useHandCursor: true });
     const icon = this.add.text(layout.icon.x, layout.icon.y, choice.icon, textStyles.icon).setOrigin(0.5);
-    const title = this.add.text(layout.title.x, layout.title.y, choice.title, textStyles.title);
+    const title = createPanelTitle(this, layout.title, textStyles.title, { text: choice.title });
     const description = createLayoutText(this, layout.description, {
       text: choice.description,
       style: textStyles.description,

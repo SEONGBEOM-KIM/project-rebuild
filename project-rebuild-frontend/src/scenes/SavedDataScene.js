@@ -4,6 +4,7 @@ import LearningDataRestoreManager from '../systems/LearningDataRestoreManager.js
 import SavedDataViewManager from '../systems/SavedDataViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
+import { createPanelBackground } from '../ui/PanelRenderer.js';
 
 export default class SavedDataScene extends Phaser.Scene {
   constructor() {
@@ -19,14 +20,12 @@ export default class SavedDataScene extends Phaser.Scene {
     createLayoutText(this, layout.title, { origin: 0.5 });
     createLayoutText(this, layout.subtitle, { origin: 0.5 });
 
-    this.add.rectangle(
-      layout.bodyPanel.x,
-      layout.bodyPanel.y,
-      layout.bodyPanel.width,
-      layout.bodyPanel.height,
-      layout.bodyPanel.fillColor,
-      layout.bodyPanel.alpha,
-    ).setStrokeStyle(layout.bodyPanel.strokeWidth, layout.bodyPanel.strokeColor);
+    createPanelBackground(this, layout.bodyPanel, {
+      fillColor: layout.bodyPanel.fillColor,
+      fillAlpha: layout.bodyPanel.alpha,
+      strokeWidth: layout.bodyPanel.strokeWidth,
+      strokeColor: layout.bodyPanel.strokeColor,
+    });
 
     const body = SavedDataViewManager.formatBody(saved);
 

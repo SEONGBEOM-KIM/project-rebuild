@@ -35,8 +35,10 @@ export default class ExplorationScene extends Phaser.Scene {
 
   drawHeader() {
     const layout = ExplorationViewManager.getScreenLayout();
-    this.add.text(layout.title.x, layout.title.y, CURRENT_EPISODE.shortTitle, layout.title);
-    this.add.text(layout.subtitle.x, layout.subtitle.y, ExplorationViewManager.formatSubtitle(CURRENT_EPISODE.regionName), layout.subtitle);
+    createLayoutText(this, layout.title, { text: CURRENT_EPISODE.shortTitle });
+    createLayoutText(this, layout.subtitle, {
+      text: ExplorationViewManager.formatSubtitle(CURRENT_EPISODE.regionName),
+    });
   }
 
   drawMapBackdrop() {
