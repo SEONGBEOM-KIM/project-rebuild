@@ -6,6 +6,7 @@ import MockApiClient from '../systems/MockApiClient.js';
 import ApiPayloadViewManager from '../systems/ApiPayloadViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { copyTextToClipboard, downloadTextFile } from '../ui/BrowserFileActions.js';
+import { createLayoutText } from '../ui/LayoutText.js';
 
 export default class ApiPayloadScene extends Phaser.Scene {
   constructor() {
@@ -22,16 +23,8 @@ export default class ApiPayloadScene extends Phaser.Scene {
     this.add.rectangle(width / 2, height / 2, width, height, screenLayout.backgroundColor);
     ProgressStepper.render(this, screenLayout.progressStep);
 
-    this.add.text(screenLayout.title.x, screenLayout.title.y, screenLayout.title.text, {
-      fontSize: screenLayout.title.fontSize,
-      color: screenLayout.title.color,
-      fontStyle: screenLayout.title.fontStyle,
-    }).setOrigin(0.5);
-
-    this.add.text(screenLayout.subtitle.x, screenLayout.subtitle.y, screenLayout.subtitle.text, {
-      fontSize: screenLayout.subtitle.fontSize,
-      color: screenLayout.subtitle.color,
-    }).setOrigin(0.5);
+    createLayoutText(this, screenLayout.title, { origin: 0.5 });
+    createLayoutText(this, screenLayout.subtitle, { origin: 0.5 });
 
     this.drawPayloadPanel();
     this.drawValidationPanel();

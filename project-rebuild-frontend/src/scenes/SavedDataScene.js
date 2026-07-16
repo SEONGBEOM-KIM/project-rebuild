@@ -3,6 +3,7 @@ import SaveManager from '../systems/SaveManager.js';
 import LearningDataRestoreManager from '../systems/LearningDataRestoreManager.js';
 import SavedDataViewManager from '../systems/SavedDataViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
+import { createLayoutText } from '../ui/LayoutText.js';
 
 export default class SavedDataScene extends Phaser.Scene {
   constructor() {
@@ -15,16 +16,8 @@ export default class SavedDataScene extends Phaser.Scene {
 
     const layout = SavedDataViewManager.getLayout(width);
     this.add.rectangle(width / 2, height / 2, width, height, layout.backgroundColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: layout.title.fontSize,
-      color: layout.title.color,
-      fontStyle: layout.title.fontStyle,
-    }).setOrigin(0.5);
-
-    this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, {
-      fontSize: layout.subtitle.fontSize,
-      color: layout.subtitle.color,
-    }).setOrigin(0.5);
+    createLayoutText(this, layout.title, { origin: 0.5 });
+    createLayoutText(this, layout.subtitle, { origin: 0.5 });
 
     this.add.rectangle(
       layout.bodyPanel.x,

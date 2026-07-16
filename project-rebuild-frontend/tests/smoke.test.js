@@ -48,6 +48,7 @@ import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_
 import ProgressStepper from '../src/ui/ProgressStepper.js';
 import { getTextButtonColor } from '../src/ui/TextButton.js';
 import { copyTextToClipboard, downloadTextFile } from '../src/ui/BrowserFileActions.js';
+import { getLayoutTextStyle } from '../src/ui/LayoutText.js';
 
 
 const PROJECT_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -1877,6 +1878,34 @@ function testSharedUiComponentStyles() {
   });
   assert.equal(getTextButtonColor(0xbbf7d0), '#bbf7d0');
   assert.equal(getTextButtonColor('#0f172a'), '#0f172a');
+  assert.deepEqual(getLayoutTextStyle({
+    x: 10,
+    y: 20,
+    text: '제목',
+    fontSize: '32px',
+    color: '#ffffff',
+    fontStyle: 'bold',
+    wordWrapWidth: 360,
+  }), {
+    fontSize: '32px',
+    color: '#ffffff',
+    fontStyle: 'bold',
+    wordWrap: { width: 360 },
+  });
+  assert.deepEqual(getLayoutTextStyle({
+    x: 10,
+    y: 20,
+    text: '소제목',
+    fontSize: '24px',
+    color: '#94a3b8',
+  }, {
+    color: '#0f172a',
+    fontStyle: 'bold',
+  }), {
+    fontSize: '24px',
+    color: '#0f172a',
+    fontStyle: 'bold',
+  });
 }
 
 

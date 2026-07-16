@@ -4,6 +4,7 @@ import ProgressStepper from '../ui/ProgressStepper.js';
 import { formatContractRequest, formatContractResponse } from '../data/apiContract.js';
 import ApiContractViewManager from '../systems/ApiContractViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
+import { createLayoutText } from '../ui/LayoutText.js';
 
 export default class ApiContractScene extends Phaser.Scene {
   constructor() {
@@ -16,16 +17,8 @@ export default class ApiContractScene extends Phaser.Scene {
     this.add.rectangle(width / 2, height / 2, width, height, screenLayout.backgroundColor);
     ProgressStepper.render(this, screenLayout.progressStep);
 
-    this.add.text(screenLayout.title.x, screenLayout.title.y, screenLayout.title.text, {
-      fontSize: screenLayout.title.fontSize,
-      color: screenLayout.title.color,
-      fontStyle: screenLayout.title.fontStyle,
-    }).setOrigin(0.5);
-
-    this.add.text(screenLayout.subtitle.x, screenLayout.subtitle.y, screenLayout.subtitle.text, {
-      fontSize: screenLayout.subtitle.fontSize,
-      color: screenLayout.subtitle.color,
-    }).setOrigin(0.5);
+    createLayoutText(this, screenLayout.title, { origin: 0.5 });
+    createLayoutText(this, screenLayout.subtitle, { origin: 0.5 });
 
     const panels = ApiContractViewManager.getPanelLayout();
     this.drawPanel(panels.request, formatContractRequest());
