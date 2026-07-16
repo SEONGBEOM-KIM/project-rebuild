@@ -2,12 +2,13 @@ import Phaser from 'phaser';
 import { buildings } from '../data/buildings.js';
 import PlacementViewManager from '../systems/PlacementViewManager.js';
 import CameraController from '../systems/CameraController.js';
-import PlacementResultManager from '../systems/PlacementResultManager.js';
 import PlacementUiStateManager from '../systems/PlacementUiStateManager.js';
 import PlacementInputController from '../systems/PlacementInputController.js';
 import PlacementUiUpdater from '../systems/PlacementUiUpdater.js';
 import PlacementUiRenderer from '../systems/PlacementUiRenderer.js';
 import PlacementSceneBootstrap from '../systems/PlacementSceneBootstrap.js';
+import PlacementActionManager from '../systems/PlacementActionManager.js';
+import { PLACEMENT_ACTION_STATUS } from '../systems/PlacementActionManager.js';
 
 export default class PlacementScene extends Phaser.Scene {
   constructor() {
@@ -94,46 +95,45 @@ export default class PlacementScene extends Phaser.Scene {
 
   updatePreview(pointer) {
     this.previewGraphics.clear();
-    const tile = this.pointerToTile(pointer);
-    if (!tile) {
+    const preview = PlacementActionManager.previewPlacement({
+      tile: this.pointerToTile(pointer),
+      placementSystem: this.placementSystem,
+      building: this.selectedBuilding,
+    });
+
+    if (preview.status === PLACEMENT_ACTION_STATUS.MISSING_TILE) {
       this.uiUpdater.updateCursorInfo(null);
       return;
     }
 
-    const validation = this.placementSystem.validatePlacement(tile.x, tile.y, this.selectedBuilding);
-    const previewStyle = PlacementViewManager.getPreviewStyle(validation);
-
-    this.mapRenderer.drawTiles(this.previewGraphics, validation.footprintTiles, previewStyle);
-
-    this.uiUpdater.updateCursorInfo(tile, this.placementSystem.getTile(tile.x, tile.y), validation);
+    const previewStyle = PlacementViewManager.getPreviewStyle(preview.validation);
+    this.mapRenderer.drawTiles(this.previewGraphics, preview.validation.footprintTiles, previewStyle);
+    this.uiUpdater.updateCursorInfo(preview.tile, preview.mapTile, preview.validation);
   }
 
   tryPlace(pointer) {
-    const tile = this.pointerToTile(pointer);
-    if (!tile) {
+    const action = PlacementActionManager.place({
+      registry: this.registry,
+      tile: this.pointerToTile(pointer),
+      placementSystem: this.placementSystem,
+      building: this.selectedBuilding,
+      placedBuildings: this.placedBuildings,
+    });
+
+    if (action.status === PLACEMENT_ACTION_STATUS.MISSING_TILE) {
       this.uiUpdater.showMessage(PlacementUiStateManager.formatMapSelectMessage(), '#fecaca');
       return;
     }
 
-    const validation = this.placementSystem.validatePlacement(tile.x, tile.y, this.selectedBuilding);
-    if (!validation.valid) {
-      this.uiUpdater.showMessage(PlacementUiStateManager.formatInvalidPlacementMessage(validation.reason), '#fecaca');
-      this.uiUpdater.updateCursorInfo(tile, this.placementSystem.getTile(tile.x, tile.y), validation);
+    if (action.status === PLACEMENT_ACTION_STATUS.INVALID) {
+      this.uiUpdater.showMessage(PlacementUiStateManager.formatInvalidPlacementMessage(action.validation.reason), '#fecaca');
+      this.uiUpdater.updateCursorInfo(action.tile, action.mapTile, action.validation);
       return;
     }
 
-    const occupiedTiles = this.placementSystem.place(tile.x, tile.y, this.selectedBuilding);
-    const placementCommit = PlacementResultManager.commitPlacement({
-      registry: this.registry,
-      building: this.selectedBuilding,
-      tile,
-      occupiedTiles,
-      placedBuildings: this.placedBuildings,
-    });
-    this.placedBuildings = placementCommit.placedBuildings;
-
-    this.worldRenderer.drawPlacedBuilding(this.selectedBuilding, tile.x, tile.y);
-    this.worldRenderer.drawImpactMarkers(this.selectedBuilding, tile.x, tile.y);
+    this.placedBuildings = action.placedBuildings;
+    this.worldRenderer.drawPlacedBuilding(this.selectedBuilding, action.tile.x, action.tile.y);
+    this.worldRenderer.drawImpactMarkers(this.selectedBuilding, action.tile.x, action.tile.y);
     this.uiUpdater.updateStatusBar(this.registry.get('gameState'));
     this.uiUpdater.updateLastChangePanel(this.registry.get('lastPlacementResult'));
     this.uiUpdater.updatePlacementHistoryPanel(this.placedBuildings);

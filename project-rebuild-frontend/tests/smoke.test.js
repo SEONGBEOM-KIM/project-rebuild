@@ -36,6 +36,7 @@ import PlacementViewManager, { TILE_COLORS, TILE_STROKES, TILE_LABELS, ZONE_LABE
 import PlacementMapGeometry from '../src/systems/PlacementMapGeometry.js';
 import PlacementMapRenderer from '../src/systems/PlacementMapRenderer.js';
 import PlacementResultManager from '../src/systems/PlacementResultManager.js';
+import PlacementActionManager, { PLACEMENT_ACTION_STATUS } from '../src/systems/PlacementActionManager.js';
 import PlacementUiStateManager from '../src/systems/PlacementUiStateManager.js';
 import PlacementSceneObjectRegistry from '../src/systems/PlacementSceneObjectRegistry.js';
 import PlacementInputController from '../src/systems/PlacementInputController.js';
@@ -1806,6 +1807,56 @@ function testPlacementViewManager() {
 }
 
 
+
+function testPlacementActionManager() {
+  const registry = createMemoryRegistry();
+  registry.set('gameState', GameState.createInitialState());
+  registry.set('learningProgress', LearningProgress.createInitialProgress());
+  const placementSystem = new PlacementSystem(cloneMapData(mapData));
+  const youthCenter = buildings.find((building) => building.id === 'youth_center');
+  const busStation = buildings.find((building) => building.id === 'bus_station');
+
+  const missingPreview = PlacementActionManager.previewPlacement({
+    tile: null,
+    placementSystem,
+    building: youthCenter,
+  });
+  assert.equal(missingPreview.status, PLACEMENT_ACTION_STATUS.MISSING_TILE);
+  assert.equal(missingPreview.validation, null);
+
+  const invalid = PlacementActionManager.place({
+    registry,
+    tile: { x: 1, y: 1 },
+    placementSystem,
+    building: busStation,
+    placedBuildings: [],
+  });
+  assert.equal(invalid.status, PLACEMENT_ACTION_STATUS.INVALID);
+  assert.equal(invalid.validation.valid, false);
+  assert.equal(registry.get('placedBuildings'), undefined);
+
+  const placed = PlacementActionManager.place({
+    registry,
+    tile: { x: 1, y: 1 },
+    placementSystem,
+    building: youthCenter,
+    placedBuildings: [],
+  });
+  assert.equal(placed.status, PLACEMENT_ACTION_STATUS.PLACED);
+  assert.equal(placed.occupiedTiles.length, 4);
+  assert.equal(placed.placedBuildings.length, 1);
+  assert.equal(placed.placementCommit.record.building.id, 'youth_center');
+  assert.equal(registry.get('gameState').population, 1080);
+  assert.deepEqual(LearningProgress.get(registry).placedBuildingIds, ['youth_center']);
+
+  const occupiedPreview = PlacementActionManager.previewPlacement({
+    tile: { x: 1, y: 1 },
+    placementSystem,
+    building: youthCenter,
+  });
+  assert.equal(occupiedPreview.status, PLACEMENT_ACTION_STATUS.INVALID);
+}
+
 function testPlacementResultManager() {
   const registry = createMemoryRegistry();
   const initialState = GameState.createInitialState();
@@ -2725,6 +2776,7 @@ async function run() {
   testPlacementUiRenderer();
   testPlacementUiUpdater();
   testPlacementViewManager();
+  testPlacementActionManager();
   testPlacementResultManager();
   testPlacementRules();
   testEndingSummaryViewManager();
