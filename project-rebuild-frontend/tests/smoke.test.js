@@ -479,7 +479,7 @@ function testSelectionViewManager() {
 }
 
 function testSelectionPolicyCardRenderer() {
-  const fixture = createExplorationRendererSceneSpy();
+  const fixture = createRendererSceneSpy();
   const selected = [];
   const policy = policies[0];
   const cardObjects = SelectionPolicyCardRenderer.render(fixture.scene, policy, policy, { x: 300, y: 400 }, {
@@ -609,7 +609,7 @@ function testExplorationViewManager() {
   });
 }
 
-function createExplorationRendererSceneSpy() {
+function createRendererSceneSpy() {
   const calls = [];
   const createObject = (type, args) => ({
     type,
@@ -683,13 +683,13 @@ function createExplorationRendererSceneSpy() {
 }
 
 function testExplorationMapRenderer() {
-  const backdropFixture = createExplorationRendererSceneSpy();
+  const backdropFixture = createRendererSceneSpy();
   ExplorationMapRenderer.renderBackdrop(backdropFixture.scene);
   assert.equal(backdropFixture.calls.filter((call) => call[0] === 'ellipse').length, 2);
   assert.equal(backdropFixture.calls.filter((call) => call[0] === 'angle').length, 3);
   assert.ok(backdropFixture.calls.some((call) => call[0] === 'text' && call[3].includes('임시 지도 데이터')));
 
-  const markerFixture = createExplorationRendererSceneSpy();
+  const markerFixture = createRendererSceneSpy();
   const selectedPlaces = [];
   const place = explorationPlaces[0];
   const markerObjects = ExplorationMapRenderer.renderPlaceMarker(markerFixture.scene, place, {
@@ -1151,7 +1151,7 @@ function testSideEffectViewManager() {
 }
 
 function testSideEffectIssueRenderer() {
-  const fixture = createExplorationRendererSceneSpy();
+  const fixture = createRendererSceneSpy();
   const issue = {
     title: '만족도 하락',
     message: '일부 주민이 체감하는 생활 편의가 낮아졌습니다.',
