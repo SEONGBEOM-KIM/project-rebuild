@@ -1905,6 +1905,7 @@ function testPlacementViewManager() {
     delta: youthCenter.effect,
   });
   assert.match(lastChange.text, /청년센터 배치/);
+  assert.match(lastChange.text, /균형: 인구와 만족도는 크게 오르지만/);
   assert.match(lastChange.text, /인구: 1000 → 1080/);
 
   const history = PlacementUiStateManager.formatPlacementHistoryState([
@@ -1920,7 +1921,9 @@ function testPlacementViewManager() {
   assert.equal(PlacementUiStateManager.canContinue(2), false);
   assert.equal(PlacementUiStateManager.canContinue(3), true);
   assert.equal(PlacementUiStateManager.getContinueState(3, null).buttonText, '종합 결과 확인');
-  assert.equal(PlacementUiStateManager.formatPlacementSuccessMessage('청년센터', 3), '청년센터 배치 완료: 종합 결과를 확인할 수 있습니다.');
+  assert.equal(PlacementUiStateManager.formatPlacementSuccessMessage('청년센터', 3), '청년센터 배치 완료\n종합 결과를 확인할 수 있습니다.');
+  assert.match(PlacementUiStateManager.formatPlacementSuccessMessage(youthCenter, 2), /변화: 인구 \+80 \/ 경제 \+10 \/ 만족도 \+12 \/ 예산 -180/);
+  assert.match(PlacementUiStateManager.formatPlacementSuccessMessage(youthCenter, 2), /시설 1개를 더 배치하세요/);
   assert.equal(PlacementUiStateManager.formatNeedMoreMessage(1), '종합 결과를 보려면 시설 2개를 더 배치하세요.');
   assert.equal(PlacementViewManager.isRecommendedBuilding(youthCenter, { recommendedBuildingIds: ['youth_center'] }), true);
   assert.equal(PlacementViewManager.isRecommendedBuilding(youthCenter, { recommendedBuildingIds: ['bus_station'] }), false);

@@ -81,9 +81,10 @@ export default class PlacementUiStateManager {
       text: [
         `${lastPlacementResult.building.name} 배치`,
         `위치: (${lastPlacementResult.position.x}, ${lastPlacementResult.position.y})`,
+        lastPlacementResult.building.balanceNote ? `균형: ${lastPlacementResult.building.balanceNote}` : null,
         '',
         ...changedRows,
-      ].join('\n'),
+      ].filter((row) => row !== null).join('\n'),
       color: '#fef3c7',
     };
   }
@@ -146,11 +147,19 @@ export default class PlacementUiStateManager {
     };
   }
 
-  static formatPlacementSuccessMessage(buildingName, placedCount, requiredPlacements = REQUIRED_PLACEMENTS) {
+  static formatPlacementSuccessMessage(building, placedCount, requiredPlacements = REQUIRED_PLACEMENTS) {
     const remaining = Math.max(0, requiredPlacements - placedCount);
-    return remaining === 0
-      ? `${buildingName} 배치 완료: 종합 결과를 확인할 수 있습니다.`
-      : `${buildingName} 배치 완료: 시설 ${remaining}개를 더 배치하세요.`;
+    const buildingName = typeof building === 'string' ? building : building.name;
+    const effectLine = typeof building === 'string' ? null : `변화: ${formatEffect(building.effect)}`;
+    const nextStepLine = remaining === 0
+      ? '종합 결과를 확인할 수 있습니다.'
+      : `시설 ${remaining}개를 더 배치하세요.`;
+
+    return [
+      `${buildingName} 배치 완료`,
+      effectLine,
+      nextStepLine,
+    ].filter(Boolean).join('\n');
   }
 
   static formatNeedMoreMessage(placedCount, requiredPlacements = REQUIRED_PLACEMENTS) {

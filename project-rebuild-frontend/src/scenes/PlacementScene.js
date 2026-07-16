@@ -138,7 +138,7 @@ export default class PlacementScene extends Phaser.Scene {
     this.uiUpdater.updateLastChangePanel(this.registry.get('lastPlacementResult'));
     this.uiUpdater.updatePlacementHistoryPanel(this.placedBuildings);
     this.uiUpdater.updateContinueButton(this.placedBuildings.length, this.selectedPolicy);
-    this.uiUpdater.showMessage(PlacementUiStateManager.formatPlacementSuccessMessage(this.selectedBuilding.name, this.placedBuildings.length), '#bbf7d0');
+    this.uiUpdater.showMessage(PlacementUiStateManager.formatPlacementSuccessMessage(this.selectedBuilding, this.placedBuildings.length), '#bbf7d0');
     this.updatePreview(pointer);
   }
 
