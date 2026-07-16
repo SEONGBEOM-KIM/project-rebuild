@@ -1215,6 +1215,7 @@ function testBuildingData() {
     assert.ok(Number.isInteger(building.footprint.width) && building.footprint.width > 0, `${building.id} footprint width should be positive integer`);
     assert.ok(Number.isInteger(building.footprint.height) && building.footprint.height > 0, `${building.id} footprint height should be positive integer`);
     assert.ok(Array.isArray(building.allowedZones) && building.allowedZones.length > 0, `${building.id} should declare allowed zones`);
+    assert.ok(building.balanceNote, `${building.id} should explain its balancing tradeoff`);
     assert.ok(building.effect && typeof building.effect === 'object', `${building.id} should declare state effects`);
     assert.equal(building.effect.budget, -building.cost, `${building.id} budget effect should match negative cost`);
     assert.ok(Object.values(building.effect).every(Number.isFinite), `${building.id} effects should be numeric`);
@@ -1847,6 +1848,7 @@ function testPlacementViewManager() {
   assert.equal(PlacementViewManager.getUiLayout().lastChangeBody.wordWrapWidth, 270);
   assert.equal(PlacementViewManager.formatBuildingDetail(buildings.find((building) => building.id === 'youth_center')), '2×2 | 비용 180');
   assert.match(PlacementViewManager.formatPlacementHint(buildings.find((building) => building.id === 'bus_station')), /^조건:/);
+  assert.match(PlacementViewManager.formatPlacementHint(buildings.find((building) => building.id === 'bus_station')), /균형:/);
   assert.deepEqual(PlacementViewManager.getBuildingCardContent(buildings.find((building) => building.id === 'bus_station')), {
     title: '버스정류장',
     detail: '2×2 | 비용 120',

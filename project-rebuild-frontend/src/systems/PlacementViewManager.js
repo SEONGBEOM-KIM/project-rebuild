@@ -277,7 +277,10 @@ export default class PlacementViewManager {
   }
 
   static formatPlacementHint(building) {
-    return `조건: ${building.placementHint}`;
+    return [
+      `조건: ${building.placementHint}`,
+      building.balanceNote ? `균형: ${building.balanceNote}` : null,
+    ].filter(Boolean).join('\n');
   }
 
 
