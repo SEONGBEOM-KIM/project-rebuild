@@ -32,7 +32,7 @@ import ApiPayloadViewManager from '../src/systems/ApiPayloadViewManager.js';
 import MockApiClient, { MOCK_SUBMISSION_LOG_STORAGE_KEY } from '../src/systems/MockApiClient.js';
 import MockSubmissionLogViewManager from '../src/systems/MockSubmissionLogViewManager.js';
 import PlacementSystem from '../src/systems/PlacementSystem.js';
-import PlacementViewManager, { TILE_COLORS, TILE_STROKES, TILE_LABELS, ZONE_LABELS, REQUIRED_PLACEMENTS, PLACEMENT_DRAG_THRESHOLD, PLACEMENT_UI_BOUNDS, PREVIEW_STYLES, PLACEMENT_UI_LAYOUT, BUILDING_CARD_LAYOUT, PLACEMENT_MAP_VISUALS } from '../src/systems/PlacementViewManager.js';
+import PlacementViewManager, { TILE_COLORS, TILE_STROKES, TILE_LABELS, ZONE_LABELS, REQUIRED_PLACEMENTS, PLACEMENT_DRAG_THRESHOLD, PLACEMENT_UI_BOUNDS, PREVIEW_STYLES, PLACEMENT_UI_LAYOUT, BUILDING_CARD_LAYOUT, BUILDING_CARD_VISUALS, PLACEMENT_MAP_VISUALS } from '../src/systems/PlacementViewManager.js';
 import SaveManager, { LEARNING_SAVE_STORAGE_KEY } from '../src/systems/SaveManager.js';
 import SavedDataViewManager from '../src/systems/SavedDataViewManager.js';
 import StorageSummaryManager from '../src/systems/StorageSummaryManager.js';
@@ -989,6 +989,7 @@ function testPlacementViewManager() {
   assert.equal(PREVIEW_STYLES.valid.fillColor, 0x22c55e);
   assert.equal(PLACEMENT_UI_LAYOUT.title.text, '건물 선택');
   assert.equal(BUILDING_CARD_LAYOUT.card.width, 300);
+  assert.deepEqual(BUILDING_CARD_VISUALS.card, { fillColor: 0x1e293b, fillAlpha: 1, strokeColor: 0x475569 });
   assert.equal(PLACEMENT_MAP_VISUALS.impactMarker.bubbleRadius, 34);
   assert.equal(TILE_COLORS.empty, 0x2f855a);
   assert.equal(TILE_STROKES.buildable, 0x86efac);
@@ -1033,6 +1034,11 @@ function testPlacementViewManager() {
     ...BUILDING_CARD_LAYOUT.card,
     x: 190,
     y: 249,
+  });
+  assert.deepEqual(PlacementViewManager.getBuildingCardVisual(buildings.find((building) => building.id === 'youth_center')).swatch, {
+    fillColor: buildings.find((building) => building.id === 'youth_center').color,
+    fillAlpha: 1,
+    strokeColor: 0xffffff,
   });
   assert.equal(PlacementViewManager.getBuildingCardLayout(40, 185).description.wrapWidth, 255);
   assert.equal(PlacementViewManager.getBuildingCardLayout(40, 185).description.wordWrapWidth, 255);

@@ -105,6 +105,12 @@ export const PLACEMENT_UI_LAYOUT = {
   historyBody: { x: 1478, y: 588, wordWrapWidth: 280 },
 };
 
+
+export const BUILDING_CARD_VISUALS = {
+  card: { fillColor: 0x1e293b, fillAlpha: 1, strokeColor: 0x475569 },
+  swatch: { fillAlpha: 1, strokeColor: 0xffffff },
+};
+
 export const BUILDING_CARD_LAYOUT = {
   card: { offsetX: 150, offsetY: 64, width: 300, height: 146 },
   swatch: { offsetX: 36, offsetY: 54, width: 38, height: 38 },
@@ -519,6 +525,18 @@ export default class PlacementViewManager {
   static formatNeedMoreMessage(placedCount, requiredPlacements = REQUIRED_PLACEMENTS) {
     const remaining = Math.max(0, requiredPlacements - placedCount);
     return `종합 결과를 보려면 시설 ${remaining}개를 더 배치하세요.`;
+  }
+
+
+  static getBuildingCardVisual(building) {
+    return {
+      card: { ...BUILDING_CARD_VISUALS.card },
+      swatch: {
+        fillColor: building.color,
+        fillAlpha: BUILDING_CARD_VISUALS.swatch.fillAlpha,
+        strokeColor: BUILDING_CARD_VISUALS.swatch.strokeColor,
+      },
+    };
   }
 
   static getBuildingCardStyle(buildingId, selectedBuilding, recommended) {

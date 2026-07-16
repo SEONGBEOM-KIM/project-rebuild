@@ -103,15 +103,7 @@ export default class PlacementScene extends Phaser.Scene {
     const layout = PlacementViewManager.getUiLayout();
     const textStyles = PlacementViewManager.getTextStyles();
 
-    this.createFixedRectangle(
-      layout.leftPanel.x,
-      layout.leftPanel.y,
-      layout.leftPanel.width,
-      layout.leftPanel.height,
-      layout.leftPanel.fillColor,
-      layout.leftPanel.alpha,
-      layout.leftPanel.strokeColor,
-    );
+    this.createFixedRectangleFromLayout(layout.leftPanel);
     this.createFixedText(layout.title.x, layout.title.y, layout.title.text, textStyles.title);
     this.createFixedText(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, textStyles.subtitle);
 
@@ -131,15 +123,9 @@ export default class PlacementScene extends Phaser.Scene {
       style: textStyles.message,
     });
 
-    this.continueButtonBg = this.createFixedRectangle(
-      layout.continueButton.x,
-      layout.continueButton.y,
-      layout.continueButton.width,
-      layout.continueButton.height,
-      layout.continueButton.backgroundColor,
-      layout.continueButton.alpha,
-      layout.continueButton.strokeColor,
-    ).setInteractive({ useHandCursor: true });
+    this.continueButtonBg = this.createFixedRectangleFromLayout(layout.continueButton, {
+      fillColor: layout.continueButton.backgroundColor,
+    }).setInteractive({ useHandCursor: true });
     this.continueButton = this.createFixedText(layout.continueButton.x, layout.continueButton.y, layout.continueButton.text, textStyles.continueButton)
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
@@ -163,28 +149,16 @@ export default class PlacementScene extends Phaser.Scene {
     const layout = PlacementViewManager.getUiLayout();
     const textStyles = PlacementViewManager.getTextStyles();
 
-    this.createFixedRectangle(
-      layout.legendPanel.x,
-      layout.legendPanel.y,
-      layout.legendPanel.width,
-      layout.legendPanel.height,
-      layout.legendPanel.fillColor,
-      layout.legendPanel.alpha,
-      layout.legendPanel.strokeColor,
-    );
+    this.createFixedRectangleFromLayout(layout.legendPanel);
     this.createFixedText(layout.legendTitle.x, layout.legendTitle.y, layout.legendTitle.text, textStyles.panelTitle);
 
     legendItems.forEach((item, index) => {
       const y = layout.legendText.startY + index * layout.legendText.gapY;
-      this.createFixedRectangle(
-        layout.legendSwatch.x,
-        y + layout.legendSwatch.yOffset,
-        layout.legendSwatch.width,
-        layout.legendSwatch.height,
-        item.color,
-        1,
-        0xffffff,
-      );
+      this.createFixedRectangleFromLayout(layout.legendSwatch, {
+        y: y + layout.legendSwatch.yOffset,
+        fillColor: item.color,
+        strokeColor: 0xffffff,
+      });
       this.createFixedText(layout.legendText.x, y, `${item.label} - ${item.note}`, {
         ...textStyles.legendText,
         color: PlacementViewManager.getLegendTextColor(item),
@@ -197,15 +171,7 @@ export default class PlacementScene extends Phaser.Scene {
     const emptyState = PlacementViewManager.getEmptyLastChangeState();
     const textStyles = PlacementViewManager.getTextStyles();
 
-    this.createFixedRectangle(
-      layout.lastChangePanel.x,
-      layout.lastChangePanel.y,
-      layout.lastChangePanel.width,
-      layout.lastChangePanel.height,
-      layout.lastChangePanel.fillColor,
-      layout.lastChangePanel.alpha,
-      layout.lastChangePanel.strokeColor,
-    );
+    this.createFixedRectangleFromLayout(layout.lastChangePanel);
     this.createFixedText(layout.lastChangeTitle.x, layout.lastChangeTitle.y, layout.lastChangeTitle.text, textStyles.panelTitle);
     this.lastChangeText = this.createFixedLayoutText(layout.lastChangeBody, {
       text: emptyState.text,
@@ -221,15 +187,7 @@ export default class PlacementScene extends Phaser.Scene {
     const emptyState = PlacementViewManager.getEmptyPlacementHistoryState();
     const textStyles = PlacementViewManager.getTextStyles();
 
-    this.createFixedRectangle(
-      layout.historyPanel.x,
-      layout.historyPanel.y,
-      layout.historyPanel.width,
-      layout.historyPanel.height,
-      layout.historyPanel.fillColor,
-      layout.historyPanel.alpha,
-      layout.historyPanel.strokeColor,
-    );
+    this.createFixedRectangleFromLayout(layout.historyPanel);
     this.createFixedText(layout.historyTitle.x, layout.historyTitle.y, layout.historyTitle.text, textStyles.panelTitle);
     this.placementHistoryText = this.createFixedLayoutText(layout.historyBody, {
       text: emptyState.text,
@@ -243,9 +201,10 @@ export default class PlacementScene extends Phaser.Scene {
   createBuildingCard(building, x, y) {
     const layout = PlacementViewManager.getBuildingCardLayout(x, y);
     const textStyles = PlacementViewManager.getTextStyles();
-    const card = this.createFixedRectangle(layout.card.x, layout.card.y, layout.card.width, layout.card.height, 0x1e293b, 1, 0x475569)
+    const visual = PlacementViewManager.getBuildingCardVisual(building);
+    const card = this.createFixedRectangleFromLayout(layout.card, visual.card)
       .setInteractive({ useHandCursor: true });
-    const swatch = this.createFixedRectangle(layout.swatch.x, layout.swatch.y, layout.swatch.width, layout.swatch.height, building.color, 1, 0xffffff);
+    const swatch = this.createFixedRectangleFromLayout(layout.swatch, visual.swatch);
     const title = this.createFixedText(layout.title.x, layout.title.y, building.name, textStyles.cardTitle);
     const recommendationBadge = this.createRecommendationBadge(building, layout.recommendationBadge.x, layout.recommendationBadge.y);
     const detail = this.createFixedText(layout.detail.x, layout.detail.y, PlacementViewManager.formatBuildingDetail(building), textStyles.cardDetail);
@@ -280,21 +239,25 @@ export default class PlacementScene extends Phaser.Scene {
     }
 
     const layout = PlacementViewManager.getRecommendationBadgeLayout(x, y);
-    const badgeBg = this.createFixedRectangle(
-      layout.background.x,
-      layout.background.y,
-      layout.background.width,
-      layout.background.height,
-      layout.background.fillColor,
-      layout.background.fillAlpha,
-      layout.background.strokeColor,
-    );
+    const badgeBg = this.createFixedRectangleFromLayout(layout.background);
     const badgeText = this.createFixedText(layout.text.x, layout.text.y, layout.text.text, PlacementViewManager.getTextStyles().recommendationBadge).setOrigin(0.5);
     return { badgeBg, badgeText };
   }
 
   isRecommendedBuilding(building) {
     return this.selectedPolicy?.recommendedBuildingIds?.includes(building.id) ?? false;
+  }
+
+  createFixedRectangleFromLayout(layout, options = {}) {
+    return this.createFixedRectangle(
+      options.x ?? layout.x,
+      options.y ?? layout.y,
+      options.width ?? layout.width,
+      options.height ?? layout.height,
+      options.fillColor ?? layout.fillColor,
+      options.alpha ?? options.fillAlpha ?? layout.alpha ?? layout.fillAlpha ?? 1,
+      options.strokeColor ?? layout.strokeColor ?? null,
+    );
   }
 
   createFixedRectangle(x, y, width, height, color, alpha = 1, strokeColor = null) {
