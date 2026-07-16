@@ -76,7 +76,7 @@ export default class PlacementScene extends Phaser.Scene {
   selectBuilding(building) {
     this.selectedBuilding = building;
     this.updateSelectedBuildingUi();
-    this.uiUpdater.showMessage(PlacementUiStateManager.formatBuildingSelectedMessage(building.name), '#bbf7d0');
+    this.uiUpdater.showMessage(PlacementUiStateManager.formatBuildingSelectedMessage(building), '#bbf7d0');
   }
 
   updateSelectedBuildingUi() {

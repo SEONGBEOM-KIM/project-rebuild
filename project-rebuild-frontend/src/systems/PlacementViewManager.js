@@ -177,7 +177,7 @@ export const PLACEMENT_TEXT_STYLES = {
   mission: { fontSize: '20px', color: '#fde68a', lineSpacing: 6 },
   status: { fontSize: '20px', color: '#f8fafc', lineSpacing: 8 },
   cursorInfo: { fontSize: '18px', color: '#bfdbfe', lineSpacing: 6 },
-  message: { fontSize: '20px', color: '#fde68a' },
+  message: { fontSize: '18px', color: '#fde68a', lineSpacing: 5 },
   continueButton: { fontSize: '30px', color: '#0f172a' },
   panelTitle: { fontSize: '26px', color: '#ffffff', fontStyle: 'bold' },
   legendText: { fontSize: '19px' },

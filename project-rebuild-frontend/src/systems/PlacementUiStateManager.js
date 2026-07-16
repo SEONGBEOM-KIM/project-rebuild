@@ -1,4 +1,4 @@
-import { STATE_LABELS, formatSignedValue } from '../data/stateLabels.js';
+import { STATE_LABELS, formatEffect, formatSignedValue } from '../data/stateLabels.js';
 import { REQUIRED_PLACEMENTS, TILE_LABELS, ZONE_LABELS } from './PlacementViewManager.js';
 
 export default class PlacementUiStateManager {
@@ -10,8 +10,17 @@ export default class PlacementUiStateManager {
     return `배치 불가: ${reason}`;
   }
 
-  static formatBuildingSelectedMessage(buildingName) {
-    return `${buildingName} 선택됨`;
+  static formatBuildingSelectedMessage(building) {
+    if (typeof building === 'string') {
+      return `${building} 선택됨`;
+    }
+
+    return [
+      `${building.name} 선택됨`,
+      `조건: ${building.placementHint}`,
+      building.balanceNote ? `균형: ${building.balanceNote}` : null,
+      `효과: ${formatEffect(building.effect)}`,
+    ].filter(Boolean).join('\n');
   }
 
   static formatCursorInfo(tile, mapTile, validation) {

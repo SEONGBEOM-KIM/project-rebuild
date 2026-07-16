@@ -1819,6 +1819,11 @@ function testPlacementViewManager() {
   assert.equal(PlacementUiStateManager.formatMapSelectMessage(), '지도 안쪽 타일을 선택하세요.');
   assert.equal(PlacementUiStateManager.formatInvalidPlacementMessage('도로 위입니다'), '배치 불가: 도로 위입니다');
   assert.equal(PlacementUiStateManager.formatBuildingSelectedMessage('청년센터'), '청년센터 선택됨');
+  const selectedBusMessage = PlacementUiStateManager.formatBuildingSelectedMessage(buildings.find((building) => building.id === 'bus_station'));
+  assert.match(selectedBusMessage, /버스정류장 선택됨/);
+  assert.match(selectedBusMessage, /조건: 도로와 인접한 빈 땅에만 배치 가능/);
+  assert.match(selectedBusMessage, /균형: 이동 불편을 줄이지만/);
+  assert.match(selectedBusMessage, /효과: 인구 \+40 \/ 만족도 \+10 \/ 교통 -3 \/ 예산 -120/);
   assert.equal(PlacementViewManager.getUiLayout().legendTitle.text, '타일 범례');
   assert.equal(PlacementViewManager.getUiLayout().continueButton.target, 'ResultScene');
   assert.equal(PlacementViewManager.getUiLayout().continueButton.backgroundColor, 0x94a3b8);
