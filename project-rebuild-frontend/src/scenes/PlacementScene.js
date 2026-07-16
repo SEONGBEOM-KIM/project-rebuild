@@ -9,6 +9,7 @@ import LearningProgress from '../systems/LearningProgress.js';
 import { formatEffect } from '../data/stateLabels.js';
 import PlacementViewManager from '../systems/PlacementViewManager.js';
 import { TILE_LABELS, ZONE_LABELS, REQUIRED_PLACEMENTS, PLACEMENT_DRAG_THRESHOLD } from '../systems/PlacementViewManager.js';
+import { createLayoutText } from '../ui/LayoutText.js';
 
 export default class PlacementScene extends Phaser.Scene {
   constructor() {
@@ -122,14 +123,12 @@ export default class PlacementScene extends Phaser.Scene {
 
     this.statusText = this.createFixedText(layout.status.x, layout.status.y, '', textStyles.status);
 
-    this.cursorInfoText = this.createFixedText(layout.cursorInfo.x, layout.cursorInfo.y, layout.cursorInfo.text, {
-      ...textStyles.cursorInfo,
-      wordWrap: { width: 320 },
+    this.cursorInfoText = this.createFixedLayoutText(layout.cursorInfo, {
+      style: textStyles.cursorInfo,
     });
 
-    this.messageText = this.createFixedText(layout.message.x, layout.message.y, layout.message.text, {
-      ...textStyles.message,
-      wordWrap: { width: 325 },
+    this.messageText = this.createFixedLayoutText(layout.message, {
+      style: textStyles.message,
     });
 
     this.continueButtonBg = this.createFixedRectangle(
@@ -208,10 +207,12 @@ export default class PlacementScene extends Phaser.Scene {
       layout.lastChangePanel.strokeColor,
     );
     this.createFixedText(layout.lastChangeTitle.x, layout.lastChangeTitle.y, layout.lastChangeTitle.text, textStyles.panelTitle);
-    this.lastChangeText = this.createFixedText(layout.lastChangeBody.x, layout.lastChangeBody.y, emptyState.text, {
-      ...textStyles.panelBody,
-      color: emptyState.color,
-      wordWrap: { width: 270 },
+    this.lastChangeText = this.createFixedLayoutText(layout.lastChangeBody, {
+      text: emptyState.text,
+      style: {
+        ...textStyles.panelBody,
+        color: emptyState.color,
+      },
     });
   }
 
@@ -230,10 +231,12 @@ export default class PlacementScene extends Phaser.Scene {
       layout.historyPanel.strokeColor,
     );
     this.createFixedText(layout.historyTitle.x, layout.historyTitle.y, layout.historyTitle.text, textStyles.panelTitle);
-    this.placementHistoryText = this.createFixedText(layout.historyBody.x, layout.historyBody.y, emptyState.text, {
-      ...textStyles.panelBody,
-      color: emptyState.color,
-      wordWrap: { width: 280 },
+    this.placementHistoryText = this.createFixedLayoutText(layout.historyBody, {
+      text: emptyState.text,
+      style: {
+        ...textStyles.panelBody,
+        color: emptyState.color,
+      },
     });
   }
 
@@ -246,17 +249,17 @@ export default class PlacementScene extends Phaser.Scene {
     const title = this.createFixedText(layout.title.x, layout.title.y, building.name, textStyles.cardTitle);
     const recommendationBadge = this.createRecommendationBadge(building, layout.recommendationBadge.x, layout.recommendationBadge.y);
     const detail = this.createFixedText(layout.detail.x, layout.detail.y, PlacementViewManager.formatBuildingDetail(building), textStyles.cardDetail);
-    const description = this.createFixedText(layout.description.x, layout.description.y, building.description, {
-      ...textStyles.cardDescription,
-      wordWrap: { width: layout.description.wrapWidth },
+    const description = this.createFixedLayoutText(layout.description, {
+      text: building.description,
+      style: textStyles.cardDescription,
     });
-    const placementHint = this.createFixedText(layout.placementHint.x, layout.placementHint.y, PlacementViewManager.formatPlacementHint(building), {
-      ...textStyles.cardPlacementHint,
-      wordWrap: { width: layout.placementHint.wrapWidth },
+    const placementHint = this.createFixedLayoutText(layout.placementHint, {
+      text: PlacementViewManager.formatPlacementHint(building),
+      style: textStyles.cardPlacementHint,
     });
-    const effect = this.createFixedText(layout.effect.x, layout.effect.y, formatEffect(building.effect), {
-      ...textStyles.cardEffect,
-      wordWrap: { width: layout.effect.wrapWidth },
+    const effect = this.createFixedLayoutText(layout.effect, {
+      text: formatEffect(building.effect),
+      style: textStyles.cardEffect,
     });
 
     const selectBuilding = () => {
@@ -304,6 +307,11 @@ export default class PlacementScene extends Phaser.Scene {
 
   createFixedText(x, y, text, style) {
     const textObject = this.add.text(x, y, text, style).setScrollFactor(0).setDepth(101);
+    return this.registerUiObject(textObject);
+  }
+
+  createFixedLayoutText(layout, options = {}) {
+    const textObject = createLayoutText(this, layout, options).setScrollFactor(0).setDepth(101);
     return this.registerUiObject(textObject);
   }
 

@@ -1035,6 +1035,9 @@ function testPlacementViewManager() {
     y: 249,
   });
   assert.equal(PlacementViewManager.getBuildingCardLayout(40, 185).description.wrapWidth, 255);
+  assert.equal(PlacementViewManager.getBuildingCardLayout(40, 185).description.wordWrapWidth, 255);
+  assert.equal(PlacementViewManager.getUiLayout().cursorInfo.wordWrapWidth, 320);
+  assert.equal(PlacementViewManager.getUiLayout().lastChangeBody.wordWrapWidth, 270);
   assert.equal(PlacementViewManager.formatBuildingDetail(buildings.find((building) => building.id === 'youth_center')), '2×2 | 비용 180');
   assert.match(PlacementViewManager.formatPlacementHint(buildings.find((building) => building.id === 'bus_station')), /^조건:/);
   assert.deepEqual(PlacementViewManager.getPlacedBuildingVisual(buildings.find((building) => building.id === 'small_park'), 6, 1), {

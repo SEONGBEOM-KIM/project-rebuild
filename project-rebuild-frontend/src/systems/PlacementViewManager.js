@@ -90,8 +90,8 @@ export const PLACEMENT_UI_LAYOUT = {
   mission: { x: 40, y: 145 },
   buildingList: { x: 40, startY: 185, gapY: 165 },
   status: { x: 40, y: 690 },
-  cursorInfo: { x: 40, y: 842, text: '커서 타일: 지도 위로 이동하세요.' },
-  message: { x: 40, y: 925, text: '아직 배치된 건물이 없습니다.' },
+  cursorInfo: { x: 40, y: 842, text: '커서 타일: 지도 위로 이동하세요.', wordWrapWidth: 320 },
+  message: { x: 40, y: 925, text: '아직 배치된 건물이 없습니다.', wordWrapWidth: 325 },
   continueButton: { x: 1615, y: 985, width: 300, height: 72, text: '시설 3개 더 배치', target: 'ResultScene', backgroundColor: 0x94a3b8, alpha: 1, strokeColor: 0xe2e8f0 },
   legendPanel: { x: 1615, y: 150, width: 330, height: 190, fillColor: 0x111827, alpha: 0.88, strokeColor: 0x475569 },
   legendTitle: { x: 1480, y: 76, text: '타일 범례' },
@@ -99,10 +99,10 @@ export const PLACEMENT_UI_LAYOUT = {
   legendText: { x: 1520, startY: 118, gapY: 34 },
   lastChangePanel: { x: 1615, y: 385, width: 330, height: 260, fillColor: 0x111827, alpha: 0.88, strokeColor: 0xfde68a },
   lastChangeTitle: { x: 1478, y: 275, text: '최근 변화' },
-  lastChangeBody: { x: 1478, y: 318 },
+  lastChangeBody: { x: 1478, y: 318, wordWrapWidth: 270 },
   historyPanel: { x: 1615, y: 655, width: 330, height: 250, fillColor: 0x111827, alpha: 0.88, strokeColor: 0x93c5fd },
   historyTitle: { x: 1478, y: 545, text: '배치 기록' },
-  historyBody: { x: 1478, y: 588 },
+  historyBody: { x: 1478, y: 588, wordWrapWidth: 280 },
 };
 
 export const BUILDING_CARD_LAYOUT = {
@@ -260,9 +260,9 @@ export default class PlacementViewManager {
       title: { ...layout.title, x: x + layout.title.offsetX, y: y + layout.title.offsetY },
       recommendationBadge: { ...layout.recommendationBadge, x: x + layout.recommendationBadge.offsetX, y: y + layout.recommendationBadge.offsetY },
       detail: { ...layout.detail, x: x + layout.detail.offsetX, y: y + layout.detail.offsetY },
-      description: { ...layout.description, x: x + layout.description.offsetX, y: y + layout.description.offsetY },
-      placementHint: { ...layout.placementHint, x: x + layout.placementHint.offsetX, y: y + layout.placementHint.offsetY },
-      effect: { ...layout.effect, x: x + layout.effect.offsetX, y: y + layout.effect.offsetY },
+      description: { ...layout.description, x: x + layout.description.offsetX, y: y + layout.description.offsetY, wordWrapWidth: layout.description.wrapWidth },
+      placementHint: { ...layout.placementHint, x: x + layout.placementHint.offsetX, y: y + layout.placementHint.offsetY, wordWrapWidth: layout.placementHint.wrapWidth },
+      effect: { ...layout.effect, x: x + layout.effect.offsetX, y: y + layout.effect.offsetY, wordWrapWidth: layout.effect.wrapWidth },
     };
   }
 
