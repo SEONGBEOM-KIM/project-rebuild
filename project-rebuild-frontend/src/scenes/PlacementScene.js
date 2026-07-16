@@ -13,6 +13,7 @@ import PlacementSceneObjectRegistry from '../systems/PlacementSceneObjectRegistr
 import PlacementInputController from '../systems/PlacementInputController.js';
 import PlacementWorldRenderer from '../systems/PlacementWorldRenderer.js';
 import PlacementUiUpdater from '../systems/PlacementUiUpdater.js';
+import PlacementUiRenderer from '../systems/PlacementUiRenderer.js';
 
 export default class PlacementScene extends Phaser.Scene {
   constructor() {
@@ -100,154 +101,30 @@ export default class PlacementScene extends Phaser.Scene {
   }
 
   createUi() {
-    this.cardObjects = new Map();
-    const layout = PlacementViewManager.getUiLayout();
-    const textStyles = PlacementViewManager.getTextStyles();
-
-    this.objectRegistry.createFixedRectangleFromLayout(layout.leftPanel);
-    this.objectRegistry.createFixedTextFromLayout(layout.title, textStyles.title);
-    this.objectRegistry.createFixedTextFromLayout(layout.subtitle, textStyles.subtitle);
-
-    this.missionText = this.objectRegistry.createFixedTextFromLayout(layout.mission, textStyles.mission);
-
-    buildings.forEach((building, index) => {
-      this.createBuildingCard(building, layout.buildingList.x, layout.buildingList.startY + index * layout.buildingList.gapY);
-    });
-
-    this.statusText = this.objectRegistry.createFixedTextFromLayout(layout.status, textStyles.status);
-
-    this.cursorInfoText = this.objectRegistry.createFixedLayoutText(layout.cursorInfo, {
-      style: textStyles.cursorInfo,
-    });
-
-    this.messageText = this.objectRegistry.createFixedLayoutText(layout.message, {
-      style: textStyles.message,
-    });
-
-    this.continueButtonBg = this.objectRegistry.createFixedRectangleFromLayout(layout.continueButton, {
-      fillColor: layout.continueButton.backgroundColor,
-    }).setInteractive({ useHandCursor: true });
-    this.continueButton = this.objectRegistry.createFixedTextFromLayout(layout.continueButton, textStyles.continueButton)
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true });
-
-    const handleContinue = () => {
-      if (!PlacementUiStateManager.canContinue(this.placedBuildings.length)) {
-        this.uiUpdater.showMessage(PlacementUiStateManager.formatNeedMoreMessage(this.placedBuildings.length), '#fecaca');
-        return;
-      }
-      this.scene.start(layout.continueButton.target);
-    };
-    this.continueButtonBg.on('pointerdown', handleContinue);
-    this.continueButton.on('pointerdown', handleContinue);
-    this.createLegend();
-    this.createLastChangePanel();
-    this.createPlacementHistoryPanel();
-  }
-
-  createLegend() {
-    const legendItems = PlacementViewManager.getLegendItems();
-    const layout = PlacementViewManager.getUiLayout();
-    const textStyles = PlacementViewManager.getTextStyles();
-
-    this.objectRegistry.createFixedRectangleFromLayout(layout.legendPanel);
-    this.objectRegistry.createFixedTextFromLayout(layout.legendTitle, textStyles.panelTitle);
-
-    legendItems.forEach((item, index) => {
-      const itemLayout = PlacementViewManager.getLegendItemLayout(index, item);
-      this.objectRegistry.createFixedRectangleFromLayout(itemLayout.swatch);
-      this.objectRegistry.createFixedTextFromLayout(itemLayout.text, {
-        ...textStyles.legendText,
-        color: PlacementViewManager.getLegendTextColor(item),
-      });
-    });
-  }
-
-  createLastChangePanel() {
-    const layout = PlacementViewManager.getUiLayout();
-    const emptyState = PlacementUiStateManager.getEmptyLastChangeState();
-    const textStyles = PlacementViewManager.getTextStyles();
-
-    this.objectRegistry.createFixedRectangleFromLayout(layout.lastChangePanel);
-    this.objectRegistry.createFixedTextFromLayout(layout.lastChangeTitle, textStyles.panelTitle);
-    this.lastChangeText = this.objectRegistry.createFixedLayoutText(layout.lastChangeBody, {
-      text: emptyState.text,
-      style: {
-        ...textStyles.panelBody,
-        color: emptyState.color,
+    this.uiRenderer = new PlacementUiRenderer({
+      objectRegistry: this.objectRegistry,
+      buildings,
+      selectedPolicy: this.selectedPolicy,
+      getPlacedCount: () => this.placedBuildings.length,
+      onSelectBuilding: (building) => this.selectBuilding(building),
+      onContinue: (target) => this.scene.start(target),
+      onContinueBlocked: (placedCount) => {
+        this.uiUpdater.showMessage(PlacementUiStateManager.formatNeedMoreMessage(placedCount), '#fecaca');
       },
     });
+
+    const uiObjects = this.uiRenderer.create();
+    Object.assign(this, uiObjects);
   }
 
-  createPlacementHistoryPanel() {
-    const layout = PlacementViewManager.getUiLayout();
-    const emptyState = PlacementUiStateManager.getEmptyPlacementHistoryState();
-    const textStyles = PlacementViewManager.getTextStyles();
-
-    this.objectRegistry.createFixedRectangleFromLayout(layout.historyPanel);
-    this.objectRegistry.createFixedTextFromLayout(layout.historyTitle, textStyles.panelTitle);
-    this.placementHistoryText = this.objectRegistry.createFixedLayoutText(layout.historyBody, {
-      text: emptyState.text,
-      style: {
-        ...textStyles.panelBody,
-        color: emptyState.color,
-      },
-    });
-  }
-
-  createBuildingCard(building, x, y) {
-    const layout = PlacementViewManager.getBuildingCardLayout(x, y);
-    const textStyles = PlacementViewManager.getTextStyles();
-    const content = PlacementViewManager.getBuildingCardContent(building);
-    const visual = PlacementViewManager.getBuildingCardVisual(building);
-    const card = this.objectRegistry.createFixedRectangleFromLayout(layout.card, visual.card)
-      .setInteractive({ useHandCursor: true });
-    const swatch = this.objectRegistry.createFixedRectangleFromLayout(layout.swatch, visual.swatch);
-    const title = this.objectRegistry.createFixedTextFromLayout(layout.title, textStyles.cardTitle, { text: content.title });
-    const recommendationBadge = this.createRecommendationBadge(building, layout.recommendationBadge.x, layout.recommendationBadge.y);
-    const detail = this.objectRegistry.createFixedTextFromLayout(layout.detail, textStyles.cardDetail, { text: content.detail });
-    const description = this.objectRegistry.createFixedLayoutText(layout.description, {
-      text: content.description,
-      style: textStyles.cardDescription,
-    });
-    const placementHint = this.objectRegistry.createFixedLayoutText(layout.placementHint, {
-      text: content.placementHint,
-      style: textStyles.cardPlacementHint,
-    });
-    const effect = this.objectRegistry.createFixedLayoutText(layout.effect, {
-      text: content.effect,
-      style: textStyles.cardEffect,
-    });
-
-    const selectBuilding = () => {
-      this.selectedBuilding = building;
-      this.updateSelectedBuildingUi();
-      this.uiUpdater.showMessage(PlacementUiStateManager.formatBuildingSelectedMessage(building.name), '#bbf7d0');
-    };
-
-    card.on('pointerdown', selectBuilding);
-    title.setInteractive({ useHandCursor: true }).on('pointerdown', selectBuilding);
-
-    this.cardObjects.set(building.id, { building, card, swatch, title, detail, description, placementHint, effect, recommendationBadge });
-  }
-
-  createRecommendationBadge(building, x, y) {
-    if (!PlacementViewManager.isRecommendedBuilding(building, this.selectedPolicy)) {
-      return null;
-    }
-
-    const layout = PlacementViewManager.getRecommendationBadgeLayout(x, y);
-    const badgeBg = this.objectRegistry.createFixedRectangleFromLayout(layout.background);
-    const badgeText = this.objectRegistry.createFixedTextFromLayout(layout.text, PlacementViewManager.getTextStyles().recommendationBadge).setOrigin(0.5);
-    return { badgeBg, badgeText };
+  selectBuilding(building) {
+    this.selectedBuilding = building;
+    this.updateSelectedBuildingUi();
+    this.uiUpdater.showMessage(PlacementUiStateManager.formatBuildingSelectedMessage(building.name), '#bbf7d0');
   }
 
   updateSelectedBuildingUi() {
-    for (const objects of this.cardObjects.values()) {
-      const style = PlacementViewManager.getBuildingCardStyle(objects.building, this.selectedBuilding, this.selectedPolicy);
-      objects.card.setStrokeStyle(style.strokeWidth, style.strokeColor);
-      objects.card.setFillStyle(style.fillColor, style.fillAlpha);
-    }
+    this.uiRenderer.updateSelectedBuildingCards(this.cardObjects, this.selectedBuilding);
   }
 
   drawMap() {

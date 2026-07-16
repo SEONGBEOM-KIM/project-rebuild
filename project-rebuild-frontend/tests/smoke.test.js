@@ -41,6 +41,7 @@ import PlacementSceneObjectRegistry from '../src/systems/PlacementSceneObjectReg
 import PlacementInputController from '../src/systems/PlacementInputController.js';
 import PlacementWorldRenderer from '../src/systems/PlacementWorldRenderer.js';
 import PlacementUiUpdater from '../src/systems/PlacementUiUpdater.js';
+import PlacementUiRenderer from '../src/systems/PlacementUiRenderer.js';
 import SaveManager, { LEARNING_SAVE_STORAGE_KEY } from '../src/systems/SaveManager.js';
 import SavedDataViewManager from '../src/systems/SavedDataViewManager.js';
 import StorageSummaryManager from '../src/systems/StorageSummaryManager.js';
@@ -1303,6 +1304,97 @@ function testPlacementWorldRenderer() {
 }
 
 
+
+function createPlacementUiRendererObjectSpy(type, layout = {}) {
+  return {
+    type,
+    layout,
+    interactive: null,
+    origin: null,
+    strokeStyle: null,
+    fillStyle: null,
+    handlers: new Map(),
+    setInteractive(options) {
+      this.interactive = options;
+      return this;
+    },
+    setOrigin(value) {
+      this.origin = value;
+      return this;
+    },
+    on(event, handler) {
+      this.handlers.set(event, handler);
+      return this;
+    },
+    setStrokeStyle(...args) {
+      this.strokeStyle = args;
+      return this;
+    },
+    setFillStyle(...args) {
+      this.fillStyle = args;
+      return this;
+    },
+  };
+}
+
+function createPlacementUiRendererRegistrySpy() {
+  const calls = [];
+  const objects = [];
+  const create = (type, layout, options = {}) => {
+    const object = createPlacementUiRendererObjectSpy(type, layout);
+    objects.push(object);
+    calls.push([type, layout, options, object]);
+    return object;
+  };
+
+  return {
+    calls,
+    objects,
+    createFixedRectangleFromLayout: (layout, options) => create('rectangle', layout, options),
+    createFixedTextFromLayout: (layout, style, options) => create('text', layout, { style, ...options }),
+    createFixedLayoutText: (layout, options) => create('layoutText', layout, options),
+  };
+}
+
+function testPlacementUiRenderer() {
+  const objectRegistry = createPlacementUiRendererRegistrySpy();
+  const selected = [];
+  const continueTargets = [];
+  const blockedCounts = [];
+  let placedCount = 0;
+  const renderer = new PlacementUiRenderer({
+    objectRegistry,
+    buildings,
+    selectedPolicy: { recommendedBuildingIds: ['youth_center'] },
+    getPlacedCount: () => placedCount,
+    onSelectBuilding: (building) => selected.push(building.id),
+    onContinue: (target) => continueTargets.push(target),
+    onContinueBlocked: (count) => blockedCounts.push(count),
+  });
+
+  const ui = renderer.create();
+  assert.equal(ui.cardObjects.size, buildings.length);
+  assert.ok(ui.missionText);
+  assert.ok(ui.continueButtonBg.interactive.useHandCursor);
+  assert.equal(ui.continueButton.origin, 0.5);
+  assert.equal(objectRegistry.calls.filter(([type]) => type === 'rectangle').length > 8, true);
+
+  ui.cardObjects.get('bus_station').card.handlers.get('pointerdown')();
+  assert.deepEqual(selected, ['bus_station']);
+
+  ui.continueButton.handlers.get('pointerdown')();
+  assert.deepEqual(blockedCounts, [0]);
+  assert.deepEqual(continueTargets, []);
+
+  placedCount = 3;
+  ui.continueButtonBg.handlers.get('pointerdown')();
+  assert.deepEqual(continueTargets, ['ResultScene']);
+
+  renderer.updateSelectedBuildingCards(ui.cardObjects, buildings.find((building) => building.id === 'small_park'));
+  assert.deepEqual(ui.cardObjects.get('small_park').card.strokeStyle, [5, 0xfde68a]);
+  assert.deepEqual(ui.cardObjects.get('youth_center').card.strokeStyle, [4, 0xf59e0b]);
+}
+
 function createUiTextSpy() {
   return {
     text: '',
@@ -2522,6 +2614,7 @@ async function run() {
   testPlacementMapGeometry();
   testPlacementMapRenderer();
   testPlacementWorldRenderer();
+  testPlacementUiRenderer();
   testPlacementUiUpdater();
   testPlacementViewManager();
   testPlacementResultManager();
