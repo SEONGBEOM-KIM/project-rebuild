@@ -7,6 +7,7 @@ import ProblemSummaryViewManager from '../systems/ProblemSummaryViewManager.js';
 import { EP1_CORE_CAUSE_SUMMARY, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS } from '../data/episodeContent.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
+import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
 
 export default class ProblemSummaryScene extends Phaser.Scene {
   constructor() {
@@ -35,9 +36,8 @@ export default class ProblemSummaryScene extends Phaser.Scene {
   drawProblemGrid() {
     const layout = ProblemSummaryViewManager.getProblemGridLayout();
     const textStyles = ProblemSummaryViewManager.getTextStyles();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
-      .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, textStyles.gridTitle).setOrigin(0.5);
+    createPanelBackground(this, layout.panel, layout.panel);
+    createPanelTitle(this, layout.title, textStyles.gridTitle, { origin: 0.5 });
 
     EP1_PROBLEM_ITEMS.forEach((item, index) => {
       const { x, y } = ProblemSummaryViewManager.getProblemItemLayout(index);
@@ -56,9 +56,8 @@ export default class ProblemSummaryScene extends Phaser.Scene {
   drawLearningRecord(exploredPlaces, quizResult) {
     const layout = ProblemSummaryViewManager.getLearningRecordLayout();
     const textStyles = ProblemSummaryViewManager.getTextStyles();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
-      .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, textStyles.learningTitle).setOrigin(0.5);
+    createPanelBackground(this, layout.panel, layout.panel);
+    createPanelTitle(this, layout.title, textStyles.learningTitle, { origin: 0.5 });
 
     createLayoutText(this, layout.body, {
       text: ProblemSummaryViewManager.formatLearningRecordText(
@@ -74,9 +73,8 @@ export default class ProblemSummaryScene extends Phaser.Scene {
   drawNextMission() {
     const layout = ProblemSummaryViewManager.getNextMissionLayout();
     const textStyles = ProblemSummaryViewManager.getTextStyles();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
-      .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, textStyles.nextTitle).setOrigin(0.5);
+    createPanelBackground(this, layout.panel, layout.panel);
+    createPanelTitle(this, layout.title, textStyles.nextTitle, { origin: 0.5 });
     createLayoutText(this, layout.body, {
       text: EP1_NEXT_MISSION.join('\n'),
       style: textStyles.nextBody,

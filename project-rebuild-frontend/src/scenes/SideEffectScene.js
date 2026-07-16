@@ -4,6 +4,7 @@ import IssueDetector from '../systems/IssueDetector.js';
 import SideEffectViewManager from '../systems/SideEffectViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
+import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
 
 export default class SideEffectScene extends Phaser.Scene {
   constructor() {
@@ -33,9 +34,12 @@ export default class SideEffectScene extends Phaser.Scene {
     const layout = SideEffectViewManager.getIssuePanelLayout();
     const panelStyle = SideEffectViewManager.getPanelStyle();
     const textStyles = SideEffectViewManager.getTextStyles();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, panelStyle.issueFillColor, panelStyle.issueFillAlpha)
-      .setStrokeStyle(panelStyle.issueStrokeWidth, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, textStyles.issueTitle).setOrigin(0.5);
+    createPanelBackground(this, layout.panel, {
+      fillColor: panelStyle.issueFillColor,
+      fillAlpha: panelStyle.issueFillAlpha,
+      strokeWidth: panelStyle.issueStrokeWidth,
+    });
+    createPanelTitle(this, layout.title, textStyles.issueTitle, { origin: 0.5 });
 
     if (!issues.length) {
       createLayoutText(this, layout.emptyBody, {
@@ -64,9 +68,12 @@ export default class SideEffectScene extends Phaser.Scene {
     const layout = SideEffectViewManager.getHintPanelLayout();
     const panelStyle = SideEffectViewManager.getPanelStyle();
     const textStyles = SideEffectViewManager.getTextStyles();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, panelStyle.hintFillColor, panelStyle.hintFillAlpha)
-      .setStrokeStyle(panelStyle.hintStrokeWidth, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, textStyles.hintTitle).setOrigin(0.5);
+    createPanelBackground(this, layout.panel, {
+      fillColor: panelStyle.hintFillColor,
+      fillAlpha: panelStyle.hintFillAlpha,
+      strokeWidth: panelStyle.hintStrokeWidth,
+    });
+    createPanelTitle(this, layout.title, textStyles.hintTitle, { origin: 0.5 });
 
     const rows = SideEffectViewManager.formatHintRows(issues);
 
