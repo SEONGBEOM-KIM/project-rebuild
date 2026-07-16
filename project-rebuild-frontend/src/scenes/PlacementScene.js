@@ -1,19 +1,13 @@
 import Phaser from 'phaser';
-import ProgressStepper from '../ui/ProgressStepper.js';
 import { buildings } from '../data/buildings.js';
-import { mapData } from '../data/mapData.js';
-import PlacementSystem from '../systems/PlacementSystem.js';
-import CameraController from '../systems/CameraController.js';
 import PlacementViewManager from '../systems/PlacementViewManager.js';
-import PlacementMapGeometry from '../systems/PlacementMapGeometry.js';
-import PlacementMapRenderer from '../systems/PlacementMapRenderer.js';
+import CameraController from '../systems/CameraController.js';
 import PlacementResultManager from '../systems/PlacementResultManager.js';
 import PlacementUiStateManager from '../systems/PlacementUiStateManager.js';
-import PlacementSceneObjectRegistry from '../systems/PlacementSceneObjectRegistry.js';
 import PlacementInputController from '../systems/PlacementInputController.js';
-import PlacementWorldRenderer from '../systems/PlacementWorldRenderer.js';
 import PlacementUiUpdater from '../systems/PlacementUiUpdater.js';
 import PlacementUiRenderer from '../systems/PlacementUiRenderer.js';
+import PlacementSceneBootstrap from '../systems/PlacementSceneBootstrap.js';
 
 export default class PlacementScene extends Phaser.Scene {
   constructor() {
@@ -23,36 +17,24 @@ export default class PlacementScene extends Phaser.Scene {
   create() {
     this.selectedBuilding = buildings[0];
     this.selectedPolicy = this.registry.get('selectedPolicy');
-    this.placementSystem = new PlacementSystem(this.cloneMapData(mapData));
     this.placedBuildings = [...(this.registry.get('placedBuildings') ?? [])];
-    this.mapGeometry = new PlacementMapGeometry({
-      origin: PlacementViewManager.getScreenLayout().mapOrigin,
-      tileWidth: mapData.tileWidth,
-      tileHeight: mapData.tileHeight,
-      mapWidth: mapData.width,
-      mapHeight: mapData.height,
-    });
-    this.mapRenderer = new PlacementMapRenderer({ geometry: this.mapGeometry });
-    this.objectRegistry = new PlacementSceneObjectRegistry(this, {
-      fixedRectangleStrokeWidth: PlacementViewManager.getFixedUiStyle().rectangleStrokeWidth,
-    });
+    this.bootstrap = new PlacementSceneBootstrap({ scene: this, cameraControllerClass: CameraController });
 
-    this.drawBackground();
-    this.mapGraphics = this.objectRegistry.registerWorldObject(this.add.graphics().setDepth(1));
-    this.buildingGraphics = this.objectRegistry.registerWorldObject(this.add.graphics().setDepth(4));
-    this.previewGraphics = this.objectRegistry.registerWorldObject(this.add.graphics().setDepth(6));
-    this.mapLabels = this.objectRegistry.registerWorldObject(this.add.container(0, 0).setDepth(8));
-    this.worldRenderer = new PlacementWorldRenderer({
-      scene: this,
-      geometry: this.mapGeometry,
-      mapRenderer: this.mapRenderer,
+    Object.assign(this, this.bootstrap.createCoreSystems());
+    this.bootstrap.drawBackground(this.objectRegistry);
+    Object.assign(this, this.bootstrap.createWorldObjects({
       objectRegistry: this.objectRegistry,
+      mapGeometry: this.mapGeometry,
+      mapRenderer: this.mapRenderer,
       placementSystem: this.placementSystem,
-      mapLabels: this.mapLabels,
+    }));
+    this.bootstrap.drawInitialWorld({
+      mapRenderer: this.mapRenderer,
+      mapGraphics: this.mapGraphics,
+      placementSystem: this.placementSystem,
+      worldRenderer: this.worldRenderer,
+      placedBuildings: this.placedBuildings,
     });
-
-    this.drawMap();
-    this.worldRenderer.restorePlacedBuildings(this.placedBuildings);
     this.createUi();
     this.uiUpdater = new PlacementUiUpdater({
       missionText: this.missionText,
@@ -64,40 +46,13 @@ export default class PlacementScene extends Phaser.Scene {
       continueButton: this.continueButton,
       continueButtonBg: this.continueButtonBg,
     });
-    this.setupCamera();
+    this.uiCamera = this.bootstrap.setupCamera(this.objectRegistry);
     this.registerPlacementInput();
     this.uiUpdater.updateStatusBar(this.registry.get('gameState'));
     this.uiUpdater.updateLastChangePanel(this.registry.get('lastPlacementResult'));
     this.uiUpdater.updatePlacementHistoryPanel(this.placedBuildings);
     this.updateSelectedBuildingUi();
     this.uiUpdater.updateContinueButton(this.placedBuildings.length, this.selectedPolicy);
-  }
-
-  cloneMapData(source) {
-    return {
-      ...source,
-      tiles: source.tiles.map((row) => row.map((tile) => ({ ...tile, occupied: false }))),
-    };
-  }
-
-  drawBackground() {
-    const { width, height } = this.scale;
-    const layout = PlacementViewManager.getScreenLayout();
-    this.objectRegistry.registerWorldObject(this.add.rectangle(width / 2, height / 2, width, height, layout.background.color).setScrollFactor(0).setDepth(-10));
-    this.objectRegistry.registerUiObject(ProgressStepper.render(this, layout.progressStep));
-    this.objectRegistry.registerUiObject(this.add.text(layout.topHint.x, layout.topHint.y, layout.topHint.text, layout.topHint).setScrollFactor(0).setDepth(100));
-  }
-
-  setupCamera() {
-    const cameraConfig = PlacementViewManager.getCameraConfig();
-
-    new CameraController(this, {
-      ...cameraConfig,
-      ignoreDrag: (pointer) => PlacementViewManager.isPointerOnUi(pointer),
-    }).enable();
-
-    this.objectRegistry.ignoreUiObjectsOnMainCamera();
-    this.uiCamera = this.objectRegistry.createUiCamera('PlacementUiCamera');
   }
 
   createUi() {
@@ -126,11 +81,6 @@ export default class PlacementScene extends Phaser.Scene {
   updateSelectedBuildingUi() {
     this.uiRenderer.updateSelectedBuildingCards(this.cardObjects, this.selectedBuilding);
   }
-
-  drawMap() {
-    this.mapRenderer.drawMap(this.mapGraphics, this.placementSystem.mapData);
-  }
-
 
   registerPlacementInput() {
     this.placementInputController = new PlacementInputController({
@@ -196,7 +146,5 @@ export default class PlacementScene extends Phaser.Scene {
     const worldPoint = pointer.positionToCamera(this.cameras.main);
     return this.mapGeometry.worldToTile(worldPoint.x, worldPoint.y);
   }
-
-
 
 }

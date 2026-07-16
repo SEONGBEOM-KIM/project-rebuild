@@ -42,6 +42,7 @@ import PlacementInputController from '../src/systems/PlacementInputController.js
 import PlacementWorldRenderer from '../src/systems/PlacementWorldRenderer.js';
 import PlacementUiUpdater from '../src/systems/PlacementUiUpdater.js';
 import PlacementUiRenderer from '../src/systems/PlacementUiRenderer.js';
+import PlacementSceneBootstrap from '../src/systems/PlacementSceneBootstrap.js';
 import SaveManager, { LEARNING_SAVE_STORAGE_KEY } from '../src/systems/SaveManager.js';
 import SavedDataViewManager from '../src/systems/SavedDataViewManager.js';
 import StorageSummaryManager from '../src/systems/StorageSummaryManager.js';
@@ -1305,6 +1306,110 @@ function testPlacementWorldRenderer() {
 
 
 
+
+function createBootstrapDisplayObjectSpy(type, args = []) {
+  return {
+    type,
+    args,
+    depth: null,
+    scrollFactor: null,
+    setDepth(value) {
+      this.depth = value;
+      return this;
+    },
+    setScrollFactor(value) {
+      this.scrollFactor = value;
+      return this;
+    },
+  };
+}
+
+function createPlacementSceneBootstrapFixture() {
+  const worldObjects = [];
+  const uiObjects = [];
+  const cameraCalls = [];
+  const progressCalls = [];
+  const scene = {
+    scale: { width: 1920, height: 1080 },
+    add: {
+      rectangle: (...args) => createBootstrapDisplayObjectSpy('rectangle', args),
+      text: (...args) => createBootstrapDisplayObjectSpy('text', args),
+      graphics: (...args) => createBootstrapDisplayObjectSpy('graphics', args),
+      container: (...args) => createBootstrapDisplayObjectSpy('container', args),
+    },
+    cameras: {
+      main: {
+        ignore: (objects) => cameraCalls.push(['main.ignore', objects]),
+      },
+      add: (...args) => ({
+        args,
+        setScroll: (...scrollArgs) => cameraCalls.push(['ui.setScroll', ...scrollArgs]),
+        setZoom: (...zoomArgs) => cameraCalls.push(['ui.setZoom', ...zoomArgs]),
+        ignore: (objects) => cameraCalls.push(['ui.ignore', objects]),
+      }),
+    },
+  };
+  class CameraControllerSpy {
+    constructor(controllerScene, config) {
+      cameraCalls.push(['controller', controllerScene, config]);
+    }
+    enable() {
+      cameraCalls.push(['controller.enable']);
+      return this;
+    }
+  }
+  const progressStepper = {
+    render: (...args) => {
+      progressCalls.push(args);
+      return createBootstrapDisplayObjectSpy('progress');
+    },
+  };
+  const bootstrap = new PlacementSceneBootstrap({ scene, progressStepper, cameraControllerClass: CameraControllerSpy });
+  return { bootstrap, scene, worldObjects, uiObjects, cameraCalls, progressCalls };
+}
+
+function testPlacementSceneBootstrap() {
+  const cloned = PlacementSceneBootstrap.cloneMapData(mapData);
+  assert.notEqual(cloned.tiles, mapData.tiles);
+  assert.notEqual(cloned.tiles[0][0], mapData.tiles[0][0]);
+  cloned.tiles[0][0].occupied = true;
+  assert.notEqual(cloned.tiles[0][0].occupied, mapData.tiles[0][0].occupied);
+
+  const { bootstrap, cameraCalls, progressCalls } = createPlacementSceneBootstrapFixture();
+  const core = bootstrap.createCoreSystems();
+  assert.ok(core.placementSystem);
+  assert.ok(core.mapGeometry);
+  assert.ok(core.mapRenderer);
+  assert.ok(core.objectRegistry);
+
+  bootstrap.drawBackground(core.objectRegistry);
+  assert.equal(progressCalls.length, 1);
+  assert.equal(core.objectRegistry.worldObjects[0].type, 'rectangle');
+  assert.equal(core.objectRegistry.uiObjects.length, 2);
+
+  const world = bootstrap.createWorldObjects(core);
+  assert.equal(world.mapGraphics.type, 'graphics');
+  assert.equal(world.previewGraphics.depth, 6);
+  assert.equal(world.mapLabels.type, 'container');
+  assert.ok(world.worldRenderer);
+
+  const mapDrawCalls = [];
+  const restoreCalls = [];
+  bootstrap.drawInitialWorld({
+    mapRenderer: { drawMap: (...args) => mapDrawCalls.push(args) },
+    mapGraphics: world.mapGraphics,
+    placementSystem: core.placementSystem,
+    worldRenderer: { restorePlacedBuildings: (...args) => restoreCalls.push(args) },
+    placedBuildings: [{ id: 'placed' }],
+  });
+  assert.equal(mapDrawCalls.length, 1);
+  assert.deepEqual(restoreCalls[0], [[{ id: 'placed' }]]);
+
+  bootstrap.setupCamera(core.objectRegistry);
+  assert.equal(cameraCalls.some(([name]) => name === 'controller.enable'), true);
+  assert.equal(cameraCalls.some(([name]) => name === 'ui.ignore'), true);
+}
+
 function createPlacementUiRendererObjectSpy(type, layout = {}) {
   return {
     type,
@@ -1578,9 +1683,11 @@ function testPlacementViewManager() {
   assert.equal(PlacementViewManager.getUiLayout().continueButton.backgroundColor, 0x94a3b8);
 
   const placementSceneSource = readProjectFile('src', 'scenes', 'PlacementScene.js');
-  assert.match(placementSceneSource, /PlacementUiCamera/, 'placement scene should render fixed UI through a separate UI camera');
-  assert.match(placementSceneSource, /this\.objectRegistry\.ignoreUiObjectsOnMainCamera\(\)/, 'world camera should ignore fixed UI objects through registry');
-  assert.match(placementSceneSource, /this\.objectRegistry\.createUiCamera\('PlacementUiCamera'\)/, 'UI camera should ignore zoomable map objects through registry');
+  assert.match(placementSceneSource, /PlacementSceneBootstrap/, 'placement scene should delegate setup through bootstrap');
+  const placementBootstrapSource = readProjectFile('src', 'systems', 'PlacementSceneBootstrap.js');
+  assert.match(placementBootstrapSource, /PlacementUiCamera/, 'placement bootstrap should render fixed UI through a separate UI camera');
+  assert.match(placementBootstrapSource, /objectRegistry\.ignoreUiObjectsOnMainCamera\(\)/, 'world camera should ignore fixed UI objects through registry');
+  assert.match(placementBootstrapSource, /objectRegistry\.createUiCamera\('PlacementUiCamera'\)/, 'UI camera should ignore zoomable map objects through registry');
 
   const cameraControllerSource = readProjectFile('src', 'systems', 'CameraController.js');
   assert.match(cameraControllerSource, /this\.ignoreDrag\(pointer\)/, 'camera wheel zoom should ignore UI pointer regions');
@@ -2614,6 +2721,7 @@ async function run() {
   testPlacementMapGeometry();
   testPlacementMapRenderer();
   testPlacementWorldRenderer();
+  testPlacementSceneBootstrap();
   testPlacementUiRenderer();
   testPlacementUiUpdater();
   testPlacementViewManager();
