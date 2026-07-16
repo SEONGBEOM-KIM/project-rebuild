@@ -6,6 +6,7 @@ import DataBriefingViewManager from '../systems/DataBriefingViewManager.js';
 
 import { EP1_CORE_CONCEPT, EP1_DATA_CARDS } from '../data/episodeContent.js';
 import { createTextButton } from '../ui/TextButton.js';
+import { createLayoutText } from '../ui/LayoutText.js';
 
 export default class DataBriefingScene extends Phaser.Scene {
   constructor() {
@@ -19,12 +20,12 @@ export default class DataBriefingScene extends Phaser.Scene {
     this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
     ProgressStepper.render(this, layout.progressStep);
 
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, layout.title).setOrigin(0.5);
+    createLayoutText(this, layout.title, { origin: 0.5 });
 
-    this.add.text(layout.subtitle.x, layout.subtitle.y, DataBriefingViewManager.formatSubtitle(CURRENT_EPISODE.regionName), {
-      fontSize: layout.subtitle.fontSize,
-      color: layout.subtitle.color,
-    }).setOrigin(0.5);
+    createLayoutText(this, layout.subtitle, {
+      text: DataBriefingViewManager.formatSubtitle(CURRENT_EPISODE.regionName),
+      origin: 0.5,
+    });
 
     EP1_DATA_CARDS.forEach((card, index) => {
       const { x, y } = DataBriefingViewManager.getCardPosition(index);

@@ -6,6 +6,7 @@ import ProblemSummaryViewManager from '../systems/ProblemSummaryViewManager.js';
 
 import { EP1_CORE_CAUSE_SUMMARY, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS } from '../data/episodeContent.js';
 import { createTextButton } from '../ui/TextButton.js';
+import { createLayoutText } from '../ui/LayoutText.js';
 
 export default class ProblemSummaryScene extends Phaser.Scene {
   constructor() {
@@ -21,9 +22,9 @@ export default class ProblemSummaryScene extends Phaser.Scene {
 
     this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
     ProgressStepper.render(this, layout.progressStep);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, layout.title).setOrigin(0.5);
+    createLayoutText(this, layout.title, { origin: 0.5 });
 
-    this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, layout.subtitle).setOrigin(0.5);
+    createLayoutText(this, layout.subtitle, { origin: 0.5 });
 
     this.drawProblemGrid();
     this.drawLearningRecord(exploredPlaces, quizResult);

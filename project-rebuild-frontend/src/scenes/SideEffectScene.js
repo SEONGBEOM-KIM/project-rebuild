@@ -3,6 +3,7 @@ import ProgressStepper from '../ui/ProgressStepper.js';
 import IssueDetector from '../systems/IssueDetector.js';
 import SideEffectViewManager from '../systems/SideEffectViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
+import { createLayoutText } from '../ui/LayoutText.js';
 
 export default class SideEffectScene extends Phaser.Scene {
   constructor() {
@@ -19,14 +20,9 @@ export default class SideEffectScene extends Phaser.Scene {
     this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
     ProgressStepper.render(this, layout.progressStep);
 
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, layout.title).setOrigin(0.5);
+    createLayoutText(this, layout.title, { origin: 0.5 });
 
-    this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, {
-      fontSize: layout.subtitle.fontSize,
-      color: layout.subtitle.color,
-      align: layout.subtitle.align,
-      wordWrap: { width: layout.subtitle.wordWrapWidth },
-    }).setOrigin(0.5);
+    createLayoutText(this, layout.subtitle, { origin: 0.5 });
 
     this.drawIssueArea(issues);
     this.drawConceptPanel(issues);

@@ -3,6 +3,7 @@ import ProgressStepper from '../ui/ProgressStepper.js';
 import TeacherReportManager from '../systems/TeacherReportManager.js';
 import TeacherReportViewManager from '../systems/TeacherReportViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
+import { createLayoutText } from '../ui/LayoutText.js';
 import { copyTextToClipboard, downloadTextFile } from '../ui/BrowserFileActions.js';
 
 export default class TeacherReportScene extends Phaser.Scene {
@@ -20,9 +21,9 @@ export default class TeacherReportScene extends Phaser.Scene {
     this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
     ProgressStepper.render(this, layout.progressStep);
 
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, layout.title).setOrigin(0.5);
+    createLayoutText(this, layout.title, { origin: 0.5 });
 
-    this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, layout.subtitle).setOrigin(0.5);
+    createLayoutText(this, layout.subtitle, { origin: 0.5 });
 
     const panels = TeacherReportViewManager.getPanelLayout();
     this.drawPanel(panels.progress, TeacherReportManager.formatProgressReport(report));

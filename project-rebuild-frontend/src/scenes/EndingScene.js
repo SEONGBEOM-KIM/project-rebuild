@@ -5,6 +5,7 @@ import LearningProgress from '../systems/LearningProgress.js';
 import EndingSummaryManager from '../systems/EndingSummaryManager.js';
 import EndingSummaryViewManager from '../systems/EndingSummaryViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
+import { createLayoutText } from '../ui/LayoutText.js';
 
 export default class EndingScene extends Phaser.Scene {
   constructor() {
@@ -26,9 +27,9 @@ export default class EndingScene extends Phaser.Scene {
 
     this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
     ProgressStepper.render(this, layout.progressStep);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, layout.title).setOrigin(0.5);
+    createLayoutText(this, layout.title, { origin: 0.5 });
 
-    this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, layout.subtitle).setOrigin(0.5);
+    createLayoutText(this, layout.subtitle, { origin: 0.5 });
 
     const panels = EndingSummaryViewManager.getPanelLayout();
     this.drawPanel(panels.choice, EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings));

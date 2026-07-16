@@ -4,6 +4,7 @@ import { EP1_REFLECTION_CHOICES } from '../data/episodeContent.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import ReflectionViewManager from '../systems/ReflectionViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
+import { createLayoutText } from '../ui/LayoutText.js';
 
 export default class ReflectionScene extends Phaser.Scene {
   constructor() {
@@ -20,9 +21,9 @@ export default class ReflectionScene extends Phaser.Scene {
     this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
     ProgressStepper.render(this, layout.progressStep);
 
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, layout.title).setOrigin(0.5);
+    createLayoutText(this, layout.title, { origin: 0.5 });
 
-    this.add.text(layout.subtitle.x, layout.subtitle.y, layout.subtitle.text, layout.subtitle).setOrigin(0.5);
+    createLayoutText(this, layout.subtitle, { origin: 0.5 });
 
     EP1_REFLECTION_CHOICES.forEach((choice, index) => {
       const { x, y } = ReflectionViewManager.getChoiceCardPosition(index);

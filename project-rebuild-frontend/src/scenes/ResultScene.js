@@ -3,6 +3,7 @@ import ProgressStepper from '../ui/ProgressStepper.js';
 import EvaluationManager from '../systems/EvaluationManager.js';
 import ResultViewManager from '../systems/ResultViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
+import { createLayoutText } from '../ui/LayoutText.js';
 
 export default class ResultScene extends Phaser.Scene {
   constructor() {
@@ -21,7 +22,7 @@ export default class ResultScene extends Phaser.Scene {
 
     this.add.rectangle(width / 2, height / 2, width, height, layout.background.color);
     ProgressStepper.render(this, layout.progressStep);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, layout.title).setOrigin(0.5);
+    createLayoutText(this, layout.title, { origin: 0.5 });
 
     this.add.text(
       layout.evaluationTitle.x,
