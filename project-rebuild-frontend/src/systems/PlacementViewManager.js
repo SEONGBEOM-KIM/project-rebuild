@@ -277,10 +277,7 @@ export default class PlacementViewManager {
   }
 
   static formatPlacementHint(building) {
-    return [
-      `조건: ${building.placementHint}`,
-      building.balanceNote ? `균형: ${building.balanceNote}` : null,
-    ].filter(Boolean).join('\n');
+    return `조건: ${building.placementHint}`;
   }
 
 
@@ -412,7 +409,7 @@ export default class PlacementViewManager {
       detail: PlacementViewManager.formatBuildingDetail(building),
       description: building.description,
       placementHint: PlacementViewManager.formatPlacementHint(building),
-      effect: formatEffect(building.effect),
+      effect: '선택하면 효과·균형 표시',
     };
   }
 

@@ -18,7 +18,7 @@ export default class PlacementUiStateManager {
     return [
       `${building.name} 선택됨`,
       `조건: ${building.placementHint}`,
-      building.balanceNote ? `균형: ${building.balanceNote}` : null,
+      building.balanceSummary ? `균형: ${building.balanceSummary}` : null,
       `효과: ${formatEffect(building.effect)}`,
     ].filter(Boolean).join('\n');
   }
@@ -81,7 +81,7 @@ export default class PlacementUiStateManager {
       text: [
         `${lastPlacementResult.building.name} 배치`,
         `위치: (${lastPlacementResult.position.x}, ${lastPlacementResult.position.y})`,
-        lastPlacementResult.building.balanceNote ? `균형: ${lastPlacementResult.building.balanceNote}` : null,
+        lastPlacementResult.building.balanceSummary ? `균형: ${lastPlacementResult.building.balanceSummary}` : null,
         '',
         ...changedRows,
       ].filter((row) => row !== null).join('\n'),

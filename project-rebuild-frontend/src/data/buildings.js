@@ -9,6 +9,7 @@ export const buildings = [
     color: 0x38bdf8,
     allowedZones: ['center', 'outskirts'],
     balanceNote: '인구와 만족도는 크게 오르지만 예산 소모가 가장 큽니다.',
+    balanceSummary: '인구·만족도↑ / 예산 소모 큼',
     effect: { population: 80, economy: 10, satisfaction: 12, budget: -180 },
   },
   {
@@ -22,6 +23,7 @@ export const buildings = [
     allowedZones: ['center', 'outskirts'],
     requiresAdjacentType: 'road',
     balanceNote: '이동 불편을 줄이지만 단독으로는 경제·환경 개선이 약합니다.',
+    balanceSummary: '교통 불편↓ / 경제·환경 개선 약함',
     effect: { population: 40, satisfaction: 10, traffic: -3, budget: -120 },
   },
   {
@@ -35,6 +37,7 @@ export const buildings = [
     allowedZones: ['center', 'outskirts'],
     requiresAdjacentAnyType: ['forest', 'river'],
     balanceNote: '환경과 만족도에 강하지만 인구·경제 회복은 다른 시설과 조합해야 합니다.',
+    balanceSummary: '환경·만족도↑ / 인구·경제는 조합 필요',
     effect: { environment: 12, satisfaction: 14, pollution: -4, budget: -140 },
   },
 ];

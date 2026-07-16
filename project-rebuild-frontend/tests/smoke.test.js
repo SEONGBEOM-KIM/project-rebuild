@@ -1822,7 +1822,7 @@ function testPlacementViewManager() {
   const selectedBusMessage = PlacementUiStateManager.formatBuildingSelectedMessage(buildings.find((building) => building.id === 'bus_station'));
   assert.match(selectedBusMessage, /버스정류장 선택됨/);
   assert.match(selectedBusMessage, /조건: 도로와 인접한 빈 땅에만 배치 가능/);
-  assert.match(selectedBusMessage, /균형: 이동 불편을 줄이지만/);
+  assert.match(selectedBusMessage, /균형: 교통 불편↓ \/ 경제·환경 개선 약함/);
   assert.match(selectedBusMessage, /효과: 인구 \+40 \/ 만족도 \+10 \/ 교통 -3 \/ 예산 -120/);
   assert.equal(PlacementViewManager.getUiLayout().legendTitle.text, '타일 범례');
   assert.equal(PlacementViewManager.getUiLayout().continueButton.target, 'ResultScene');
@@ -1852,14 +1852,13 @@ function testPlacementViewManager() {
   assert.equal(PlacementViewManager.getUiLayout().cursorInfo.wordWrapWidth, 320);
   assert.equal(PlacementViewManager.getUiLayout().lastChangeBody.wordWrapWidth, 270);
   assert.equal(PlacementViewManager.formatBuildingDetail(buildings.find((building) => building.id === 'youth_center')), '2×2 | 비용 180');
-  assert.match(PlacementViewManager.formatPlacementHint(buildings.find((building) => building.id === 'bus_station')), /^조건:/);
-  assert.match(PlacementViewManager.formatPlacementHint(buildings.find((building) => building.id === 'bus_station')), /균형:/);
+  assert.equal(PlacementViewManager.formatPlacementHint(buildings.find((building) => building.id === 'bus_station')), '조건: 도로와 인접한 빈 땅에만 배치 가능');
   assert.deepEqual(PlacementViewManager.getBuildingCardContent(buildings.find((building) => building.id === 'bus_station')), {
     title: '버스정류장',
     detail: '2×2 | 비용 120',
     description: buildings.find((building) => building.id === 'bus_station').description,
     placementHint: PlacementViewManager.formatPlacementHint(buildings.find((building) => building.id === 'bus_station')),
-    effect: '인구 +40 / 만족도 +10 / 교통 -3 / 예산 -120',
+    effect: '선택하면 효과·균형 표시',
   });
   assert.deepEqual(PlacementViewManager.getPlacedBuildingVisual(buildings.find((building) => building.id === 'small_park'), 6, 1), {
     fillColor: buildings.find((building) => building.id === 'small_park').color,
@@ -1905,7 +1904,7 @@ function testPlacementViewManager() {
     delta: youthCenter.effect,
   });
   assert.match(lastChange.text, /청년센터 배치/);
-  assert.match(lastChange.text, /균형: 인구와 만족도는 크게 오르지만/);
+  assert.match(lastChange.text, /균형: 인구·만족도↑ \/ 예산 소모 큼/);
   assert.match(lastChange.text, /인구: 1000 → 1080/);
 
   const history = PlacementUiStateManager.formatPlacementHistoryState([
