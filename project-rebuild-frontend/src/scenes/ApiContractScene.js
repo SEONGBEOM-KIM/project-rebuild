@@ -5,6 +5,7 @@ import { formatContractRequest, formatContractResponse } from '../data/apiContra
 import ApiContractViewManager from '../systems/ApiContractViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
+import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
 
 export default class ApiContractScene extends Phaser.Scene {
   constructor() {
@@ -29,14 +30,9 @@ export default class ApiContractScene extends Phaser.Scene {
 
   drawPanel(panel, body) {
     const panelStyle = ApiContractViewManager.getPanelStyle();
-    this.add.rectangle(panel.x, panel.y, panel.width, panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
-      .setStrokeStyle(panelStyle.strokeWidth, panelStyle.strokeColor);
+    createPanelBackground(this, panel, panelStyle);
     const titlePosition = ApiContractViewManager.getPanelTitlePosition(panel);
-    this.add.text(titlePosition.x, titlePosition.y, panel.title, {
-      fontSize: panelStyle.titleFontSize,
-      color: panelStyle.titleColor,
-      fontStyle: panelStyle.titleFontStyle,
-    });
+    createPanelTitle(this, titlePosition, panelStyle, { text: panel.title });
     const bodyPosition = ApiContractViewManager.getPanelBodyPosition(panel);
     this.add.text(bodyPosition.x, bodyPosition.y, body, ApiContractViewManager.getPanelBodyStyle(panel));
   }
@@ -44,13 +40,8 @@ export default class ApiContractScene extends Phaser.Scene {
   drawNotes() {
     const layout = ApiContractViewManager.getNotesLayout();
     const noteStyle = ApiContractViewManager.getNoteStyle();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, noteStyle.fillColor, noteStyle.fillAlpha)
-      .setStrokeStyle(noteStyle.strokeWidth, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: noteStyle.titleFontSize,
-      color: noteStyle.titleColor,
-      fontStyle: noteStyle.titleFontStyle,
-    });
+    createPanelBackground(this, layout.panel, noteStyle);
+    createPanelTitle(this, layout.title, noteStyle);
     createLayoutText(this, {
       x: layout.body.x,
       y: layout.body.y,

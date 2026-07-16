@@ -5,6 +5,7 @@ import StorageSummaryManager from '../systems/StorageSummaryManager.js';
 import StorageManagerViewManager from '../systems/StorageManagerViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
+import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
 
 export default class StorageManagerScene extends Phaser.Scene {
   constructor() {
@@ -29,15 +30,8 @@ export default class StorageManagerScene extends Phaser.Scene {
   drawSavedDataPanel() {
     const layout = StorageManagerViewManager.getPanelLayout().saved;
     const panelStyle = StorageManagerViewManager.getPanelStyle();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
-      .setStrokeStyle(panelStyle.strokeWidth, layout.panel.strokeColor);
-    createLayoutText(this, layout.title, {
-      origin: 0.5,
-      style: {
-        fontSize: panelStyle.titleFontSize,
-        fontStyle: panelStyle.titleFontStyle,
-      },
-    });
+    createPanelBackground(this, layout.panel, panelStyle);
+    createPanelTitle(this, layout.title, panelStyle, { origin: 0.5 });
 
     const rows = StorageSummaryManager.formatSavedDataRows(this.saved);
 
@@ -47,15 +41,8 @@ export default class StorageManagerScene extends Phaser.Scene {
   drawSubmissionPanel() {
     const layout = StorageManagerViewManager.getPanelLayout().submissions;
     const panelStyle = StorageManagerViewManager.getPanelStyle();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
-      .setStrokeStyle(panelStyle.strokeWidth, layout.panel.strokeColor);
-    createLayoutText(this, layout.title, {
-      origin: 0.5,
-      style: {
-        fontSize: panelStyle.titleFontSize,
-        fontStyle: panelStyle.titleFontStyle,
-      },
-    });
+    createPanelBackground(this, layout.panel, panelStyle);
+    createPanelTitle(this, layout.title, panelStyle, { origin: 0.5 });
 
     const rows = StorageSummaryManager.formatSubmissionRows(this.submissions);
 

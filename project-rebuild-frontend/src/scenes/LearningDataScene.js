@@ -6,6 +6,7 @@ import LearningDataViewManager from '../systems/LearningDataViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { copyTextToClipboard, downloadTextFile } from '../ui/BrowserFileActions.js';
 import { createLayoutText } from '../ui/LayoutText.js';
+import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
 
 export default class LearningDataScene extends Phaser.Scene {
   constructor() {
@@ -38,13 +39,8 @@ export default class LearningDataScene extends Phaser.Scene {
   drawDataPanel(_learningData) {
     const layout = LearningDataViewManager.getDataPanelLayout();
     const panelStyle = LearningDataViewManager.getDarkPanelStyle();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
-      .setStrokeStyle(panelStyle.strokeWidth, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: panelStyle.titleFontSize,
-      color: panelStyle.titleColor,
-      fontStyle: panelStyle.titleFontStyle,
-    });
+    createPanelBackground(this, layout.panel, panelStyle);
+    createPanelTitle(this, layout.title, panelStyle);
 
     this.add.text(
       layout.body.x,
@@ -57,13 +53,8 @@ export default class LearningDataScene extends Phaser.Scene {
   drawValidationPanel(learningData) {
     const layout = LearningDataViewManager.getValidationPanelLayout();
     const panelStyle = LearningDataViewManager.getLightPanelStyle();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
-      .setStrokeStyle(panelStyle.strokeWidth, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: panelStyle.titleFontSize,
-      color: panelStyle.titleColor,
-      fontStyle: panelStyle.titleFontStyle,
-    }).setOrigin(0.5);
+    createPanelBackground(this, layout.panel, panelStyle);
+    createPanelTitle(this, layout.title, panelStyle, { origin: 0.5 });
 
     const summary = LearningDataViewManager.getValidationSummary(learningData);
     this.add.text(
@@ -74,12 +65,10 @@ export default class LearningDataScene extends Phaser.Scene {
     );
 
     const summaryStyle = LearningDataViewManager.getSummaryBoxStyle(layout.summaryBody.wordWrapWidth);
-    this.add.rectangle(layout.summaryBox.x, layout.summaryBox.y, layout.summaryBox.width, layout.summaryBox.height, summary.backgroundColor, summaryStyle.fillAlpha)
-      .setStrokeStyle(summaryStyle.strokeWidth, summary.strokeColor);
-    this.add.text(layout.summaryTitle.x, layout.summaryTitle.y, summary.title, {
-      fontSize: summaryStyle.titleFontSize,
-      color: summary.titleColor,
-      fontStyle: summaryStyle.titleFontStyle,
+    createPanelBackground(this, layout.summaryBox, { ...summaryStyle, fillColor: summary.backgroundColor }, { strokeColor: summary.strokeColor });
+    createPanelTitle(this, layout.summaryTitle, summaryStyle, {
+      text: summary.title,
+      style: { color: summary.titleColor },
     });
     this.add.text(layout.summaryBody.x, layout.summaryBody.y, summary.body, {
       fontSize: summaryStyle.bodyFontSize,
@@ -93,13 +82,8 @@ export default class LearningDataScene extends Phaser.Scene {
     const saved = SaveManager.load();
     const layout = LearningDataViewManager.getSavePanelLayout();
     const panelStyle = LearningDataViewManager.getSavePanelStyle();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, panelStyle.fillColor, panelStyle.fillAlpha)
-      .setStrokeStyle(panelStyle.strokeWidth, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, {
-      fontSize: panelStyle.titleFontSize,
-      color: panelStyle.titleColor,
-      fontStyle: panelStyle.titleFontStyle,
-    });
+    createPanelBackground(this, layout.panel, panelStyle);
+    createPanelTitle(this, layout.title, panelStyle);
     this.saveStatusText = createLayoutText(this, layout.body, {
       text: LearningDataViewManager.formatSaveStatus(saved),
       style: {

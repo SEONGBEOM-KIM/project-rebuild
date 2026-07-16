@@ -60,6 +60,7 @@ import ProgressStepper from '../src/ui/ProgressStepper.js';
 import { getTextButtonColor } from '../src/ui/TextButton.js';
 import { copyTextToClipboard, downloadTextFile } from '../src/ui/BrowserFileActions.js';
 import { getLayoutTextStyle } from '../src/ui/LayoutText.js';
+import { createPanelBackground, createPanelTitle, getPanelTitleStyle } from '../src/ui/PanelRenderer.js';
 
 
 const PROJECT_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -2695,6 +2696,59 @@ function testSharedUiComponentStyles() {
     color: '#0f172a',
     fontStyle: 'bold',
   });
+
+  assert.deepEqual(getPanelTitleStyle({
+    titleFontSize: '28px',
+    titleColor: '#ffffff',
+    titleFontStyle: 'bold',
+  }), {
+    fontSize: '28px',
+    color: '#ffffff',
+    fontStyle: 'bold',
+  });
+  assert.deepEqual(getPanelTitleStyle({
+    titleFontSize: '28px',
+    titleFontStyle: 'bold',
+  }, {
+    color: '#172554',
+  }), {
+    fontSize: '28px',
+    fontStyle: 'bold',
+    color: '#172554',
+  });
+
+  const calls = [];
+  const scene = {
+    add: {
+      rectangle: (...args) => {
+        calls.push(['rectangle', ...args]);
+        return {
+          setStrokeStyle(width, color) {
+            calls.push(['stroke', width, color]);
+            return this;
+          },
+        };
+      },
+      text: (...args) => {
+        calls.push(['text', ...args]);
+        return {
+          setOrigin(...args) {
+            calls.push(['origin', ...args]);
+            return this;
+          },
+        };
+      },
+    },
+  };
+
+  createPanelBackground(scene, { x: 1, y: 2, width: 3, height: 4, strokeColor: 0x222222 }, { fillColor: 0x111111, fillAlpha: 0.5, strokeWidth: 2 });
+  createPanelTitle(scene, { x: 5, y: 6, text: '패널', color: '#94a3b8' }, { titleFontSize: '20px', titleFontStyle: 'bold' }, { origin: 0.5 });
+  assert.deepEqual(calls, [
+    ['rectangle', 1, 2, 3, 4, 0x111111, 0.5],
+    ['stroke', 2, 0x222222],
+    ['text', 5, 6, '패널', { color: '#94a3b8', fontSize: '20px', fontStyle: 'bold' }],
+    ['origin', 0.5],
+  ]);
 }
 
 
