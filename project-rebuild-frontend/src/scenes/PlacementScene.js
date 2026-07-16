@@ -9,7 +9,7 @@ import PlacementMapGeometry from '../systems/PlacementMapGeometry.js';
 import PlacementMapRenderer from '../systems/PlacementMapRenderer.js';
 import PlacementResultManager from '../systems/PlacementResultManager.js';
 import PlacementUiStateManager from '../systems/PlacementUiStateManager.js';
-import { createLayoutText } from '../ui/LayoutText.js';
+import PlacementSceneObjectRegistry from '../systems/PlacementSceneObjectRegistry.js';
 
 export default class PlacementScene extends Phaser.Scene {
   constructor() {
@@ -30,14 +30,15 @@ export default class PlacementScene extends Phaser.Scene {
       mapHeight: mapData.height,
     });
     this.mapRenderer = new PlacementMapRenderer({ geometry: this.mapGeometry });
-    this.uiObjects = [];
-    this.worldObjects = [];
+    this.objectRegistry = new PlacementSceneObjectRegistry(this, {
+      fixedRectangleStrokeWidth: PlacementViewManager.getFixedUiStyle().rectangleStrokeWidth,
+    });
 
     this.drawBackground();
-    this.mapGraphics = this.registerWorldObject(this.add.graphics().setDepth(1));
-    this.buildingGraphics = this.registerWorldObject(this.add.graphics().setDepth(4));
-    this.previewGraphics = this.registerWorldObject(this.add.graphics().setDepth(6));
-    this.mapLabels = this.registerWorldObject(this.add.container(0, 0).setDepth(8));
+    this.mapGraphics = this.objectRegistry.registerWorldObject(this.add.graphics().setDepth(1));
+    this.buildingGraphics = this.objectRegistry.registerWorldObject(this.add.graphics().setDepth(4));
+    this.previewGraphics = this.objectRegistry.registerWorldObject(this.add.graphics().setDepth(6));
+    this.mapLabels = this.objectRegistry.registerWorldObject(this.add.container(0, 0).setDepth(8));
 
     this.drawMap();
     this.restorePlacedBuildings();
@@ -61,9 +62,9 @@ export default class PlacementScene extends Phaser.Scene {
   drawBackground() {
     const { width, height } = this.scale;
     const layout = PlacementViewManager.getScreenLayout();
-    this.registerWorldObject(this.add.rectangle(width / 2, height / 2, width, height, layout.background.color).setScrollFactor(0).setDepth(-10));
-    this.registerUiObject(ProgressStepper.render(this, layout.progressStep));
-    this.registerUiObject(this.add.text(layout.topHint.x, layout.topHint.y, layout.topHint.text, layout.topHint).setScrollFactor(0).setDepth(100));
+    this.objectRegistry.registerWorldObject(this.add.rectangle(width / 2, height / 2, width, height, layout.background.color).setScrollFactor(0).setDepth(-10));
+    this.objectRegistry.registerUiObject(ProgressStepper.render(this, layout.progressStep));
+    this.objectRegistry.registerUiObject(this.add.text(layout.topHint.x, layout.topHint.y, layout.topHint.text, layout.topHint).setScrollFactor(0).setDepth(100));
   }
 
   setupCamera() {
@@ -74,31 +75,8 @@ export default class PlacementScene extends Phaser.Scene {
       ignoreDrag: (pointer) => PlacementViewManager.isPointerOnUi(pointer),
     }).enable();
 
-    this.cameras.main.ignore(this.uiObjects);
-    this.uiCamera = this.cameras.add(0, 0, this.scale.width, this.scale.height, false, 'PlacementUiCamera');
-    this.uiCamera.setScroll(0, 0);
-    this.uiCamera.setZoom(1);
-    this.uiCamera.ignore(this.worldObjects);
-  }
-
-  registerWorldObject(object) {
-    this.worldObjects.push(object);
-
-    if (this.uiCamera) {
-      this.uiCamera.ignore(object);
-    }
-
-    return object;
-  }
-
-  registerUiObject(object) {
-    this.uiObjects.push(object);
-
-    if (this.cameras?.main) {
-      this.cameras.main.ignore(object);
-    }
-
-    return object;
+    this.objectRegistry.ignoreUiObjectsOnMainCamera();
+    this.uiCamera = this.objectRegistry.createUiCamera('PlacementUiCamera');
   }
 
   createUi() {
@@ -106,30 +84,30 @@ export default class PlacementScene extends Phaser.Scene {
     const layout = PlacementViewManager.getUiLayout();
     const textStyles = PlacementViewManager.getTextStyles();
 
-    this.createFixedRectangleFromLayout(layout.leftPanel);
-    this.createFixedTextFromLayout(layout.title, textStyles.title);
-    this.createFixedTextFromLayout(layout.subtitle, textStyles.subtitle);
+    this.objectRegistry.createFixedRectangleFromLayout(layout.leftPanel);
+    this.objectRegistry.createFixedTextFromLayout(layout.title, textStyles.title);
+    this.objectRegistry.createFixedTextFromLayout(layout.subtitle, textStyles.subtitle);
 
-    this.missionText = this.createFixedTextFromLayout(layout.mission, textStyles.mission);
+    this.missionText = this.objectRegistry.createFixedTextFromLayout(layout.mission, textStyles.mission);
 
     buildings.forEach((building, index) => {
       this.createBuildingCard(building, layout.buildingList.x, layout.buildingList.startY + index * layout.buildingList.gapY);
     });
 
-    this.statusText = this.createFixedTextFromLayout(layout.status, textStyles.status);
+    this.statusText = this.objectRegistry.createFixedTextFromLayout(layout.status, textStyles.status);
 
-    this.cursorInfoText = this.createFixedLayoutText(layout.cursorInfo, {
+    this.cursorInfoText = this.objectRegistry.createFixedLayoutText(layout.cursorInfo, {
       style: textStyles.cursorInfo,
     });
 
-    this.messageText = this.createFixedLayoutText(layout.message, {
+    this.messageText = this.objectRegistry.createFixedLayoutText(layout.message, {
       style: textStyles.message,
     });
 
-    this.continueButtonBg = this.createFixedRectangleFromLayout(layout.continueButton, {
+    this.continueButtonBg = this.objectRegistry.createFixedRectangleFromLayout(layout.continueButton, {
       fillColor: layout.continueButton.backgroundColor,
     }).setInteractive({ useHandCursor: true });
-    this.continueButton = this.createFixedTextFromLayout(layout.continueButton, textStyles.continueButton)
+    this.continueButton = this.objectRegistry.createFixedTextFromLayout(layout.continueButton, textStyles.continueButton)
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
 
@@ -152,13 +130,13 @@ export default class PlacementScene extends Phaser.Scene {
     const layout = PlacementViewManager.getUiLayout();
     const textStyles = PlacementViewManager.getTextStyles();
 
-    this.createFixedRectangleFromLayout(layout.legendPanel);
-    this.createFixedTextFromLayout(layout.legendTitle, textStyles.panelTitle);
+    this.objectRegistry.createFixedRectangleFromLayout(layout.legendPanel);
+    this.objectRegistry.createFixedTextFromLayout(layout.legendTitle, textStyles.panelTitle);
 
     legendItems.forEach((item, index) => {
       const itemLayout = PlacementViewManager.getLegendItemLayout(index, item);
-      this.createFixedRectangleFromLayout(itemLayout.swatch);
-      this.createFixedTextFromLayout(itemLayout.text, {
+      this.objectRegistry.createFixedRectangleFromLayout(itemLayout.swatch);
+      this.objectRegistry.createFixedTextFromLayout(itemLayout.text, {
         ...textStyles.legendText,
         color: PlacementViewManager.getLegendTextColor(item),
       });
@@ -170,9 +148,9 @@ export default class PlacementScene extends Phaser.Scene {
     const emptyState = PlacementUiStateManager.getEmptyLastChangeState();
     const textStyles = PlacementViewManager.getTextStyles();
 
-    this.createFixedRectangleFromLayout(layout.lastChangePanel);
-    this.createFixedTextFromLayout(layout.lastChangeTitle, textStyles.panelTitle);
-    this.lastChangeText = this.createFixedLayoutText(layout.lastChangeBody, {
+    this.objectRegistry.createFixedRectangleFromLayout(layout.lastChangePanel);
+    this.objectRegistry.createFixedTextFromLayout(layout.lastChangeTitle, textStyles.panelTitle);
+    this.lastChangeText = this.objectRegistry.createFixedLayoutText(layout.lastChangeBody, {
       text: emptyState.text,
       style: {
         ...textStyles.panelBody,
@@ -186,9 +164,9 @@ export default class PlacementScene extends Phaser.Scene {
     const emptyState = PlacementUiStateManager.getEmptyPlacementHistoryState();
     const textStyles = PlacementViewManager.getTextStyles();
 
-    this.createFixedRectangleFromLayout(layout.historyPanel);
-    this.createFixedTextFromLayout(layout.historyTitle, textStyles.panelTitle);
-    this.placementHistoryText = this.createFixedLayoutText(layout.historyBody, {
+    this.objectRegistry.createFixedRectangleFromLayout(layout.historyPanel);
+    this.objectRegistry.createFixedTextFromLayout(layout.historyTitle, textStyles.panelTitle);
+    this.placementHistoryText = this.objectRegistry.createFixedLayoutText(layout.historyBody, {
       text: emptyState.text,
       style: {
         ...textStyles.panelBody,
@@ -202,21 +180,21 @@ export default class PlacementScene extends Phaser.Scene {
     const textStyles = PlacementViewManager.getTextStyles();
     const content = PlacementViewManager.getBuildingCardContent(building);
     const visual = PlacementViewManager.getBuildingCardVisual(building);
-    const card = this.createFixedRectangleFromLayout(layout.card, visual.card)
+    const card = this.objectRegistry.createFixedRectangleFromLayout(layout.card, visual.card)
       .setInteractive({ useHandCursor: true });
-    const swatch = this.createFixedRectangleFromLayout(layout.swatch, visual.swatch);
-    const title = this.createFixedTextFromLayout(layout.title, textStyles.cardTitle, { text: content.title });
+    const swatch = this.objectRegistry.createFixedRectangleFromLayout(layout.swatch, visual.swatch);
+    const title = this.objectRegistry.createFixedTextFromLayout(layout.title, textStyles.cardTitle, { text: content.title });
     const recommendationBadge = this.createRecommendationBadge(building, layout.recommendationBadge.x, layout.recommendationBadge.y);
-    const detail = this.createFixedTextFromLayout(layout.detail, textStyles.cardDetail, { text: content.detail });
-    const description = this.createFixedLayoutText(layout.description, {
+    const detail = this.objectRegistry.createFixedTextFromLayout(layout.detail, textStyles.cardDetail, { text: content.detail });
+    const description = this.objectRegistry.createFixedLayoutText(layout.description, {
       text: content.description,
       style: textStyles.cardDescription,
     });
-    const placementHint = this.createFixedLayoutText(layout.placementHint, {
+    const placementHint = this.objectRegistry.createFixedLayoutText(layout.placementHint, {
       text: content.placementHint,
       style: textStyles.cardPlacementHint,
     });
-    const effect = this.createFixedLayoutText(layout.effect, {
+    const effect = this.objectRegistry.createFixedLayoutText(layout.effect, {
       text: content.effect,
       style: textStyles.cardEffect,
     });
@@ -239,48 +217,9 @@ export default class PlacementScene extends Phaser.Scene {
     }
 
     const layout = PlacementViewManager.getRecommendationBadgeLayout(x, y);
-    const badgeBg = this.createFixedRectangleFromLayout(layout.background);
-    const badgeText = this.createFixedTextFromLayout(layout.text, PlacementViewManager.getTextStyles().recommendationBadge).setOrigin(0.5);
+    const badgeBg = this.objectRegistry.createFixedRectangleFromLayout(layout.background);
+    const badgeText = this.objectRegistry.createFixedTextFromLayout(layout.text, PlacementViewManager.getTextStyles().recommendationBadge).setOrigin(0.5);
     return { badgeBg, badgeText };
-  }
-
-  createFixedRectangleFromLayout(layout, options = {}) {
-    return this.createFixedRectangle(
-      options.x ?? layout.x,
-      options.y ?? layout.y,
-      options.width ?? layout.width,
-      options.height ?? layout.height,
-      options.fillColor ?? layout.fillColor,
-      options.alpha ?? options.fillAlpha ?? layout.alpha ?? layout.fillAlpha ?? 1,
-      options.strokeColor ?? layout.strokeColor ?? null,
-    );
-  }
-
-  createFixedRectangle(x, y, width, height, color, alpha = 1, strokeColor = null) {
-    const rectangle = this.add.rectangle(x, y, width, height, color, alpha).setScrollFactor(0).setDepth(100);
-    if (strokeColor !== null) {
-      rectangle.setStrokeStyle(PlacementViewManager.getFixedUiStyle().rectangleStrokeWidth, strokeColor);
-    }
-    return this.registerUiObject(rectangle);
-  }
-
-  createFixedTextFromLayout(layout, style, options = {}) {
-    return this.createFixedText(
-      options.x ?? layout.x,
-      options.y ?? layout.y,
-      options.text ?? layout.text ?? '',
-      style,
-    );
-  }
-
-  createFixedText(x, y, text, style) {
-    const textObject = this.add.text(x, y, text, style).setScrollFactor(0).setDepth(101);
-    return this.registerUiObject(textObject);
-  }
-
-  createFixedLayoutText(layout, options = {}) {
-    const textObject = createLayoutText(this, layout, options).setScrollFactor(0).setDepth(101);
-    return this.registerUiObject(textObject);
   }
 
   updateSelectedBuildingUi() {
@@ -408,7 +347,7 @@ export default class PlacementScene extends Phaser.Scene {
     const center = this.mapGeometry.getFootprintCenter(tileX, tileY, building.footprint);
     const markerData = PlacementViewManager.getImpactMarkerData(building);
     const markerLayout = PlacementViewManager.getImpactMarkerLayout(center, tileX, tileY);
-    const markerContainer = this.registerWorldObject(this.add.container(markerLayout.container.x, markerLayout.container.y)
+    const markerContainer = this.objectRegistry.registerWorldObject(this.add.container(markerLayout.container.x, markerLayout.container.y)
       .setDepth(markerLayout.container.depth));
 
     const bubble = this.add.circle(0, 0, markerLayout.bubble.radius, markerData.color, markerLayout.bubble.alpha)
@@ -443,7 +382,7 @@ export default class PlacementScene extends Phaser.Scene {
 
   drawPlacedBuilding(building, tileX, tileY) {
     const buildingVisual = PlacementViewManager.getPlacedBuildingVisual(building, tileX, tileY);
-    const graphics = this.registerWorldObject(this.add.graphics().setDepth(buildingVisual.depth));
+    const graphics = this.objectRegistry.registerWorldObject(this.add.graphics().setDepth(buildingVisual.depth));
     this.mapRenderer.drawTiles(
       graphics,
       this.placementSystem.getFootprintTiles(tileX, tileY, building.footprint),
@@ -460,7 +399,7 @@ export default class PlacementScene extends Phaser.Scene {
       labelLayout.background.height,
       labelLayout.background.radius,
     );
-    const label = this.registerWorldObject(this.add.text(
+    const label = this.objectRegistry.registerWorldObject(this.add.text(
       labelLayout.text.x,
       labelLayout.text.y,
       building.name,

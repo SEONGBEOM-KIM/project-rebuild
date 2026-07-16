@@ -37,6 +37,7 @@ import PlacementMapGeometry from '../src/systems/PlacementMapGeometry.js';
 import PlacementMapRenderer from '../src/systems/PlacementMapRenderer.js';
 import PlacementResultManager from '../src/systems/PlacementResultManager.js';
 import PlacementUiStateManager from '../src/systems/PlacementUiStateManager.js';
+import PlacementSceneObjectRegistry from '../src/systems/PlacementSceneObjectRegistry.js';
 import SaveManager, { LEARNING_SAVE_STORAGE_KEY } from '../src/systems/SaveManager.js';
 import SavedDataViewManager from '../src/systems/SavedDataViewManager.js';
 import StorageSummaryManager from '../src/systems/StorageSummaryManager.js';
@@ -138,6 +139,91 @@ function createGraphicsSpy() {
   };
   return graphics;
 }
+
+
+function createDisplayObjectSpy() {
+  return {
+    scrollFactor: null,
+    depth: null,
+    stroke: null,
+    setScrollFactor(value) {
+      this.scrollFactor = value;
+      return this;
+    },
+    setDepth(value) {
+      this.depth = value;
+      return this;
+    },
+    setStrokeStyle(width, color) {
+      this.stroke = { width, color };
+      return this;
+    },
+  };
+}
+
+function createPlacementSceneObjectRegistryFixture() {
+  const ignoredByMain = [];
+  const ignoredByUi = [];
+  const cameraAddCalls = [];
+  const scene = {
+    scale: { width: 1920, height: 1080 },
+    add: {
+      rectangle: (...args) => ({ ...createDisplayObjectSpy(), type: 'rectangle', args }),
+      text: (...args) => ({ ...createDisplayObjectSpy(), type: 'text', args }),
+    },
+    cameras: {
+      main: {
+        ignore: (objects) => ignoredByMain.push(objects),
+      },
+      add: (...args) => {
+        cameraAddCalls.push(args);
+        return {
+          scroll: null,
+          zoom: null,
+          setScroll(x, y) {
+            this.scroll = { x, y };
+            return this;
+          },
+          setZoom(value) {
+            this.zoom = value;
+            return this;
+          },
+          ignore: (objects) => ignoredByUi.push(objects),
+        };
+      },
+    },
+  };
+  return { scene, ignoredByMain, ignoredByUi, cameraAddCalls };
+}
+
+function testPlacementSceneObjectRegistry() {
+  const fixture = createPlacementSceneObjectRegistryFixture();
+  const registry = new PlacementSceneObjectRegistry(fixture.scene, { fixedRectangleStrokeWidth: 3 });
+  const worldObject = createDisplayObjectSpy();
+  const uiObject = registry.createFixedRectangleFromLayout({ x: 10, y: 20, width: 30, height: 40, fillColor: 0x123456, strokeColor: 0xffffff });
+
+  assert.equal(uiObject.type, 'rectangle');
+  assert.deepEqual(uiObject.args, [10, 20, 30, 40, 0x123456, 1]);
+  assert.deepEqual(uiObject.stroke, { width: 3, color: 0xffffff });
+  assert.equal(uiObject.scrollFactor, 0);
+  assert.equal(uiObject.depth, 100);
+  assert.deepEqual(fixture.ignoredByMain, [uiObject]);
+
+  registry.registerWorldObject(worldObject);
+  registry.ignoreUiObjectsOnMainCamera();
+  assert.deepEqual(fixture.ignoredByMain.at(-1), [uiObject]);
+
+  const uiCamera = registry.createUiCamera('PlacementUiCamera');
+  assert.deepEqual(fixture.cameraAddCalls[0], [0, 0, 1920, 1080, false, 'PlacementUiCamera']);
+  assert.deepEqual(uiCamera.scroll, { x: 0, y: 0 });
+  assert.equal(uiCamera.zoom, 1);
+  assert.deepEqual(fixture.ignoredByUi[0], [worldObject]);
+
+  const nextWorldObject = createDisplayObjectSpy();
+  registry.registerWorldObject(nextWorldObject);
+  assert.equal(fixture.ignoredByUi.at(-1), nextWorldObject);
+}
+
 
 function testBootFlowManager() {
   const entries = BootFlowManager.createInitialRegistryEntries();
@@ -1127,8 +1213,8 @@ function testPlacementViewManager() {
 
   const placementSceneSource = readProjectFile('src', 'scenes', 'PlacementScene.js');
   assert.match(placementSceneSource, /PlacementUiCamera/, 'placement scene should render fixed UI through a separate UI camera');
-  assert.match(placementSceneSource, /this\.cameras\.main\.ignore\(this\.uiObjects\)/, 'world camera should ignore fixed UI objects');
-  assert.match(placementSceneSource, /this\.uiCamera\.ignore\(this\.worldObjects\)/, 'UI camera should ignore zoomable map objects');
+  assert.match(placementSceneSource, /this\.objectRegistry\.ignoreUiObjectsOnMainCamera\(\)/, 'world camera should ignore fixed UI objects through registry');
+  assert.match(placementSceneSource, /this\.objectRegistry\.createUiCamera\('PlacementUiCamera'\)/, 'UI camera should ignore zoomable map objects through registry');
 
   const cameraControllerSource = readProjectFile('src', 'systems', 'CameraController.js');
   assert.match(cameraControllerSource, /this\.ignoreDrag\(pointer\)/, 'camera wheel zoom should ignore UI pointer regions');
@@ -2157,6 +2243,7 @@ async function run() {
   testPolicyData();
   testPolicyRecommendationMatchingUsesIds();
   testMapData();
+  testPlacementSceneObjectRegistry();
   testPlacementMapGeometry();
   testPlacementMapRenderer();
   testPlacementViewManager();
