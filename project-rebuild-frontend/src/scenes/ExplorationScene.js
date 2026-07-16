@@ -6,6 +6,7 @@ import LearningProgress from '../systems/LearningProgress.js';
 import ExplorationViewManager from '../systems/ExplorationViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
+import { createPanelBackground } from '../ui/PanelRenderer.js';
 
 export default class ExplorationScene extends Phaser.Scene {
   constructor() {
@@ -40,8 +41,7 @@ export default class ExplorationScene extends Phaser.Scene {
 
   drawMapBackdrop() {
     const layout = ExplorationViewManager.getMapLayout();
-    this.add.rectangle(layout.backdrop.x, layout.backdrop.y, layout.backdrop.width, layout.backdrop.height, layout.backdrop.fillColor, layout.backdrop.fillAlpha)
-      .setStrokeStyle(layout.backdrop.strokeWidth, layout.backdrop.strokeColor);
+    createPanelBackground(this, layout.backdrop, layout.backdrop);
     layout.hills.forEach((hill) => {
       this.add.ellipse(hill.x, hill.y, hill.width, hill.height, hill.fillColor, hill.fillAlpha);
     });
@@ -77,8 +77,7 @@ export default class ExplorationScene extends Phaser.Scene {
   drawInfoPanel() {
     const layout = ExplorationViewManager.getInfoPanelLayout();
     const textStyles = ExplorationViewManager.getTextStyles();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
-      .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
+    createPanelBackground(this, layout.panel, layout.panel);
     this.panelTitle = createLayoutText(this, layout.title, {
       style: textStyles.panelTitle,
     });

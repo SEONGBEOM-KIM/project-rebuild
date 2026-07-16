@@ -7,6 +7,7 @@ import CauseQuizViewManager from '../systems/CauseQuizViewManager.js';
 import { EP1_CAUSE_QUESTION, EP1_EXPLORATION_CLUES } from '../data/episodeContent.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
+import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
 
 export default class CauseQuizScene extends Phaser.Scene {
   constructor() {
@@ -35,9 +36,8 @@ export default class CauseQuizScene extends Phaser.Scene {
     const exploredCount = (this.registry.get('exploredPlaces') ?? []).length;
     const layout = CauseQuizViewManager.getExplorationSummaryLayout();
     const textStyles = CauseQuizViewManager.getTextStyles();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
-      .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, textStyles.summaryTitle).setOrigin(0.5);
+    createPanelBackground(this, layout.panel, layout.panel);
+    createPanelTitle(this, layout.title, textStyles.summaryTitle, { origin: 0.5 });
 
     const rows = CauseQuizManager.formatExplorationSummaryRows(exploredCount, EP1_EXPLORATION_CLUES);
 
@@ -50,8 +50,7 @@ export default class CauseQuizScene extends Phaser.Scene {
   drawQuestionPanel() {
     const layout = CauseQuizViewManager.getQuestionLayout();
     const textStyles = CauseQuizViewManager.getTextStyles();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
-      .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
+    createPanelBackground(this, layout.panel, layout.panel);
     createLayoutText(this, layout.prompt, {
       text: EP1_CAUSE_QUESTION.prompt,
       style: textStyles.prompt,

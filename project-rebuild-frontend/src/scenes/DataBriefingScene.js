@@ -7,6 +7,7 @@ import DataBriefingViewManager from '../systems/DataBriefingViewManager.js';
 import { EP1_CORE_CONCEPT, EP1_DATA_CARDS } from '../data/episodeContent.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
+import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
 
 export default class DataBriefingScene extends Phaser.Scene {
   constructor() {
@@ -39,13 +40,8 @@ export default class DataBriefingScene extends Phaser.Scene {
   drawDataCard(card, x, y) {
     const layout = DataBriefingViewManager.getDataCardLayout(x, y);
     const textStyles = DataBriefingViewManager.getDataCardTextStyles();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
-      .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
-    createLayoutText(this, layout.title, {
-      text: card.title,
-      style: textStyles.title,
-      origin: 0.5,
-    });
+    createPanelBackground(this, layout.panel, layout.panel);
+    createPanelTitle(this, layout.title, textStyles.title, { text: card.title, origin: 0.5 });
     this.add.text(layout.subtitle.x, layout.subtitle.y, card.subtitle, textStyles.subtitle).setOrigin(0.5);
 
     card.bars.forEach((bar, index) => {
@@ -56,9 +52,8 @@ export default class DataBriefingScene extends Phaser.Scene {
       this.add.text(layout.barValue.x, barLayout.y, DataBriefingViewManager.formatBarValue(bar), textStyles.barValue).setOrigin(1, 0.5);
     });
 
-    this.add.rectangle(layout.takeawayPanel.x, layout.takeawayPanel.y, layout.takeawayPanel.width, layout.takeawayPanel.height, layout.takeawayPanel.fillColor, layout.takeawayPanel.fillAlpha)
-      .setStrokeStyle(layout.takeawayPanel.strokeWidth, layout.takeawayPanel.strokeColor);
-    this.add.text(layout.takeawayTitle.x, layout.takeawayTitle.y, layout.takeawayTitle.text, textStyles.takeawayTitle);
+    createPanelBackground(this, layout.takeawayPanel, layout.takeawayPanel);
+    createPanelTitle(this, layout.takeawayTitle, textStyles.takeawayTitle);
     createLayoutText(this, layout.takeawayBody, {
       text: card.takeaway,
       style: textStyles.takeawayBody,
@@ -68,9 +63,8 @@ export default class DataBriefingScene extends Phaser.Scene {
   drawConceptBox() {
     const layout = DataBriefingViewManager.getConceptBoxLayout();
     const textStyles = DataBriefingViewManager.getConceptBoxTextStyles();
-    this.add.rectangle(layout.panel.x, layout.panel.y, layout.panel.width, layout.panel.height, layout.panel.fillColor, layout.panel.fillAlpha)
-      .setStrokeStyle(layout.panel.strokeWidth, layout.panel.strokeColor);
-    this.add.text(layout.title.x, layout.title.y, layout.title.text, textStyles.title);
+    createPanelBackground(this, layout.panel, layout.panel);
+    createPanelTitle(this, layout.title, textStyles.title);
     createLayoutText(this, layout.body, {
       text: EP1_CORE_CONCEPT,
       style: textStyles.body,
