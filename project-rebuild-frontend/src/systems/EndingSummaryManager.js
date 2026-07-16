@@ -38,7 +38,7 @@ export default class EndingSummaryManager {
     };
   }
 
-  static formatChoiceSummary(selectedPolicy, placedBuildings) {
+  static formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice = null) {
     const buildingCounts = placedBuildings.reduce((counts, record) => {
       counts[record.building.name] = (counts[record.building.name] ?? 0) + 1;
       return counts;
@@ -57,6 +57,20 @@ export default class EndingSummaryManager {
       '',
       '복기 질문:',
       '내 선택은 인구·경제·환경·만족도 중 어떤 값을 가장 크게 바꾸었나요?',
+      '',
+      '다음 보완 방향:',
+      EndingSummaryManager.formatReflectionNextAction(reflectionChoice),
+    ].join('\n');
+  }
+
+  static formatReflectionNextAction(reflectionChoice) {
+    if (!reflectionChoice) {
+      return '• 아직 선택하지 않음: 다음에는 결과를 보고 보완 방향을 하나 정합니다.';
+    }
+
+    return [
+      `• ${reflectionChoice.title}`,
+      reflectionChoice.nextAction ?? reflectionChoice.description,
     ].join('\n');
   }
 
@@ -92,7 +106,7 @@ export default class EndingSummaryManager {
       `탐색: ${exploredPlaces.length}/${explorationPlaces.length}곳 확인 (${exploredNames})`,
       `자료 확인: ${learningProgress.dataViewed ? '완료' : '미완료'} / 인구 감소 · 지역 불균형 · 고령화 자료 카드 확인`,
       `원인 질문: ${quizStatus} / 문제 정리: ${learningProgress.problemSummaryCompleted ? '완료' : '미완료'} / EP1 완료: ${learningProgress.completed ? '예' : '아니오'}`,
-      `배치 기록: ${learningProgress.placedBuildingIds.length}개 시설 배치 / 생각 정리: ${reflectionChoice?.title ?? '미선택'}`,
+      `배치 기록: ${learningProgress.placedBuildingIds.length}개 시설 배치 / 생각 정리: ${reflectionChoice?.title ?? '미선택'} / 다음 액션: ${reflectionChoice?.nextActionLabel ?? '미정'}`,
     ];
   }
 }

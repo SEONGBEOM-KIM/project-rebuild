@@ -34,7 +34,7 @@ export default class EndingScene extends Phaser.Scene {
     createLayoutText(this, layout.subtitle, { origin: 0.5 });
 
     const panels = EndingSummaryViewManager.getPanelLayout();
-    this.drawPanel(panels.choice, EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings));
+    this.drawPanel(panels.choice, EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice));
     this.drawPanel(panels.state, EndingSummaryManager.formatStateSummary(gameState, ending));
     this.drawNextMissionPanel(panels.nextMission);
     this.drawLearningRecordStrip(width / 2, learningProgress, exploredPlaces, quizResult, reflectionChoice);

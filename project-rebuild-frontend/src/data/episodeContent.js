@@ -103,6 +103,8 @@ export const EP1_REFLECTION_CHOICES = [
     title: '인구·경제 보완',
     icon: '👥',
     description: '사람들이 돌아오고 일자리가 늘어나는 조건을 더 고민한다.',
+    nextActionLabel: '일자리·생활 기반 비교',
+    nextAction: '다음 개발에서는 일자리와 생활 기반 시설이 인구 회복에 함께 작동하는지 비교합니다.',
     color: 0x38bdf8,
   },
   {
@@ -110,6 +112,8 @@ export const EP1_REFLECTION_CHOICES = [
     title: '교통·복지 보완',
     icon: '🚌',
     description: '주민이 학교, 시장, 병원에 쉽게 갈 수 있는 조건을 더 고민한다.',
+    nextActionLabel: '이동·복지 접근성 확인',
+    nextAction: '다음 개발에서는 이동 편의와 복지 접근성이 주민 만족도에 주는 영향을 확인합니다.',
     color: 0xfacc15,
   },
   {
@@ -117,6 +121,8 @@ export const EP1_REFLECTION_CHOICES = [
     title: '환경 보완',
     icon: '🌿',
     description: '개발 과정에서 환경과 오염 문제를 줄이는 방법을 더 고민한다.',
+    nextActionLabel: '개발 효과와 환경 부담 비교',
+    nextAction: '다음 개발에서는 개발 효과와 환경 부담을 동시에 낮추는 배치 조합을 찾습니다.',
     color: 0x4ade80,
   },
   {
@@ -124,6 +130,8 @@ export const EP1_REFLECTION_CHOICES = [
     title: '예산 균형 보완',
     icon: '💰',
     description: '효과와 비용을 비교해 우선순위를 정하는 방법을 더 고민한다.',
+    nextActionLabel: '예산 안의 우선순위 정하기',
+    nextAction: '다음 개발에서는 예산 한도 안에서 효과가 큰 시설을 먼저 고르는 기준을 세웁니다.',
     color: 0xfb7185,
   },
 ];

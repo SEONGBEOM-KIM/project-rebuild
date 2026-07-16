@@ -101,9 +101,9 @@ export default class EndingSummaryViewManager {
 
   static getPanelBodyStyle(panel) {
     return {
-      fontSize: '23px',
+      fontSize: '22px',
       color: '#1e293b',
-      lineSpacing: 9,
+      lineSpacing: 7,
       wordWrap: { width: panel.width - 90 },
     };
   }

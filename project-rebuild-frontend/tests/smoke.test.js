@@ -800,6 +800,7 @@ function testReflectionViewManager() {
   assert.equal(ReflectionViewManager.formatInitialFeedback(), '하나를 선택하면 학습 기록에 저장됩니다.');
   assert.match(ReflectionViewManager.formatSelectedFeedback(selectedChoice), new RegExp(`선택됨: ${selectedChoice.title}`));
   assert.match(ReflectionViewManager.formatSelectedFeedback(selectedChoice), new RegExp(selectedChoice.description));
+  assert.match(ReflectionViewManager.formatSelectedFeedback(selectedChoice), new RegExp(selectedChoice.nextAction));
   assert.equal(ReflectionViewManager.formatMissingChoiceFeedback(), '학습 기록에 남길 보완 방향을 하나 선택하세요.');
   assert.deepEqual(ReflectionViewManager.getFeedbackStyle('initial'), { color: '#e0f2fe' });
   assert.deepEqual(ReflectionViewManager.getFeedbackStyle('selected'), { color: '#bbf7d0' });
@@ -2109,10 +2110,14 @@ function testEndingSummaryManager() {
   const ending = EndingSummaryManager.getEndingSummary(finalState, placedBuildings);
 
   assert.equal(ending.title, '균형형 회복안');
-  assert.match(EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings), /선택 방향: 청년 생활 지원/);
-  assert.match(EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings), /배치한 시설: 3개/);
+  const reflectionChoice = EP1_REFLECTION_CHOICES.find((choice) => choice.id === 'budget_balance');
+  assert.match(EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice), /선택 방향: 청년 생활 지원/);
+  assert.match(EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice), /배치한 시설: 3개/);
+  assert.match(EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice), /다음 보완 방향:/);
+  assert.match(EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice), new RegExp(reflectionChoice.nextAction));
   assert.match(EndingSummaryManager.formatStateSummary(finalState, ending), /최종 상태:/);
   assert.match(EndingSummaryManager.formatStateSummary(finalState, ending), /큰 부작용 신호 없음/);
+  assert.match(EndingSummaryManager.formatReflectionNextAction(null), /아직 선택하지 않음/);
 
   const progress = {
     ...LearningProgress.createInitialProgress(),
@@ -2126,12 +2131,13 @@ function testEndingSummaryManager() {
     progress,
     ['school', 'market', 'bus_stop'],
     { selected: 'lack_jobs_services', correct: true },
-    { id: 'budget_balance', title: '예산 균형 보완' },
+    reflectionChoice,
   );
   assert.equal(rows.length, 4);
   assert.match(rows[0], /탐색: 3\/5곳 확인/);
   assert.match(rows[2], /원인 질문: 정답/);
   assert.match(rows[3], /생각 정리: 예산 균형 보완/);
+  assert.match(rows[3], new RegExp(reflectionChoice.nextActionLabel));
 }
 
 function testTeacherReportViewManager() {

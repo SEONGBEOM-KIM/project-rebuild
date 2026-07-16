@@ -100,7 +100,12 @@ export default class ReflectionViewManager {
   }
 
   static formatSelectedFeedback(choice) {
-    return `선택됨: ${choice.title}\n${choice.description}`;
+    return [
+      `선택됨: ${choice.title}`,
+      choice.description,
+      '',
+      `다음 액션: ${choice.nextAction}`,
+    ].join('\n');
   }
 
   static formatMissingChoiceFeedback() {
