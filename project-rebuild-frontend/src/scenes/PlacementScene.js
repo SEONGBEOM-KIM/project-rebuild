@@ -7,7 +7,6 @@ import PlacementSystem from '../systems/PlacementSystem.js';
 import CameraController from '../systems/CameraController.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import PlacementViewManager from '../systems/PlacementViewManager.js';
-import { TILE_LABELS, ZONE_LABELS, REQUIRED_PLACEMENTS, PLACEMENT_DRAG_THRESHOLD } from '../systems/PlacementViewManager.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 
 export default class PlacementScene extends Phaser.Scene {
@@ -130,7 +129,7 @@ export default class PlacementScene extends Phaser.Scene {
       .setInteractive({ useHandCursor: true });
 
     const handleContinue = () => {
-      if (this.placedBuildings.length < REQUIRED_PLACEMENTS) {
+      if (!PlacementViewManager.canContinue(this.placedBuildings.length)) {
         this.showMessage(PlacementViewManager.formatNeedMoreMessage(this.placedBuildings.length), '#fecaca');
         return;
       }
@@ -341,7 +340,7 @@ export default class PlacementScene extends Phaser.Scene {
 
       this.pendingPlacementPointer = null;
 
-      if (!PlacementViewManager.isDragPlacementCandidate(dragDistance, sameTile, PLACEMENT_DRAG_THRESHOLD)) {
+      if (!PlacementViewManager.isDragPlacementCandidate(dragDistance, sameTile)) {
         return;
       }
 
@@ -566,7 +565,7 @@ export default class PlacementScene extends Phaser.Scene {
 
     const mapTile = this.placementSystem.getTile(tile.x, tile.y);
     const status = validation ?? this.placementSystem.validatePlacement(tile.x, tile.y, this.selectedBuilding);
-    const cursorState = PlacementViewManager.formatCursorInfo(tile, mapTile, status, TILE_LABELS, ZONE_LABELS);
+    const cursorState = PlacementViewManager.formatCursorInfo(tile, mapTile, status);
     this.cursorInfoText.setText(cursorState.text);
     this.cursorInfoText.setColor(cursorState.color);
 

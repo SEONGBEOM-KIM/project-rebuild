@@ -1084,8 +1084,6 @@ function testPlacementViewManager() {
     { x: 1, y: 2 },
     { type: 'empty', zone: 'center' },
     { valid: true },
-    { empty: '빈 땅' },
-    { center: '중심지' },
   ), {
     text: '커서 타일: (1, 2)\n지형: 빈 땅 / 구역: 중심지\n판정: 배치 가능',
     color: '#bbf7d0',
@@ -1115,6 +1113,8 @@ function testPlacementViewManager() {
   assert.equal(continueState.enabled, false);
   assert.equal(continueState.buttonText, '시설 1개 더 배치');
   assert.match(continueState.missionText, /추천 시설: 작은 공원/);
+  assert.equal(PlacementViewManager.canContinue(2), false);
+  assert.equal(PlacementViewManager.canContinue(3), true);
   assert.equal(PlacementViewManager.getContinueState(3, null).buttonText, '종합 결과 확인');
   assert.equal(PlacementViewManager.formatPlacementSuccessMessage('청년센터', 3), '청년센터 배치 완료: 종합 결과를 확인할 수 있습니다.');
   assert.equal(PlacementViewManager.formatNeedMoreMessage(1), '종합 결과를 보려면 시설 2개를 더 배치하세요.');

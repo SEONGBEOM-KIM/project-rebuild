@@ -415,7 +415,7 @@ export default class PlacementViewManager {
     return `${buildingName} 선택됨`;
   }
 
-  static formatCursorInfo(tile, mapTile, validation, tileLabels, zoneLabels) {
+  static formatCursorInfo(tile, mapTile, validation) {
     if (!tile) {
       return {
         text: '커서 타일: 지도 밖 또는 UI 영역',
@@ -423,8 +423,8 @@ export default class PlacementViewManager {
       };
     }
 
-    const tileLabel = tileLabels[mapTile?.type] ?? mapTile?.type ?? '알 수 없음';
-    const zoneLabel = zoneLabels[mapTile?.zone] ?? mapTile?.zone ?? '알 수 없음';
+    const tileLabel = TILE_LABELS[mapTile?.type] ?? mapTile?.type ?? '알 수 없음';
+    const zoneLabel = ZONE_LABELS[mapTile?.zone] ?? mapTile?.zone ?? '알 수 없음';
     return {
       text: [
         `커서 타일: (${tile.x}, ${tile.y})`,
@@ -509,8 +509,12 @@ export default class PlacementViewManager {
     };
   }
 
+  static canContinue(placedCount, requiredPlacements = REQUIRED_PLACEMENTS) {
+    return placedCount >= requiredPlacements;
+  }
+
   static getContinueState(placedCount, selectedPolicy, requiredPlacements = REQUIRED_PLACEMENTS) {
-    const enabled = placedCount >= requiredPlacements;
+    const enabled = PlacementViewManager.canContinue(placedCount, requiredPlacements);
     const remaining = Math.max(0, requiredPlacements - placedCount);
     const policyLine = selectedPolicy ? `선택 방향: ${selectedPolicy.name}` : '선택 방향: 기본 배치 연습';
     const recommendedLine = selectedPolicy ? `추천 시설: ${selectedPolicy.recommendedBuildings.join(', ')}` : null;
