@@ -6,7 +6,6 @@ import GameState from '../systems/GameState.js';
 import PlacementSystem from '../systems/PlacementSystem.js';
 import CameraController from '../systems/CameraController.js';
 import LearningProgress from '../systems/LearningProgress.js';
-import { formatEffect } from '../data/stateLabels.js';
 import PlacementViewManager from '../systems/PlacementViewManager.js';
 import { TILE_LABELS, ZONE_LABELS, REQUIRED_PLACEMENTS, PLACEMENT_DRAG_THRESHOLD } from '../systems/PlacementViewManager.js';
 import { createLayoutText } from '../ui/LayoutText.js';
@@ -197,23 +196,24 @@ export default class PlacementScene extends Phaser.Scene {
   createBuildingCard(building, x, y) {
     const layout = PlacementViewManager.getBuildingCardLayout(x, y);
     const textStyles = PlacementViewManager.getTextStyles();
+    const content = PlacementViewManager.getBuildingCardContent(building);
     const visual = PlacementViewManager.getBuildingCardVisual(building);
     const card = this.createFixedRectangleFromLayout(layout.card, visual.card)
       .setInteractive({ useHandCursor: true });
     const swatch = this.createFixedRectangleFromLayout(layout.swatch, visual.swatch);
-    const title = this.createFixedTextFromLayout(layout.title, textStyles.cardTitle, { text: building.name });
+    const title = this.createFixedTextFromLayout(layout.title, textStyles.cardTitle, { text: content.title });
     const recommendationBadge = this.createRecommendationBadge(building, layout.recommendationBadge.x, layout.recommendationBadge.y);
-    const detail = this.createFixedTextFromLayout(layout.detail, textStyles.cardDetail, { text: PlacementViewManager.formatBuildingDetail(building) });
+    const detail = this.createFixedTextFromLayout(layout.detail, textStyles.cardDetail, { text: content.detail });
     const description = this.createFixedLayoutText(layout.description, {
-      text: building.description,
+      text: content.description,
       style: textStyles.cardDescription,
     });
     const placementHint = this.createFixedLayoutText(layout.placementHint, {
-      text: PlacementViewManager.formatPlacementHint(building),
+      text: content.placementHint,
       style: textStyles.cardPlacementHint,
     });
     const effect = this.createFixedLayoutText(layout.effect, {
-      text: formatEffect(building.effect),
+      text: content.effect,
       style: textStyles.cardEffect,
     });
 

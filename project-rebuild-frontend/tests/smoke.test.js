@@ -1050,6 +1050,13 @@ function testPlacementViewManager() {
   assert.equal(PlacementViewManager.getUiLayout().lastChangeBody.wordWrapWidth, 270);
   assert.equal(PlacementViewManager.formatBuildingDetail(buildings.find((building) => building.id === 'youth_center')), '2×2 | 비용 180');
   assert.match(PlacementViewManager.formatPlacementHint(buildings.find((building) => building.id === 'bus_station')), /^조건:/);
+  assert.deepEqual(PlacementViewManager.getBuildingCardContent(buildings.find((building) => building.id === 'bus_station')), {
+    title: '버스정류장',
+    detail: '2×2 | 비용 120',
+    description: buildings.find((building) => building.id === 'bus_station').description,
+    placementHint: PlacementViewManager.formatPlacementHint(buildings.find((building) => building.id === 'bus_station')),
+    effect: '인구 +40 / 만족도 +10 / 교통 -3 / 예산 -120',
+  });
   assert.deepEqual(PlacementViewManager.getPlacedBuildingVisual(buildings.find((building) => building.id === 'small_park'), 6, 1), {
     fillColor: buildings.find((building) => building.id === 'small_park').color,
     alpha: 0.78,

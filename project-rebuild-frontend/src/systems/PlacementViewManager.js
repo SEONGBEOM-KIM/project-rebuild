@@ -1,4 +1,4 @@
-import { STATE_LABELS, formatSignedValue } from '../data/stateLabels.js';
+import { STATE_LABELS, formatEffect, formatSignedValue } from '../data/stateLabels.js';
 
 
 export const TILE_COLORS = {
@@ -546,6 +546,17 @@ export default class PlacementViewManager {
     return `종합 결과를 보려면 시설 ${remaining}개를 더 배치하세요.`;
   }
 
+
+
+  static getBuildingCardContent(building) {
+    return {
+      title: building.name,
+      detail: PlacementViewManager.formatBuildingDetail(building),
+      description: building.description,
+      placementHint: PlacementViewManager.formatPlacementHint(building),
+      effect: formatEffect(building.effect),
+    };
+  }
 
   static getBuildingCardVisual(building) {
     return {
