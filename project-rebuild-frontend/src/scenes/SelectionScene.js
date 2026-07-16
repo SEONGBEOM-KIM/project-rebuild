@@ -57,7 +57,7 @@ export default class SelectionScene extends Phaser.Scene {
     const container = this.add.container(x, y);
     const background = createPanelBackground(this, layout.background, initialStyle)
       .setInteractive({ useHandCursor: true });
-    const colorBar = this.add.rectangle(layout.colorBar.x, layout.colorBar.y, layout.colorBar.width, layout.colorBar.height, policy.color, 1);
+    const colorBar = createPanelBackground(this, layout.colorBar, { fillColor: policy.color, fillAlpha: 1 });
     const title = createPanelTitle(this, layout.title, textStyles.title, {
       text: policy.name,
       origin: 0.5,
@@ -72,7 +72,11 @@ export default class SelectionScene extends Phaser.Scene {
       style: textStyles.description,
       origin: 0.5,
     });
-    const focus = this.add.text(layout.focus.x, layout.focus.y, SelectionViewManager.formatFocusText(policy), textStyles.focus).setOrigin(0.5);
+    const focus = createLayoutText(this, layout.focus, {
+      text: SelectionViewManager.formatFocusText(policy),
+      style: textStyles.focus,
+      origin: 0.5,
+    });
     const recommended = createLayoutText(this, layout.recommended, {
       text: SelectionViewManager.formatRecommendedBuildings(policy),
       style: textStyles.recommended,

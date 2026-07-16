@@ -39,12 +39,10 @@ export default class MockSubmissionLogScene extends Phaser.Scene {
 
     const rows = MockSubmissionLogViewManager.formatSummaryRows(this.submissions);
 
-    this.add.text(
-      layout.body.x,
-      layout.body.y,
-      rows.join('\n'),
-      MockSubmissionLogViewManager.getSummaryTextStyle(layout.body.wordWrapWidth),
-    );
+    createLayoutText(this, layout.body, {
+      text: rows.join('\n'),
+      style: MockSubmissionLogViewManager.getSummaryTextStyle(layout.body.wordWrapWidth),
+    });
   }
 
   drawLogPanel() {
@@ -54,18 +52,19 @@ export default class MockSubmissionLogScene extends Phaser.Scene {
     createPanelTitle(this, layout.title, panelStyle);
 
     const body = MockSubmissionLogViewManager.formatLogBody(this.submissions);
-    this.add.text(
-      layout.body.x,
-      layout.body.y,
-      body,
-      MockSubmissionLogViewManager.getLogTextStyle(layout.body.wordWrapWidth),
-    );
+    createLayoutText(this, layout.body, {
+      text: body,
+      style: MockSubmissionLogViewManager.getLogTextStyle(layout.body.wordWrapWidth),
+    });
   }
 
   drawControls() {
     const layout = MockSubmissionLogViewManager.getControlLayout();
-    this.statusText = this.add.text(layout.status.x, layout.status.y, MockSubmissionLogViewManager.formatStatusText(), MockSubmissionLogViewManager.getStatusTextStyle())
-      .setOrigin(0.5);
+    this.statusText = createLayoutText(this, layout.status, {
+      text: MockSubmissionLogViewManager.formatStatusText(),
+      style: MockSubmissionLogViewManager.getStatusTextStyle(),
+      origin: 0.5,
+    });
 
     const copyButton = createTextButton(this, layout.copy, MockSubmissionLogViewManager.getButtonStyle());
     copyButton.on('pointerdown', () => this.copyLogs());

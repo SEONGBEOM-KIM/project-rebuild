@@ -39,12 +39,10 @@ export default class ApiPayloadScene extends Phaser.Scene {
     const panelStyle = ApiPayloadViewManager.getDarkPanelStyle();
     createPanelBackground(this, layout.panel, panelStyle);
     createPanelTitle(this, layout.title, panelStyle);
-    this.add.text(
-      layout.body.x,
-      layout.body.y,
-      this.apiPayloadJson,
-      ApiPayloadViewManager.getPayloadTextStyle(layout.body.wordWrapWidth),
-    );
+    createLayoutText(this, layout.body, {
+      text: this.apiPayloadJson,
+      style: ApiPayloadViewManager.getPayloadTextStyle(layout.body.wordWrapWidth),
+    });
   }
 
   drawValidationPanel() {
@@ -55,19 +53,15 @@ export default class ApiPayloadScene extends Phaser.Scene {
     createPanelBackground(this, layout.panel, panelStyle, { strokeColor: summary.strokeColor });
     createPanelTitle(this, layout.title, panelStyle, { origin: 0.5 });
 
-    this.add.text(
-      layout.rows.x,
-      layout.rows.y,
-      ApiPayloadViewManager.formatValidationRows(summary.rows),
-      ApiPayloadViewManager.getValidationTextStyle(layout.rows.wordWrapWidth),
-    );
+    createLayoutText(this, layout.rows, {
+      text: ApiPayloadViewManager.formatValidationRows(summary.rows),
+      style: ApiPayloadViewManager.getValidationTextStyle(layout.rows.wordWrapWidth),
+    });
 
-    this.statusText = this.add.text(
-      layout.status.x,
-      layout.status.y,
-      summary.statusText,
-      ApiPayloadViewManager.getStatusTextStyle(layout.status.wordWrapWidth, summary.statusColor),
-    );
+    this.statusText = createLayoutText(this, layout.status, {
+      text: summary.statusText,
+      style: ApiPayloadViewManager.getStatusTextStyle(layout.status.wordWrapWidth, summary.statusColor),
+    });
   }
 
   drawSubmissionLog() {
@@ -76,12 +70,10 @@ export default class ApiPayloadScene extends Phaser.Scene {
     const logStyle = ApiPayloadViewManager.getLogPanelStyle();
     createPanelBackground(this, layout.panel, logStyle, { strokeColor: layout.title.strokeColor });
     createPanelTitle(this, layout.title, logStyle);
-    this.submissionLogText = this.add.text(
-      layout.body.x,
-      layout.body.y,
-      ApiPayloadViewManager.formatSubmissionLog(submissions),
-      ApiPayloadViewManager.getLogTextStyle(layout.body.wordWrapWidth),
-    );
+    this.submissionLogText = createLayoutText(this, layout.body, {
+      text: ApiPayloadViewManager.formatSubmissionLog(submissions),
+      style: ApiPayloadViewManager.getLogTextStyle(layout.body.wordWrapWidth),
+    });
   }
 
   drawControls() {

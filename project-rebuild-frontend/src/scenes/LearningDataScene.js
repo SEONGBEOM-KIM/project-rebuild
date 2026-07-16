@@ -43,12 +43,10 @@ export default class LearningDataScene extends Phaser.Scene {
     createPanelBackground(this, layout.panel, panelStyle);
     createPanelTitle(this, layout.title, panelStyle);
 
-    this.add.text(
-      layout.body.x,
-      layout.body.y,
-      this.learningDataJson,
-      LearningDataViewManager.getJsonTextStyle(layout.body.wordWrapWidth),
-    );
+    createLayoutText(this, layout.body, {
+      text: this.learningDataJson,
+      style: LearningDataViewManager.getJsonTextStyle(layout.body.wordWrapWidth),
+    });
   }
 
   drawValidationPanel(learningData) {
@@ -58,12 +56,10 @@ export default class LearningDataScene extends Phaser.Scene {
     createPanelTitle(this, layout.title, panelStyle, { origin: 0.5 });
 
     const summary = LearningDataViewManager.getValidationSummary(learningData);
-    this.add.text(
-      layout.rows.x,
-      layout.rows.y,
-      LearningDataViewManager.formatValidationRows(summary.rows),
-      LearningDataViewManager.getValidationTextStyle(layout.rows.wordWrapWidth),
-    );
+    createLayoutText(this, layout.rows, {
+      text: LearningDataViewManager.formatValidationRows(summary.rows),
+      style: LearningDataViewManager.getValidationTextStyle(layout.rows.wordWrapWidth),
+    });
 
     const summaryStyle = LearningDataViewManager.getSummaryBoxStyle(layout.summaryBody.wordWrapWidth);
     createPanelBackground(this, layout.summaryBox, { ...summaryStyle, fillColor: summary.backgroundColor }, { strokeColor: summary.strokeColor });
@@ -71,11 +67,14 @@ export default class LearningDataScene extends Phaser.Scene {
       text: summary.title,
       style: { color: summary.titleColor },
     });
-    this.add.text(layout.summaryBody.x, layout.summaryBody.y, summary.body, {
-      fontSize: summaryStyle.bodyFontSize,
-      color: summary.bodyColor,
-      lineSpacing: summaryStyle.lineSpacing,
-      wordWrap: summaryStyle.wordWrap,
+    createLayoutText(this, layout.summaryBody, {
+      text: summary.body,
+      style: {
+        fontSize: summaryStyle.bodyFontSize,
+        color: summary.bodyColor,
+        lineSpacing: summaryStyle.lineSpacing,
+        wordWrap: summaryStyle.wordWrap,
+      },
     });
   }
 
