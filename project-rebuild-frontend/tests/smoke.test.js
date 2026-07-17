@@ -2016,8 +2016,11 @@ function testPlacementUiUpdater() {
 
   updater.updateContinueButton(1, policies[0], EP2_MISSION_BRIEFING.strategies[0]);
   assert.match(missionText.text, /EP2 전략: 일자리와 생활 기반/);
-  assert.match(missionText.text, /선택 방향: 청년 생활 지원/);
-  assert.match(missionText.text, /추천 시설: 청년센터, 버스정류장/);
+  assert.match(missionText.text, /목표: 인구·경제 동시 개선/);
+  assert.match(missionText.text, /관찰: 예산 대비 효과/);
+  assert.match(missionText.text, /배치: 1\/3 · 남은 2개/);
+  assert.doesNotMatch(missionText.text, /선택 방향: 청년 생활 지원/);
+  assert.doesNotMatch(missionText.text, /추천 시설: 청년센터, 버스정류장/);
 
   updater.updateContinueButton(3, null);
   assert.match(missionText.text, /종합 결과 확인 가능/);
@@ -2084,6 +2087,7 @@ function testPlacementViewManager() {
   assert.equal(PlacementViewManager.getRecommendationBadgeLayout(10, 20).text.text, '추천');
   assert.deepEqual(PlacementViewManager.getFixedUiStyle(), { rectangleStrokeWidth: 3 });
   assert.equal(PlacementViewManager.getTextStyles().title.fontSize, '34px');
+  assert.equal(PlacementViewManager.getTextStyles().mission.fontSize, '18px');
   assert.equal(PlacementViewManager.getTextStyles().panelBody.lineSpacing, 6);
   assert.equal(PlacementViewManager.getTextStyles().recommendationBadge.color, '#78350f');
   assert.equal(PlacementViewManager.getTextStyles().impactIcon.fontStyle, 'bold');
@@ -2148,18 +2152,18 @@ function testPlacementViewManager() {
 
   const cameraControllerSource = readProjectFile('src', 'systems', 'CameraController.js');
   assert.match(cameraControllerSource, /this\.ignoreDrag\(pointer\)/, 'camera wheel zoom should ignore UI pointer regions');
-  assert.deepEqual(PlacementViewManager.getBuildingCardLayout(40, 185).card, {
+  assert.deepEqual(PlacementViewManager.getBuildingCardLayout(40, 245).card, {
     ...BUILDING_CARD_LAYOUT.card,
     x: 190,
-    y: 249,
+    y: 309,
   });
   assert.deepEqual(PlacementViewManager.getBuildingCardVisual(buildings.find((building) => building.id === 'youth_center')).swatch, {
     fillColor: buildings.find((building) => building.id === 'youth_center').color,
     fillAlpha: 1,
     strokeColor: 0xffffff,
   });
-  assert.equal(PlacementViewManager.getBuildingCardLayout(40, 185).description.wrapWidth, 255);
-  assert.equal(PlacementViewManager.getBuildingCardLayout(40, 185).description.wordWrapWidth, 255);
+  assert.equal(PlacementViewManager.getBuildingCardLayout(40, 245).description.wrapWidth, 255);
+  assert.equal(PlacementViewManager.getBuildingCardLayout(40, 245).description.wordWrapWidth, 255);
   assert.equal(PlacementViewManager.getUiLayout().cursorInfo.wordWrapWidth, 320);
   assert.equal(PlacementViewManager.getUiLayout().lastChangeBody.wordWrapWidth, 270);
   assert.equal(PlacementViewManager.formatBuildingDetail(buildings.find((building) => building.id === 'youth_center')), '2×2 | 비용 180');
@@ -2231,8 +2235,11 @@ function testPlacementViewManager() {
 
   const strategyContinueState = PlacementUiStateManager.getContinueState(1, policies[0], EP2_MISSION_BRIEFING.strategies[0]);
   assert.match(strategyContinueState.missionText, /EP2 전략: 일자리와 생활 기반/);
-  assert.match(strategyContinueState.missionText, /선택 방향: 청년 생활 지원/);
-  assert.match(strategyContinueState.missionText, /추천 시설: 청년센터, 버스정류장/);
+  assert.match(strategyContinueState.missionText, /목표: 인구·경제 동시 개선/);
+  assert.match(strategyContinueState.missionText, /관찰: 예산 대비 효과/);
+  assert.match(strategyContinueState.missionText, /배치: 1\/3 · 남은 2개/);
+  assert.doesNotMatch(strategyContinueState.missionText, /선택 방향: 청년 생활 지원/);
+  assert.doesNotMatch(strategyContinueState.missionText, /추천 시설: 청년센터, 버스정류장/);
   assert.equal(PlacementUiStateManager.canContinue(2), false);
   assert.equal(PlacementUiStateManager.canContinue(3), true);
   assert.equal(PlacementUiStateManager.getContinueState(3, null).buttonText, '종합 결과 확인');

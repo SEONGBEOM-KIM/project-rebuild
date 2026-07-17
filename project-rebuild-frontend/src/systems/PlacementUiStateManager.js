@@ -128,18 +128,23 @@ export default class PlacementUiStateManager {
     const enabled = PlacementUiStateManager.canContinue(placedCount, resolvedRequiredPlacements);
     const remaining = Math.max(0, resolvedRequiredPlacements - placedCount);
     const strategyLine = strategy ? `EP2 전략: ${strategy.title}` : null;
-    const policyLine = selectedPolicy ? `선택 방향: ${selectedPolicy.name}` : '선택 방향: 기본 배치 연습';
-    const recommendedLine = selectedPolicy ? `추천 시설: ${selectedPolicy.recommendedBuildings.join(', ')}` : null;
+    const strategyGoalLine = strategy?.placementGoalShort ? `목표: ${strategy.placementGoalShort}` : null;
+    const strategyObservationLine = strategy?.observationPointShort ? `관찰: ${strategy.observationPointShort}` : null;
+    const policyLine = strategy ? null : selectedPolicy ? `선택 방향: ${selectedPolicy.name}` : '선택 방향: 기본 배치 연습';
+    const recommendedLine = strategy ? null : selectedPolicy ? `추천 시설: ${selectedPolicy.recommendedBuildings.join(', ')}` : null;
 
     return {
       enabled,
       remaining,
       missionText: [
         strategyLine,
+        strategyGoalLine,
+        strategyObservationLine,
         policyLine,
         recommendedLine,
-        `미션: 시설 ${resolvedRequiredPlacements}개 배치 (${placedCount}/${resolvedRequiredPlacements})`,
-        remaining > 0 ? `남은 배치: ${remaining}개` : '종합 결과 확인 가능',
+        remaining > 0
+          ? `배치: ${placedCount}/${resolvedRequiredPlacements} · 남은 ${remaining}개`
+          : `배치: ${placedCount}/${resolvedRequiredPlacements} · 종합 결과 확인 가능`,
       ].filter(Boolean).join('\n'),
       buttonText: enabled ? '종합 결과 확인' : `시설 ${remaining}개 더 배치`,
       buttonAlpha: enabled ? 1 : 0.75,
