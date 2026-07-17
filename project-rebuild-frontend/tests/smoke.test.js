@@ -1347,6 +1347,10 @@ function testEvaluationManager() {
   assert.match(trendRows, /다음 실험:/);
   assert.match(trendRows, /예산 소모를 줄이면서/);
   assert.match(trendRows, /최근 배치:/);
+  const strategyTrendRows = EvaluationManager.formatChoiceTrendRows(placedBuildings, youthPolicy, EP2_MISSION_BRIEFING.strategies[0]);
+  assert.match(strategyTrendRows, /EP2 전략: 일자리와 생활 기반/);
+  assert.match(strategyTrendRows, /목표: 인구·경제 동시 개선/);
+  assert.match(strategyTrendRows, /관찰: 예산 대비 효과/);
   assert.equal(EvaluationManager.formatChoiceTrendRows([]), '배치 없음');
   assert.match(EvaluationManager.formatResidentReactions(finalState, placedBuildings), /생활이 더 편리/);
   assert.match(EvaluationManager.formatResidentReactions(finalState, [createPlacementRecord('bus_station')]), /이동이 쉬워지면/);
@@ -1372,6 +1376,7 @@ function testEvaluationManager() {
   assert.match(evaluationRows, /학습 포인트:/);
   assert.deepEqual(EvaluationManager.formatIssueRows(finalState), ['• 현재 큰 부작용 신호는 없습니다.']);
   assert.match(EvaluationManager.getNextExperimentSuggestion({ population: 80 }, [createPlacementRecord('youth_center')], youthPolicy), /추천 시설 버스정류장/);
+  assert.match(EvaluationManager.getNextExperimentSuggestion(totals, placedBuildings, youthPolicy, EP2_MISSION_BRIEFING.strategies[0]), /예산 대비 효과 기준/);
 }
 
 

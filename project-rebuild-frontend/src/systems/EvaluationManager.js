@@ -185,12 +185,16 @@ export default class EvaluationManager {
     return '경향: 아직 선택 경향이 뚜렷하지 않습니다.';
   }
 
-  static getNextExperimentSuggestion(totals, placedBuildings, selectedPolicy) {
+  static getNextExperimentSuggestion(totals, placedBuildings, selectedPolicy, selectedStrategy = null) {
     const placedIds = new Set(placedBuildings.map((record) => record.building.id));
     const missingRecommended = selectedPolicy?.recommendedBuildings?.filter((_, index) => !placedIds.has(selectedPolicy.recommendedBuildingIds[index])) ?? [];
 
     if (missingRecommended.length) {
       return `추천 시설 ${missingRecommended.join(', ')}도 포함한 조합을 비교하세요.`;
+    }
+
+    if (selectedStrategy?.observationPointShort) {
+      return `${selectedStrategy.observationPointShort} 기준으로 다른 위치 조합도 비교하세요.`;
     }
 
     if ((totals.budget ?? 0) <= -400) {
@@ -204,8 +208,21 @@ export default class EvaluationManager {
     return '같은 방향으로 시설 순서와 위치를 바꾸어 결과 차이를 비교하세요.';
   }
 
+  static formatStrategyTrendRows(selectedStrategy) {
+    if (!selectedStrategy) {
+      return [];
+    }
 
-  static formatChoiceTrendRows(placedBuildings, selectedPolicy = null) {
+    return [
+      `EP2 전략: ${selectedStrategy.title}`,
+      selectedStrategy.placementGoalShort ? `목표: ${selectedStrategy.placementGoalShort}` : null,
+      selectedStrategy.observationPointShort ? `관찰: ${selectedStrategy.observationPointShort}` : null,
+      '',
+    ].filter((row) => row !== null);
+  }
+
+
+  static formatChoiceTrendRows(placedBuildings, selectedPolicy = null, selectedStrategy = null) {
     if (!placedBuildings.length) {
       return '배치 없음';
     }
@@ -218,6 +235,7 @@ export default class EvaluationManager {
       .join('\n');
 
     return [
+      ...EvaluationManager.formatStrategyTrendRows(selectedStrategy),
       '누적 효과 상위:',
       ...(focusRows.length ? focusRows : ['• 변화 없음']),
       '',
@@ -225,7 +243,7 @@ export default class EvaluationManager {
       EvaluationManager.getChoiceTrendMessage(totals, placedBuildings),
       '',
       '다음 실험:',
-      `• ${EvaluationManager.getNextExperimentSuggestion(totals, placedBuildings, selectedPolicy)}`,
+      `• ${EvaluationManager.getNextExperimentSuggestion(totals, placedBuildings, selectedPolicy, selectedStrategy)}`,
       '',
       '최근 배치:',
       placementRows,
