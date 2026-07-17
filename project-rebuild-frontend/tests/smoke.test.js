@@ -142,7 +142,16 @@ function createCompleteLearningData(overrides = {}) {
     quizResult: { questionId: 'ep1_q1', selected: 'lack_jobs_services', correct: true },
     problemSummaryCompleted: true,
     selectedPolicy: { id: 'green_recovery', name: '녹색 회복 계획' },
-    selectedStrategy: { id: 'balanced_growth', title: '균형 성장', stateFocus: '환경 유지 만족도↑ 오염↓', policyId: 'green_recovery' },
+    selectedStrategy: { id: 'balanced_growth', title: '균형 성장', stateFocus: '환경 유지 만족도↑ 오염↓', policyId: 'green_recovery', placementConfigId: DEFAULT_PLACEMENT_CONFIG_ID },
+    placementConfig: {
+      id: DEFAULT_PLACEMENT_CONFIG_ID,
+      episodeId: 'ep2',
+      title: '푸른군 인구 회복 배치 실험',
+      requiredPlacements: 3,
+      stateKeys: DEFAULT_STATE_KEYS,
+      evaluationProfileId: DEFAULT_EVALUATION_PROFILE_ID,
+    },
+    evaluationProfile: { id: DEFAULT_EVALUATION_PROFILE_ID },
     placements: [
       { buildingId: 'small_park', buildingName: '작은 공원', position: { x: 6, y: 1 }, effect: { environment: 12 } },
     ],
@@ -3199,6 +3208,11 @@ function testLearningApiPayloadManager() {
   assert.equal(payload.summary.selected_strategy_title, '균형 성장');
   assert.equal(payload.selected_strategy.id, 'balanced_growth');
   assert.equal(payload.selected_strategy.policy_id, 'green_recovery');
+  assert.equal(payload.selected_strategy.placement_config_id, DEFAULT_PLACEMENT_CONFIG_ID);
+  assert.equal(payload.placement_config.id, DEFAULT_PLACEMENT_CONFIG_ID);
+  assert.equal(payload.placement_config.evaluation_profile_id, DEFAULT_EVALUATION_PROFILE_ID);
+  assert.deepEqual(payload.placement_config.state_keys, DEFAULT_STATE_KEYS);
+  assert.equal(payload.evaluation_profile.id, DEFAULT_EVALUATION_PROFILE_ID);
   assert.equal(payload.learning_steps.quiz_result.question_id, 'ep1_q1');
   assert.equal(payload.placements[0].building_id, 'small_park');
   assert.equal(payload.placements[0].order, 1);
@@ -3347,7 +3361,16 @@ function testLearningDataRestoreManager() {
     quizResult: { questionId: 'ep1_q1', selected: 'lack_jobs_services', correct: true },
     problemSummaryCompleted: true,
     selectedPolicy: { id: 'green_recovery', name: '녹색 회복 계획' },
-    selectedStrategy: { id: 'balanced_growth', title: '균형 성장', stateFocus: '환경 유지 만족도↑ 오염↓', policyId: 'green_recovery' },
+    selectedStrategy: { id: 'balanced_growth', title: '균형 성장', stateFocus: '환경 유지 만족도↑ 오염↓', policyId: 'green_recovery', placementConfigId: DEFAULT_PLACEMENT_CONFIG_ID },
+    placementConfig: {
+      id: DEFAULT_PLACEMENT_CONFIG_ID,
+      episodeId: 'ep2',
+      title: '푸른군 인구 회복 배치 실험',
+      requiredPlacements: 3,
+      stateKeys: DEFAULT_STATE_KEYS,
+      evaluationProfileId: DEFAULT_EVALUATION_PROFILE_ID,
+    },
+    evaluationProfile: { id: DEFAULT_EVALUATION_PROFILE_ID },
     placements: [
       { buildingId: 'small_park', position: { x: 6, y: 1 }, effect: { environment: 12, satisfaction: 14, pollution: -4, budget: -140 } },
       { buildingId: 'unknown_building', position: { x: 9, y: 9 }, effect: {} },

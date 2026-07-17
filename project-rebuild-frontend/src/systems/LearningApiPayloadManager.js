@@ -36,6 +36,18 @@ export default class LearningApiPayloadManager {
         title: learningData.selectedStrategy.title,
         state_focus: learningData.selectedStrategy.stateFocus,
         policy_id: learningData.selectedStrategy.policyId,
+        placement_config_id: learningData.selectedStrategy.placementConfigId ?? learningData.placementConfig?.id ?? null,
+      } : null,
+      placement_config: learningData.placementConfig ? {
+        id: learningData.placementConfig.id,
+        episode_id: learningData.placementConfig.episodeId,
+        title: learningData.placementConfig.title,
+        required_placements: learningData.placementConfig.requiredPlacements,
+        state_keys: learningData.placementConfig.stateKeys,
+        evaluation_profile_id: learningData.placementConfig.evaluationProfileId,
+      } : null,
+      evaluation_profile: learningData.evaluationProfile ? {
+        id: learningData.evaluationProfile.id,
       } : null,
       placements: (learningData.placements ?? []).map((placement, index) => ({
         order: index + 1,
@@ -84,6 +96,16 @@ export default class LearningApiPayloadManager {
         ok: payload.selected_strategy == null || Boolean(payload.selected_strategy.id),
         label: 'EP2 전략 구조 확인',
         message: 'selected_strategy.id 값이 없습니다.',
+      },
+      {
+        ok: payload.placement_config == null || Boolean(payload.placement_config?.id),
+        label: '배치 설정 구조 확인',
+        message: 'placement_config.id 값이 없습니다.',
+      },
+      {
+        ok: payload.evaluation_profile == null || Boolean(payload.evaluation_profile?.id),
+        label: '평가 프로필 구조 확인',
+        message: 'evaluation_profile.id 값이 없습니다.',
       },
       {
         ok: Array.isArray(payload.placements),
