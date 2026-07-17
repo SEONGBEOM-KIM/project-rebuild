@@ -3156,6 +3156,16 @@ function testLearningDataManager() {
   assert.equal(data.evaluationProfile.id, DEFAULT_EVALUATION_PROFILE_ID);
   assert.equal(data.summary.placementCount, 3);
   assert.equal(data.summary.nextAction.title, '예산 균형 보완');
+
+  registry.set('placementConfigId', ENVIRONMENT_PLACEMENT_CONFIG_ID);
+  const alternateData = LearningDataManager.build(registry);
+  assert.equal(alternateData.placementConfig.id, ENVIRONMENT_PLACEMENT_CONFIG_ID);
+  assert.equal(alternateData.placementConfig.requiredPlacements, 2);
+  assert.deepEqual(alternateData.placementConfig.stateKeys, ['environment', 'pollution', 'budget']);
+  assert.equal(alternateData.evaluationProfile.id, ENVIRONMENT_EVALUATION_PROFILE_ID);
+  assert.equal(alternateData.selectedStrategy.placementConfigId, ENVIRONMENT_PLACEMENT_CONFIG_ID);
+  registry.set('placementConfigId', DEFAULT_PLACEMENT_CONFIG_ID);
+
   assert.equal(LearningDataManager.isReadyToSave(data), true);
   assert.equal(LearningDataManager.validate({ ...data, summary: null }).some((row) => !row.ok && row.label === '학습 결론 요약'), true);
   assert.equal(LearningDataManager.validate({ ...data, selectedStrategy: null }).every((row) => row.ok), true, 'saved data without selectedStrategy should be accepted when policy maps to an EP2 strategy');
@@ -3272,6 +3282,27 @@ function testLearningApiPayloadManager() {
   assert.equal(payload.placements[0].building_id, 'small_park');
   assert.equal(payload.placements[0].order, 1);
   assert.equal(LearningApiPayloadManager.validate(payload).every((row) => row.ok), true);
+
+  const alternatePayload = LearningApiPayloadManager.build(createCompleteLearningData({
+    selectedStrategy: {
+      ...learningData.selectedStrategy,
+      placementConfigId: ENVIRONMENT_PLACEMENT_CONFIG_ID,
+    },
+    placementConfig: {
+      id: ENVIRONMENT_PLACEMENT_CONFIG_ID,
+      episodeId: 'ep2',
+      title: '푸른군 환경 균형 배치 실험',
+      requiredPlacements: 2,
+      stateKeys: ['environment', 'pollution', 'budget'],
+      evaluationProfileId: ENVIRONMENT_EVALUATION_PROFILE_ID,
+    },
+    evaluationProfile: { id: ENVIRONMENT_EVALUATION_PROFILE_ID },
+  }));
+  assert.equal(alternatePayload.selected_strategy.placement_config_id, ENVIRONMENT_PLACEMENT_CONFIG_ID);
+  assert.equal(alternatePayload.placement_config.required_placements, 2);
+  assert.deepEqual(alternatePayload.placement_config.state_keys, ['environment', 'pollution', 'budget']);
+  assert.equal(alternatePayload.evaluation_profile.id, ENVIRONMENT_EVALUATION_PROFILE_ID);
+  assert.equal(LearningApiPayloadManager.validate(alternatePayload).every((row) => row.ok), true);
 }
 
 
@@ -3447,6 +3478,18 @@ function testLearningDataRestoreManager() {
   assert.equal(registry.get('learningProgress').placementConfigId, DEFAULT_PLACEMENT_CONFIG_ID);
   assert.equal(registry.get('placementConfigId'), DEFAULT_PLACEMENT_CONFIG_ID);
   assert.deepEqual(registry.get('learningProgress').placedBuildingIds, ['small_park']);
+
+  const alternateProgress = LearningDataRestoreManager.buildProgress(
+    {
+      ...data,
+      placementConfig: { ...data.placementConfig, id: ENVIRONMENT_PLACEMENT_CONFIG_ID },
+      selectedStrategy: { ...data.selectedStrategy, placementConfigId: DEFAULT_PLACEMENT_CONFIG_ID },
+    },
+    restored.selectedPolicy,
+    restored.selectedStrategy,
+    restored.placedBuildings,
+  );
+  assert.equal(alternateProgress.placementConfigId, ENVIRONMENT_PLACEMENT_CONFIG_ID);
 
   const legacyProgress = LearningDataRestoreManager.buildProgress(
     { ...data, placementConfig: null },
