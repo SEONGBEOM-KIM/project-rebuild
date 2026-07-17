@@ -43,6 +43,11 @@ export default class SideEffectScene extends Phaser.Scene {
     });
     createPanelTitle(this, layout.title, textStyles.issueTitle, { origin: 0.5 });
 
+    createLayoutText(this, layout.summary, {
+      text: SideEffectViewManager.formatIssueSummary(issues),
+      style: textStyles.issueSummary,
+    });
+
     if (!issues.length) {
       createLayoutText(this, layout.emptyBody, {
         text: SideEffectViewManager.formatEmptyIssueMessage(),
@@ -51,7 +56,7 @@ export default class SideEffectScene extends Phaser.Scene {
       return;
     }
 
-    issues.slice(0, 4).forEach((issue, index) => {
+    SideEffectViewManager.sortIssuesByPriority(issues).slice(0, 4).forEach((issue, index) => {
       SideEffectIssueRenderer.renderIssueCard(this, issue, index);
     });
   }

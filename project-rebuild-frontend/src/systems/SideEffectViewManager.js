@@ -32,11 +32,22 @@ const SIDE_EFFECT_ISSUE_CARD_STYLE = {
 
 const SIDE_EFFECT_TEXT_STYLES = {
   issueTitle: { fontSize: '38px', color: '#172554', fontStyle: 'bold' },
+  issueSummary: { fontSize: '22px', color: '#334155', fontStyle: 'bold' },
   emptyBody: { fontSize: '30px', color: '#1e293b', lineSpacing: 14 },
-  cardTitle: { fontSize: '27px', color: '#0f172a', fontStyle: 'bold' },
-  cardMessage: { fontSize: '22px', color: '#334155' },
+  cardPriority: { fontSize: '16px', color: '#475569', fontStyle: 'bold' },
+  cardTitle: { fontSize: '25px', color: '#0f172a', fontStyle: 'bold' },
+  cardMessage: { fontSize: '20px', color: '#334155' },
   hintTitle: { fontSize: '36px', color: '#ffffff', fontStyle: 'bold' },
   hintBody: { fontSize: '22px', color: '#dbeafe', lineSpacing: 10 },
+};
+
+const SIDE_EFFECT_PRIORITY_ORDER = ['budget', 'environment', 'traffic', 'satisfaction'];
+
+const SIDE_EFFECT_PRIORITY_LABELS = {
+  budget: '1순위 · 비용 균형',
+  environment: '2순위 · 환경 안전',
+  traffic: '3순위 · 이동 편의',
+  satisfaction: '4순위 · 체감 만족',
 };
 
 const SIDE_EFFECT_BUTTON_STYLE = {
@@ -65,7 +76,9 @@ export default class SideEffectViewManager {
   static getTextStyles() {
     return {
       issueTitle: { ...SIDE_EFFECT_TEXT_STYLES.issueTitle },
+      issueSummary: { ...SIDE_EFFECT_TEXT_STYLES.issueSummary },
       emptyBody: { ...SIDE_EFFECT_TEXT_STYLES.emptyBody },
+      cardPriority: { ...SIDE_EFFECT_TEXT_STYLES.cardPriority },
       cardTitle: { ...SIDE_EFFECT_TEXT_STYLES.cardTitle },
       cardMessage: { ...SIDE_EFFECT_TEXT_STYLES.cardMessage },
       hintTitle: { ...SIDE_EFFECT_TEXT_STYLES.hintTitle },
@@ -83,18 +96,20 @@ export default class SideEffectViewManager {
   static getIssuePanelLayout() {
     return {
       panel: { x: 665, y: 545, width: 980, height: 650, strokeColor: 0xfde68a },
-      title: { x: 665, y: 260, text: '감지된 주의 신호' },
+      title: { x: 665, y: 250, text: '감지된 주의 신호' },
+      summary: { x: 235, y: 296, wordWrapWidth: 860 },
       emptyBody: { x: 230, y: 385, wordWrapWidth: 860 },
     };
   }
 
   static getIssueCardLayout(index) {
-    const y = 335 + index * 135;
+    const y = 335 + index * 125;
     return {
-      background: { x: 665, y: y + 48, width: 860, height: 112 },
-      marker: { x: 270, y: y + 48, radius: 22 },
-      title: { x: 310, y: y + 8 },
-      message: { x: 310, y: y + 45, wordWrapWidth: 760 },
+      background: { x: 665, y: y + 52, width: 860, height: 108 },
+      marker: { x: 270, y: y + 52, radius: 22 },
+      priority: { x: 310, y: y + 8 },
+      title: { x: 310, y: y + 30 },
+      message: { x: 310, y: y + 64, wordWrapWidth: 760 },
     };
   }
 
@@ -113,6 +128,28 @@ export default class SideEffectViewManager {
     };
   }
 
+  static getIssuePriorityRank(issue) {
+    const rank = SIDE_EFFECT_PRIORITY_ORDER.indexOf(issue.id);
+    return rank === -1 ? SIDE_EFFECT_PRIORITY_ORDER.length : rank;
+  }
+
+  static getIssuePriorityLabel(issue) {
+    return SIDE_EFFECT_PRIORITY_LABELS[issue.id] ?? '확인 필요';
+  }
+
+  static sortIssuesByPriority(issues) {
+    return [...issues].sort((a, b) => SideEffectViewManager.getIssuePriorityRank(a) - SideEffectViewManager.getIssuePriorityRank(b));
+  }
+
+  static formatIssueSummary(issues) {
+    if (!issues.length) {
+      return '우선 확인: 현재 즉시 조정할 신호는 없습니다.';
+    }
+
+    const [firstIssue] = SideEffectViewManager.sortIssuesByPriority(issues);
+    return `우선 확인: ${firstIssue.title} · 총 ${issues.length}개 신호`;
+  }
+
   static formatEmptyIssueMessage() {
     return [
       '현재 큰 부작용 신호는 없습니다.',
@@ -124,7 +161,7 @@ export default class SideEffectViewManager {
 
   static formatHintRows(issues) {
     return issues.length
-      ? issues.flatMap((issue) => [
+      ? SideEffectViewManager.sortIssuesByPriority(issues).flatMap((issue) => [
         `• ${issue.title}`,
         issue.cause,
         `대응: ${issue.nextAction}`,

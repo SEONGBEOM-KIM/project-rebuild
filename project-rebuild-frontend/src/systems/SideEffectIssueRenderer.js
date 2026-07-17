@@ -11,6 +11,10 @@ export default class SideEffectIssueRenderer {
     const background = createPanelBackground(scene, card.background, cardStyle, { strokeColor: issue.color });
     const marker = scene.add.circle(card.marker.x, card.marker.y, card.marker.radius, issue.color, cardStyle.markerAlpha)
       .setStrokeStyle(cardStyle.markerStrokeWidth, cardStyle.markerStrokeColor);
+    const priority = createLayoutText(scene, card.priority, {
+      text: SideEffectViewManager.getIssuePriorityLabel(issue),
+      style: textStyles.cardPriority,
+    });
     const title = createLayoutText(scene, card.title, {
       text: issue.title,
       style: textStyles.cardTitle,
@@ -20,6 +24,6 @@ export default class SideEffectIssueRenderer {
       style: textStyles.cardMessage,
     });
 
-    return { background, marker, title, message };
+    return { background, marker, priority, title, message };
   }
 }

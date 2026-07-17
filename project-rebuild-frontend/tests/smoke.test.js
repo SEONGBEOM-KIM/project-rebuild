@@ -1128,13 +1128,16 @@ function testSideEffectViewManager() {
     color: '#dbeafe',
     lineSpacing: 10,
   });
+  assert.equal(SideEffectViewManager.getTextStyles().issueSummary.fontStyle, 'bold');
+  assert.equal(SideEffectViewManager.getTextStyles().cardPriority.fontSize, '16px');
   assert.deepEqual(SideEffectViewManager.getButtonStyle(), {
     fontSize: '32px',
     padding: { x: 34, y: 18 },
   });
   assert.equal(SideEffectViewManager.getIssuePanelLayout().panel.width, 980);
   assert.equal(SideEffectViewManager.getIssuePanelLayout().title.text, '감지된 주의 신호');
-  assert.deepEqual(SideEffectViewManager.getIssueCardLayout(1).title, { x: 310, y: 478 });
+  assert.deepEqual(SideEffectViewManager.getIssueCardLayout(1).priority, { x: 310, y: 468 });
+  assert.deepEqual(SideEffectViewManager.getIssueCardLayout(1).title, { x: 310, y: 490 });
   assert.equal(SideEffectViewManager.getHintPanelLayout().body.wordWrapWidth, 500);
   assert.equal(SideEffectViewManager.getHintPanelLayout().title.text, '다음 선택 힌트');
   assert.deepEqual(SideEffectViewManager.getControlLayout().next, {
@@ -1146,6 +1149,7 @@ function testSideEffectViewManager() {
     textColor: '#123524',
   });
   assert.equal(SideEffectViewManager.getControlLayout().back.target, 'ResultScene');
+  assert.match(SideEffectViewManager.formatIssueSummary([]), /즉시 조정할 신호는 없습니다/);
   assert.match(SideEffectViewManager.formatEmptyIssueMessage(), /현재 큰 부작용 신호는 없습니다/);
   assert.deepEqual(SideEffectViewManager.formatHintRows([]), [
     '• 균형 확인',
@@ -1157,12 +1161,17 @@ function testSideEffectViewManager() {
   const rows = SideEffectViewManager.formatHintRows(issues);
   assert.ok(rows.includes('• 예산 부족'));
   assert.ok(rows.includes('• 만족도 보완'));
+  assert.equal(rows[0], '• 예산 부족');
+  assert.equal(SideEffectViewManager.sortIssuesByPriority(issues)[0].id, 'budget');
+  assert.match(SideEffectViewManager.getIssuePriorityLabel(issues[0]), /비용 균형/);
+  assert.match(SideEffectViewManager.formatIssueSummary(issues), /예산 부족 · 총 2개 신호/);
   assert.match(SideEffectViewManager.formatHintText(issues), /대응:/);
 }
 
 function testSideEffectIssueRenderer() {
   const fixture = createRendererSceneSpy();
   const issue = {
+    id: 'satisfaction',
     title: '만족도 하락',
     message: '일부 주민이 체감하는 생활 편의가 낮아졌습니다.',
     color: 0xef4444,
@@ -1176,6 +1185,8 @@ function testSideEffectIssueRenderer() {
     width: SideEffectViewManager.getIssueCardStyle().markerStrokeWidth,
     color: SideEffectViewManager.getIssueCardStyle().markerStrokeColor,
   });
+  assert.ok(objects.priority);
+  assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3] === SideEffectViewManager.getIssuePriorityLabel(issue)));
   assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3] === issue.title));
   assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3] === issue.message));
 }
