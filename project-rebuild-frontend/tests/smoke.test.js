@@ -26,7 +26,9 @@ import DataBriefingRenderer from '../src/systems/DataBriefingRenderer.js';
 import ReflectionViewManager from '../src/systems/ReflectionViewManager.js';
 import TitleViewManager from '../src/systems/TitleViewManager.js';
 import AuthViewManager from '../src/systems/AuthViewManager.js';
+import AuthRenderer from '../src/systems/AuthRenderer.js';
 import StoryViewManager from '../src/systems/StoryViewManager.js';
+import StoryRenderer from '../src/systems/StoryRenderer.js';
 import ApiContractViewManager from '../src/systems/ApiContractViewManager.js';
 import LearningDataManager from '../src/systems/LearningDataManager.js';
 import LearningDataViewManager from '../src/systems/LearningDataViewManager.js';
@@ -941,6 +943,16 @@ function testTitleViewManager() {
 }
 
 
+function testAuthRenderer() {
+  const fixture = createRendererSceneSpy();
+  AuthRenderer.renderAuthPanel(fixture.scene, 700, 580, '로그인');
+  assert.ok(fixture.calls.some((call) => call[0] === 'rectangle' && call[1] === 700 && call[2] === 580));
+  assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3] === '로그인'));
+  assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3] === '이름'));
+  assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3] === '비밀번호'));
+  assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3] === 'UI 샘플'));
+}
+
 function testAuthViewManager() {
   const layout = AuthViewManager.getLayout();
   assert.equal(layout.title.text, '학습자 입장');
@@ -960,6 +972,20 @@ function testAuthViewManager() {
   assert.deepEqual(layout.panel.fields.map((field) => field.label), ['이름', '비밀번호']);
   assert.equal(layout.panel.strokeWidth, 4);
   assert.equal(layout.panel.sampleButton.textColor, '#0f172a');
+}
+
+function testStoryRenderer() {
+  const fixture = createRendererSceneSpy();
+  const selectedTargets = [];
+  const button = StoryViewManager.getStartButton(1920);
+  const rendered = StoryRenderer.renderStartButton(fixture.scene, button, () => selectedTargets.push(button.targetScene));
+  assert.equal(rendered.buttonBg.type, 'rectangle');
+  assert.equal(rendered.buttonText.type, 'text');
+  assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3] === '지역 탐색 시작'));
+  assert.ok(fixture.calls.some((call) => call[0] === 'interactive' && call[1] === 'rectangle'));
+  rendered.buttonBg.events.get('pointerdown')();
+  rendered.buttonText.events.get('pointerdown')();
+  assert.deepEqual(selectedTargets, ['ExplorationScene', 'ExplorationScene']);
 }
 
 function testStoryViewManager() {
@@ -3256,7 +3282,9 @@ async function run() {
   testDataBriefingViewManager();
   testReflectionViewManager();
   testTitleViewManager();
+  testAuthRenderer();
   testAuthViewManager();
+  testStoryRenderer();
   testStoryViewManager();
   testApiContractViewManager();
   testEvaluationRuleConstants();
