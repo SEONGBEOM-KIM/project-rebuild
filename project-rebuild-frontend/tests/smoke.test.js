@@ -1372,6 +1372,8 @@ function testEvaluationManager() {
   assert.match(EvaluationManager.formatResidentReactions(finalState, [createPlacementRecord('bus_station')]), /이동이 쉬워지면/);
   assert.match(EvaluationManager.formatResidentReactions({ ...finalState, traffic: 10 }, [createPlacementRecord('small_park')]), /쉴 수 있는 공간/);
   assert.match(EvaluationManager.formatBeforeAfterRows({ before: { ...finalState, population: 1080 }, after: finalState }, finalState), /인구: 1000 → 1120 \(\+120\)/);
+  const focusedBeforeAfterRows = EvaluationManager.formatBeforeAfterRows(null, finalState, GameState.createInitialState(), ['budget', 'pollution']);
+  assert.equal(focusedBeforeAfterRows, '예산: 1000 → 560 (-440)\n오염: 10 → 6 (-4)');
   assert.deepEqual(EvaluationManager.formatJudgementRows(finalState), [
     '• 인구 변화: 증가 확인',
     '• 경제 수준: 개선됨',
@@ -2240,6 +2242,8 @@ function testPlacementViewManager() {
   assert.match(placementSceneSource, /selectedStrategyId/, 'placement scene should recover EP2 strategy from learning progress');
   const resultSceneSource = readProjectFile('src', 'scenes', 'ResultScene.js');
   assert.match(resultSceneSource, /selectedStrategyId/, 'result scene should recover EP2 strategy from learning progress');
+  assert.match(resultSceneSource, /getPlacementConfig/, 'result scene should resolve active placement config');
+  assert.match(resultSceneSource, /stateKeys/, 'result scene should apply state display keys from active placement config');
   const endingSceneSource = readProjectFile('src', 'scenes', 'EndingScene.js');
   assert.match(endingSceneSource, /selectedStrategyId/, 'ending scene should recover EP2 strategy from learning progress');
   const reflectionSceneSource = readProjectFile('src', 'scenes', 'ReflectionScene.js');

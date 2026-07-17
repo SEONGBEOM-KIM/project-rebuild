@@ -1,5 +1,5 @@
 import { REACTION_THRESHOLDS, RESULT_THRESHOLDS, SCORE_RULES } from '../data/evaluationRules.js';
-import { STATE_LABELS, formatSignedValue } from '../data/stateLabels.js';
+import { DEFAULT_STATE_KEYS, STATE_LABELS, formatSignedValue } from '../data/stateLabels.js';
 import IssueDetector from './IssueDetector.js';
 import GameState from './GameState.js';
 
@@ -49,11 +49,12 @@ export default class EvaluationManager {
   }
 
 
-  static formatBeforeAfterRows(_lastPlacementResult, finalState, initialState = GameState.createInitialState()) {
-    return Object.entries(STATE_LABELS)
-      .map(([key, label]) => {
-        const before = initialState[key];
-        const after = finalState[key];
+  static formatBeforeAfterRows(_lastPlacementResult, finalState, initialState = GameState.createInitialState(), stateKeys = DEFAULT_STATE_KEYS) {
+    return stateKeys
+      .map((key) => {
+        const label = STATE_LABELS[key] ?? key;
+        const before = initialState[key] ?? 0;
+        const after = finalState[key] ?? 0;
         const delta = after - before;
         const marker = delta === 0 ? '' : ` (${formatSignedValue(delta)})`;
         return `${label}: ${before} → ${after}${marker}`;

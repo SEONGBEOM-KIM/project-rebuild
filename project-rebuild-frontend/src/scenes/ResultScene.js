@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import { EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
+import { getPlacementConfig } from '../data/episodePlacementConfigs.js';
 import EvaluationManager from '../systems/EvaluationManager.js';
 import ResultViewManager from '../systems/ResultViewManager.js';
 import ResultRenderer from '../systems/ResultRenderer.js';
@@ -23,6 +24,7 @@ export default class ResultScene extends Phaser.Scene {
     const selectedPolicy = this.registry.get('selectedPolicy');
     const learningProgress = LearningProgress.get(this.registry);
     const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, this.registry.get('ep2StrategyId') ?? learningProgress.selectedStrategyId, selectedPolicy?.id);
+    const placementConfig = getPlacementConfig(this.registry.get('placementConfigId') ?? learningProgress.placementConfigId);
     const evaluation = EvaluationManager.evaluateState(gameState, placedBuildings);
 
     const layout = ResultViewManager.getScreenLayout(width);
@@ -38,7 +40,7 @@ export default class ResultScene extends Phaser.Scene {
     });
 
     const panels = ResultViewManager.getPanelLayout(width / 2);
-    ResultRenderer.renderStatePanel(this, panels.beforeAfter, EvaluationManager.formatBeforeAfterRows(lastPlacementResult, gameState));
+    ResultRenderer.renderStatePanel(this, panels.beforeAfter, EvaluationManager.formatBeforeAfterRows(lastPlacementResult, gameState, undefined, placementConfig.stateKeys));
     ResultRenderer.renderStatePanel(this, panels.evaluation, EvaluationManager.formatEvaluationRows(evaluation, gameState, placedBuildings, selectedPolicy, selectedStrategy));
     ResultRenderer.renderStatePanel(this, panels.trend, EvaluationManager.formatChoiceTrendRows(placedBuildings, selectedPolicy, selectedStrategy));
     ResultRenderer.renderResidentReactionStrip(this, width / 2, EvaluationManager.formatResidentReactions(gameState, placedBuildings));
