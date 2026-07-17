@@ -1,28 +1,31 @@
-import { REACTION_THRESHOLDS, RESULT_THRESHOLDS, SCORE_RULES } from '../data/evaluationRules.js';
+import { REACTION_THRESHOLDS, RESULT_THRESHOLDS, SCORE_RULES, getEvaluationProfile } from '../data/evaluationRules.js';
 import { DEFAULT_STATE_KEYS, STATE_LABELS, formatSignedValue } from '../data/stateLabels.js';
 import IssueDetector from './IssueDetector.js';
 import GameState from './GameState.js';
 
 export default class EvaluationManager {
-  static calculateScore(gameState) {
+  static calculateScore(gameState, evaluationProfile = getEvaluationProfile()) {
+    const scoreRules = evaluationProfile.scoreRules;
+    const resultThresholds = evaluationProfile.resultThresholds;
     const scoreParts = [
-      Math.min(SCORE_RULES.maxPartScore, Math.max(0, (gameState.population - SCORE_RULES.populationBase) / SCORE_RULES.populationDivisor)),
-      Math.min(SCORE_RULES.maxPartScore, Math.max(0, (gameState.economy - SCORE_RULES.economyBase) * SCORE_RULES.economyMultiplier)),
-      Math.min(SCORE_RULES.maxPartScore, Math.max(0, gameState.environment - SCORE_RULES.environmentBase)),
-      Math.min(SCORE_RULES.maxPartScore, Math.max(0, gameState.satisfaction - SCORE_RULES.satisfactionBase)),
-      gameState.budget >= RESULT_THRESHOLDS.budgetSafe ? SCORE_RULES.maxPartScore : Math.max(0, gameState.budget / SCORE_RULES.budgetDivisor),
+      Math.min(scoreRules.maxPartScore, Math.max(0, (gameState.population - scoreRules.populationBase) / scoreRules.populationDivisor)),
+      Math.min(scoreRules.maxPartScore, Math.max(0, (gameState.economy - scoreRules.economyBase) * scoreRules.economyMultiplier)),
+      Math.min(scoreRules.maxPartScore, Math.max(0, gameState.environment - scoreRules.environmentBase)),
+      Math.min(scoreRules.maxPartScore, Math.max(0, gameState.satisfaction - scoreRules.satisfactionBase)),
+      gameState.budget >= resultThresholds.budgetSafe ? scoreRules.maxPartScore : Math.max(0, gameState.budget / scoreRules.budgetDivisor),
     ];
     return Math.round(scoreParts.reduce((sum, value) => sum + value, 0));
   }
 
-  static evaluateState(gameState, placedBuildings) {
-    const score = EvaluationManager.calculateScore(gameState);
+  static evaluateState(gameState, placedBuildings, evaluationProfile = getEvaluationProfile()) {
+    const resultThresholds = evaluationProfile.resultThresholds;
+    const score = EvaluationManager.calculateScore(gameState, evaluationProfile);
     const uniqueBuildingTypes = new Set(placedBuildings.map((record) => record.building.id)).size;
-    const hasBalancedChoices = uniqueBuildingTypes >= RESULT_THRESHOLDS.balancedMinimumBuildingTypes
-      && gameState.environment >= RESULT_THRESHOLDS.environmentGood
-      && gameState.satisfaction >= RESULT_THRESHOLDS.satisfactionBalanced;
+    const hasBalancedChoices = uniqueBuildingTypes >= resultThresholds.balancedMinimumBuildingTypes
+      && gameState.environment >= resultThresholds.environmentGood
+      && gameState.satisfaction >= resultThresholds.satisfactionBalanced;
 
-    if (hasBalancedChoices && score >= RESULT_THRESHOLDS.balancedScore) {
+    if (hasBalancedChoices && score >= resultThresholds.balancedScore) {
       return {
         score,
         title: '균형 있는 회복 가능성이 보입니다',
@@ -31,7 +34,7 @@ export default class EvaluationManager {
       };
     }
 
-    if (score >= RESULT_THRESHOLDS.recoveryScore) {
+    if (score >= resultThresholds.recoveryScore) {
       return {
         score,
         title: '지역 회복의 출발점이 마련되었습니다',

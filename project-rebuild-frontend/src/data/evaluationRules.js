@@ -35,3 +35,19 @@ export const REACTION_THRESHOLDS = Object.freeze({
   satisfactionModerate: 70,
   trafficComfortable: 7,
 });
+
+export const DEFAULT_EVALUATION_PROFILE_ID = 'ep2_population_recovery_default';
+
+export const evaluationProfiles = Object.freeze({
+  [DEFAULT_EVALUATION_PROFILE_ID]: Object.freeze({
+    id: DEFAULT_EVALUATION_PROFILE_ID,
+    issueThresholds: ISSUE_THRESHOLDS,
+    resultThresholds: RESULT_THRESHOLDS,
+    scoreRules: SCORE_RULES,
+    reactionThresholds: REACTION_THRESHOLDS,
+  }),
+});
+
+export function getEvaluationProfile(profileId = DEFAULT_EVALUATION_PROFILE_ID) {
+  return evaluationProfiles[profileId] ?? evaluationProfiles[DEFAULT_EVALUATION_PROFILE_ID];
+}

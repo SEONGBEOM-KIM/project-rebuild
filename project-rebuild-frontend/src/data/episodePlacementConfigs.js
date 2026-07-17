@@ -1,5 +1,6 @@
 import { buildings } from './buildings.js';
 import { mapData } from './mapData.js';
+import { DEFAULT_EVALUATION_PROFILE_ID } from './evaluationRules.js';
 
 export const DEFAULT_PLACEMENT_CONFIG_ID = 'ep2_population_recovery';
 
@@ -11,6 +12,7 @@ export const episodePlacementConfigs = {
     map: mapData,
     buildings,
     requiredPlacements: 3,
+    evaluationProfileId: DEFAULT_EVALUATION_PROFILE_ID,
     stateKeys: [
       'population',
       'economy',

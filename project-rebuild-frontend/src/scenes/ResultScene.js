@@ -3,6 +3,7 @@ import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import { EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
 import { getPlacementConfig } from '../data/episodePlacementConfigs.js';
+import { getEvaluationProfile } from '../data/evaluationRules.js';
 import EvaluationManager from '../systems/EvaluationManager.js';
 import ResultViewManager from '../systems/ResultViewManager.js';
 import ResultRenderer from '../systems/ResultRenderer.js';
@@ -25,7 +26,8 @@ export default class ResultScene extends Phaser.Scene {
     const learningProgress = LearningProgress.get(this.registry);
     const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, this.registry.get('ep2StrategyId') ?? learningProgress.selectedStrategyId, selectedPolicy?.id);
     const placementConfig = getPlacementConfig(this.registry.get('placementConfigId') ?? learningProgress.placementConfigId);
-    const evaluation = EvaluationManager.evaluateState(gameState, placedBuildings);
+    const evaluationProfile = getEvaluationProfile(placementConfig.evaluationProfileId);
+    const evaluation = EvaluationManager.evaluateState(gameState, placedBuildings, evaluationProfile);
 
     const layout = ResultViewManager.getScreenLayout(width);
 

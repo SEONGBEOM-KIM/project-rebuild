@@ -76,7 +76,7 @@ import { policies } from '../src/data/policies.js';
 import { explorationPlaces } from '../src/data/explorationPlaces.js';
 import { mapData } from '../src/data/mapData.js';
 import { DEFAULT_PLACEMENT_CONFIG_ID, episodePlacementConfigs, getPlacementConfig, getPlacementConfigIdForStrategy } from '../src/data/episodePlacementConfigs.js';
-import { ISSUE_THRESHOLDS, REACTION_THRESHOLDS, RESULT_THRESHOLDS, SCORE_RULES } from '../src/data/evaluationRules.js';
+import { DEFAULT_EVALUATION_PROFILE_ID, ISSUE_THRESHOLDS, REACTION_THRESHOLDS, RESULT_THRESHOLDS, SCORE_RULES, evaluationProfiles, getEvaluationProfile } from '../src/data/evaluationRules.js';
 import { API_CONTRACT, formatContractRequest, formatContractResponse } from '../src/data/apiContract.js';
 import { CURRENT_EPISODE, EPISODE_STEPS } from '../src/data/episodes.js';
 import SCENE_KEYS from '../src/data/sceneKeys.js';
@@ -1257,6 +1257,14 @@ function testEvaluationRuleConstants() {
   assert.equal(REACTION_THRESHOLDS.satisfactionHigh, 85);
   assert.equal(REACTION_THRESHOLDS.satisfactionModerate, 70);
   assert.equal(REACTION_THRESHOLDS.trafficComfortable, 7);
+
+  const defaultProfile = getEvaluationProfile();
+  assert.equal(defaultProfile.id, DEFAULT_EVALUATION_PROFILE_ID);
+  assert.equal(defaultProfile, evaluationProfiles[DEFAULT_EVALUATION_PROFILE_ID]);
+  assert.equal(defaultProfile.scoreRules, SCORE_RULES);
+  assert.equal(defaultProfile.resultThresholds, RESULT_THRESHOLDS);
+  assert.equal(defaultProfile.reactionThresholds, REACTION_THRESHOLDS);
+  assert.equal(getEvaluationProfile('missing_profile').id, DEFAULT_EVALUATION_PROFILE_ID);
 }
 
 
@@ -1337,6 +1345,11 @@ function testEvaluationManager() {
   assert.equal(EvaluationManager.calculateScore(GameState.createInitialState()), 40, 'initial state score should remain documented baseline');
   const evaluation = EvaluationManager.evaluateState(finalState, placedBuildings);
   assert.equal(evaluation.score, 92);
+  const strictProfile = {
+    ...getEvaluationProfile(),
+    resultThresholds: { ...RESULT_THRESHOLDS, balancedScore: 95, recoveryScore: 90 },
+  };
+  assert.equal(EvaluationManager.evaluateState(finalState, placedBuildings, strictProfile).title, '지역 회복의 출발점이 마련되었습니다');
   assert.equal(evaluation.title, '균형 있는 회복 가능성이 보입니다');
 
   const youthPolicy = policies.find((policy) => policy.id === 'youth_living_support');
@@ -1579,6 +1592,7 @@ function testEpisodePlacementConfigs() {
   assert.equal(config.map.width, mapData.width, 'episode config should expose current sample map');
   assert.equal(config.map.height, mapData.height);
   assert.equal(config.requiredPlacements, 3, 'episode config should declare the current placement target');
+  assert.equal(config.evaluationProfileId, DEFAULT_EVALUATION_PROFILE_ID, 'episode config should declare its result evaluation profile');
   assert.deepEqual(config.stateKeys, DEFAULT_STATE_KEYS, 'default episode config should use the canonical state display order');
   assert.equal(getPlacementConfig('missing_config').id, DEFAULT_PLACEMENT_CONFIG_ID, 'unknown config ids should fall back safely');
   for (const strategy of EP2_MISSION_BRIEFING.strategies) {
@@ -2248,6 +2262,7 @@ function testPlacementViewManager() {
   const resultSceneSource = readProjectFile('src', 'scenes', 'ResultScene.js');
   assert.match(resultSceneSource, /selectedStrategyId/, 'result scene should recover EP2 strategy from learning progress');
   assert.match(resultSceneSource, /getPlacementConfig/, 'result scene should resolve active placement config');
+  assert.match(resultSceneSource, /getEvaluationProfile/, 'result scene should resolve evaluation profile from active placement config');
   assert.match(resultSceneSource, /stateKeys/, 'result scene should apply state display keys from active placement config');
   const endingSceneSource = readProjectFile('src', 'scenes', 'EndingScene.js');
   assert.match(endingSceneSource, /selectedStrategyId/, 'ending scene should recover EP2 strategy from learning progress');
