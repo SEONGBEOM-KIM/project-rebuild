@@ -1375,6 +1375,14 @@ function testEvaluationManager() {
     resultThresholds: { ...RESULT_THRESHOLDS, populationImproved: 1300, satisfactionHigh: 100, environmentGood: 95 },
   }), /아직 뚜렷한 강점보다 보완할 지표/);
   assert.match(EvaluationManager.formatKeyInterpretation({ ...finalState, budget: 300 }), /예산 부족 신호/);
+  assert.match(EvaluationManager.formatKeyInterpretation(GameState.createInitialState(), {
+    ...getEvaluationProfile(),
+    issueThresholds: { ...ISSUE_THRESHOLDS, budgetMin: 1100 },
+  }), /예산 부족 신호/);
+  assert.match(EvaluationManager.formatIssueRows(GameState.createInitialState(), {
+    ...getEvaluationProfile(),
+    issueThresholds: { ...ISSUE_THRESHOLDS, budgetMin: 1100 },
+  }).join('\n'), /예산 부족/);
   const trendRows = EvaluationManager.formatChoiceTrendRows(placedBuildings, youthPolicy);
   assert.match(trendRows, /누적 효과 상위:/);
   assert.match(trendRows, /선택 유형 수: 3종/);
@@ -1445,6 +1453,26 @@ function testSideEffectRenderer() {
   assert.ok(emptyFixture.calls.some((call) => call[0] === 'text' && call[3].includes('현재 큰 부작용 신호는 없습니다')));
 
   const issues = IssueDetector.detect({ ...GameState.createInitialState(), budget: 400, environment: 48 });
+  const strictIssueProfile = {
+    ...getEvaluationProfile(),
+    issueThresholds: {
+      ...ISSUE_THRESHOLDS,
+      budgetMin: 1100,
+      environmentMin: 90,
+      trafficMax: 8,
+      satisfactionMin: 90,
+    },
+  };
+  assert.deepEqual(
+    IssueDetector.detect(GameState.createInitialState(), strictIssueProfile).map((issue) => issue.id),
+    ['environment', 'traffic', 'budget', 'satisfaction'],
+  );
+  assert.deepEqual(IssueDetector.formatRows(GameState.createInitialState(), '없음', strictIssueProfile), [
+    '• 환경 주의: 환경 보전 대책 필요',
+    '• 교통 불편: 이동 편의 개선 필요',
+    '• 예산 부족: 비용 균형 검토 필요',
+    '• 만족도 보완: 생활 편의 개선 필요',
+  ]);
   const issueFixture = createRendererSceneSpy();
   SideEffectRenderer.renderIssueArea(issueFixture.scene, issues);
   assert.ok(issueFixture.calls.some((call) => call[0] === 'text' && call[3].includes('우선 확인: 예산 부족')));

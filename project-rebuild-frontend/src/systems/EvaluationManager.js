@@ -77,8 +77,8 @@ export default class EvaluationManager {
   }
 
 
-  static formatIssueRows(gameState) {
-    const issues = IssueDetector.detect(gameState);
+  static formatIssueRows(gameState, evaluationProfile = getEvaluationProfile()) {
+    const issues = IssueDetector.detect(gameState, evaluationProfile);
     if (!issues.length) {
       return ['• 현재 큰 부작용 신호는 없습니다.'];
     }
@@ -86,7 +86,7 @@ export default class EvaluationManager {
   }
 
   static formatKeyInterpretation(gameState, evaluationProfile = getEvaluationProfile()) {
-    const issues = IssueDetector.detect(gameState);
+    const issues = IssueDetector.detect(gameState, evaluationProfile);
     if (issues.length) {
       return `핵심 해석: ${issues[0].title} 신호가 가장 먼저 보입니다. 다음 선택은 이 위험을 줄이는 방향이어야 합니다.`;
     }
@@ -116,7 +116,7 @@ export default class EvaluationManager {
       EvaluationManager.formatKeyInterpretation(gameState, evaluationProfile),
       '',
       '주의 신호:',
-      ...EvaluationManager.formatIssueRows(gameState),
+      ...EvaluationManager.formatIssueRows(gameState, evaluationProfile),
       '',
       '판단 기준:',
       ...EvaluationManager.formatJudgementRows(gameState, evaluationProfile),

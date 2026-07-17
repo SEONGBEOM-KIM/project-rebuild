@@ -1,10 +1,11 @@
-import { ISSUE_THRESHOLDS } from '../data/evaluationRules.js';
+import { getEvaluationProfile } from '../data/evaluationRules.js';
 
 export default class IssueDetector {
-  static detect(gameState) {
+  static detect(gameState, evaluationProfile = getEvaluationProfile()) {
     const issues = [];
+    const issueThresholds = evaluationProfile.issueThresholds;
 
-    if (gameState.environment < ISSUE_THRESHOLDS.environmentMin || gameState.pollution >= ISSUE_THRESHOLDS.pollutionMax) {
+    if (gameState.environment < issueThresholds.environmentMin || gameState.pollution >= issueThresholds.pollutionMax) {
       issues.push({
         id: 'environment',
         title: '환경 주의',
@@ -16,7 +17,7 @@ export default class IssueDetector {
       });
     }
 
-    if (gameState.traffic >= ISSUE_THRESHOLDS.trafficMax) {
+    if (gameState.traffic >= issueThresholds.trafficMax) {
       issues.push({
         id: 'traffic',
         title: '교통 불편',
@@ -28,7 +29,7 @@ export default class IssueDetector {
       });
     }
 
-    if (gameState.budget < ISSUE_THRESHOLDS.budgetMin) {
+    if (gameState.budget < issueThresholds.budgetMin) {
       issues.push({
         id: 'budget',
         title: '예산 부족',
@@ -40,7 +41,7 @@ export default class IssueDetector {
       });
     }
 
-    if (gameState.satisfaction < ISSUE_THRESHOLDS.satisfactionMin) {
+    if (gameState.satisfaction < issueThresholds.satisfactionMin) {
       issues.push({
         id: 'satisfaction',
         title: '만족도 보완',
@@ -55,8 +56,8 @@ export default class IssueDetector {
     return issues;
   }
 
-  static formatRows(gameState, emptyMessage = '큰 부작용 신호 없음') {
-    const issues = IssueDetector.detect(gameState);
+  static formatRows(gameState, emptyMessage = '큰 부작용 신호 없음', evaluationProfile = getEvaluationProfile()) {
+    const issues = IssueDetector.detect(gameState, evaluationProfile);
     return issues.length
       ? issues.map((issue) => `• ${issue.title}: ${issue.shortMessage}`)
       : [`• ${emptyMessage}`];
