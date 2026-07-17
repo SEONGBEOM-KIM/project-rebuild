@@ -2923,6 +2923,8 @@ function testTeacherReportManager() {
   assert.equal(report.exploredNames.length, 3);
   assert.equal(report.selectedPolicy.id, 'youth_living_support');
   assert.equal(report.selectedStrategy.id, 'jobs_services');
+  assert.equal(report.placementConfig.id, DEFAULT_PLACEMENT_CONFIG_ID);
+  assert.equal(report.evaluationProfile.id, DEFAULT_EVALUATION_PROFILE_ID);
   assert.equal(report.placedBuildings.length, 3);
   assert.equal(report.issues.length, 0);
   assert.equal(report.ending.title, '균형형 회복안');
@@ -2936,6 +2938,8 @@ function testTeacherReportManager() {
   assert.match(TeacherReportManager.formatChoiceReport(report), /회복 방향: 청년 생활 지원/);
   assert.match(TeacherReportManager.formatChoiceReport(report), /전략 초점: 인구↑ 경제↑ 예산↓/);
   assert.match(TeacherReportManager.formatChoiceReport(report), /1\. 청년센터/);
+  assert.match(TeacherReportManager.formatChoiceReport({ ...report, placementConfig: { ...report.placementConfig, stateKeys: ['budget'] } }), /최종 상태:\n예산: 560/);
+  assert.doesNotMatch(TeacherReportManager.formatChoiceReport({ ...report, placementConfig: { ...report.placementConfig, stateKeys: ['budget'] } }), /인구:/);
   assert.match(TeacherReportManager.formatTeachingPointReport(report), /큰 부작용 신호 없음/);
   assert.match(TeacherReportManager.buildReportText(report), /\[프로젝트 리빌드 EP1 교사용 요약\]/);
   assert.match(TeacherReportManager.buildReportText(report), /0\. 수업 결론/);

@@ -1,10 +1,12 @@
 import { explorationPlaces } from '../data/explorationPlaces.js';
 import { EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
-import { STATE_LABELS } from '../data/stateLabels.js';
+import { DEFAULT_STATE_KEYS, STATE_LABELS } from '../data/stateLabels.js';
 import IssueDetector from './IssueDetector.js';
 import LearningProgress from './LearningProgress.js';
 import EndingSummaryManager from './EndingSummaryManager.js';
 import Ep2BriefingViewManager from './Ep2BriefingViewManager.js';
+import { getPlacementConfig, getPlacementConfigIdForStrategy } from '../data/episodePlacementConfigs.js';
+import { getEvaluationProfile } from '../data/evaluationRules.js';
 
 const TEACHER_REPORT_DOWNLOAD_CONFIG = {
   mimeType: 'text/plain;charset=utf-8',
@@ -39,11 +41,14 @@ export default class TeacherReportManager {
     const progress = LearningProgress.get(registry);
     const selectedPolicy = registry.get('selectedPolicy');
     const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, registry.get('ep2StrategyId') ?? progress.selectedStrategyId, selectedPolicy?.id);
+    const placementConfigId = registry.get('placementConfigId') ?? progress.placementConfigId ?? getPlacementConfigIdForStrategy(selectedStrategy);
+    const placementConfig = getPlacementConfig(placementConfigId);
+    const evaluationProfile = getEvaluationProfile(placementConfig.evaluationProfileId);
     const placedBuildings = registry.get('placedBuildings') ?? [];
     const gameState = registry.get('gameState');
     const reflectionChoice = registry.get('reflectionChoice');
     const quizResult = registry.get('quizResult') ?? progress.quizResult;
-    const issues = IssueDetector.detect(gameState);
+    const issues = IssueDetector.detect(gameState, evaluationProfile);
     const ending = EndingSummaryManager.getEndingSummary(gameState, placedBuildings);
     const exploredNames = explorationPlaces
       .filter((place) => progress.exploredPlaces.includes(place.id))
@@ -53,6 +58,8 @@ export default class TeacherReportManager {
       progress,
       selectedPolicy,
       selectedStrategy,
+      placementConfig,
+      evaluationProfile,
       placedBuildings,
       gameState,
       reflectionChoice,
@@ -101,8 +108,9 @@ export default class TeacherReportManager {
     const buildingRows = report.placedBuildings.length
       ? report.placedBuildings.map((record, index) => `${index + 1}. ${record.building.name} (${record.position.x}, ${record.position.y})`).join('\n')
       : '배치 없음';
-    const stateRows = Object.entries(STATE_LABELS)
-      .map(([key, label]) => `${label}: ${report.gameState[key]}`)
+    const stateKeys = report.placementConfig?.stateKeys ?? DEFAULT_STATE_KEYS;
+    const stateRows = stateKeys
+      .map((key) => `${STATE_LABELS[key] ?? key}: ${report.gameState[key] ?? 0}`)
       .join(' / ');
 
     return [
