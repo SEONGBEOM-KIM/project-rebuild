@@ -3,9 +3,9 @@ import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import TeacherReportManager from '../systems/TeacherReportManager.js';
 import TeacherReportViewManager from '../systems/TeacherReportViewManager.js';
+import TeacherReportRenderer from '../systems/TeacherReportRenderer.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
-import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
 import { copyTextToClipboard, downloadTextFile } from '../ui/BrowserFileActions.js';
 
 export default class TeacherReportScene extends Phaser.Scene {
@@ -14,7 +14,7 @@ export default class TeacherReportScene extends Phaser.Scene {
   }
 
   create() {
-    const { width, height } = this.scale;
+    const { width } = this.scale;
     const report = TeacherReportManager.build(this.registry);
     this.reportText = TeacherReportManager.buildReportText(report);
 
@@ -27,39 +27,15 @@ export default class TeacherReportScene extends Phaser.Scene {
 
     createLayoutText(this, layout.subtitle, { origin: 0.5 });
 
-    this.drawSummaryStrip(width / 2, TeacherReportManager.formatClassSummaryReport(report));
+    TeacherReportRenderer.renderSummaryStrip(this, width / 2, TeacherReportManager.formatClassSummaryReport(report));
 
     const panels = TeacherReportViewManager.getPanelLayout();
-    this.drawPanel(panels.progress, TeacherReportManager.formatProgressReport(report));
-    this.drawPanel(panels.choice, TeacherReportManager.formatChoiceReport(report));
-    this.drawPanel(panels.teaching, TeacherReportManager.formatTeachingPointReport(report));
+    TeacherReportRenderer.renderPanel(this, panels.progress, TeacherReportManager.formatProgressReport(report));
+    TeacherReportRenderer.renderPanel(this, panels.choice, TeacherReportManager.formatChoiceReport(report));
+    TeacherReportRenderer.renderPanel(this, panels.teaching, TeacherReportManager.formatTeachingPointReport(report));
     this.drawControls();
   }
 
-  drawSummaryStrip(centerX, body) {
-    const layout = TeacherReportViewManager.getSummaryLayout(centerX);
-    const summaryStyle = TeacherReportViewManager.getSummaryStyle();
-    const textStyles = TeacherReportViewManager.getTextStyles();
-    createPanelBackground(this, layout.panel, summaryStyle);
-    createPanelTitle(this, layout.title, textStyles.summaryTitle);
-    createLayoutText(this, layout.body, {
-      text: body,
-      style: textStyles.summaryBody,
-    });
-  }
-
-  drawPanel(panel, body) {
-    const panelStyle = TeacherReportViewManager.getPanelStyle();
-    const textStyles = TeacherReportViewManager.getTextStyles();
-    createPanelBackground(this, panel, panelStyle);
-    const titlePosition = TeacherReportViewManager.getPanelTitlePosition(panel);
-    createPanelTitle(this, titlePosition, textStyles.panelTitle, { text: panel.title, origin: 0.5 });
-    const bodyPosition = TeacherReportViewManager.getPanelBodyPosition(panel);
-    createLayoutText(this, bodyPosition, {
-      text: body,
-      style: TeacherReportViewManager.getPanelBodyStyle(panel),
-    });
-  }
 
   drawControls() {
     const layout = TeacherReportViewManager.getControlLayout();

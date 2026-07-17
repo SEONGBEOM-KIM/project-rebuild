@@ -10,6 +10,7 @@ import EvaluationManager from '../src/systems/EvaluationManager.js';
 import ResultViewManager from '../src/systems/ResultViewManager.js';
 import EndingSummaryManager from '../src/systems/EndingSummaryManager.js';
 import EndingSummaryViewManager from '../src/systems/EndingSummaryViewManager.js';
+import EndingSummaryRenderer from '../src/systems/EndingSummaryRenderer.js';
 import LearningProgress from '../src/systems/LearningProgress.js';
 import CauseQuizManager from '../src/systems/CauseQuizManager.js';
 import CauseQuizViewManager from '../src/systems/CauseQuizViewManager.js';
@@ -31,6 +32,7 @@ import LearningDataManager from '../src/systems/LearningDataManager.js';
 import LearningDataViewManager from '../src/systems/LearningDataViewManager.js';
 import TeacherReportManager from '../src/systems/TeacherReportManager.js';
 import TeacherReportViewManager from '../src/systems/TeacherReportViewManager.js';
+import TeacherReportRenderer from '../src/systems/TeacherReportRenderer.js';
 import LearningDataRestoreManager from '../src/systems/LearningDataRestoreManager.js';
 import LearningApiPayloadManager from '../src/systems/LearningApiPayloadManager.js';
 import ApiPayloadViewManager from '../src/systems/ApiPayloadViewManager.js';
@@ -2163,6 +2165,29 @@ function testPlacementRules() {
 
 
 
+function testEndingSummaryRenderer() {
+  const takeawayFixture = createRendererSceneSpy();
+  EndingSummaryRenderer.renderTakeawayStrip(takeawayFixture.scene, 960, '균형형 회복안');
+  assert.ok(takeawayFixture.calls.some((call) => call[0] === 'text' && call[3] === '학습 결론'));
+  assert.ok(takeawayFixture.calls.some((call) => call[0] === 'text' && call[3] === '균형형 회복안'));
+
+  const panels = EndingSummaryViewManager.getPanelLayout();
+  const panelFixture = createRendererSceneSpy();
+  EndingSummaryRenderer.renderPanel(panelFixture.scene, panels.choice, '선택 방향: 청년 생활 지원');
+  assert.ok(panelFixture.calls.some((call) => call[0] === 'text' && call[3] === panels.choice.title));
+  assert.ok(panelFixture.calls.some((call) => call[0] === 'text' && call[3] === '선택 방향: 청년 생활 지원'));
+
+  const missionFixture = createRendererSceneSpy();
+  EndingSummaryRenderer.renderNextMissionPanel(missionFixture.scene, panels.nextMission, EP1_NEXT_DEVELOPMENT_GOALS);
+  assert.ok(missionFixture.calls.some((call) => call[0] === 'text' && call[3] === panels.nextMission.title));
+  assert.ok(missionFixture.calls.some((call) => call[0] === 'text' && call[3] === EP1_NEXT_DEVELOPMENT_GOALS.join('\n')));
+
+  const recordFixture = createRendererSceneSpy();
+  EndingSummaryRenderer.renderLearningRecordStrip(recordFixture.scene, 960, ['탐색: 3/5곳 확인']);
+  assert.ok(recordFixture.calls.some((call) => call[0] === 'text' && call[3] === '학습 기록'));
+  assert.ok(recordFixture.calls.some((call) => call[0] === 'text' && call[3] === '탐색: 3/5곳 확인'));
+}
+
 function testEndingSummaryViewManager() {
   assert.deepEqual(EndingSummaryViewManager.getScreenLayout(1920).title, {
     x: 960,
@@ -2249,6 +2274,19 @@ function testEndingSummaryManager() {
   assert.match(rows[2], /원인 질문: 정답/);
   assert.match(rows[3], /생각 정리: 예산 균형 보완/);
   assert.match(rows[3], new RegExp(reflectionChoice.nextActionLabel));
+}
+
+function testTeacherReportRenderer() {
+  const summaryFixture = createRendererSceneSpy();
+  TeacherReportRenderer.renderSummaryStrip(summaryFixture.scene, 960, '수업 결론 요약');
+  assert.ok(summaryFixture.calls.some((call) => call[0] === 'text' && call[3] === '수업 결론'));
+  assert.ok(summaryFixture.calls.some((call) => call[0] === 'text' && call[3] === '수업 결론 요약'));
+
+  const panels = TeacherReportViewManager.getPanelLayout();
+  const panelFixture = createRendererSceneSpy();
+  TeacherReportRenderer.renderPanel(panelFixture.scene, panels.progress, '탐색 장소: 3/5');
+  assert.ok(panelFixture.calls.some((call) => call[0] === 'text' && call[3] === panels.progress.title));
+  assert.ok(panelFixture.calls.some((call) => call[0] === 'text' && call[3] === '탐색 장소: 3/5'));
 }
 
 function testTeacherReportViewManager() {
@@ -3172,8 +3210,10 @@ async function run() {
   testPlacementActionManager();
   testPlacementResultManager();
   testPlacementRules();
+  testEndingSummaryRenderer();
   testEndingSummaryViewManager();
   testEndingSummaryManager();
+  testTeacherReportRenderer();
   testTeacherReportViewManager();
   testTeacherReportManager();
   testLearningDataViewManager();
