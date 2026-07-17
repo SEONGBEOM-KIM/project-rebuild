@@ -25,6 +25,7 @@ export default class Ep2BriefingScene extends Phaser.Scene {
 
     Ep2BriefingRenderer.renderIntroPanel(this, EP2_MISSION_BRIEFING);
     this.renderStrategyCards();
+    this.selectedStrategyPanel = Ep2BriefingRenderer.renderSelectedStrategyPanel(this, this.selectedStrategy);
 
     const controls = Ep2BriefingRenderer.renderControls(this, width / 2);
     controls.endingButton.on('pointerdown', () => this.scene.start(controls.layout.ending.target));
@@ -67,6 +68,7 @@ export default class Ep2BriefingScene extends Phaser.Scene {
       objects.selectionLabel.setText(Ep2BriefingViewManager.formatSelectionLabel(strategyId, this.selectedStrategy?.id));
       objects.selectionLabel.setColor(Ep2BriefingViewManager.getSelectionLabelStyle(style.selected).color);
     }
+    this.selectedStrategyPanel?.body.setText(Ep2BriefingViewManager.formatSelectedStrategySummary(this.selectedStrategy));
   }
 
   applySelectedStrategy() {

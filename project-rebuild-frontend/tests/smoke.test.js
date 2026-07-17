@@ -2488,6 +2488,15 @@ function testEp2BriefingRenderer() {
   card.selectionLabel.events.get('pointerdown')();
   assert.deepEqual(selectedStrategyIds, [EP2_MISSION_BRIEFING.strategies[0].id, EP2_MISSION_BRIEFING.strategies[0].id]);
 
+  const summaryFixture = createRendererSceneSpy();
+  const summaryPanel = Ep2BriefingRenderer.renderSelectedStrategyPanel(summaryFixture.scene, EP2_MISSION_BRIEFING.strategies[1]);
+  assert.equal(summaryPanel.background.type, 'rectangle');
+  assert.equal(summaryPanel.title.type, 'text');
+  assert.equal(summaryPanel.body.type, 'text');
+  assert.ok(summaryFixture.calls.some((call) => call[0] === 'text' && call[3] === '선택한 전략의 배치 목표'));
+  assert.ok(summaryFixture.calls.some((call) => call[0] === 'text' && call[3].includes('배치 목표:')));
+  assert.ok(summaryFixture.calls.some((call) => call[0] === 'text' && call[3].includes('관찰 포인트:')));
+
   const controlsFixture = createRendererSceneSpy();
   const controls = Ep2BriefingRenderer.renderControls(controlsFixture.scene, 960);
   assert.equal(controls.endingButton.type, 'text');
@@ -2509,6 +2518,8 @@ function testEp2BriefingViewManager() {
   assert.equal(Ep2BriefingViewManager.getIntroPanelLayout().title.text, '다음 미션');
   assert.equal(Ep2BriefingViewManager.getStrategyCardLayout(1).panel.x, 960);
   assert.equal(Ep2BriefingViewManager.getStrategyCardLayout(0).selection.y, 717);
+  assert.equal(Ep2BriefingViewManager.getSelectedStrategyPanelLayout().title.text, '선택한 전략의 배치 목표');
+  assert.equal(Ep2BriefingViewManager.getSelectedStrategyPanelLayout().body.wordWrapWidth, 1380);
   assert.equal(Ep2BriefingViewManager.getPanelStyle().bodyFontSize, '24px');
   assert.equal(Ep2BriefingViewManager.getCardStyle().titleColor, '#172554');
   assert.deepEqual(Ep2BriefingViewManager.getCardStyle('jobs_services', 'jobs_services', 0x38bdf8).selected, true);
@@ -2525,6 +2536,9 @@ function testEp2BriefingViewManager() {
   assert.match(Ep2BriefingViewManager.formatIntroText(EP2_MISSION_BRIEFING), /EP2에서는/);
   assert.match(Ep2BriefingViewManager.formatStrategyBody(EP2_MISSION_BRIEFING.strategies[0]), /상태 변화:/);
   assert.match(Ep2BriefingViewManager.formatStrategyCheck(EP2_MISSION_BRIEFING.strategies[0]), /생각할 점:/);
+  assert.match(Ep2BriefingViewManager.formatSelectedStrategySummary(EP2_MISSION_BRIEFING.strategies[0]), /배치 목표:/);
+  assert.match(Ep2BriefingViewManager.formatSelectedStrategySummary(EP2_MISSION_BRIEFING.strategies[0]), /관찰 포인트:/);
+  assert.match(Ep2BriefingViewManager.formatSelectedStrategySummary(null), /전략 카드를 선택/);
   assert.equal(Ep2BriefingViewManager.formatSelectionLabel('jobs_services', 'jobs_services'), '선택된 전략');
   assert.equal(Ep2BriefingViewManager.formatSelectionLabel('jobs_services', 'balanced_growth'), '클릭해서 선택');
   assert.equal(Ep2BriefingViewManager.findStrategyById(EP2_MISSION_BRIEFING, 'housing_mobility').policyId, 'mobility_access');
@@ -2534,6 +2548,10 @@ function testEp2BriefingViewManager() {
   assert.equal(Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, null, 'youth_living_support').id, 'jobs_services');
   assert.equal(Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, 'housing_mobility', 'youth_living_support').id, 'housing_mobility');
   assert.equal(Ep2BriefingViewManager.getDefaultStrategy(EP2_MISSION_BRIEFING).id, 'jobs_services');
+  assert.equal(EP2_MISSION_BRIEFING.strategies.every((strategy) => strategy.placementGoal && strategy.observationPoint), true);
+  const briefingSceneSource = readProjectFile('src', 'scenes', 'Ep2BriefingScene.js');
+  assert.match(briefingSceneSource, /renderSelectedStrategyPanel/, 'EP2 briefing should show selected strategy summary panel');
+  assert.match(briefingSceneSource, /formatSelectedStrategySummary/, 'EP2 briefing should refresh selected strategy summary when selection changes');
 }
 
 function testEndingSummaryManager() {

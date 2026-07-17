@@ -36,6 +36,19 @@ const EP2_BRIEFING_CARD_STYLE = {
   bodyLineSpacing: 8,
 };
 
+const EP2_BRIEFING_SELECTION_PANEL_STYLE = {
+  fillColor: 0x0f172a,
+  fillAlpha: 0.96,
+  strokeWidth: 4,
+  strokeColor: 0xfde68a,
+  titleFontSize: '27px',
+  titleColor: '#fde68a',
+  titleFontStyle: 'bold',
+  bodyFontSize: '19px',
+  bodyColor: '#e0f2fe',
+  bodyLineSpacing: 5,
+};
+
 const EP2_BRIEFING_BUTTON_STYLE = {
   fontSize: '29px',
   padding: { x: 34, y: 18 },
@@ -71,6 +84,10 @@ export default class Ep2BriefingViewManager {
     return { ...EP2_BRIEFING_BUTTON_STYLE, padding: { ...EP2_BRIEFING_BUTTON_STYLE.padding } };
   }
 
+  static getSelectionPanelStyle() {
+    return { ...EP2_BRIEFING_SELECTION_PANEL_STYLE };
+  }
+
   static getIntroPanelLayout() {
     return {
       panel: { x: 960, y: 262, width: 1510, height: 150, strokeColor: 0x93c5fd },
@@ -93,6 +110,14 @@ export default class Ep2BriefingViewManager {
       body: { x: position.x - 180, y: position.y - 25, wordWrapWidth: 360 },
       check: { x: position.x - 180, y: position.y + 112, wordWrapWidth: 360 },
       selection: { x: position.x, y: position.y + 162 },
+    };
+  }
+
+  static getSelectedStrategyPanelLayout() {
+    return {
+      panel: { x: 960, y: 830, width: 1510, height: 150 },
+      title: { x: 250, y: 775, text: '선택한 전략의 배치 목표' },
+      body: { x: 250, y: 810, wordWrapWidth: 1380 },
     };
   }
 
@@ -146,5 +171,17 @@ export default class Ep2BriefingViewManager {
 
   static formatStrategyCheck(strategy) {
     return `생각할 점: ${strategy.checkQuestion}`;
+  }
+
+  static formatSelectedStrategySummary(strategy) {
+    if (!strategy) {
+      return '전략 카드를 선택하면 배치 목표와 관찰 포인트가 표시됩니다.';
+    }
+
+    return [
+      `${strategy.icon} ${strategy.title} — ${strategy.stateFocus}`,
+      `배치 목표: ${strategy.placementGoal}`,
+      `관찰 포인트: ${strategy.observationPoint}`,
+    ].join('\n');
   }
 }

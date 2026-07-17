@@ -71,6 +71,23 @@ export default class Ep2BriefingRenderer {
     return { background, icon, title, body, check, selectionLabel, strategy };
   }
 
+  static renderSelectedStrategyPanel(scene, strategy) {
+    const layout = Ep2BriefingViewManager.getSelectedStrategyPanelLayout();
+    const style = Ep2BriefingViewManager.getSelectionPanelStyle();
+    const background = createPanelBackground(scene, layout.panel, style);
+    const title = createPanelTitle(scene, layout.title, style);
+    const body = createLayoutText(scene, layout.body, {
+      text: Ep2BriefingViewManager.formatSelectedStrategySummary(strategy),
+      style: {
+        fontSize: style.bodyFontSize,
+        color: style.bodyColor,
+        lineSpacing: style.bodyLineSpacing,
+        wordWrap: { width: layout.body.wordWrapWidth },
+      },
+    });
+    return { background, title, body };
+  }
+
   static renderControls(scene, centerX) {
     const layout = Ep2BriefingViewManager.getControlLayout(centerX);
     return {

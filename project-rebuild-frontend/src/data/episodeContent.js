@@ -114,6 +114,8 @@ export const EP2_MISSION_BRIEFING = {
       description: '청년센터, 상권 지원, 생활 편의 시설로 머물 이유를 만듭니다.',
       stateFocus: '인구↑ 경제↑ 예산↓',
       checkQuestion: '효과가 크지만 예산을 많이 쓰는 선택을 언제 우선할까요?',
+      placementGoal: '청년센터와 상권 시설을 조합해 인구와 경제가 함께 오르는지 확인합니다.',
+      observationPoint: '예산 감소 폭이 커질 때 만족도와 경제 효과가 충분히 보상하는지 비교합니다.',
       color: 0x38bdf8,
     },
     {
@@ -124,6 +126,8 @@ export const EP2_MISSION_BRIEFING = {
       description: '빈집 활용, 버스 연결, 이동 편의 개선으로 정주 조건을 높입니다.',
       stateFocus: '만족도↑ 교통 부담↓ 예산↓',
       checkQuestion: '이동이 편해지면 학교·시장·병원 이용은 어떻게 달라질까요?',
+      placementGoal: '버스정류장과 생활 시설을 연결해 만족도와 교통 부담 변화를 확인합니다.',
+      observationPoint: '이동 편의가 높아질수록 의료·교육·시장 접근성이 어떻게 좋아지는지 살펴봅니다.',
       color: 0xfacc15,
     },
     {
@@ -134,6 +138,8 @@ export const EP2_MISSION_BRIEFING = {
       description: '개발 효과와 환경 부담을 함께 비교해 오래 지속되는 회복을 노립니다.',
       stateFocus: '환경 유지 만족도↑ 오염↓',
       checkQuestion: '인구와 경제만 높이면 어떤 부작용이 생길 수 있을까요?',
+      placementGoal: '공원과 회복 시설을 섞어 환경 부담을 낮추면서 만족도를 유지합니다.',
+      observationPoint: '개발 효과가 커질 때 환경과 오염 지표가 함께 나빠지지 않는지 확인합니다.',
       color: 0x4ade80,
     },
   ],
