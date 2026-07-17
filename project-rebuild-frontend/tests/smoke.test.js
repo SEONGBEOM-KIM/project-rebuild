@@ -2323,6 +2323,9 @@ function testPlacementViewManager() {
   assert.match(endingSceneSource, /selectedStrategyId/, 'ending scene should recover EP2 strategy from learning progress');
   const reflectionSceneSource = readProjectFile('src', 'scenes', 'ReflectionScene.js');
   assert.match(reflectionSceneSource, /selectedStrategyId/, 'reflection scene should recover EP2 strategy from learning progress');
+  assert.match(reflectionSceneSource, /getPlacementConfig/, 'reflection scene should resolve active placement config');
+  assert.match(reflectionSceneSource, /getEvaluationProfile/, 'reflection scene should resolve evaluation profile from active placement config');
+  assert.match(reflectionSceneSource, /IssueDetector\.detect\(gameState, evaluationProfile\)/, 'reflection scene should detect issues with active evaluation profile');
   const placementBootstrapSource = readProjectFile('src', 'systems', 'PlacementSceneBootstrap.js');
   assert.match(placementBootstrapSource, /PlacementUiCamera/, 'placement bootstrap should render fixed UI through a separate UI camera');
   assert.match(placementBootstrapSource, /objectRegistry\.ignoreUiObjectsOnMainCamera\(\)/, 'world camera should ignore fixed UI objects through registry');

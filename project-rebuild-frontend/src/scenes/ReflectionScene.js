@@ -2,6 +2,8 @@ import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import { EP1_REFLECTION_CHOICES, EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
+import { getPlacementConfig } from '../data/episodePlacementConfigs.js';
+import { getEvaluationProfile } from '../data/evaluationRules.js';
 import IssueDetector from '../systems/IssueDetector.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import ReflectionViewManager from '../systems/ReflectionViewManager.js';
@@ -18,7 +20,6 @@ export default class ReflectionScene extends Phaser.Scene {
   create() {
     const { width } = this.scale;
     const gameState = this.registry.get('gameState');
-    const issues = IssueDetector.detect(gameState);
     const selectedPolicy = this.registry.get('selectedPolicy');
     const placedBuildings = this.registry.get('placedBuildings') ?? [];
     const learningProgress = LearningProgress.get(this.registry);
@@ -27,6 +28,9 @@ export default class ReflectionScene extends Phaser.Scene {
       this.registry.get('ep2StrategyId') ?? learningProgress.selectedStrategyId,
       selectedPolicy?.id,
     );
+    const placementConfig = getPlacementConfig(this.registry.get('placementConfigId') ?? learningProgress.placementConfigId);
+    const evaluationProfile = getEvaluationProfile(placementConfig.evaluationProfileId);
+    const issues = IssueDetector.detect(gameState, evaluationProfile);
     this.selectedChoice = this.registry.get('reflectionChoice');
     this.choiceObjects = new Map();
 
