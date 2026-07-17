@@ -28,6 +28,7 @@ import DataBriefingRenderer from '../src/systems/DataBriefingRenderer.js';
 import ReflectionViewManager from '../src/systems/ReflectionViewManager.js';
 import ReflectionRenderer from '../src/systems/ReflectionRenderer.js';
 import TitleViewManager from '../src/systems/TitleViewManager.js';
+import TitleRenderer from '../src/systems/TitleRenderer.js';
 import AuthViewManager from '../src/systems/AuthViewManager.js';
 import AuthRenderer from '../src/systems/AuthRenderer.js';
 import StoryViewManager from '../src/systems/StoryViewManager.js';
@@ -943,6 +944,29 @@ function testReflectionViewManager() {
     fillColor: 0x0f172a,
     fillAlpha: 0.96,
   });
+}
+
+
+function testTitleRenderer() {
+  const emptyFixture = createRendererSceneSpy();
+  emptyFixture.scene.scale = { width: 1920, height: 1080 };
+  const emptyControls = TitleRenderer.renderScreen(emptyFixture.scene, 1920, false);
+  assert.equal(emptyControls.startButton.type, 'text');
+  assert.equal(emptyControls.importButton.type, 'text');
+  assert.equal(emptyControls.storageButton.type, 'text');
+  assert.equal(emptyControls.loadButton, null);
+  assert.equal(emptyControls.importStatusText.type, 'text');
+  assert.ok(emptyFixture.calls.some((call) => call[0] === 'rectangle' && call[5] === TitleViewManager.getScreenText().backgroundColor));
+  assert.ok(emptyFixture.calls.some((call) => call[0] === 'text' && call[3] === '프로젝트 리빌드'));
+  assert.ok(emptyFixture.calls.some((call) => call[0] === 'text' && call[3] === '시작하기'));
+  assert.ok(emptyFixture.calls.some((call) => call[0] === 'text' && call[3] === 'JSON 가져오기'));
+
+  const savedFixture = createRendererSceneSpy();
+  savedFixture.scene.scale = { width: 1920, height: 1080 };
+  const savedControls = TitleRenderer.renderScreen(savedFixture.scene, 1920, true);
+  assert.equal(savedControls.loadButton.type, 'text');
+  assert.ok(savedFixture.calls.some((call) => call[0] === 'text' && call[3] === '저장 데이터 확인'));
+  assert.deepEqual(savedControls.layout, TitleViewManager.getLayout(true));
 }
 
 function testTitleViewManager() {
@@ -3432,6 +3456,7 @@ async function run() {
   testDataBriefingViewManager();
   testReflectionRenderer();
   testReflectionViewManager();
+  testTitleRenderer();
   testTitleViewManager();
   testAuthRenderer();
   testAuthViewManager();
