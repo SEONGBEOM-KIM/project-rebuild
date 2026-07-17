@@ -1,4 +1,4 @@
-import { REACTION_THRESHOLDS, RESULT_THRESHOLDS, SCORE_RULES, getEvaluationProfile } from '../data/evaluationRules.js';
+import { getEvaluationProfile } from '../data/evaluationRules.js';
 import { DEFAULT_STATE_KEYS, STATE_LABELS, formatSignedValue } from '../data/stateLabels.js';
 import IssueDetector from './IssueDetector.js';
 import GameState from './GameState.js';
@@ -258,19 +258,20 @@ export default class EvaluationManager {
     ].join('\n');
   }
 
-  static formatResidentReactions(gameState, placedBuildings) {
+  static formatResidentReactions(gameState, placedBuildings, evaluationProfile = getEvaluationProfile()) {
     const reactions = [];
+    const reactionThresholds = evaluationProfile.reactionThresholds;
     const placedBuildingIds = new Set(placedBuildings.map((record) => record.building.id));
 
-    if (gameState.satisfaction >= REACTION_THRESHOLDS.satisfactionHigh) {
+    if (gameState.satisfaction >= reactionThresholds.satisfactionHigh) {
       reactions.push('주민: 생활이 더 편리해질 것 같아요.');
-    } else if (gameState.satisfaction >= REACTION_THRESHOLDS.satisfactionModerate) {
+    } else if (gameState.satisfaction >= reactionThresholds.satisfactionModerate) {
       reactions.push('주민: 변화가 보이지만 아직 더 필요한 시설이 있어요.');
     } else {
       reactions.push('주민: 시설은 생겼지만 생활 만족도 개선은 아직 부족해요.');
     }
 
-    if (placedBuildingIds.has('bus_station') || gameState.traffic <= REACTION_THRESHOLDS.trafficComfortable) {
+    if (placedBuildingIds.has('bus_station') || gameState.traffic <= reactionThresholds.trafficComfortable) {
       reactions.push('고령 주민: 이동이 쉬워지면 병원과 시장에 가기 좋아져요.');
     } else if (placedBuildingIds.has('small_park')) {
       reactions.push('학생 주민: 쉴 수 있는 공간이 생겨 마을 분위기가 좋아졌어요.');

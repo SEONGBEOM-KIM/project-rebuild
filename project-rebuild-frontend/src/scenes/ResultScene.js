@@ -45,7 +45,7 @@ export default class ResultScene extends Phaser.Scene {
     ResultRenderer.renderStatePanel(this, panels.beforeAfter, EvaluationManager.formatBeforeAfterRows(lastPlacementResult, gameState, undefined, placementConfig.stateKeys));
     ResultRenderer.renderStatePanel(this, panels.evaluation, EvaluationManager.formatEvaluationRows(evaluation, gameState, placedBuildings, selectedPolicy, selectedStrategy, evaluationProfile));
     ResultRenderer.renderStatePanel(this, panels.trend, EvaluationManager.formatChoiceTrendRows(placedBuildings, selectedPolicy, selectedStrategy, placementConfig.stateKeys));
-    ResultRenderer.renderResidentReactionStrip(this, width / 2, EvaluationManager.formatResidentReactions(gameState, placedBuildings));
+    ResultRenderer.renderResidentReactionStrip(this, width / 2, EvaluationManager.formatResidentReactions(gameState, placedBuildings, evaluationProfile));
     this.drawControls(width / 2);
   }
 

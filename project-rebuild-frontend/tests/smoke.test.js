@@ -1408,6 +1408,10 @@ function testEvaluationManager() {
   assert.match(strategyTrendRows, /관찰: 예산 대비 효과/);
   assert.equal(EvaluationManager.formatChoiceTrendRows([]), '배치 없음');
   assert.match(EvaluationManager.formatResidentReactions(finalState, placedBuildings), /생활이 더 편리/);
+  assert.match(EvaluationManager.formatResidentReactions(finalState, placedBuildings, {
+    ...getEvaluationProfile(),
+    reactionThresholds: { ...REACTION_THRESHOLDS, satisfactionHigh: 120, satisfactionModerate: 100 },
+  }), /생활 만족도 개선은 아직 부족/);
   assert.match(EvaluationManager.formatResidentReactions(finalState, [createPlacementRecord('bus_station')]), /이동이 쉬워지면/);
   assert.match(EvaluationManager.formatResidentReactions({ ...finalState, traffic: 10 }, [createPlacementRecord('small_park')]), /쉴 수 있는 공간/);
   assert.match(EvaluationManager.formatBeforeAfterRows({ before: { ...finalState, population: 1080 }, after: finalState }, finalState), /인구: 1000 → 1120 \(\+120\)/);
@@ -2323,6 +2327,7 @@ function testPlacementViewManager() {
   assert.match(resultSceneSource, /getPlacementConfig/, 'result scene should resolve active placement config');
   assert.match(resultSceneSource, /getEvaluationProfile/, 'result scene should resolve evaluation profile from active placement config');
   assert.match(resultSceneSource, /formatEvaluationRows\(evaluation, gameState, placedBuildings, selectedPolicy, selectedStrategy, evaluationProfile\)/, 'result scene should pass evaluation profile into result copy');
+  assert.match(resultSceneSource, /formatResidentReactions\(gameState, placedBuildings, evaluationProfile\)/, 'result scene should pass evaluation profile into resident reactions');
   assert.match(resultSceneSource, /stateKeys/, 'result scene should apply state display keys from active placement config');
   const sideEffectSceneSource = readProjectFile('src', 'scenes', 'SideEffectScene.js');
   assert.match(sideEffectSceneSource, /getPlacementConfig/, 'side effect scene should resolve active placement config');
