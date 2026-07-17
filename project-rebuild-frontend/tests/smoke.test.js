@@ -2116,6 +2116,11 @@ function testPlacementViewManager() {
 
   const placementSceneSource = readProjectFile('src', 'scenes', 'PlacementScene.js');
   assert.match(placementSceneSource, /PlacementSceneBootstrap/, 'placement scene should delegate setup through bootstrap');
+  assert.match(placementSceneSource, /selectedStrategyId/, 'placement scene should recover EP2 strategy from learning progress');
+  const resultSceneSource = readProjectFile('src', 'scenes', 'ResultScene.js');
+  assert.match(resultSceneSource, /selectedStrategyId/, 'result scene should recover EP2 strategy from learning progress');
+  const endingSceneSource = readProjectFile('src', 'scenes', 'EndingScene.js');
+  assert.match(endingSceneSource, /selectedStrategyId/, 'ending scene should recover EP2 strategy from learning progress');
   const placementBootstrapSource = readProjectFile('src', 'systems', 'PlacementSceneBootstrap.js');
   assert.match(placementBootstrapSource, /PlacementUiCamera/, 'placement bootstrap should render fixed UI through a separate UI camera');
   assert.match(placementBootstrapSource, /objectRegistry\.ignoreUiObjectsOnMainCamera\(\)/, 'world camera should ignore fixed UI objects through registry');

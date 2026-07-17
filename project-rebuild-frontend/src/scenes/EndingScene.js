@@ -20,11 +20,11 @@ export default class EndingScene extends Phaser.Scene {
     const gameState = this.registry.get('gameState');
     const placedBuildings = this.registry.get('placedBuildings') ?? [];
     const selectedPolicy = this.registry.get('selectedPolicy');
-    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, this.registry.get('ep2StrategyId'), selectedPolicy?.id);
     const exploredPlaces = this.registry.get('exploredPlaces') ?? [];
     const quizResult = this.registry.get('quizResult');
     const reflectionChoice = this.registry.get('reflectionChoice');
     const learningProgress = LearningProgress.update(this.registry, { completed: true });
+    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, this.registry.get('ep2StrategyId') ?? learningProgress.selectedStrategyId, selectedPolicy?.id);
     const ending = EndingSummaryManager.getEndingSummary(gameState, placedBuildings);
 
     const layout = EndingSummaryViewManager.getScreenLayout(width);

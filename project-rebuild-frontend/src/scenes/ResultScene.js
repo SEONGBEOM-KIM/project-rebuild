@@ -5,6 +5,7 @@ import { EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
 import EvaluationManager from '../systems/EvaluationManager.js';
 import ResultViewManager from '../systems/ResultViewManager.js';
 import ResultRenderer from '../systems/ResultRenderer.js';
+import LearningProgress from '../systems/LearningProgress.js';
 import Ep2BriefingViewManager from '../systems/Ep2BriefingViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
@@ -20,7 +21,8 @@ export default class ResultScene extends Phaser.Scene {
     const lastPlacementResult = this.registry.get('lastPlacementResult');
     const placedBuildings = this.registry.get('placedBuildings') ?? [];
     const selectedPolicy = this.registry.get('selectedPolicy');
-    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, this.registry.get('ep2StrategyId'), selectedPolicy?.id);
+    const learningProgress = LearningProgress.get(this.registry);
+    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, this.registry.get('ep2StrategyId') ?? learningProgress.selectedStrategyId, selectedPolicy?.id);
     const evaluation = EvaluationManager.evaluateState(gameState, placedBuildings);
 
     const layout = ResultViewManager.getScreenLayout(width);
