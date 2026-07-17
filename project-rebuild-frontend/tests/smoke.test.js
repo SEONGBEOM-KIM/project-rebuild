@@ -2998,6 +2998,18 @@ function testStorageManagerRenderer() {
   const statusFixture = createRendererSceneSpy();
   StorageManagerRenderer.renderStatus(statusFixture.scene, StorageManagerViewManager.getControlLayout(), '저장 관리 상태');
   assert.ok(statusFixture.calls.some((call) => call[0] === 'text' && call[3] === '저장 관리 상태'));
+
+  const controlsFixture = createRendererSceneSpy();
+  const controls = StorageManagerRenderer.renderControls(
+    controlsFixture.scene,
+    StorageManagerViewManager.getControlLayout(),
+    '저장 관리 상태',
+  );
+  assert.equal(controls.statusText.type, 'text');
+  assert.equal(controls.clearSaveButton.type, 'text');
+  assert.equal(controls.savedDataButton.type, 'text');
+  assert.ok(controlsFixture.calls.some((call) => call[0] === 'text' && call[3] === '학습 저장 삭제'));
+  assert.ok(controlsFixture.calls.some((call) => call[0] === 'text' && call[3] === '저장 확인'));
 }
 
 function testStorageManagerViewManager() {
