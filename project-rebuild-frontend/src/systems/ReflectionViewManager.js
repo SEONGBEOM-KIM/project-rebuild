@@ -139,13 +139,21 @@ export default class ReflectionViewManager {
     })[0];
   }
 
-  static formatRunSummary({ gameState, issues = [], selectedPolicy = null, placedBuildings = [] }) {
+  static formatRunContext(selectedPolicy, selectedStrategy) {
+    if (selectedStrategy) {
+      return `EP2 전략: ${selectedStrategy.title}  |  목표: ${selectedStrategy.placementGoalShort ?? selectedStrategy.stateFocus}`;
+    }
+
+    return `선택 방향: ${selectedPolicy?.name ?? '기본 배치 연습'}`;
+  }
+
+  static formatRunSummary({ gameState, issues = [], selectedPolicy = null, selectedStrategy = null, placedBuildings = [] }) {
     const priorityIssue = ReflectionViewManager.getPriorityIssue(issues);
     const issueText = priorityIssue ? priorityIssue.title : '큰 부작용 신호 없음';
-    const policyName = selectedPolicy?.name ?? '기본 배치 연습';
+    const contextText = ReflectionViewManager.formatRunContext(selectedPolicy, selectedStrategy);
 
     return [
-      `선택 방향: ${policyName}  |  배치: ${placedBuildings.length}개  |  우선 보완: ${issueText}`,
+      `${contextText}  |  배치: ${placedBuildings.length}개  |  우선 보완: ${issueText}`,
       `최종 상태: 인구 ${gameState.population}, 경제 ${gameState.economy}, 만족도 ${gameState.satisfaction}, 예산 ${gameState.budget}`,
     ].join('\n');
   }

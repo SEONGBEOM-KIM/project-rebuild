@@ -964,6 +964,19 @@ function testReflectionViewManager() {
   assert.match(runSummary, /선택 방향: 청년 생활 지원/);
   assert.match(runSummary, /우선 보완: 예산 부족/);
   assert.match(runSummary, /최종 상태: 인구 1240/);
+  assert.equal(ReflectionViewManager.formatRunContext(policies[0], null), '선택 방향: 청년 생활 지원');
+  assert.match(ReflectionViewManager.formatRunContext(policies[0], EP2_MISSION_BRIEFING.strategies[0]), /EP2 전략: 일자리와 생활 기반/);
+  assert.match(ReflectionViewManager.formatRunContext(policies[0], EP2_MISSION_BRIEFING.strategies[0]), /목표: 인구·경제 동시 개선/);
+  const strategyRunSummary = ReflectionViewManager.formatRunSummary({
+    gameState: { ...GameState.createInitialState(), population: 1240, economy: 80, satisfaction: 96, budget: 460 },
+    issues: IssueDetector.detect({ ...GameState.createInitialState(), budget: 460, satisfaction: 96 }),
+    selectedPolicy: policies[0],
+    selectedStrategy: EP2_MISSION_BRIEFING.strategies[0],
+    placedBuildings: [createPlacementRecord('youth_center')],
+  });
+  assert.match(strategyRunSummary, /EP2 전략: 일자리와 생활 기반/);
+  assert.match(strategyRunSummary, /목표: 인구·경제 동시 개선/);
+  assert.doesNotMatch(strategyRunSummary, /선택 방향: 청년 생활 지원/);
   assert.match(ReflectionViewManager.formatSelectedFeedback(selectedChoice), new RegExp(`선택됨: ${selectedChoice.title}`));
   assert.match(ReflectionViewManager.formatSelectedFeedback(selectedChoice), new RegExp(selectedChoice.description));
   assert.match(ReflectionViewManager.formatSelectedFeedback(selectedChoice), new RegExp(selectedChoice.nextAction));
@@ -2161,6 +2174,8 @@ function testPlacementViewManager() {
   assert.match(resultSceneSource, /selectedStrategyId/, 'result scene should recover EP2 strategy from learning progress');
   const endingSceneSource = readProjectFile('src', 'scenes', 'EndingScene.js');
   assert.match(endingSceneSource, /selectedStrategyId/, 'ending scene should recover EP2 strategy from learning progress');
+  const reflectionSceneSource = readProjectFile('src', 'scenes', 'ReflectionScene.js');
+  assert.match(reflectionSceneSource, /selectedStrategyId/, 'reflection scene should recover EP2 strategy from learning progress');
   const placementBootstrapSource = readProjectFile('src', 'systems', 'PlacementSceneBootstrap.js');
   assert.match(placementBootstrapSource, /PlacementUiCamera/, 'placement bootstrap should render fixed UI through a separate UI camera');
   assert.match(placementBootstrapSource, /objectRegistry\.ignoreUiObjectsOnMainCamera\(\)/, 'world camera should ignore fixed UI objects through registry');

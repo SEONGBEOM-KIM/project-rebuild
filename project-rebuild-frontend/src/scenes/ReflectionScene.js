@@ -1,11 +1,12 @@
 import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
-import { EP1_REFLECTION_CHOICES } from '../data/episodeContent.js';
+import { EP1_REFLECTION_CHOICES, EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
 import IssueDetector from '../systems/IssueDetector.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import ReflectionViewManager from '../systems/ReflectionViewManager.js';
 import ReflectionRenderer from '../systems/ReflectionRenderer.js';
+import Ep2BriefingViewManager from '../systems/Ep2BriefingViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 
@@ -20,6 +21,12 @@ export default class ReflectionScene extends Phaser.Scene {
     const issues = IssueDetector.detect(gameState);
     const selectedPolicy = this.registry.get('selectedPolicy');
     const placedBuildings = this.registry.get('placedBuildings') ?? [];
+    const learningProgress = LearningProgress.get(this.registry);
+    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(
+      EP2_MISSION_BRIEFING,
+      this.registry.get('ep2StrategyId') ?? learningProgress.selectedStrategyId,
+      selectedPolicy?.id,
+    );
     this.selectedChoice = this.registry.get('reflectionChoice');
     this.choiceObjects = new Map();
 
@@ -32,7 +39,7 @@ export default class ReflectionScene extends Phaser.Scene {
 
     createLayoutText(this, layout.subtitle, { origin: 0.5 });
 
-    ReflectionRenderer.renderRunSummary(this, { gameState, issues, selectedPolicy, placedBuildings }, layout);
+    ReflectionRenderer.renderRunSummary(this, { gameState, issues, selectedPolicy, selectedStrategy, placedBuildings }, layout);
 
     EP1_REFLECTION_CHOICES.forEach((choice, index) => {
       const { x, y } = ReflectionViewManager.getChoiceCardPosition(index);
