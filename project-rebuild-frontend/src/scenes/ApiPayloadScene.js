@@ -5,10 +5,10 @@ import LearningDataManager from '../systems/LearningDataManager.js';
 import LearningApiPayloadManager from '../systems/LearningApiPayloadManager.js';
 import MockApiClient from '../systems/MockApiClient.js';
 import ApiPayloadViewManager from '../systems/ApiPayloadViewManager.js';
+import ApiPayloadRenderer from '../systems/ApiPayloadRenderer.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { copyTextToClipboard, downloadTextFile } from '../ui/BrowserFileActions.js';
 import { createLayoutText } from '../ui/LayoutText.js';
-import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
 
 export default class ApiPayloadScene extends Phaser.Scene {
   constructor() {
@@ -16,7 +16,7 @@ export default class ApiPayloadScene extends Phaser.Scene {
   }
 
   create() {
-    const { width, height } = this.scale;
+    const { width } = this.scale;
     this.learningData = LearningDataManager.build(this.registry);
     this.apiPayload = LearningApiPayloadManager.build(this.learningData);
     this.apiPayloadJson = ApiPayloadViewManager.formatJson(this.apiPayload);
@@ -35,45 +35,15 @@ export default class ApiPayloadScene extends Phaser.Scene {
   }
 
   drawPayloadPanel() {
-    const layout = ApiPayloadViewManager.getPayloadPanelLayout();
-    const panelStyle = ApiPayloadViewManager.getDarkPanelStyle();
-    createPanelBackground(this, layout.panel, panelStyle);
-    createPanelTitle(this, layout.title, panelStyle);
-    createLayoutText(this, layout.body, {
-      text: this.apiPayloadJson,
-      style: ApiPayloadViewManager.getPayloadTextStyle(layout.body.wordWrapWidth),
-    });
+    ApiPayloadRenderer.renderPayloadPanel(this, this.apiPayloadJson);
   }
 
   drawValidationPanel() {
-    const summary = ApiPayloadViewManager.getValidationSummary(this.apiPayload);
-
-    const layout = ApiPayloadViewManager.getValidationPanelLayout();
-    const panelStyle = ApiPayloadViewManager.getLightPanelStyle();
-    createPanelBackground(this, layout.panel, panelStyle, { strokeColor: summary.strokeColor });
-    createPanelTitle(this, layout.title, panelStyle, { origin: 0.5 });
-
-    createLayoutText(this, layout.rows, {
-      text: ApiPayloadViewManager.formatValidationRows(summary.rows),
-      style: ApiPayloadViewManager.getValidationTextStyle(layout.rows.wordWrapWidth),
-    });
-
-    this.statusText = createLayoutText(this, layout.status, {
-      text: summary.statusText,
-      style: ApiPayloadViewManager.getStatusTextStyle(layout.status.wordWrapWidth, summary.statusColor),
-    });
+    this.statusText = ApiPayloadRenderer.renderValidationPanel(this, this.apiPayload);
   }
 
   drawSubmissionLog() {
-    const submissions = MockApiClient.listSubmissions();
-    const layout = ApiPayloadViewManager.getSubmissionLogLayout();
-    const logStyle = ApiPayloadViewManager.getLogPanelStyle();
-    createPanelBackground(this, layout.panel, logStyle, { strokeColor: layout.title.strokeColor });
-    createPanelTitle(this, layout.title, logStyle);
-    this.submissionLogText = createLayoutText(this, layout.body, {
-      text: ApiPayloadViewManager.formatSubmissionLog(submissions),
-      style: ApiPayloadViewManager.getLogTextStyle(layout.body.wordWrapWidth),
-    });
+    this.submissionLogText = ApiPayloadRenderer.renderSubmissionLog(this, MockApiClient.listSubmissions());
   }
 
   drawControls() {

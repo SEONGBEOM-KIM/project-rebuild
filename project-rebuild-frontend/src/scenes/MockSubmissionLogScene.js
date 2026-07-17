@@ -3,10 +3,10 @@ import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import MockApiClient from '../systems/MockApiClient.js';
 import MockSubmissionLogViewManager from '../systems/MockSubmissionLogViewManager.js';
+import MockSubmissionLogRenderer from '../systems/MockSubmissionLogRenderer.js';
 import { createTextButton } from '../ui/TextButton.js';
-import { copyTextToClipboard, downloadTextFile } from '../ui/BrowserFileActions.js';
 import { createLayoutText } from '../ui/LayoutText.js';
-import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
+import { copyTextToClipboard, downloadTextFile } from '../ui/BrowserFileActions.js';
 
 export default class MockSubmissionLogScene extends Phaser.Scene {
   constructor() {
@@ -14,7 +14,7 @@ export default class MockSubmissionLogScene extends Phaser.Scene {
   }
 
   create() {
-    const { width, height } = this.scale;
+    const { width } = this.scale;
     this.submissions = MockApiClient.listSubmissions();
     this.submissionsJson = MockSubmissionLogViewManager.formatJson(this.submissions);
 
@@ -32,39 +32,16 @@ export default class MockSubmissionLogScene extends Phaser.Scene {
   }
 
   drawSummaryPanel() {
-    const layout = MockSubmissionLogViewManager.getSummaryPanelLayout();
-    const panelStyle = MockSubmissionLogViewManager.getSummaryPanelStyle();
-    createPanelBackground(this, layout.panel, panelStyle);
-    createPanelTitle(this, layout.title, panelStyle, { origin: 0.5 });
-
-    const rows = MockSubmissionLogViewManager.formatSummaryRows(this.submissions);
-
-    createLayoutText(this, layout.body, {
-      text: rows.join('\n'),
-      style: MockSubmissionLogViewManager.getSummaryTextStyle(layout.body.wordWrapWidth),
-    });
+    MockSubmissionLogRenderer.renderSummaryPanel(this, this.submissions);
   }
 
   drawLogPanel() {
-    const layout = MockSubmissionLogViewManager.getLogPanelLayout();
-    const panelStyle = MockSubmissionLogViewManager.getLogPanelStyle();
-    createPanelBackground(this, layout.panel, panelStyle);
-    createPanelTitle(this, layout.title, panelStyle);
-
-    const body = MockSubmissionLogViewManager.formatLogBody(this.submissions);
-    createLayoutText(this, layout.body, {
-      text: body,
-      style: MockSubmissionLogViewManager.getLogTextStyle(layout.body.wordWrapWidth),
-    });
+    MockSubmissionLogRenderer.renderLogPanel(this, this.submissions);
   }
 
   drawControls() {
     const layout = MockSubmissionLogViewManager.getControlLayout();
-    this.statusText = createLayoutText(this, layout.status, {
-      text: MockSubmissionLogViewManager.formatStatusText(),
-      style: MockSubmissionLogViewManager.getStatusTextStyle(),
-      origin: 0.5,
-    });
+    this.statusText = MockSubmissionLogRenderer.renderStatus(this, layout);
 
     const copyButton = createTextButton(this, layout.copy, MockSubmissionLogViewManager.getButtonStyle());
     copyButton.on('pointerdown', () => this.copyLogs());

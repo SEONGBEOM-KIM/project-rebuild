@@ -36,8 +36,10 @@ import TeacherReportRenderer from '../src/systems/TeacherReportRenderer.js';
 import LearningDataRestoreManager from '../src/systems/LearningDataRestoreManager.js';
 import LearningApiPayloadManager from '../src/systems/LearningApiPayloadManager.js';
 import ApiPayloadViewManager from '../src/systems/ApiPayloadViewManager.js';
+import ApiPayloadRenderer from '../src/systems/ApiPayloadRenderer.js';
 import MockApiClient, { MOCK_SUBMISSION_LOG_STORAGE_KEY } from '../src/systems/MockApiClient.js';
 import MockSubmissionLogViewManager from '../src/systems/MockSubmissionLogViewManager.js';
+import MockSubmissionLogRenderer from '../src/systems/MockSubmissionLogRenderer.js';
 import PlacementSystem from '../src/systems/PlacementSystem.js';
 import PlacementViewManager, { TILE_COLORS, TILE_STROKES, TILE_LABELS, ZONE_LABELS, REQUIRED_PLACEMENTS, PLACEMENT_DRAG_THRESHOLD, PLACEMENT_UI_BOUNDS, PREVIEW_STYLES, PLACEMENT_UI_LAYOUT, BUILDING_CARD_LAYOUT, BUILDING_CARD_VISUALS, PLACEMENT_MAP_VISUALS } from '../src/systems/PlacementViewManager.js';
 import PlacementMapGeometry from '../src/systems/PlacementMapGeometry.js';
@@ -2513,6 +2515,25 @@ function testLearningDataManager() {
 }
 
 
+function testApiPayloadRenderer() {
+  const payload = LearningApiPayloadManager.build(createCompleteLearningData());
+  const payloadFixture = createRendererSceneSpy();
+  ApiPayloadRenderer.renderPayloadPanel(payloadFixture.scene, ApiPayloadViewManager.formatJson(payload));
+  assert.ok(payloadFixture.calls.some((call) => call[0] === 'text' && call[3] === 'POST /api/learning-records/ 후보 body'));
+  assert.ok(payloadFixture.calls.some((call) => call[0] === 'text' && call[3].includes('schema_version')));
+
+  const validationFixture = createRendererSceneSpy();
+  const statusText = ApiPayloadRenderer.renderValidationPanel(validationFixture.scene, payload);
+  assert.equal(statusText.type, 'text');
+  assert.ok(validationFixture.calls.some((call) => call[0] === 'text' && call[3] === 'API 구조 검증'));
+  assert.ok(validationFixture.calls.some((call) => call[0] === 'text' && call[3].includes('PASS schema_version 확인')));
+
+  const logFixture = createRendererSceneSpy();
+  ApiPayloadRenderer.renderSubmissionLog(logFixture.scene, []);
+  assert.ok(logFixture.calls.some((call) => call[0] === 'text' && call[3] === 'Mock 제출 로그'));
+  assert.ok(logFixture.calls.some((call) => call[0] === 'text' && call[3] === '아직 제출 로그가 없습니다.'));
+}
+
 function testApiPayloadViewManager() {
   const payload = LearningApiPayloadManager.build(createCompleteLearningData());
   assert.match(ApiPayloadViewManager.formatJson(payload), /"schema_version": 1/);
@@ -2593,6 +2614,30 @@ function testLearningApiPayloadManager() {
   assert.equal(LearningApiPayloadManager.validate(payload).every((row) => row.ok), true);
 }
 
+
+function testMockSubmissionLogRenderer() {
+  const submissions = [{
+    id: 'mock-1',
+    submittedAt: '2026-07-12T10:00:00+09:00',
+    method: 'POST',
+    endpoint: '/api/learning-records/',
+    payload: { episode_id: 1, placements: [{ order: 1 }], completed: true },
+  }];
+
+  const summaryFixture = createRendererSceneSpy();
+  MockSubmissionLogRenderer.renderSummaryPanel(summaryFixture.scene, submissions);
+  assert.ok(summaryFixture.calls.some((call) => call[0] === 'text' && call[3] === '제출 요약'));
+  assert.ok(summaryFixture.calls.some((call) => call[0] === 'text' && call[3].includes('mock-1')));
+
+  const logFixture = createRendererSceneSpy();
+  MockSubmissionLogRenderer.renderLogPanel(logFixture.scene, submissions);
+  assert.ok(logFixture.calls.some((call) => call[0] === 'text' && call[3] === '최근 제출 JSON'));
+  assert.ok(logFixture.calls.some((call) => call[0] === 'text' && call[3].includes('mock-1')));
+
+  const statusFixture = createRendererSceneSpy();
+  MockSubmissionLogRenderer.renderStatus(statusFixture.scene, MockSubmissionLogViewManager.getControlLayout());
+  assert.ok(statusFixture.calls.some((call) => call[0] === 'text' && call[3].includes('localStorage')));
+}
 
 function testMockSubmissionLogViewManager() {
   assert.deepEqual(MockSubmissionLogViewManager.getScreenLayout(1920).title, {
@@ -3245,8 +3290,10 @@ async function run() {
   testTeacherReportManager();
   testLearningDataViewManager();
   testLearningDataManager();
+  testApiPayloadRenderer();
   testApiPayloadViewManager();
   testLearningApiPayloadManager();
+  testMockSubmissionLogRenderer();
   testMockSubmissionLogViewManager();
   testMockApiClient();
   testMockApiClientLogSafety();
