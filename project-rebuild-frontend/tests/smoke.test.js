@@ -2085,6 +2085,16 @@ function testPlacementUiUpdater() {
   assert.match(lastChangeText.text, /청년센터 배치/);
   assert.equal(lastChangeText.color, '#fef3c7');
 
+  updater.updateLastChangePanel({
+    building: youthCenter,
+    position: { x: 1, y: 1 },
+    before: GameState.createInitialState(),
+    after: GameState.applyEffect(GameState.createInitialState(), youthCenter.effect),
+    delta: youthCenter.effect,
+  }, ['satisfaction']);
+  assert.match(lastChangeText.text, /만족도: 60 → 72/);
+  assert.doesNotMatch(lastChangeText.text, /예산: 1000 → 820/);
+
   updater.updatePlacementHistoryPanel([{ building: youthCenter, position: { x: 1, y: 1 } }]);
   assert.match(placementHistoryText.text, /총 배치: 1개/);
   assert.equal(placementHistoryText.color, '#e0f2fe');
@@ -2306,6 +2316,16 @@ function testPlacementViewManager() {
   assert.match(lastChange.text, /청년센터 배치/);
   assert.match(lastChange.text, /균형: 인구·만족도↑ \/ 예산 소모 큼/);
   assert.match(lastChange.text, /인구: 1000 → 1080/);
+
+  const filteredLastChange = PlacementUiStateManager.formatLastChangeState({
+    building: youthCenter,
+    position: { x: 1, y: 1 },
+    before: GameState.createInitialState(),
+    after: GameState.applyEffect(GameState.createInitialState(), youthCenter.effect),
+    delta: youthCenter.effect,
+  }, ['budget']);
+  assert.match(filteredLastChange.text, /예산: 1000 → 820/);
+  assert.doesNotMatch(filteredLastChange.text, /인구: 1000 → 1080/);
 
   const history = PlacementUiStateManager.formatPlacementHistoryState([
     { building: youthCenter, position: { x: 1, y: 1 } },

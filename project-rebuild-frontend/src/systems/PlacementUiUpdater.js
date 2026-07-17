@@ -44,12 +44,12 @@ export default class PlacementUiUpdater {
     this.statusText.setText(this.uiStateManager.formatStatusText(state, stateKeys));
   }
 
-  updateLastChangePanel(lastPlacementResult) {
+  updateLastChangePanel(lastPlacementResult, stateKeys = null) {
     if (!this.lastChangeText) {
       return;
     }
 
-    const lastChangeState = this.uiStateManager.formatLastChangeState(lastPlacementResult);
+    const lastChangeState = this.uiStateManager.formatLastChangeState(lastPlacementResult, stateKeys);
     this.lastChangeText.setText(lastChangeState.text);
     this.lastChangeText.setColor(lastChangeState.color);
   }

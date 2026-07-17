@@ -60,13 +60,14 @@ export default class PlacementUiStateManager {
     };
   }
 
-  static formatLastChangeState(lastPlacementResult) {
+  static formatLastChangeState(lastPlacementResult, stateKeys = null) {
     if (!lastPlacementResult) {
       return PlacementUiStateManager.getEmptyLastChangeState();
     }
 
+    const visibleStateKeys = stateKeys ? new Set(stateKeys) : null;
     const changedRows = Object.entries(lastPlacementResult.delta)
-      .filter(([, value]) => value !== 0)
+      .filter(([key, value]) => value !== 0 && (!visibleStateKeys || visibleStateKeys.has(key)))
       .map(([key, value]) => {
         const before = lastPlacementResult.before[key] ?? 0;
         const after = lastPlacementResult.after[key] ?? before + value;
