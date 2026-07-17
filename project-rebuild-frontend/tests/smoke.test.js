@@ -340,6 +340,7 @@ function testBootFlowManager() {
     'lastPlacementResult',
     'placedBuildings',
     'selectedPolicy',
+    'ep2StrategyId',
     'exploredPlaces',
     'quizResult',
     'reflectionChoice',
@@ -351,6 +352,7 @@ function testBootFlowManager() {
   assert.deepEqual(values.get('exploredPlaces'), []);
   assert.equal(values.get('lastPlacementResult'), null);
   assert.equal(values.get('selectedPolicy'), null);
+  assert.equal(values.get('ep2StrategyId'), null);
   assert.equal(values.get('quizResult'), null);
   assert.equal(values.get('reflectionChoice'), null);
   assert.equal(values.get('learningProgress').episode, 1);
@@ -516,6 +518,7 @@ function testSelectionViewManager() {
   const selectionSceneSource = readProjectFile('src', 'scenes', 'SelectionScene.js');
   assert.match(selectionSceneSource, /syncSelectedStrategy/, 'selection scene should persist EP2 strategy when entered directly from EP1 summary');
   assert.match(selectionSceneSource, /findStrategyByPolicyId/, 'selection scene should infer strategy from selected policy');
+  assert.match(selectionSceneSource, /selectedStrategyId/, 'selection scene should mirror selected EP2 strategy into learning progress');
 
   assert.deepEqual(SelectionViewManager.getCardStyle(selectedPolicy.id, selectedPolicy), {
     selected: true,
@@ -1476,6 +1479,7 @@ function testLearningProgress() {
   assert.equal(progress.dataViewed, true);
   assert.deepEqual(progress.exploredPlaces, ['school', 'market'], 'explored places should be unique');
   assert.deepEqual(progress.placedBuildingIds, ['youth_center']);
+  assert.equal(LearningProgress.createInitialProgress().selectedStrategyId, null);
 }
 
 
@@ -3101,6 +3105,7 @@ function testLearningDataRestoreManager() {
   assert.equal(registry.get('gameState').environment, 92);
   assert.deepEqual(registry.get('exploredPlaces'), ['school', 'market', 'bus_stop']);
   assert.equal(registry.get('reflectionChoice').id, 'environment');
+  assert.equal(registry.get('learningProgress').selectedStrategyId, 'balanced_growth');
   assert.deepEqual(registry.get('learningProgress').placedBuildingIds, ['small_park']);
 }
 

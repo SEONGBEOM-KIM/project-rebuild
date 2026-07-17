@@ -10,7 +10,7 @@ export default class LearningDataRestoreManager {
     const selectedPolicy = policies.find((policy) => policy.id === data.selectedPolicy?.id) ?? null;
     const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, data.selectedStrategy?.id, selectedPolicy?.id);
     const restoredPlacements = LearningDataRestoreManager.restorePlacements(data.placements ?? []);
-    const progress = LearningDataRestoreManager.buildProgress(data, selectedPolicy, restoredPlacements);
+    const progress = LearningDataRestoreManager.buildProgress(data, selectedPolicy, selectedStrategy, restoredPlacements);
 
     registry.set('gameState', data.gameState ?? GameState.createInitialState());
     registry.set('lastPlacementResult', null);
@@ -48,7 +48,7 @@ export default class LearningDataRestoreManager {
       .filter(Boolean);
   }
 
-  static buildProgress(data, selectedPolicy, restoredPlacements) {
+  static buildProgress(data, selectedPolicy, selectedStrategy, restoredPlacements) {
     return {
       ...LearningProgress.createInitialProgress(),
       episode: data.episode ?? 1,
@@ -57,6 +57,7 @@ export default class LearningDataRestoreManager {
       quizResult: data.quizResult ?? null,
       problemSummaryCompleted: Boolean(data.problemSummaryCompleted),
       selectedPolicyId: selectedPolicy?.id ?? null,
+      selectedStrategyId: selectedStrategy?.id ?? null,
       placedBuildingIds: restoredPlacements.map((record) => record.building.id),
       reflectionChoice: data.reflectionChoice ?? null,
       completed: Boolean(data.completed),

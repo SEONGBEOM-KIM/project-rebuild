@@ -14,6 +14,7 @@ export default class BootFlowManager {
       ['lastPlacementResult', null],
       ['placedBuildings', []],
       ['selectedPolicy', null],
+      ['ep2StrategyId', null],
       ['exploredPlaces', []],
       ['quizResult', null],
       ['reflectionChoice', null],

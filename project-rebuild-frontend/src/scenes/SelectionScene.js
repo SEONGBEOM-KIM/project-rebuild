@@ -44,9 +44,12 @@ export default class SelectionScene extends Phaser.Scene {
 
     const startButton = createTextButton(this, controls.start, SelectionViewManager.getButtonStyle());
     startButton.on('pointerdown', () => {
-      this.syncSelectedStrategy(this.selectedPolicy);
+      const strategy = this.syncSelectedStrategy(this.selectedPolicy);
       this.registry.set('selectedPolicy', this.selectedPolicy);
-      LearningProgress.update(this.registry, { selectedPolicyId: this.selectedPolicy.id });
+      LearningProgress.update(this.registry, {
+        selectedPolicyId: this.selectedPolicy.id,
+        selectedStrategyId: strategy?.id ?? null,
+      });
       this.scene.start(controls.start.target);
     });
 
@@ -58,7 +61,11 @@ export default class SelectionScene extends Phaser.Scene {
       onSelect: (selectedPolicy) => {
         this.selectedPolicy = selectedPolicy;
         this.registry.set('selectedPolicy', selectedPolicy);
-        this.syncSelectedStrategy(selectedPolicy);
+        const strategy = this.syncSelectedStrategy(selectedPolicy);
+        LearningProgress.update(this.registry, {
+          selectedPolicyId: selectedPolicy.id,
+          selectedStrategyId: strategy?.id ?? null,
+        });
         this.updateSelectionUi();
       },
     });
@@ -71,6 +78,7 @@ export default class SelectionScene extends Phaser.Scene {
     if (strategy) {
       this.registry.set('ep2StrategyId', strategy.id);
     }
+    return strategy;
   }
 
   updateSelectionUi() {
