@@ -13,6 +13,8 @@ import ResultRenderer from '../src/systems/ResultRenderer.js';
 import EndingSummaryManager from '../src/systems/EndingSummaryManager.js';
 import EndingSummaryViewManager from '../src/systems/EndingSummaryViewManager.js';
 import EndingSummaryRenderer from '../src/systems/EndingSummaryRenderer.js';
+import Ep2BriefingViewManager from '../src/systems/Ep2BriefingViewManager.js';
+import Ep2BriefingRenderer from '../src/systems/Ep2BriefingRenderer.js';
 import LearningProgress from '../src/systems/LearningProgress.js';
 import CauseQuizManager from '../src/systems/CauseQuizManager.js';
 import CauseQuizViewManager from '../src/systems/CauseQuizViewManager.js';
@@ -76,7 +78,7 @@ import { mapData } from '../src/data/mapData.js';
 import { ISSUE_THRESHOLDS, REACTION_THRESHOLDS, RESULT_THRESHOLDS, SCORE_RULES } from '../src/data/evaluationRules.js';
 import { API_CONTRACT, formatContractRequest, formatContractResponse } from '../src/data/apiContract.js';
 import { CURRENT_EPISODE, EPISODE_STEPS } from '../src/data/episodes.js';
-import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES } from '../src/data/episodeContent.js';
+import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES, EP2_MISSION_BRIEFING } from '../src/data/episodeContent.js';
 import ProgressStepper from '../src/ui/ProgressStepper.js';
 import { getTextButtonColor } from '../src/ui/TextButton.js';
 import { copyTextToClipboard, downloadTextFile } from '../src/ui/BrowserFileActions.js';
@@ -2383,19 +2385,78 @@ function testEndingSummaryViewManager() {
   assert.equal(EndingSummaryViewManager.getTextStyles().takeawayBody.color, '#e0f2fe');
   assert.equal(EndingSummaryViewManager.getTextStyles().learningRecordBody.lineSpacing, 9);
   assert.deepEqual(EndingSummaryViewManager.getButtonStyle(), {
-    fontSize: '29px',
+    fontSize: '26px',
     padding: { x: 34, y: 18 },
   });
   assert.deepEqual(EndingSummaryViewManager.getLearningRecordLayout(960).title, { x: 170, y: 737, text: '학습 기록' });
   assert.deepEqual(EndingSummaryViewManager.getControlLayout(960).restart, {
-    x: 1480,
+    x: 1640,
     y: 955,
     label: '처음부터 다시',
     target: 'BootScene',
     backgroundColor: '#fde68a',
     textColor: '#0f172a',
   });
+  assert.deepEqual(EndingSummaryViewManager.getControlLayout(960).ep2, {
+    x: 1300,
+    y: 955,
+    label: 'EP2 미션 보기',
+    target: 'Ep2BriefingScene',
+    backgroundColor: '#a7f3d0',
+    textColor: '#064e3b',
+  });
   assert.equal(EndingSummaryViewManager.getControlLayout(960).report.target, 'TeacherReportScene');
+}
+
+
+function testEp2BriefingRenderer() {
+  const introFixture = createRendererSceneSpy();
+  const intro = Ep2BriefingRenderer.renderIntroPanel(introFixture.scene, EP2_MISSION_BRIEFING);
+  assert.equal(intro.type, 'text');
+  assert.ok(introFixture.calls.some((call) => call[0] === 'text' && call[3] === '다음 미션'));
+  assert.ok(introFixture.calls.some((call) => call[0] === 'text' && call[3].includes('EP1에서')));
+
+  const cardFixture = createRendererSceneSpy();
+  const card = Ep2BriefingRenderer.renderStrategyCard(cardFixture.scene, EP2_MISSION_BRIEFING.strategies[0], 0);
+  assert.equal(card.icon.type, 'text');
+  assert.equal(card.title.type, 'text');
+  assert.equal(card.body.type, 'text');
+  assert.equal(card.check.type, 'text');
+  assert.ok(cardFixture.calls.some((call) => call[0] === 'text' && call[3] === EP2_MISSION_BRIEFING.strategies[0].title));
+
+  const controlsFixture = createRendererSceneSpy();
+  const controls = Ep2BriefingRenderer.renderControls(controlsFixture.scene, 960);
+  assert.equal(controls.endingButton.type, 'text');
+  assert.equal(controls.startButton.type, 'text');
+  assert.equal(controls.layout.start.target, 'SelectionScene');
+  assert.ok(controlsFixture.calls.some((call) => call[0] === 'text' && call[3] === '전략 선택으로'));
+}
+
+function testEp2BriefingViewManager() {
+  assert.deepEqual(Ep2BriefingViewManager.getScreenLayout(1920).title, {
+    x: 960,
+    y: 76,
+    text: 'EP2. 인구 유입 전략',
+    fontSize: '62px',
+    color: '#ffffff',
+    fontStyle: 'bold',
+  });
+  assert.equal(Ep2BriefingViewManager.getScreenLayout(1920).progressStep, 'ending');
+  assert.equal(Ep2BriefingViewManager.getIntroPanelLayout().title.text, '다음 미션');
+  assert.equal(Ep2BriefingViewManager.getStrategyCardLayout(1).panel.x, 960);
+  assert.equal(Ep2BriefingViewManager.getPanelStyle().bodyFontSize, '24px');
+  assert.equal(Ep2BriefingViewManager.getCardStyle().titleColor, '#172554');
+  assert.deepEqual(Ep2BriefingViewManager.getControlLayout(960).start, {
+    x: 1210,
+    y: 950,
+    label: '전략 선택으로',
+    target: 'SelectionScene',
+    backgroundColor: '#bbf7d0',
+    textColor: '#123524',
+  });
+  assert.match(Ep2BriefingViewManager.formatIntroText(EP2_MISSION_BRIEFING), /EP2에서는/);
+  assert.match(Ep2BriefingViewManager.formatStrategyBody(EP2_MISSION_BRIEFING.strategies[0]), /상태 변화:/);
+  assert.match(Ep2BriefingViewManager.formatStrategyCheck(EP2_MISSION_BRIEFING.strategies[0]), /생각할 점:/);
 }
 
 function testEndingSummaryManager() {
@@ -3517,6 +3578,8 @@ async function run() {
   testPlacementRules();
   testEndingSummaryRenderer();
   testEndingSummaryViewManager();
+  testEp2BriefingRenderer();
+  testEp2BriefingViewManager();
   testEndingSummaryManager();
   testTeacherReportRenderer();
   testTeacherReportViewManager();

@@ -15,6 +15,7 @@ import ResultScene from './scenes/ResultScene.js';
 import SideEffectScene from './scenes/SideEffectScene.js';
 import ReflectionScene from './scenes/ReflectionScene.js';
 import EndingScene from './scenes/EndingScene.js';
+import Ep2BriefingScene from './scenes/Ep2BriefingScene.js';
 import LearningDataScene from './scenes/LearningDataScene.js';
 import ApiPayloadScene from './scenes/ApiPayloadScene.js';
 import ApiContractScene from './scenes/ApiContractScene.js';
@@ -50,6 +51,7 @@ const config = {
     SideEffectScene,
     ReflectionScene,
     EndingScene,
+    Ep2BriefingScene,
     LearningDataScene,
     ApiPayloadScene,
     ApiContractScene,

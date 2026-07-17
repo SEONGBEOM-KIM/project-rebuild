@@ -97,6 +97,45 @@ export const EP1_NEXT_DEVELOPMENT_GOALS = [
 ];
 
 
+
+export const EP2_MISSION_BRIEFING = {
+  title: '인구 유입 전략',
+  intro: [
+    'EP1에서 푸른군의 인구 감소, 고령화, 상권 침체를 확인했습니다.',
+    'EP2에서는 사람들이 다시 찾아오고 머물 수 있는 조건을 비교합니다.',
+    '정책 선택과 시설 배치가 인구, 경제, 만족도, 예산에 어떤 영향을 주는지 살펴봅니다.',
+  ],
+  strategies: [
+    {
+      id: 'jobs_services',
+      title: '일자리와 생활 기반',
+      icon: '🏢',
+      description: '청년센터, 상권 지원, 생활 편의 시설로 머물 이유를 만듭니다.',
+      stateFocus: '인구↑ 경제↑ 예산↓',
+      checkQuestion: '효과가 크지만 예산을 많이 쓰는 선택을 언제 우선할까요?',
+      color: 0x38bdf8,
+    },
+    {
+      id: 'housing_mobility',
+      title: '주거와 교통 접근성',
+      icon: '🚌',
+      description: '빈집 활용, 버스 연결, 이동 편의 개선으로 정주 조건을 높입니다.',
+      stateFocus: '만족도↑ 교통 부담↓ 예산↓',
+      checkQuestion: '이동이 편해지면 학교·시장·병원 이용은 어떻게 달라질까요?',
+      color: 0xfacc15,
+    },
+    {
+      id: 'balanced_growth',
+      title: '균형 성장',
+      icon: '🌿',
+      description: '개발 효과와 환경 부담을 함께 비교해 오래 지속되는 회복을 노립니다.',
+      stateFocus: '환경 유지 만족도↑ 오염↓',
+      checkQuestion: '인구와 경제만 높이면 어떤 부작용이 생길 수 있을까요?',
+      color: 0x4ade80,
+    },
+  ],
+};
+
 export const EP1_REFLECTION_CHOICES = [
   {
     id: 'population_economy',
