@@ -54,7 +54,7 @@ export default class EndingSummaryManager {
     ].join('\n');
   }
 
-  static formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice = null) {
+  static formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice = null, selectedStrategy = null) {
     const buildingCounts = placedBuildings.reduce((counts, record) => {
       counts[record.building.name] = (counts[record.building.name] ?? 0) + 1;
       return counts;
@@ -65,7 +65,9 @@ export default class EndingSummaryManager {
       .join('\n') || '• 배치 없음';
 
     return [
+      selectedStrategy ? `EP2 전략: ${selectedStrategy.title}` : null,
       `선택 방향: ${selectedPolicy?.name ?? '기본 배치 연습'}`,
+      selectedStrategy ? `전략 초점: ${selectedStrategy.stateFocus}` : null,
       selectedPolicy ? `중점: ${selectedPolicy.focus.join(' · ')}` : '중점: 상태 변화 확인',
       '',
       `배치한 시설: ${placedBuildings.length}개`,
@@ -76,7 +78,7 @@ export default class EndingSummaryManager {
       '',
       '다음 보완 방향:',
       EndingSummaryManager.formatReflectionNextAction(reflectionChoice),
-    ].join('\n');
+    ].filter((row) => row !== null).join('\n');
   }
 
   static formatReflectionNextAction(reflectionChoice) {

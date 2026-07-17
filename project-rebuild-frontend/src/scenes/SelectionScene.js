@@ -1,10 +1,12 @@
 import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
+import { EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
 import { policies } from '../data/policies.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import SelectionViewManager from '../systems/SelectionViewManager.js';
 import SelectionPolicyCardRenderer from '../systems/SelectionPolicyCardRenderer.js';
+import Ep2BriefingViewManager from '../systems/Ep2BriefingViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 
@@ -42,6 +44,7 @@ export default class SelectionScene extends Phaser.Scene {
 
     const startButton = createTextButton(this, controls.start, SelectionViewManager.getButtonStyle());
     startButton.on('pointerdown', () => {
+      this.syncSelectedStrategy(this.selectedPolicy);
       this.registry.set('selectedPolicy', this.selectedPolicy);
       LearningProgress.update(this.registry, { selectedPolicyId: this.selectedPolicy.id });
       this.scene.start(controls.start.target);
@@ -55,12 +58,20 @@ export default class SelectionScene extends Phaser.Scene {
       onSelect: (selectedPolicy) => {
         this.selectedPolicy = selectedPolicy;
         this.registry.set('selectedPolicy', selectedPolicy);
+        this.syncSelectedStrategy(selectedPolicy);
         this.updateSelectionUi();
       },
     });
     this.cardObjects.set(policy.id, cardObjects);
   }
 
+
+  syncSelectedStrategy(policy) {
+    const strategy = Ep2BriefingViewManager.findStrategyByPolicyId(EP2_MISSION_BRIEFING, policy?.id);
+    if (strategy) {
+      this.registry.set('ep2StrategyId', strategy.id);
+    }
+  }
 
   updateSelectionUi() {
     for (const [policyId, objects] of this.cardObjects.entries()) {

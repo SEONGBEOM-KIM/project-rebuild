@@ -97,10 +97,12 @@ export default class EvaluationManager {
     return '핵심 해석: 아직 뚜렷한 강점보다 보완할 지표를 찾는 단계입니다.';
   }
 
-  static formatEvaluationRows(evaluation, gameState, placedBuildings, selectedPolicy) {
+  static formatEvaluationRows(evaluation, gameState, placedBuildings, selectedPolicy, selectedStrategy = null) {
     const policyAlignment = EvaluationManager.calculatePolicyAlignment(selectedPolicy, placedBuildings);
     return [
+      selectedStrategy ? `EP2 전략: ${selectedStrategy.title}` : null,
       `선택 방향: ${selectedPolicy?.name ?? '기본 배치 연습'}`,
+      selectedStrategy ? `전략 초점: ${selectedStrategy.stateFocus}` : null,
       `배치 수: ${placedBuildings.length}개`,
       policyAlignment.label,
       `균형 점수: ${evaluation.score}/100`,
@@ -117,7 +119,7 @@ export default class EvaluationManager {
       policyAlignment.message,
       '',
       '※ 현재 평가는 시스템 검증용 임시 기준입니다.',
-    ].join('\n');
+    ].filter((row) => row !== null).join('\n');
   }
 
   static calculatePolicyAlignment(selectedPolicy, placedBuildings) {

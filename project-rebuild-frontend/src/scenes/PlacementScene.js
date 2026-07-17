@@ -20,7 +20,7 @@ export default class PlacementScene extends Phaser.Scene {
   create() {
     this.selectedBuilding = buildings[0];
     this.selectedPolicy = this.registry.get('selectedPolicy');
-    this.selectedStrategy = Ep2BriefingViewManager.findStrategyById(EP2_MISSION_BRIEFING, this.registry.get('ep2StrategyId'));
+    this.selectedStrategy = Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, this.registry.get('ep2StrategyId'), this.selectedPolicy?.id);
     this.placedBuildings = [...(this.registry.get('placedBuildings') ?? [])];
     this.bootstrap = new PlacementSceneBootstrap({ scene: this, cameraControllerClass: CameraController });
 

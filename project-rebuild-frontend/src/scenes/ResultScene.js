@@ -1,9 +1,11 @@
 import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
+import { EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
 import EvaluationManager from '../systems/EvaluationManager.js';
 import ResultViewManager from '../systems/ResultViewManager.js';
 import ResultRenderer from '../systems/ResultRenderer.js';
+import Ep2BriefingViewManager from '../systems/Ep2BriefingViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 
@@ -18,6 +20,7 @@ export default class ResultScene extends Phaser.Scene {
     const lastPlacementResult = this.registry.get('lastPlacementResult');
     const placedBuildings = this.registry.get('placedBuildings') ?? [];
     const selectedPolicy = this.registry.get('selectedPolicy');
+    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, this.registry.get('ep2StrategyId'), selectedPolicy?.id);
     const evaluation = EvaluationManager.evaluateState(gameState, placedBuildings);
 
     const layout = ResultViewManager.getScreenLayout(width);
@@ -34,7 +37,7 @@ export default class ResultScene extends Phaser.Scene {
 
     const panels = ResultViewManager.getPanelLayout(width / 2);
     ResultRenderer.renderStatePanel(this, panels.beforeAfter, EvaluationManager.formatBeforeAfterRows(lastPlacementResult, gameState));
-    ResultRenderer.renderStatePanel(this, panels.evaluation, EvaluationManager.formatEvaluationRows(evaluation, gameState, placedBuildings, selectedPolicy));
+    ResultRenderer.renderStatePanel(this, panels.evaluation, EvaluationManager.formatEvaluationRows(evaluation, gameState, placedBuildings, selectedPolicy, selectedStrategy));
     ResultRenderer.renderStatePanel(this, panels.trend, EvaluationManager.formatChoiceTrendRows(placedBuildings, selectedPolicy));
     ResultRenderer.renderResidentReactionStrip(this, width / 2, EvaluationManager.formatResidentReactions(gameState, placedBuildings));
     this.drawControls(width / 2);

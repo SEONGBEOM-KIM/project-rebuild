@@ -110,6 +110,15 @@ export default class Ep2BriefingViewManager {
     return briefing.strategies.find((strategy) => strategy.id === strategyId) ?? null;
   }
 
+  static findStrategyByPolicyId(briefing, policyId) {
+    return briefing.strategies.find((strategy) => strategy.policyId === policyId) ?? null;
+  }
+
+  static resolveStrategy(briefing, strategyId, policyId = null) {
+    return Ep2BriefingViewManager.findStrategyById(briefing, strategyId)
+      ?? Ep2BriefingViewManager.findStrategyByPolicyId(briefing, policyId);
+  }
+
   static getDefaultStrategy(briefing) {
     return briefing.strategies[0] ?? null;
   }

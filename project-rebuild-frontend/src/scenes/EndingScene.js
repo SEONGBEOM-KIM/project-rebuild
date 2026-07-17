@@ -1,11 +1,12 @@
 import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
-import { EP1_NEXT_DEVELOPMENT_GOALS } from '../data/episodeContent.js';
+import { EP1_NEXT_DEVELOPMENT_GOALS, EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import EndingSummaryManager from '../systems/EndingSummaryManager.js';
 import EndingSummaryViewManager from '../systems/EndingSummaryViewManager.js';
 import EndingSummaryRenderer from '../systems/EndingSummaryRenderer.js';
+import Ep2BriefingViewManager from '../systems/Ep2BriefingViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 
@@ -19,6 +20,7 @@ export default class EndingScene extends Phaser.Scene {
     const gameState = this.registry.get('gameState');
     const placedBuildings = this.registry.get('placedBuildings') ?? [];
     const selectedPolicy = this.registry.get('selectedPolicy');
+    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, this.registry.get('ep2StrategyId'), selectedPolicy?.id);
     const exploredPlaces = this.registry.get('exploredPlaces') ?? [];
     const quizResult = this.registry.get('quizResult');
     const reflectionChoice = this.registry.get('reflectionChoice');
@@ -36,7 +38,7 @@ export default class EndingScene extends Phaser.Scene {
     EndingSummaryRenderer.renderTakeawayStrip(this, width / 2, EndingSummaryManager.formatFinalTakeaway({ gameState, ending, reflectionChoice }));
 
     const panels = EndingSummaryViewManager.getPanelLayout();
-    EndingSummaryRenderer.renderPanel(this, panels.choice, EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice));
+    EndingSummaryRenderer.renderPanel(this, panels.choice, EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice, selectedStrategy));
     EndingSummaryRenderer.renderPanel(this, panels.state, EndingSummaryManager.formatStateSummary(gameState, ending));
     EndingSummaryRenderer.renderNextMissionPanel(this, panels.nextMission, EP1_NEXT_DEVELOPMENT_GOALS);
     EndingSummaryRenderer.renderLearningRecordStrip(

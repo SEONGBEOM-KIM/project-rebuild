@@ -511,6 +511,9 @@ function testSelectionViewManager() {
   assert.equal(SelectionViewManager.formatRecommendedBuildings(selectedPolicy), `추천 시설: ${selectedPolicy.recommendedBuildings.join(', ')}`);
   assert.equal(EP2_MISSION_BRIEFING.strategies.every((strategy) => policies.some((policy) => policy.id === strategy.policyId)), true);
   assert.match(policies.find((policy) => policy.id === EP2_MISSION_BRIEFING.strategies[0].policyId).note, /EP2 전략/);
+  const selectionSceneSource = readProjectFile('src', 'scenes', 'SelectionScene.js');
+  assert.match(selectionSceneSource, /syncSelectedStrategy/, 'selection scene should persist EP2 strategy when entered directly from EP1 summary');
+  assert.match(selectionSceneSource, /findStrategyByPolicyId/, 'selection scene should infer strategy from selected policy');
 
   assert.deepEqual(SelectionViewManager.getCardStyle(selectedPolicy.id, selectedPolicy), {
     selected: true,
@@ -1334,6 +1337,10 @@ function testEvaluationManager() {
   const evaluationRows = EvaluationManager.formatEvaluationRows(evaluation, finalState, placedBuildings, youthPolicy);
   assert.match(evaluationRows, /선택 방향: 청년 생활 지원/);
   assert.match(evaluationRows, /방향 일치: 2\/3개/);
+
+  const strategyEvaluationRows = EvaluationManager.formatEvaluationRows(evaluation, finalState, placedBuildings, youthPolicy, EP2_MISSION_BRIEFING.strategies[0]);
+  assert.match(strategyEvaluationRows, /EP2 전략: 일자리와 생활 기반/);
+  assert.match(strategyEvaluationRows, /전략 초점: 인구↑ 경제↑ 예산↓/);
   assert.match(evaluationRows, /균형 점수: 92\/100/);
   assert.match(evaluationRows, /핵심 해석:/);
   assert.match(evaluationRows, /주의 신호:/);
@@ -2491,6 +2498,10 @@ function testEp2BriefingViewManager() {
   assert.equal(Ep2BriefingViewManager.formatSelectionLabel('jobs_services', 'balanced_growth'), '클릭해서 선택');
   assert.equal(Ep2BriefingViewManager.findStrategyById(EP2_MISSION_BRIEFING, 'housing_mobility').policyId, 'mobility_access');
   assert.equal(Ep2BriefingViewManager.findStrategyById(EP2_MISSION_BRIEFING, 'missing'), null);
+  assert.equal(Ep2BriefingViewManager.findStrategyByPolicyId(EP2_MISSION_BRIEFING, 'green_recovery').id, 'balanced_growth');
+  assert.equal(Ep2BriefingViewManager.findStrategyByPolicyId(EP2_MISSION_BRIEFING, 'missing'), null);
+  assert.equal(Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, null, 'youth_living_support').id, 'jobs_services');
+  assert.equal(Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, 'housing_mobility', 'youth_living_support').id, 'housing_mobility');
   assert.equal(Ep2BriefingViewManager.getDefaultStrategy(EP2_MISSION_BRIEFING).id, 'jobs_services');
 }
 
@@ -2516,6 +2527,10 @@ function testEndingSummaryManager() {
   assert.match(EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice), /배치한 시설: 3개/);
   assert.match(EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice), /다음 보완 방향:/);
   assert.match(EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice), new RegExp(reflectionChoice.nextAction));
+
+  const strategyChoiceSummary = EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice, EP2_MISSION_BRIEFING.strategies[0]);
+  assert.match(strategyChoiceSummary, /EP2 전략: 일자리와 생활 기반/);
+  assert.match(strategyChoiceSummary, /전략 초점: 인구↑ 경제↑ 예산↓/);
   assert.match(EndingSummaryManager.formatStateSummary(finalState, ending), /최종 상태:/);
   assert.match(EndingSummaryManager.formatStateSummary(finalState, ending), /큰 부작용 신호 없음/);
   assert.match(EndingSummaryManager.formatReflectionNextAction(null), /아직 선택하지 않음/);
