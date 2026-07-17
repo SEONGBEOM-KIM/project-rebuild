@@ -161,8 +161,21 @@ export default class SideEffectViewManager {
     ].join('\n');
   }
 
-  static formatHintRows(issues) {
-    return issues.length
+  static formatStrategyHintRows(selectedStrategy) {
+    if (!selectedStrategy) {
+      return [];
+    }
+
+    return [
+      `EP2 전략: ${selectedStrategy.title}`,
+      selectedStrategy.observationPointShort ? `관찰 기준: ${selectedStrategy.observationPointShort}` : null,
+      '',
+    ].filter((row) => row !== null);
+  }
+
+  static formatHintRows(issues, selectedStrategy = null) {
+    const strategyRows = SideEffectViewManager.formatStrategyHintRows(selectedStrategy);
+    const issueRows = issues.length
       ? SideEffectViewManager.sortIssuesByPriority(issues).flatMap((issue) => [
         `• ${issue.title}`,
         issue.cause,
@@ -171,12 +184,16 @@ export default class SideEffectViewManager {
       ])
       : [
         '• 균형 확인',
-        '현재는 큰 부작용 신호가 없지만, 인구·경제·환경·만족도를 함께 확인하는 습관이 중요합니다.',
+        selectedStrategy?.placementGoalShort
+          ? `${selectedStrategy.placementGoalShort} 목표는 유지하되, 부작용 신호도 함께 확인합니다.`
+          : '현재는 큰 부작용 신호가 없지만, 인구·경제·환경·만족도를 함께 확인하는 습관이 중요합니다.',
         '대응: 다음 미션에서는 더 많은 정책 조합을 비교합니다.',
       ];
+
+    return [...strategyRows, ...issueRows];
   }
 
-  static formatHintText(issues) {
-    return SideEffectViewManager.formatHintRows(issues).join('\n');
+  static formatHintText(issues, selectedStrategy = null) {
+    return SideEffectViewManager.formatHintRows(issues, selectedStrategy).join('\n');
   }
 }

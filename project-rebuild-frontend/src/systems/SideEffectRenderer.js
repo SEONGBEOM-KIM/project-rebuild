@@ -32,7 +32,7 @@ export default class SideEffectRenderer {
     ));
   }
 
-  static renderConceptPanel(scene, issues) {
+  static renderConceptPanel(scene, issues, selectedStrategy = null) {
     const layout = SideEffectViewManager.getHintPanelLayout();
     const panelStyle = SideEffectViewManager.getPanelStyle();
     const textStyles = SideEffectViewManager.getTextStyles();
@@ -44,7 +44,7 @@ export default class SideEffectRenderer {
     createPanelTitle(scene, layout.title, textStyles.hintTitle, { origin: 0.5 });
 
     return createLayoutText(scene, layout.body, {
-      text: SideEffectViewManager.formatHintRows(issues).join('\n'),
+      text: SideEffectViewManager.formatHintRows(issues, selectedStrategy).join('\n'),
       style: textStyles.hintBody,
     });
   }

@@ -1393,8 +1393,10 @@ function testSideEffectRenderer() {
   assert.ok(issueFixture.calls.some((call) => call[0] === 'text' && call[3] === SideEffectViewManager.getIssuePriorityLabel(issues[0])));
 
   const hintFixture = createRendererSceneSpy();
-  SideEffectRenderer.renderConceptPanel(hintFixture.scene, issues);
+  SideEffectRenderer.renderConceptPanel(hintFixture.scene, issues, EP2_MISSION_BRIEFING.strategies[0]);
   assert.ok(hintFixture.calls.some((call) => call[0] === 'text' && call[3] === '다음 선택 힌트'));
+  assert.ok(hintFixture.calls.some((call) => call[0] === 'text' && call[3].includes('EP2 전략: 일자리와 생활 기반')));
+  assert.ok(hintFixture.calls.some((call) => call[0] === 'text' && call[3].includes('관찰 기준: 예산 대비 효과')));
   assert.ok(hintFixture.calls.some((call) => call[0] === 'text' && call[3].includes('대응:')));
 }
 
@@ -1444,6 +1446,14 @@ function testSideEffectViewManager() {
     '현재는 큰 부작용 신호가 없지만, 인구·경제·환경·만족도를 함께 확인하는 습관이 중요합니다.',
     '대응: 다음 미션에서는 더 많은 정책 조합을 비교합니다.',
   ]);
+  assert.deepEqual(SideEffectViewManager.formatStrategyHintRows(EP2_MISSION_BRIEFING.strategies[0]), [
+    'EP2 전략: 일자리와 생활 기반',
+    '관찰 기준: 예산 대비 효과',
+    '',
+  ]);
+  const strategyHintRows = SideEffectViewManager.formatHintRows([], EP2_MISSION_BRIEFING.strategies[0]);
+  assert.equal(strategyHintRows[0], 'EP2 전략: 일자리와 생활 기반');
+  assert.match(strategyHintRows.join('\n'), /인구·경제 동시 개선 목표는 유지/);
 
   const issues = IssueDetector.detect({ ...GameState.createInitialState(), budget: 400, satisfaction: 50 });
   const rows = SideEffectViewManager.formatHintRows(issues);
@@ -1453,6 +1463,7 @@ function testSideEffectViewManager() {
   assert.equal(SideEffectViewManager.sortIssuesByPriority(issues)[0].id, 'budget');
   assert.match(SideEffectViewManager.getIssuePriorityLabel(issues[0]), /비용 균형/);
   assert.match(SideEffectViewManager.formatIssueSummary(issues), /예산 부족 · 총 2개 신호/);
+  assert.match(SideEffectViewManager.formatHintText(issues, EP2_MISSION_BRIEFING.strategies[0]), /관찰 기준: 예산 대비 효과/);
   assert.match(SideEffectViewManager.formatHintText(issues), /대응:/);
 }
 
