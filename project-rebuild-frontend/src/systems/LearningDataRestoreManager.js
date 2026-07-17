@@ -12,7 +12,7 @@ export default class LearningDataRestoreManager {
     const restoredPlacements = LearningDataRestoreManager.restorePlacements(data.placements ?? []);
     const progress = LearningDataRestoreManager.buildProgress(data, selectedPolicy, selectedStrategy, restoredPlacements);
 
-    registry.set('gameState', data.gameState ?? GameState.createInitialState());
+    registry.set('gameState', LearningDataRestoreManager.restoreGameState(data.gameState, restoredPlacements));
     registry.set('lastPlacementResult', null);
     registry.set('placedBuildings', restoredPlacements);
     registry.set('selectedPolicy', selectedPolicy);
@@ -28,6 +28,17 @@ export default class LearningDataRestoreManager {
       placedBuildings: restoredPlacements,
       learningProgress: progress,
     };
+  }
+
+  static restoreGameState(gameState, restoredPlacements) {
+    if (gameState) {
+      return gameState;
+    }
+
+    return restoredPlacements.reduce(
+      (state, record) => GameState.applyEffect(state, record.delta ?? record.building.effect),
+      GameState.createInitialState(),
+    );
   }
 
   static restorePlacements(placements) {

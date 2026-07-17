@@ -3135,6 +3135,24 @@ function testLearningDataRestoreManager() {
   assert.equal(registry.get('reflectionChoice').id, 'environment');
   assert.equal(registry.get('learningProgress').selectedStrategyId, 'balanced_growth');
   assert.deepEqual(registry.get('learningProgress').placedBuildingIds, ['small_park']);
+
+  const derivedRegistry = createMemoryRegistry();
+  const derivedData = {
+    ...data,
+    placements: [
+      { buildingId: 'youth_center', position: { x: 1, y: 1 }, effect: { population: 80, economy: 10, satisfaction: 12, budget: -180 } },
+      { buildingId: 'bus_station', position: { x: 3, y: 2 }, effect: { population: 40, satisfaction: 10, traffic: -3, budget: -120 } },
+    ],
+    gameState: null,
+    completed: false,
+  };
+  const derivedRestored = LearningDataRestoreManager.restore(derivedRegistry, derivedData);
+  assert.equal(derivedRestored.placedBuildings.length, 2);
+  assert.equal(derivedRegistry.get('gameState').population, 1120);
+  assert.equal(derivedRegistry.get('gameState').economy, 60);
+  assert.equal(derivedRegistry.get('gameState').satisfaction, 82);
+  assert.equal(derivedRegistry.get('gameState').budget, 700);
+  assert.equal(derivedRegistry.get('gameState').traffic, 7);
 }
 
 
