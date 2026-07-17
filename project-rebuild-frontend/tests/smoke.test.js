@@ -36,6 +36,7 @@ import ApiContractViewManager from '../src/systems/ApiContractViewManager.js';
 import ApiContractRenderer from '../src/systems/ApiContractRenderer.js';
 import LearningDataManager from '../src/systems/LearningDataManager.js';
 import LearningDataViewManager from '../src/systems/LearningDataViewManager.js';
+import LearningDataRenderer from '../src/systems/LearningDataRenderer.js';
 import TeacherReportManager from '../src/systems/TeacherReportManager.js';
 import TeacherReportViewManager from '../src/systems/TeacherReportViewManager.js';
 import TeacherReportRenderer from '../src/systems/TeacherReportRenderer.js';
@@ -2506,6 +2507,42 @@ function testTeacherReportManager() {
 }
 
 
+function testLearningDataRenderer() {
+  const learningData = createCompleteLearningData({
+    placements: [
+      { buildingId: 'youth_center', buildingName: '청년센터', position: { x: 1, y: 1 }, effect: { population: 80, budget: -180 } },
+      { buildingId: 'bus_station', buildingName: '버스정류장', position: { x: 3, y: 2 }, effect: { population: 40, budget: -120 } },
+      { buildingId: 'small_park', buildingName: '작은 공원', position: { x: 6, y: 1 }, effect: { environment: 12, budget: -140 } },
+    ],
+  });
+  const learningDataJson = LearningDataViewManager.formatJson(learningData);
+
+  const summaryFixture = createRendererSceneSpy();
+  const summaryText = LearningDataRenderer.renderSummaryStrip(summaryFixture.scene, learningData, 960);
+  assert.equal(summaryText.type, 'text');
+  assert.ok(summaryFixture.calls.some((call) => call[0] === 'text' && call[3] === '저장 요약'));
+  assert.ok(summaryFixture.calls.some((call) => call[0] === 'text' && call[3].includes('환경 우선 회복안')));
+
+  const dataFixture = createRendererSceneSpy();
+  const dataText = LearningDataRenderer.renderDataPanel(dataFixture.scene, learningDataJson);
+  assert.equal(dataText.type, 'text');
+  assert.ok(dataFixture.calls.some((call) => call[0] === 'text' && call[3] === '저장 후보 데이터'));
+  assert.ok(dataFixture.calls.some((call) => call[0] === 'text' && call[3].includes('"episode": 1')));
+
+  const validationFixture = createRendererSceneSpy();
+  const validation = LearningDataRenderer.renderValidationPanel(validationFixture.scene, learningData);
+  assert.equal(validation.rowsText.type, 'text');
+  assert.equal(validation.summaryBody.type, 'text');
+  assert.ok(validationFixture.calls.some((call) => call[0] === 'text' && call[3] === '데이터 검증'));
+  assert.ok(validationFixture.calls.some((call) => call[0] === 'text' && call[3] === '저장 준비 상태'));
+
+  const saveFixture = createRendererSceneSpy();
+  const saveText = LearningDataRenderer.renderSavePanel(saveFixture.scene, { savedAt: '2026-07-12T10:00:00+09:00' });
+  assert.equal(saveText.type, 'text');
+  assert.ok(saveFixture.calls.some((call) => call[0] === 'text' && call[3] === '임시 저장 상태'));
+  assert.ok(saveFixture.calls.some((call) => call[0] === 'text' && call[3].includes('저장됨:')));
+}
+
 function testLearningDataViewManager() {
   assert.deepEqual(LearningDataViewManager.getScreenLayout(1920).title, {
     y: 78,
@@ -3405,6 +3442,7 @@ async function run() {
   testTeacherReportRenderer();
   testTeacherReportViewManager();
   testTeacherReportManager();
+  testLearningDataRenderer();
   testLearningDataViewManager();
   testLearningDataManager();
   testApiPayloadRenderer();

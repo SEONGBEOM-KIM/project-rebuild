@@ -4,10 +4,10 @@ import ProgressStepper from '../ui/ProgressStepper.js';
 import LearningDataManager from '../systems/LearningDataManager.js';
 import SaveManager from '../systems/SaveManager.js';
 import LearningDataViewManager from '../systems/LearningDataViewManager.js';
+import LearningDataRenderer from '../systems/LearningDataRenderer.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { copyTextToClipboard, downloadTextFile } from '../ui/BrowserFileActions.js';
 import { createLayoutText } from '../ui/LayoutText.js';
-import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
 
 export default class LearningDataScene extends Phaser.Scene {
   constructor() {
@@ -15,7 +15,7 @@ export default class LearningDataScene extends Phaser.Scene {
   }
 
   create() {
-    const { width, height } = this.scale;
+    const { width } = this.scale;
     const learningData = this.buildLearningData();
 
     const screenLayout = LearningDataViewManager.getScreenLayout(width);
@@ -27,10 +27,10 @@ export default class LearningDataScene extends Phaser.Scene {
 
     this.learningData = learningData;
     this.learningDataJson = LearningDataViewManager.formatJson(learningData);
-    this.drawSummaryStrip(learningData, width / 2);
-    this.drawDataPanel(learningData);
-    this.drawValidationPanel(learningData);
-    this.drawSavePanel();
+    LearningDataRenderer.renderSummaryStrip(this, learningData, width / 2);
+    LearningDataRenderer.renderDataPanel(this, this.learningDataJson);
+    LearningDataRenderer.renderValidationPanel(this, learningData);
+    this.saveStatusText = LearningDataRenderer.renderSavePanel(this, SaveManager.load());
     this.drawControls();
   }
 
@@ -38,78 +38,6 @@ export default class LearningDataScene extends Phaser.Scene {
     return LearningDataManager.build(this.registry);
   }
 
-  drawSummaryStrip(learningData, centerX) {
-    const layout = LearningDataViewManager.getSummaryLayout(centerX);
-    const panelStyle = LearningDataViewManager.getSummaryStyle();
-    createPanelBackground(this, layout.panel, panelStyle);
-    createPanelTitle(this, layout.title, panelStyle);
-    createLayoutText(this, layout.body, {
-      text: LearningDataViewManager.formatSummaryText(learningData),
-      style: {
-        fontSize: panelStyle.bodyFontSize,
-        color: panelStyle.bodyColor,
-        lineSpacing: panelStyle.bodyLineSpacing,
-        wordWrap: { width: layout.body.wordWrapWidth },
-      },
-    });
-  }
-
-  drawDataPanel(_learningData) {
-    const layout = LearningDataViewManager.getDataPanelLayout();
-    const panelStyle = LearningDataViewManager.getDarkPanelStyle();
-    createPanelBackground(this, layout.panel, panelStyle);
-    createPanelTitle(this, layout.title, panelStyle);
-
-    createLayoutText(this, layout.body, {
-      text: this.learningDataJson,
-      style: LearningDataViewManager.getJsonTextStyle(layout.body.wordWrapWidth),
-    });
-  }
-
-  drawValidationPanel(learningData) {
-    const layout = LearningDataViewManager.getValidationPanelLayout();
-    const panelStyle = LearningDataViewManager.getLightPanelStyle();
-    createPanelBackground(this, layout.panel, panelStyle);
-    createPanelTitle(this, layout.title, panelStyle, { origin: 0.5 });
-
-    const summary = LearningDataViewManager.getValidationSummary(learningData);
-    createLayoutText(this, layout.rows, {
-      text: LearningDataViewManager.formatValidationRows(summary.rows),
-      style: LearningDataViewManager.getValidationTextStyle(layout.rows.wordWrapWidth),
-    });
-
-    const summaryStyle = LearningDataViewManager.getSummaryBoxStyle(layout.summaryBody.wordWrapWidth);
-    createPanelBackground(this, layout.summaryBox, { ...summaryStyle, fillColor: summary.backgroundColor }, { strokeColor: summary.strokeColor });
-    createPanelTitle(this, layout.summaryTitle, summaryStyle, {
-      text: summary.title,
-      style: { color: summary.titleColor },
-    });
-    createLayoutText(this, layout.summaryBody, {
-      text: summary.body,
-      style: {
-        fontSize: summaryStyle.bodyFontSize,
-        color: summary.bodyColor,
-        lineSpacing: summaryStyle.lineSpacing,
-        wordWrap: summaryStyle.wordWrap,
-      },
-    });
-  }
-
-  drawSavePanel() {
-    const saved = SaveManager.load();
-    const layout = LearningDataViewManager.getSavePanelLayout();
-    const panelStyle = LearningDataViewManager.getSavePanelStyle();
-    createPanelBackground(this, layout.panel, panelStyle);
-    createPanelTitle(this, layout.title, panelStyle);
-    this.saveStatusText = createLayoutText(this, layout.body, {
-      text: LearningDataViewManager.formatSaveStatus(saved),
-      style: {
-        fontSize: panelStyle.bodyFontSize,
-        color: panelStyle.bodyColor,
-        lineSpacing: panelStyle.bodyLineSpacing,
-      },
-    });
-  }
 
   drawControls() {
     const layout = LearningDataViewManager.getControlLayout();
