@@ -75,7 +75,7 @@ import { buildings } from '../src/data/buildings.js';
 import { policies } from '../src/data/policies.js';
 import { explorationPlaces } from '../src/data/explorationPlaces.js';
 import { mapData } from '../src/data/mapData.js';
-import { DEFAULT_PLACEMENT_CONFIG_ID, episodePlacementConfigs, getPlacementConfig } from '../src/data/episodePlacementConfigs.js';
+import { DEFAULT_PLACEMENT_CONFIG_ID, episodePlacementConfigs, getPlacementConfig, getPlacementConfigIdForStrategy } from '../src/data/episodePlacementConfigs.js';
 import { ISSUE_THRESHOLDS, REACTION_THRESHOLDS, RESULT_THRESHOLDS, SCORE_RULES } from '../src/data/evaluationRules.js';
 import { API_CONTRACT, formatContractRequest, formatContractResponse } from '../src/data/apiContract.js';
 import { CURRENT_EPISODE, EPISODE_STEPS } from '../src/data/episodes.js';
@@ -521,6 +521,7 @@ function testSelectionViewManager() {
   assert.match(selectionSceneSource, /syncSelectedStrategy/, 'selection scene should persist EP2 strategy when entered directly from EP1 summary');
   assert.match(selectionSceneSource, /findStrategyByPolicyId/, 'selection scene should infer strategy from selected policy');
   assert.match(selectionSceneSource, /selectedStrategyId/, 'selection scene should mirror selected EP2 strategy into learning progress');
+  assert.match(selectionSceneSource, /placementConfigId/, 'selection scene should persist selected placement config for the placement scene');
 
   assert.deepEqual(SelectionViewManager.getCardStyle(selectedPolicy.id, selectedPolicy), {
     selected: true,
@@ -1530,6 +1531,7 @@ function testLearningProgress() {
   assert.deepEqual(progress.exploredPlaces, ['school', 'market'], 'explored places should be unique');
   assert.deepEqual(progress.placedBuildingIds, ['youth_center']);
   assert.equal(LearningProgress.createInitialProgress().selectedStrategyId, null);
+  assert.equal(LearningProgress.createInitialProgress().placementConfigId, null);
 }
 
 
@@ -1571,7 +1573,12 @@ function testEpisodePlacementConfigs() {
   assert.equal(config.requiredPlacements, 3, 'episode config should declare the current placement target');
   assert.ok(config.stateKeys.includes('budget'), 'episode config should declare tracked state keys');
   assert.equal(getPlacementConfig('missing_config').id, DEFAULT_PLACEMENT_CONFIG_ID, 'unknown config ids should fall back safely');
+  for (const strategy of EP2_MISSION_BRIEFING.strategies) {
+    assert.equal(getPlacementConfigIdForStrategy(strategy), DEFAULT_PLACEMENT_CONFIG_ID, `${strategy.id} should declare a valid placement config`);
+    assert.equal(getPlacementConfig(strategy.placementConfigId).id, DEFAULT_PLACEMENT_CONFIG_ID);
+  }
 }
+
 
 function testPolicyData() {
   assert.equal(policies.length, 3, 'EP1 should expose three recovery policies');
@@ -3218,6 +3225,8 @@ function testLearningDataRestoreManager() {
   assert.deepEqual(registry.get('exploredPlaces'), ['school', 'market', 'bus_stop']);
   assert.equal(registry.get('reflectionChoice').id, 'environment');
   assert.equal(registry.get('learningProgress').selectedStrategyId, 'balanced_growth');
+  assert.equal(registry.get('learningProgress').placementConfigId, DEFAULT_PLACEMENT_CONFIG_ID);
+  assert.equal(registry.get('placementConfigId'), DEFAULT_PLACEMENT_CONFIG_ID);
   assert.deepEqual(registry.get('learningProgress').placedBuildingIds, ['small_park']);
 
   const derivedRegistry = createMemoryRegistry();

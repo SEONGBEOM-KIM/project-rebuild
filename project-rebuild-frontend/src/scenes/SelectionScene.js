@@ -3,6 +3,7 @@ import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import { EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
 import { policies } from '../data/policies.js';
+import { getPlacementConfigIdForStrategy } from '../data/episodePlacementConfigs.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import SelectionViewManager from '../systems/SelectionViewManager.js';
 import SelectionPolicyCardRenderer from '../systems/SelectionPolicyCardRenderer.js';
@@ -49,6 +50,7 @@ export default class SelectionScene extends Phaser.Scene {
       LearningProgress.update(this.registry, {
         selectedPolicyId: this.selectedPolicy.id,
         selectedStrategyId: strategy?.id ?? null,
+        placementConfigId: getPlacementConfigIdForStrategy(strategy),
       });
       this.scene.start(controls.start.target);
     });
@@ -65,6 +67,7 @@ export default class SelectionScene extends Phaser.Scene {
         LearningProgress.update(this.registry, {
           selectedPolicyId: selectedPolicy.id,
           selectedStrategyId: strategy?.id ?? null,
+          placementConfigId: getPlacementConfigIdForStrategy(strategy),
         });
         this.updateSelectionUi();
       },
@@ -77,6 +80,7 @@ export default class SelectionScene extends Phaser.Scene {
     const strategy = Ep2BriefingViewManager.findStrategyByPolicyId(EP2_MISSION_BRIEFING, policy?.id);
     if (strategy) {
       this.registry.set('ep2StrategyId', strategy.id);
+      this.registry.set('placementConfigId', getPlacementConfigIdForStrategy(strategy));
     }
     return strategy;
   }

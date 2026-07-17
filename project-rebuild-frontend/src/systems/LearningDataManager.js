@@ -4,6 +4,7 @@ import IssueDetector from './IssueDetector.js';
 import LearningProgress from './LearningProgress.js';
 import EndingSummaryManager from './EndingSummaryManager.js';
 import Ep2BriefingViewManager from './Ep2BriefingViewManager.js';
+import { getPlacementConfigIdForStrategy } from '../data/episodePlacementConfigs.js';
 
 export default class LearningDataManager {
   static build(registry) {
@@ -44,6 +45,7 @@ export default class LearningDataManager {
         title: selectedStrategy.title,
         stateFocus: selectedStrategy.stateFocus,
         policyId: selectedStrategy.policyId,
+        placementConfigId: getPlacementConfigIdForStrategy(selectedStrategy),
       } : null,
       placements: placedBuildings.map((record) => ({
         buildingId: record.building.id,

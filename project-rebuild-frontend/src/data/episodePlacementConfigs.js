@@ -23,6 +23,11 @@ export const episodePlacementConfigs = {
   },
 };
 
+
+export function getPlacementConfigIdForStrategy(strategy) {
+  return strategy?.placementConfigId ?? DEFAULT_PLACEMENT_CONFIG_ID;
+}
+
 export function getPlacementConfig(configId = DEFAULT_PLACEMENT_CONFIG_ID) {
   return episodePlacementConfigs[configId] ?? episodePlacementConfigs[DEFAULT_PLACEMENT_CONFIG_ID];
 }

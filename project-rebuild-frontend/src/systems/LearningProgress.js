@@ -6,6 +6,7 @@ const INITIAL_PROGRESS = Object.freeze({
   problemSummaryCompleted: false,
   selectedPolicyId: null,
   selectedStrategyId: null,
+  placementConfigId: null,
   placedBuildingIds: [],
   reflectionChoice: null,
   completed: false,

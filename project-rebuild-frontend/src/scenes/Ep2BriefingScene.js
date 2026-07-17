@@ -3,6 +3,7 @@ import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import { EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
 import { policies } from '../data/policies.js';
+import { getPlacementConfigIdForStrategy } from '../data/episodePlacementConfigs.js';
 import Ep2BriefingViewManager from '../systems/Ep2BriefingViewManager.js';
 import Ep2BriefingRenderer from '../systems/Ep2BriefingRenderer.js';
 import { createLayoutText } from '../ui/LayoutText.js';
@@ -57,6 +58,7 @@ export default class Ep2BriefingScene extends Phaser.Scene {
   selectStrategy(strategy) {
     this.selectedStrategy = strategy;
     this.registry.set('ep2StrategyId', strategy.id);
+    this.registry.set('placementConfigId', getPlacementConfigIdForStrategy(strategy));
     this.updateStrategyUi();
   }
 
@@ -76,6 +78,7 @@ export default class Ep2BriefingScene extends Phaser.Scene {
     const policy = policies.find((candidate) => candidate.id === strategy?.policyId);
     if (strategy) {
       this.registry.set('ep2StrategyId', strategy.id);
+      this.registry.set('placementConfigId', getPlacementConfigIdForStrategy(strategy));
     }
     if (policy) {
       this.registry.set('selectedPolicy', policy);
