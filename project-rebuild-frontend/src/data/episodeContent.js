@@ -108,6 +108,7 @@ export const EP2_MISSION_BRIEFING = {
   strategies: [
     {
       id: 'jobs_services',
+      policyId: 'youth_living_support',
       title: '일자리와 생활 기반',
       icon: '🏢',
       description: '청년센터, 상권 지원, 생활 편의 시설로 머물 이유를 만듭니다.',
@@ -117,6 +118,7 @@ export const EP2_MISSION_BRIEFING = {
     },
     {
       id: 'housing_mobility',
+      policyId: 'mobility_access',
       title: '주거와 교통 접근성',
       icon: '🚌',
       description: '빈집 활용, 버스 연결, 이동 편의 개선으로 정주 조건을 높입니다.',
@@ -126,6 +128,7 @@ export const EP2_MISSION_BRIEFING = {
     },
     {
       id: 'balanced_growth',
+      policyId: 'green_recovery',
       title: '균형 성장',
       icon: '🌿',
       description: '개발 효과와 환경 부담을 함께 비교해 오래 지속되는 회복을 노립니다.',

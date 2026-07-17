@@ -2,7 +2,7 @@ const SELECTION_SCREEN_LAYOUT = {
   backgroundColor: 0x172554,
   progressStep: 'selection',
   title: { y: 86, text: '회복 방향 선택', fontSize: '60px', color: '#ffffff', fontStyle: 'bold' },
-  subtitle: { y: 150, text: '정책 밸런싱은 아직 적용하지 않고, 배치 미션의 의도만 정하는 UI 단계입니다.', fontSize: '26px', color: '#bfdbfe', align: 'center' },
+  subtitle: { y: 150, text: 'EP2 인구 유입 전략 중 하나를 선택하고, 배치 실험으로 상태 변화를 확인합니다.', fontSize: '26px', color: '#bfdbfe', align: 'center' },
   detail: { y: 750, wordWrapWidth: 1180 },
 };
 
@@ -66,7 +66,7 @@ export default class SelectionViewManager {
 
   static getControlLayout(centerX) {
     return {
-      back: { x: centerX - 180, y: 955, label: '탐색 다시 보기', target: 'ExplorationScene', backgroundColor: 0x93c5fd, textColor: '#0f172a' },
+      back: { x: centerX - 180, y: 955, label: 'EP2 미션 보기', target: 'Ep2BriefingScene', backgroundColor: 0x93c5fd, textColor: '#0f172a' },
       start: { x: centerX + 180, y: 955, label: '배치 연습 시작', target: 'PlacementScene', backgroundColor: 0xbbf7d0, textColor: '#123524' },
     };
   }
@@ -97,7 +97,7 @@ export default class SelectionViewManager {
     return [
       `선택됨: ${policy.name}`,
       policy.note,
-      '다음 화면에서는 이 방향을 참고해 건물 3개를 배치하고 상태 변화를 확인합니다.',
+      '다음 화면에서는 이 전략에 맞는 추천 시설을 참고해 건물 3개를 배치합니다.',
     ];
   }
 

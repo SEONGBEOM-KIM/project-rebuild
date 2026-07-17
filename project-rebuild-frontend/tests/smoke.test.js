@@ -498,9 +498,10 @@ function testSelectionViewManager() {
     backgroundColor: 0xbbf7d0,
     textColor: '#123524',
   });
-  assert.equal(SelectionViewManager.getControlLayout(960).back.target, 'ExplorationScene');
+  assert.equal(SelectionViewManager.getControlLayout(960).back.target, 'Ep2BriefingScene');
   assert.match(SelectionViewManager.formatDetailText(selectedPolicy), new RegExp(`선택됨: ${selectedPolicy.name}`));
-  assert.match(SelectionViewManager.formatDetailText(selectedPolicy), /건물 3개를 배치/);
+  assert.match(SelectionViewManager.formatDetailText(selectedPolicy), /추천 시설을 참고해 건물 3개를 배치/);
+  assert.match(SelectionViewManager.getScreenLayout(1920).subtitle.text, /EP2 인구 유입 전략/);
   assert.deepEqual(SelectionViewManager.formatDetailRows(null), [
     '선택된 회복 방향이 없습니다.',
     '',
@@ -508,6 +509,8 @@ function testSelectionViewManager() {
   ]);
   assert.equal(SelectionViewManager.formatFocusText(selectedPolicy), `중점 지표: ${selectedPolicy.focus.join(' · ')}`);
   assert.equal(SelectionViewManager.formatRecommendedBuildings(selectedPolicy), `추천 시설: ${selectedPolicy.recommendedBuildings.join(', ')}`);
+  assert.equal(EP2_MISSION_BRIEFING.strategies.every((strategy) => policies.some((policy) => policy.id === strategy.policyId)), true);
+  assert.match(policies.find((policy) => policy.id === EP2_MISSION_BRIEFING.strategies[0].policyId).note, /EP2 전략/);
 
   assert.deepEqual(SelectionViewManager.getCardStyle(selectedPolicy.id, selectedPolicy), {
     selected: true,
