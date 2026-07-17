@@ -65,13 +65,14 @@ export default class EvaluationManager {
       .join('\n');
   }
 
-  static formatJudgementRows(gameState) {
+  static formatJudgementRows(gameState, evaluationProfile = getEvaluationProfile()) {
+    const resultThresholds = evaluationProfile.resultThresholds;
     return [
-      `• 인구 변화: ${gameState.population >= RESULT_THRESHOLDS.populationImproved ? '증가 확인' : '아직 제한적'}`,
-      `• 경제 수준: ${gameState.economy >= RESULT_THRESHOLDS.economyImproved ? '개선됨' : '추가 개선 필요'}`,
-      `• 환경 상태: ${gameState.environment >= RESULT_THRESHOLDS.environmentGood ? '양호' : '주의 필요'}`,
-      `• 주민 만족도: ${gameState.satisfaction >= RESULT_THRESHOLDS.satisfactionHigh ? '높아짐' : '추가 개선 필요'}`,
-      `• 예산: ${gameState.budget >= RESULT_THRESHOLDS.budgetSafe ? '여유 있음' : '주의 필요'}`,
+      `• 인구 변화: ${gameState.population >= resultThresholds.populationImproved ? '증가 확인' : '아직 제한적'}`,
+      `• 경제 수준: ${gameState.economy >= resultThresholds.economyImproved ? '개선됨' : '추가 개선 필요'}`,
+      `• 환경 상태: ${gameState.environment >= resultThresholds.environmentGood ? '양호' : '주의 필요'}`,
+      `• 주민 만족도: ${gameState.satisfaction >= resultThresholds.satisfactionHigh ? '높아짐' : '추가 개선 필요'}`,
+      `• 예산: ${gameState.budget >= resultThresholds.budgetSafe ? '여유 있음' : '주의 필요'}`,
     ];
   }
 
@@ -101,7 +102,7 @@ export default class EvaluationManager {
     return '핵심 해석: 아직 뚜렷한 강점보다 보완할 지표를 찾는 단계입니다.';
   }
 
-  static formatEvaluationRows(evaluation, gameState, placedBuildings, selectedPolicy, selectedStrategy = null) {
+  static formatEvaluationRows(evaluation, gameState, placedBuildings, selectedPolicy, selectedStrategy = null, evaluationProfile = getEvaluationProfile()) {
     const policyAlignment = EvaluationManager.calculatePolicyAlignment(selectedPolicy, placedBuildings);
     return [
       selectedStrategy ? `EP2 전략: ${selectedStrategy.title}` : null,
@@ -116,7 +117,7 @@ export default class EvaluationManager {
       ...EvaluationManager.formatIssueRows(gameState),
       '',
       '판단 기준:',
-      ...EvaluationManager.formatJudgementRows(gameState),
+      ...EvaluationManager.formatJudgementRows(gameState, evaluationProfile),
       '',
       '학습 포인트:',
       evaluation.message,

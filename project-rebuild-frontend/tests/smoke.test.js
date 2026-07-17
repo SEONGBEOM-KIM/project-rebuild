@@ -1399,6 +1399,24 @@ function testEvaluationManager() {
     '• 주민 만족도: 높아짐',
     '• 예산: 여유 있음',
   ]);
+  const strictJudgementProfile = {
+    ...getEvaluationProfile(),
+    resultThresholds: {
+      ...RESULT_THRESHOLDS,
+      populationImproved: 1300,
+      economyImproved: 90,
+      environmentGood: 95,
+      satisfactionHigh: 100,
+      budgetSafe: 900,
+    },
+  };
+  assert.deepEqual(EvaluationManager.formatJudgementRows(finalState, strictJudgementProfile), [
+    '• 인구 변화: 아직 제한적',
+    '• 경제 수준: 추가 개선 필요',
+    '• 환경 상태: 주의 필요',
+    '• 주민 만족도: 추가 개선 필요',
+    '• 예산: 주의 필요',
+  ]);
   const evaluationRows = EvaluationManager.formatEvaluationRows(evaluation, finalState, placedBuildings, youthPolicy);
   assert.match(evaluationRows, /선택 방향: 청년 생활 지원/);
   assert.match(evaluationRows, /방향 일치: 2\/3개/);
@@ -2263,6 +2281,7 @@ function testPlacementViewManager() {
   assert.match(resultSceneSource, /selectedStrategyId/, 'result scene should recover EP2 strategy from learning progress');
   assert.match(resultSceneSource, /getPlacementConfig/, 'result scene should resolve active placement config');
   assert.match(resultSceneSource, /getEvaluationProfile/, 'result scene should resolve evaluation profile from active placement config');
+  assert.match(resultSceneSource, /formatEvaluationRows\(evaluation, gameState, placedBuildings, selectedPolicy, selectedStrategy, evaluationProfile\)/, 'result scene should pass evaluation profile into result copy');
   assert.match(resultSceneSource, /stateKeys/, 'result scene should apply state display keys from active placement config');
   const endingSceneSource = readProjectFile('src', 'scenes', 'EndingScene.js');
   assert.match(endingSceneSource, /selectedStrategyId/, 'ending scene should recover EP2 strategy from learning progress');
