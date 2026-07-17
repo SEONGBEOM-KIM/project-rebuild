@@ -88,24 +88,48 @@ export default class LearningApiPayloadManager {
         message: 'quiz_result.selected 값이 없습니다.',
       },
       {
-        ok: payload.selected_policy === null || Boolean(payload.selected_policy.id),
+        ok: payload.selected_policy == null || Boolean(payload.selected_policy?.id),
         label: '정책 선택 구조 확인',
         message: 'selected_policy.id 값이 없습니다.',
       },
       {
-        ok: payload.selected_strategy == null || Boolean(payload.selected_strategy.id),
+        ok: payload.selected_strategy == null || Boolean(payload.selected_strategy?.id),
         label: 'EP2 전략 구조 확인',
         message: 'selected_strategy.id 값이 없습니다.',
       },
       {
         ok: payload.placement_config == null || Boolean(payload.placement_config?.id),
-        label: '배치 설정 구조 확인',
+        label: '배치 설정 ID 확인',
         message: 'placement_config.id 값이 없습니다.',
       },
       {
+        ok: payload.placement_config == null || Number.isFinite(payload.placement_config?.required_placements),
+        label: '배치 설정 요구 수 확인',
+        message: 'placement_config.required_placements 값이 숫자가 아닙니다.',
+      },
+      {
+        ok: payload.placement_config == null || Array.isArray(payload.placement_config?.state_keys),
+        label: '배치 설정 상태 키 확인',
+        message: 'placement_config.state_keys 배열이 없습니다.',
+      },
+      {
         ok: payload.evaluation_profile == null || Boolean(payload.evaluation_profile?.id),
-        label: '평가 프로필 구조 확인',
+        label: '평가 프로필 ID 확인',
         message: 'evaluation_profile.id 값이 없습니다.',
+      },
+      {
+        ok: payload.selected_strategy?.placement_config_id == null
+          || payload.placement_config?.id == null
+          || payload.selected_strategy.placement_config_id === payload.placement_config.id,
+        label: '전략-배치 설정 연결 확인',
+        message: 'selected_strategy.placement_config_id와 placement_config.id가 다릅니다.',
+      },
+      {
+        ok: payload.placement_config?.evaluation_profile_id == null
+          || payload.evaluation_profile?.id == null
+          || payload.placement_config.evaluation_profile_id === payload.evaluation_profile.id,
+        label: '배치 설정-평가 프로필 연결 확인',
+        message: 'placement_config.evaluation_profile_id와 evaluation_profile.id가 다릅니다.',
       },
       {
         ok: Array.isArray(payload.placements),

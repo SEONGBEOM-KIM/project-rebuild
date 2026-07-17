@@ -1,3 +1,5 @@
+import LearningApiPayloadManager from './LearningApiPayloadManager.js';
+
 export const MOCK_SUBMISSION_LOG_STORAGE_KEY = 'project-rebuild:mock-api-submissions:v1';
 
 export default class MockApiClient {
@@ -54,17 +56,10 @@ export default class MockApiClient {
     if (!payload || typeof payload !== 'object') {
       return { ok: false, message: 'payload 객체가 없습니다.' };
     }
-    if (payload.schema_version !== 1) {
-      return { ok: false, message: 'schema_version이 1이 아닙니다.' };
-    }
-    if (!Number.isFinite(payload.episode_id)) {
-      return { ok: false, message: 'episode_id가 숫자가 아닙니다.' };
-    }
-    if (!Array.isArray(payload.placements)) {
-      return { ok: false, message: 'placements 배열이 없습니다.' };
-    }
-    if (!payload.final_state || typeof payload.final_state !== 'object') {
-      return { ok: false, message: 'final_state 객체가 없습니다.' };
+
+    const failedRow = LearningApiPayloadManager.validate(payload).find((row) => !row.ok);
+    if (failedRow) {
+      return { ok: false, message: failedRow.message };
     }
     return { ok: true, message: '제출 가능' };
   }

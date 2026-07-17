@@ -3303,6 +3303,24 @@ function testLearningApiPayloadManager() {
   assert.deepEqual(alternatePayload.placement_config.state_keys, ['environment', 'pollution', 'budget']);
   assert.equal(alternatePayload.evaluation_profile.id, ENVIRONMENT_EVALUATION_PROFILE_ID);
   assert.equal(LearningApiPayloadManager.validate(alternatePayload).every((row) => row.ok), true);
+
+  const invalidPlacementConfig = LearningApiPayloadManager.validate({
+    ...payload,
+    placement_config: { ...payload.placement_config, required_placements: '3' },
+  });
+  assert.equal(invalidPlacementConfig.find((row) => row.label === '배치 설정 요구 수 확인').ok, false);
+
+  const mismatchedConfig = LearningApiPayloadManager.validate({
+    ...payload,
+    selected_strategy: { ...payload.selected_strategy, placement_config_id: ENVIRONMENT_PLACEMENT_CONFIG_ID },
+  });
+  assert.equal(mismatchedConfig.find((row) => row.label === '전략-배치 설정 연결 확인').ok, false);
+
+  const mismatchedProfile = LearningApiPayloadManager.validate({
+    ...payload,
+    evaluation_profile: { id: ENVIRONMENT_EVALUATION_PROFILE_ID },
+  });
+  assert.equal(mismatchedProfile.find((row) => row.label === '배치 설정-평가 프로필 연결 확인').ok, false);
 }
 
 
@@ -3404,6 +3422,13 @@ function testMockApiClient() {
 
   const failed = MockApiClient.submitLearningRecord({ schema_version: 0 });
   assert.equal(failed.ok, false);
+
+  const mismatchedMetadata = MockApiClient.submitLearningRecord({
+    ...payload,
+    selected_strategy: { ...payload.selected_strategy, placement_config_id: ENVIRONMENT_PLACEMENT_CONFIG_ID },
+  });
+  assert.equal(mismatchedMetadata.ok, false);
+  assert.match(mismatchedMetadata.error, /placement_config_id/);
   MockApiClient.clearSubmissions();
   assert.equal(MockApiClient.listSubmissions().length, 0);
 }
