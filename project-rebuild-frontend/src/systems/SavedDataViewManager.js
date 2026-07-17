@@ -1,7 +1,7 @@
 export const SAVED_DATA_LAYOUT = {
   backgroundColor: 0x10253f,
   title: { y: 90, text: '저장 데이터 확인', fontSize: '60px', color: '#ffffff', fontStyle: 'bold' },
-  subtitle: { y: 155, text: '브라우저 localStorage에 임시 저장된 학습 기록입니다.', fontSize: '26px', color: '#bfdbfe' },
+  subtitle: { y: 155, text: '브라우저 localStorage에 임시 저장된 학습 기록입니다. 앱 저장 JSON과 API 미리보기 JSON을 가져올 수 있습니다.', fontSize: '24px', color: '#bfdbfe' },
   bodyPanel: { y: 535, width: 1320, height: 660, fillColor: 0x111827, alpha: 0.98, strokeWidth: 5, strokeColor: 0x60a5fa },
   bodyText: { x: 340, y: 245 },
   status: { y: 865 },

@@ -28,6 +28,7 @@ export default class TitleRenderer {
       loadButton: hasSave
         ? TitleRenderer.renderTitleButton(scene, width / 2, layout.loadButtonY, loadButtonConfig, TitleViewManager.getLoadButtonStyle())
         : null,
+      importHintText: TitleRenderer.renderImportHint(scene, width / 2, layout.importHint),
       importStatusText: TitleRenderer.renderImportStatus(scene, width / 2, layout.importStatusY),
       startButtonConfig,
       importButtonConfig,
@@ -44,6 +45,17 @@ export default class TitleRenderer {
       backgroundColor: style.backgroundColor,
       textColor: style.color,
     }, style);
+  }
+
+  static renderImportHint(scene, x, hint) {
+    return createLayoutText(scene, { x, y: hint.y, text: hint.text }, {
+      style: {
+        fontSize: hint.fontSize,
+        color: hint.color,
+        align: 'center',
+      },
+      origin: 0.5,
+    });
   }
 
   static renderImportStatus(scene, x, y) {

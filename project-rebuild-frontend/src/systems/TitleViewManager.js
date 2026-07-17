@@ -2,6 +2,7 @@ export const TITLE_LAYOUT = {
   backgroundColor: 0x10253f,
   title: { y: 280, text: '프로젝트 리빌드', fontSize: '92px', color: '#f7fbff', fontStyle: 'bold' },
   subtitle: { y: 380, text: '균형 있게 성장하는 지역을 위하여', fontSize: '36px', color: '#b9d7ff' },
+  importHint: { savedY: 700, emptyY: 700, text: '앱 저장 JSON과 API 미리보기 JSON을 가져올 수 있습니다.', fontSize: '20px', color: '#bfdbfe' },
   buttons: {
     start: { y: 620, label: '시작하기', targetScene: 'AuthScene' },
     load: { savedY: 745, label: '저장 데이터 확인', targetScene: 'SavedDataScene' },
@@ -29,6 +30,10 @@ export default class TitleViewManager {
       importButtonY: hasSave ? TITLE_LAYOUT.buttons.import.savedY : TITLE_LAYOUT.buttons.import.emptyY,
       storageButtonY: hasSave ? TITLE_LAYOUT.buttons.storage.savedY : TITLE_LAYOUT.buttons.storage.emptyY,
       importStatusY: hasSave ? TITLE_LAYOUT.importStatus.savedY : TITLE_LAYOUT.importStatus.emptyY,
+      importHint: {
+        ...TITLE_LAYOUT.importHint,
+        y: hasSave ? TITLE_LAYOUT.importHint.savedY : TITLE_LAYOUT.importHint.emptyY,
+      },
     };
   }
 
@@ -46,6 +51,13 @@ export default class TitleViewManager {
 
   static getStorageButton() {
     return TITLE_LAYOUT.buttons.storage;
+  }
+
+  static getImportHint(hasSave) {
+    return {
+      ...TITLE_LAYOUT.importHint,
+      y: hasSave ? TITLE_LAYOUT.importHint.savedY : TITLE_LAYOUT.importHint.emptyY,
+    };
   }
 
   static getImportFileConfig() {

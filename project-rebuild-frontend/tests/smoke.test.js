@@ -995,11 +995,13 @@ function testTitleRenderer() {
   assert.equal(emptyControls.importButton.type, 'text');
   assert.equal(emptyControls.storageButton.type, 'text');
   assert.equal(emptyControls.loadButton, null);
+  assert.equal(emptyControls.importHintText.type, 'text');
   assert.equal(emptyControls.importStatusText.type, 'text');
   assert.ok(emptyFixture.calls.some((call) => call[0] === 'rectangle' && call[5] === TitleViewManager.getScreenText().backgroundColor));
   assert.ok(emptyFixture.calls.some((call) => call[0] === 'text' && call[3] === '프로젝트 리빌드'));
   assert.ok(emptyFixture.calls.some((call) => call[0] === 'text' && call[3] === '시작하기'));
   assert.ok(emptyFixture.calls.some((call) => call[0] === 'text' && call[3] === 'JSON 가져오기'));
+  assert.ok(emptyFixture.calls.some((call) => call[0] === 'text' && call[3].includes('API 미리보기 JSON')));
 
   const savedFixture = createRendererSceneSpy();
   savedFixture.scene.scale = { width: 1920, height: 1080 };
@@ -1021,6 +1023,14 @@ function testTitleViewManager() {
     importButtonY: 745,
     storageButtonY: 820,
     importStatusY: 885,
+    importHint: {
+      savedY: 700,
+      emptyY: 700,
+      y: 700,
+      text: '앱 저장 JSON과 API 미리보기 JSON을 가져올 수 있습니다.',
+      fontSize: '20px',
+      color: '#bfdbfe',
+    },
   });
   assert.deepEqual(TitleViewManager.getLayout(true), {
     startButtonY: 620,
@@ -1028,11 +1038,20 @@ function testTitleViewManager() {
     importButtonY: 835,
     storageButtonY: 910,
     importStatusY: 975,
+    importHint: {
+      savedY: 700,
+      emptyY: 700,
+      y: 700,
+      text: '앱 저장 JSON과 API 미리보기 JSON을 가져올 수 있습니다.',
+      fontSize: '20px',
+      color: '#bfdbfe',
+    },
   });
   assert.deepEqual(TitleViewManager.getStartButton(), { y: 620, label: '시작하기', targetScene: 'AuthScene' });
   assert.deepEqual(TitleViewManager.getLoadButton(), { savedY: 745, label: '저장 데이터 확인', targetScene: 'SavedDataScene' });
   assert.equal(TitleViewManager.getImportButton().label, 'JSON 가져오기');
   assert.deepEqual(TitleViewManager.getStorageButton(), { savedY: 910, emptyY: 820, label: '브라우저 저장 관리', targetScene: 'StorageManagerScene' });
+  assert.deepEqual(TitleViewManager.getImportHint(true), TitleViewManager.getLayout(true).importHint);
   assert.deepEqual(TitleViewManager.getImportFileConfig(), { type: 'file', accept: 'application/json,.json', successTargetScene: 'SavedDataScene' });
   assert.equal(TitleViewManager.formatImportError(new Error('bad json')), 'bad json');
   assert.equal(TitleViewManager.formatImportError(null), 'JSON 가져오기에 실패했습니다.');
@@ -3164,6 +3183,7 @@ function testSavedDataViewManager() {
     fontStyle: 'bold',
     x: 960,
   });
+  assert.match(SavedDataViewManager.getLayout(1920).subtitle.text, /API 미리보기 JSON/);
   assert.equal(SavedDataViewManager.getLayout(1920).bodyPanel.strokeWidth, 5);
   assert.deepEqual(SavedDataViewManager.getButtonStyle().padding, { x: 34, y: 18 });
   assert.deepEqual(SavedDataViewManager.getLayout(1920).importFile, { type: 'file', accept: 'application/json,.json' });
