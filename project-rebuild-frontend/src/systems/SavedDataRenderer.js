@@ -38,6 +38,8 @@ export default class SavedDataRenderer {
       importButton: createTextButton(scene, buttonLayout.import, SavedDataViewManager.getButtonStyle()),
       continueButton: createTextButton(scene, {
         ...buttonLayout.continue,
+        label: continueButtonState.label,
+        targetScene: continueButtonState.targetScene,
         backgroundColor: continueButtonState.backgroundColor,
         textColor: continueButtonState.textColor,
       }, SavedDataViewManager.getButtonStyle()),

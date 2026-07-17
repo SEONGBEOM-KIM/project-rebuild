@@ -17,7 +17,7 @@ export const SAVED_DATA_BUTTON_STYLE = {
 export const SAVED_DATA_BUTTONS = {
   back: { offsetX: -600, y: 940, label: '제목으로', backgroundColor: '#c4b5fd', textColor: '#1e1b4b', targetScene: 'TitleScene' },
   import: { offsetX: -200, y: 940, label: 'JSON 가져오기', backgroundColor: '#bfdbfe', textColor: '#0f172a' },
-  continue: { offsetX: 175, y: 940, label: '이어보기', targetScene: 'EndingScene' },
+  continue: { offsetX: 175, y: 940, label: '이어보기', targetScene: 'ExplorationScene' },
   clear: { offsetX: 560, y: 940, label: '저장 삭제', backgroundColor: '#fecaca', textColor: '#7f1d1d' },
 };
 
@@ -80,8 +80,11 @@ export default class SavedDataViewManager {
 
   static getContinueButtonState(saved) {
     const canContinue = SavedDataViewManager.canContinue(saved);
+    const targetScene = SavedDataViewManager.getContinueTargetScene(saved);
     return {
       canContinue,
+      targetScene,
+      label: canContinue ? SavedDataViewManager.formatContinueLabel(targetScene) : '이어보기 불가',
       backgroundColor: canContinue ? '#bbf7d0' : '#94a3b8',
       textColor: '#123524',
     };
@@ -136,6 +139,48 @@ export default class SavedDataViewManager {
 
   static canContinue(saved) {
     return Boolean(saved?.data);
+  }
+
+  static getContinueTargetScene(saved) {
+    const data = saved?.data;
+    if (!data) {
+      return null;
+    }
+    if (data.completed) {
+      return 'EndingScene';
+    }
+    if ((data.placements?.length ?? 0) >= 3) {
+      return 'ResultScene';
+    }
+    if (data.selectedPolicy?.id) {
+      return 'PlacementScene';
+    }
+    if (data.problemSummaryCompleted) {
+      return 'Ep2BriefingScene';
+    }
+    if (data.quizResult) {
+      return 'ProblemSummaryScene';
+    }
+    if (data.dataViewed) {
+      return 'CauseQuizScene';
+    }
+    if ((data.exploredPlaces?.length ?? 0) >= 3) {
+      return 'DataBriefingScene';
+    }
+    return 'ExplorationScene';
+  }
+
+  static formatContinueLabel(targetScene) {
+    return {
+      ExplorationScene: '탐색 이어보기',
+      DataBriefingScene: '자료 확인 이어보기',
+      CauseQuizScene: '원인 질문 이어보기',
+      ProblemSummaryScene: '문제 정리 이어보기',
+      Ep2BriefingScene: 'EP2 미션 이어보기',
+      PlacementScene: '배치 이어보기',
+      ResultScene: '결과 이어보기',
+      EndingScene: '마무리 이어보기',
+    }[targetScene] ?? '이어보기';
   }
 
   static getContinueButtonColor(saved) {

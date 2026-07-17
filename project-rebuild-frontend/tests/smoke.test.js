@@ -3165,8 +3165,9 @@ function testSavedDataRenderer() {
   assert.equal(controls.continueButton.type, 'text');
   assert.equal(controls.clearButton.type, 'text');
   assert.equal(controls.continueButtonState.canContinue, true);
+  assert.equal(controls.continueButtonState.targetScene, 'ExplorationScene');
   assert.ok(controlsFixture.calls.some((call) => call[0] === 'text' && call[3] === 'JSON 가져오기'));
-  assert.ok(controlsFixture.calls.some((call) => call[0] === 'text' && call[3] === '이어보기'));
+  assert.ok(controlsFixture.calls.some((call) => call[0] === 'text' && call[3] === '탐색 이어보기'));
 }
 
 function testSavedDataViewManager() {
@@ -3176,6 +3177,8 @@ function testSavedDataViewManager() {
   assert.equal(SavedDataViewManager.getContinueButtonColor(null), '#94a3b8');
   assert.deepEqual(SavedDataViewManager.getContinueButtonState(null), {
     canContinue: false,
+    targetScene: null,
+    label: '이어보기 불가',
     backgroundColor: '#94a3b8',
     textColor: '#123524',
   });
@@ -3194,7 +3197,7 @@ function testSavedDataViewManager() {
   assert.deepEqual(SavedDataViewManager.getButtonLayout(1920), {
     back: { offsetX: -600, x: 360, y: 940, label: '제목으로', backgroundColor: '#c4b5fd', textColor: '#1e1b4b', targetScene: 'TitleScene' },
     import: { offsetX: -200, x: 760, y: 940, label: 'JSON 가져오기', backgroundColor: '#bfdbfe', textColor: '#0f172a' },
-    continue: { offsetX: 175, x: 1135, y: 940, label: '이어보기', targetScene: 'EndingScene' },
+    continue: { offsetX: 175, x: 1135, y: 940, label: '이어보기', targetScene: 'ExplorationScene' },
     clear: { offsetX: 560, x: 1520, y: 940, label: '저장 삭제', backgroundColor: '#fecaca', textColor: '#7f1d1d' },
   });
   assert.deepEqual(SavedDataViewManager.getLayout(1920).summaryText, { x: 340, y: 235 });
@@ -3217,9 +3220,20 @@ function testSavedDataViewManager() {
   assert.equal(SavedDataViewManager.getContinueButtonColor(saved), '#bbf7d0');
   assert.deepEqual(SavedDataViewManager.getContinueButtonState(saved), {
     canContinue: true,
+    targetScene: 'DataBriefingScene',
+    label: '자료 확인 이어보기',
     backgroundColor: '#bbf7d0',
     textColor: '#123524',
   });
+  assert.equal(SavedDataViewManager.getContinueTargetScene({ data: { exploredPlaces: [] } }), 'ExplorationScene');
+  assert.equal(SavedDataViewManager.getContinueTargetScene({ data: { exploredPlaces: ['school', 'market', 'bus_stop'] } }), 'DataBriefingScene');
+  assert.equal(SavedDataViewManager.getContinueTargetScene({ data: { dataViewed: true } }), 'CauseQuizScene');
+  assert.equal(SavedDataViewManager.getContinueTargetScene({ data: { quizResult: { correct: true } } }), 'ProblemSummaryScene');
+  assert.equal(SavedDataViewManager.getContinueTargetScene({ data: { problemSummaryCompleted: true } }), 'Ep2BriefingScene');
+  assert.equal(SavedDataViewManager.getContinueTargetScene({ data: { selectedPolicy: { id: 'youth_living_support' } } }), 'PlacementScene');
+  assert.equal(SavedDataViewManager.getContinueTargetScene({ data: { placements: [{}, {}, {}] } }), 'ResultScene');
+  assert.equal(SavedDataViewManager.getContinueTargetScene({ data: { completed: true } }), 'EndingScene');
+  assert.equal(SavedDataViewManager.formatContinueLabel('PlacementScene'), '배치 이어보기');
   const fullSaved = {
     savedAt: 'bad-date',
     data: createCompleteLearningData({

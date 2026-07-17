@@ -34,7 +34,7 @@ export default class SavedDataScene extends Phaser.Scene {
         return;
       }
       this.restoreSavedData(saved.data);
-      this.scene.start(buttonLayout.continue.targetScene);
+      this.scene.start(controls.continueButtonState.targetScene);
     });
 
     controls.clearButton.on('pointerdown', () => {
