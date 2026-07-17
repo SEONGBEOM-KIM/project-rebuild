@@ -2936,6 +2936,20 @@ function testSavedDataRenderer() {
   const statusText = SavedDataRenderer.renderStatusText(statusFixture.scene, layout);
   assert.equal(statusText.type, 'text');
   assert.ok(statusFixture.calls.some((call) => call[0] === 'origin' && call[2] === 0.5));
+
+  const controlsFixture = createRendererSceneSpy();
+  const controls = SavedDataRenderer.renderControls(
+    controlsFixture.scene,
+    SavedDataViewManager.getButtonLayout(1920),
+    { data: { episode: 1 } },
+  );
+  assert.equal(controls.backButton.type, 'text');
+  assert.equal(controls.importButton.type, 'text');
+  assert.equal(controls.continueButton.type, 'text');
+  assert.equal(controls.clearButton.type, 'text');
+  assert.equal(controls.continueButtonState.canContinue, true);
+  assert.ok(controlsFixture.calls.some((call) => call[0] === 'text' && call[3] === 'JSON 가져오기'));
+  assert.ok(controlsFixture.calls.some((call) => call[0] === 'text' && call[3] === '이어보기'));
 }
 
 function testSavedDataViewManager() {

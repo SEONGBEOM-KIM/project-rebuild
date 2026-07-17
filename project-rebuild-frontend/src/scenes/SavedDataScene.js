@@ -4,7 +4,6 @@ import SaveManager from '../systems/SaveManager.js';
 import LearningDataRestoreManager from '../systems/LearningDataRestoreManager.js';
 import SavedDataViewManager from '../systems/SavedDataViewManager.js';
 import SavedDataRenderer from '../systems/SavedDataRenderer.js';
-import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 
 export default class SavedDataScene extends Phaser.Scene {
@@ -25,29 +24,20 @@ export default class SavedDataScene extends Phaser.Scene {
     this.importStatusText = SavedDataRenderer.renderStatusText(this, layout);
 
     const buttonLayout = SavedDataViewManager.getButtonLayout(width);
-    const continueButtonState = SavedDataViewManager.getContinueButtonState(saved);
+    const controls = SavedDataRenderer.renderControls(this, buttonLayout, saved);
 
-    const backButton = createTextButton(this, buttonLayout.back, SavedDataViewManager.getButtonStyle());
-    backButton.on('pointerdown', () => this.scene.start(buttonLayout.back.targetScene));
+    controls.backButton.on('pointerdown', () => this.scene.start(buttonLayout.back.targetScene));
+    controls.importButton.on('pointerdown', () => this.openImportPicker());
 
-    const importButton = createTextButton(this, buttonLayout.import, SavedDataViewManager.getButtonStyle());
-    importButton.on('pointerdown', () => this.openImportPicker());
-
-    const continueButton = createTextButton(this, {
-      ...buttonLayout.continue,
-      backgroundColor: continueButtonState.backgroundColor,
-      textColor: continueButtonState.textColor,
-    }, SavedDataViewManager.getButtonStyle());
-    continueButton.on('pointerdown', () => {
-      if (!continueButtonState.canContinue) {
+    controls.continueButton.on('pointerdown', () => {
+      if (!controls.continueButtonState.canContinue) {
         return;
       }
       this.restoreSavedData(saved.data);
       this.scene.start(buttonLayout.continue.targetScene);
     });
 
-    const clearButton = createTextButton(this, buttonLayout.clear, SavedDataViewManager.getButtonStyle());
-    clearButton.on('pointerdown', () => {
+    controls.clearButton.on('pointerdown', () => {
       SaveManager.clear();
       this.scene.restart();
     });

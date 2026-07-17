@@ -1,5 +1,6 @@
 import SavedDataViewManager from './SavedDataViewManager.js';
 import { createLayoutText } from '../ui/LayoutText.js';
+import { createTextButton } from '../ui/TextButton.js';
 import { createPanelBackground } from '../ui/PanelRenderer.js';
 
 export default class SavedDataRenderer {
@@ -22,5 +23,20 @@ export default class SavedDataRenderer {
       style: SavedDataViewManager.getStatusTextStyle(),
       origin: 0.5,
     });
+  }
+
+  static renderControls(scene, buttonLayout, saved) {
+    const continueButtonState = SavedDataViewManager.getContinueButtonState(saved);
+    return {
+      backButton: createTextButton(scene, buttonLayout.back, SavedDataViewManager.getButtonStyle()),
+      importButton: createTextButton(scene, buttonLayout.import, SavedDataViewManager.getButtonStyle()),
+      continueButton: createTextButton(scene, {
+        ...buttonLayout.continue,
+        backgroundColor: continueButtonState.backgroundColor,
+        textColor: continueButtonState.textColor,
+      }, SavedDataViewManager.getButtonStyle()),
+      clearButton: createTextButton(scene, buttonLayout.clear, SavedDataViewManager.getButtonStyle()),
+      continueButtonState,
+    };
   }
 }
