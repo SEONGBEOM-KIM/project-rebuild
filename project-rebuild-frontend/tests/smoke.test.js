@@ -3897,6 +3897,40 @@ function testSceneRenderingBoundaries() {
 }
 
 
+function testPlacementContextBoundaries() {
+  const allowedDirectContextFiles = new Set([
+    'scenes/PlacementScene.js',
+    'systems/PlacementContextManager.js',
+    'systems/LearningDataRestoreManager.js',
+  ]);
+  const violations = [];
+
+  for (const directoryName of ['scenes', 'systems']) {
+    const directory = join(SRC_DIR, directoryName);
+    for (const file of readdirSync(directory).filter((name) => name.endsWith('.js'))) {
+      const relativeFile = `${directoryName}/${file}`;
+      if (allowedDirectContextFiles.has(relativeFile)) {
+        continue;
+      }
+
+      const source = readFileSync(join(directory, file), 'utf8');
+      if (/getEvaluationProfile\(placementConfig\.evaluationProfileId\)/.test(source)) {
+        violations.push(`${relativeFile} directly resolves evaluation profile from placement config`);
+      }
+      if (/getPlacementConfig\([^)]*placementConfigId/.test(source)) {
+        violations.push(`${relativeFile} directly resolves placement config id`);
+      }
+    }
+  }
+
+  assert.deepEqual(
+    violations,
+    [],
+    'Shared result/export/report paths should resolve placement context through PlacementContextManager',
+  );
+}
+
+
 function testSharedUiComponentStyles() {
   const progressStyle = ProgressStepper.getStyle();
   assert.equal(progressStyle.spacing, 176);
@@ -4155,6 +4189,7 @@ async function run() {
   testSceneManagerImports();
   testSceneReferences();
   testSceneRenderingBoundaries();
+  testPlacementContextBoundaries();
   testSharedUiComponentStyles();
   await testBrowserFileActions();
   console.log('Smoke tests passed');
