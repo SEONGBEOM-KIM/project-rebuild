@@ -75,6 +75,7 @@ import { buildings } from '../src/data/buildings.js';
 import { policies } from '../src/data/policies.js';
 import { explorationPlaces } from '../src/data/explorationPlaces.js';
 import { mapData } from '../src/data/mapData.js';
+import { DEFAULT_PLACEMENT_CONFIG_ID, episodePlacementConfigs, getPlacementConfig } from '../src/data/episodePlacementConfigs.js';
 import { ISSUE_THRESHOLDS, REACTION_THRESHOLDS, RESULT_THRESHOLDS, SCORE_RULES } from '../src/data/evaluationRules.js';
 import { API_CONTRACT, formatContractRequest, formatContractResponse } from '../src/data/apiContract.js';
 import { CURRENT_EPISODE, EPISODE_STEPS } from '../src/data/episodes.js';
@@ -1557,6 +1558,21 @@ function testBuildingData() {
   assert.deepEqual(smallPark.requiresAdjacentAnyType, ['forest', 'river'], 'small park should keep nature adjacency rule');
 }
 
+
+function testEpisodePlacementConfigs() {
+  const config = getPlacementConfig();
+
+  assert.equal(config.id, DEFAULT_PLACEMENT_CONFIG_ID, 'default placement config should resolve by default');
+  assert.equal(config, episodePlacementConfigs[DEFAULT_PLACEMENT_CONFIG_ID], 'default config should be registered by id');
+  assert.equal(config.episodeId, 'ep2');
+  assert.equal(config.buildings.length, buildings.length, 'episode config should expose current sample facilities');
+  assert.equal(config.map.width, mapData.width, 'episode config should expose current sample map');
+  assert.equal(config.map.height, mapData.height);
+  assert.equal(config.requiredPlacements, 3, 'episode config should declare the current placement target');
+  assert.ok(config.stateKeys.includes('budget'), 'episode config should declare tracked state keys');
+  assert.equal(getPlacementConfig('missing_config').id, DEFAULT_PLACEMENT_CONFIG_ID, 'unknown config ids should fall back safely');
+}
+
 function testPolicyData() {
   assert.equal(policies.length, 3, 'EP1 should expose three recovery policies');
   assert.equal(new Set(policies.map((policy) => policy.id)).size, policies.length, 'policy ids should be unique');
@@ -2169,6 +2185,8 @@ function testPlacementViewManager() {
 
   const placementSceneSource = readProjectFile('src', 'scenes', 'PlacementScene.js');
   assert.match(placementSceneSource, /PlacementSceneBootstrap/, 'placement scene should delegate setup through bootstrap');
+  assert.match(placementSceneSource, /getPlacementConfig/, 'placement scene should resolve swappable episode placement config');
+  assert.match(placementSceneSource, /availableBuildings/, 'placement scene should render buildings from the active episode config');
   assert.match(placementSceneSource, /selectedStrategyId/, 'placement scene should recover EP2 strategy from learning progress');
   const resultSceneSource = readProjectFile('src', 'scenes', 'ResultScene.js');
   assert.match(resultSceneSource, /selectedStrategyId/, 'result scene should recover EP2 strategy from learning progress');
@@ -3812,6 +3830,7 @@ async function run() {
   testGameStateAndIssues();
   testLearningProgress();
   testBuildingData();
+  testEpisodePlacementConfigs();
   testPolicyData();
   testPolicyRecommendationMatchingUsesIds();
   testMapData();

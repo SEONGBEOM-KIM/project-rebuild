@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { buildings } from '../data/buildings.js';
+import { getPlacementConfig } from '../data/episodePlacementConfigs.js';
 import { EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
 import PlacementViewManager from '../systems/PlacementViewManager.js';
 import CameraController from '../systems/CameraController.js';
@@ -19,12 +19,18 @@ export default class PlacementScene extends Phaser.Scene {
   }
 
   create() {
-    this.selectedBuilding = buildings[0];
+    this.placementConfig = getPlacementConfig(this.registry.get('placementConfigId'));
+    this.availableBuildings = this.placementConfig.buildings;
+    this.selectedBuilding = this.availableBuildings[0];
     this.selectedPolicy = this.registry.get('selectedPolicy');
     const learningProgress = LearningProgress.get(this.registry);
     this.selectedStrategy = Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, this.registry.get('ep2StrategyId') ?? learningProgress.selectedStrategyId, this.selectedPolicy?.id);
     this.placedBuildings = [...(this.registry.get('placedBuildings') ?? [])];
-    this.bootstrap = new PlacementSceneBootstrap({ scene: this, cameraControllerClass: CameraController });
+    this.bootstrap = new PlacementSceneBootstrap({
+      scene: this,
+      sourceMapData: this.placementConfig.map,
+      cameraControllerClass: CameraController,
+    });
 
     Object.assign(this, this.bootstrap.createCoreSystems());
     this.bootstrap.drawBackground(this.objectRegistry);
@@ -64,7 +70,7 @@ export default class PlacementScene extends Phaser.Scene {
   createUi() {
     this.uiRenderer = new PlacementUiRenderer({
       objectRegistry: this.objectRegistry,
-      buildings,
+      buildings: this.availableBuildings,
       selectedPolicy: this.selectedPolicy,
       getPlacedCount: () => this.placedBuildings.length,
       onSelectBuilding: (building) => this.selectBuilding(building),
