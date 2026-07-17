@@ -9,6 +9,12 @@ export default class PlacementContextManager {
       ?? getPlacementConfigIdForStrategy(selectedStrategy);
   }
 
+  static resolvePlacementConfigIdFromLearningData(data, selectedStrategy = null) {
+    return data?.placementConfig?.id
+      ?? data?.selectedStrategy?.placementConfigId
+      ?? getPlacementConfigIdForStrategy(selectedStrategy);
+  }
+
   static resolve({ registry, progress = null, selectedStrategy = null } = {}) {
     const resolvedProgress = progress ?? (registry ? LearningProgress.get(registry) : null);
     const placementConfig = getPlacementConfig(PlacementContextManager.resolvePlacementConfigId({

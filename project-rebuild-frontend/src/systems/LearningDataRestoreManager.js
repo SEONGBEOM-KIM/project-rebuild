@@ -4,7 +4,7 @@ import { policies } from '../data/policies.js';
 import { buildings } from '../data/buildings.js';
 import { EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
 import Ep2BriefingViewManager from './Ep2BriefingViewManager.js';
-import { getPlacementConfigIdForStrategy } from '../data/episodePlacementConfigs.js';
+import PlacementContextManager from './PlacementContextManager.js';
 
 export default class LearningDataRestoreManager {
   static restore(registry, data) {
@@ -71,7 +71,7 @@ export default class LearningDataRestoreManager {
       problemSummaryCompleted: Boolean(data.problemSummaryCompleted),
       selectedPolicyId: selectedPolicy?.id ?? null,
       selectedStrategyId: selectedStrategy?.id ?? null,
-      placementConfigId: data.selectedStrategy?.placementConfigId ?? getPlacementConfigIdForStrategy(selectedStrategy),
+      placementConfigId: PlacementContextManager.resolvePlacementConfigIdFromLearningData(data, selectedStrategy),
       placedBuildingIds: restoredPlacements.map((record) => record.building.id),
       reflectionChoice: data.reflectionChoice ?? null,
       completed: Boolean(data.completed),

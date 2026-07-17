@@ -1672,6 +1672,8 @@ function testPlacementContextManager() {
   const strategy = EP2_MISSION_BRIEFING.strategies[0];
 
   assert.equal(PlacementContextManager.resolvePlacementConfigId({ selectedStrategy: strategy }), DEFAULT_PLACEMENT_CONFIG_ID);
+  assert.equal(PlacementContextManager.resolvePlacementConfigIdFromLearningData({ placementConfig: { id: 'custom_config' }, selectedStrategy: { placementConfigId: 'legacy_config' } }, strategy), 'custom_config');
+  assert.equal(PlacementContextManager.resolvePlacementConfigIdFromLearningData({ selectedStrategy: { placementConfigId: 'legacy_config' } }, strategy), 'legacy_config');
 
   const fromStrategy = PlacementContextManager.resolve({ selectedStrategy: strategy });
   assert.equal(fromStrategy.placementConfig.id, DEFAULT_PLACEMENT_CONFIG_ID);
@@ -3430,6 +3432,14 @@ function testLearningDataRestoreManager() {
   assert.equal(registry.get('learningProgress').placementConfigId, DEFAULT_PLACEMENT_CONFIG_ID);
   assert.equal(registry.get('placementConfigId'), DEFAULT_PLACEMENT_CONFIG_ID);
   assert.deepEqual(registry.get('learningProgress').placedBuildingIds, ['small_park']);
+
+  const legacyProgress = LearningDataRestoreManager.buildProgress(
+    { ...data, placementConfig: null },
+    restored.selectedPolicy,
+    restored.selectedStrategy,
+    restored.placedBuildings,
+  );
+  assert.equal(legacyProgress.placementConfigId, DEFAULT_PLACEMENT_CONFIG_ID);
 
   const derivedRegistry = createMemoryRegistry();
   const derivedData = {
