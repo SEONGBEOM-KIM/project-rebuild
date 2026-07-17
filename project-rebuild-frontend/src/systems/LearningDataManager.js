@@ -20,7 +20,7 @@ export default class LearningDataManager {
     const gameState = registry.get('gameState');
     const reflectionChoice = registry.get('reflectionChoice');
     const issues = IssueDetector.detect(gameState, evaluationProfile);
-    const ending = EndingSummaryManager.getEndingSummary(gameState, placedBuildings);
+    const ending = EndingSummaryManager.getEndingSummary(gameState, placedBuildings, evaluationProfile);
     const exploredPlaceNames = explorationPlaces
       .filter((place) => progress.exploredPlaces.includes(place.id))
       .map((place) => place.name);

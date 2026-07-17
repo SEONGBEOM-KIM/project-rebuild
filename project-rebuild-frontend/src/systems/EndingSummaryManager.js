@@ -1,15 +1,16 @@
 import { explorationPlaces } from '../data/explorationPlaces.js';
-import { STATE_LABELS } from '../data/stateLabels.js';
-import { RESULT_THRESHOLDS } from '../data/evaluationRules.js';
+import { DEFAULT_STATE_KEYS, STATE_LABELS } from '../data/stateLabels.js';
+import { getEvaluationProfile } from '../data/evaluationRules.js';
 import IssueDetector from './IssueDetector.js';
 
 export default class EndingSummaryManager {
-  static getEndingSummary(gameState, placedBuildings) {
+  static getEndingSummary(gameState, placedBuildings, evaluationProfile = getEvaluationProfile()) {
     const uniqueBuildingTypes = new Set(placedBuildings.map((record) => record.building.id)).size;
-    const balanced = uniqueBuildingTypes >= RESULT_THRESHOLDS.balancedMinimumBuildingTypes
-      && gameState.environment >= RESULT_THRESHOLDS.environmentGood
-      && gameState.satisfaction >= RESULT_THRESHOLDS.satisfactionBalanced
-      && gameState.budget >= RESULT_THRESHOLDS.budgetSafe;
+    const resultThresholds = evaluationProfile.resultThresholds;
+    const balanced = uniqueBuildingTypes >= resultThresholds.balancedMinimumBuildingTypes
+      && gameState.environment >= resultThresholds.environmentGood
+      && gameState.satisfaction >= resultThresholds.satisfactionBalanced
+      && gameState.budget >= resultThresholds.budgetSafe;
 
     if (balanced) {
       return {
@@ -38,13 +39,13 @@ export default class EndingSummaryManager {
     };
   }
 
-  static getPriorityIssue(gameState) {
-    const issues = IssueDetector.detect(gameState);
+  static getPriorityIssue(gameState, evaluationProfile = getEvaluationProfile()) {
+    const issues = IssueDetector.detect(gameState, evaluationProfile);
     return issues[0] ?? null;
   }
 
-  static formatFinalTakeaway({ gameState, ending, reflectionChoice, selectedStrategy = null }) {
-    const issue = EndingSummaryManager.getPriorityIssue(gameState);
+  static formatFinalTakeaway({ gameState, ending, reflectionChoice, selectedStrategy = null, evaluationProfile = getEvaluationProfile() }) {
+    const issue = EndingSummaryManager.getPriorityIssue(gameState, evaluationProfile);
     const issueText = issue ? issue.title : '큰 부작용 신호 없음';
     const actionText = reflectionChoice?.nextActionLabel ?? '다음 보완 방향 선택 필요';
     const strategyText = selectedStrategy
@@ -97,11 +98,11 @@ export default class EndingSummaryManager {
     ].join('\n');
   }
 
-  static formatStateSummary(gameState, ending) {
-    const stateRows = Object.entries(STATE_LABELS)
-      .map(([key, label]) => `• ${label}: ${gameState[key]}`)
+  static formatStateSummary(gameState, ending, stateKeys = DEFAULT_STATE_KEYS, evaluationProfile = getEvaluationProfile()) {
+    const stateRows = stateKeys
+      .map((key) => `• ${STATE_LABELS[key] ?? key}: ${gameState[key] ?? 0}`)
       .join('\n');
-    const issueRows = IssueDetector.formatRows(gameState).join('\n');
+    const issueRows = IssueDetector.formatRows(gameState, '큰 부작용 신호 없음', evaluationProfile).join('\n');
 
     return [
       ending.title,

@@ -49,7 +49,7 @@ export default class TeacherReportManager {
     const reflectionChoice = registry.get('reflectionChoice');
     const quizResult = registry.get('quizResult') ?? progress.quizResult;
     const issues = IssueDetector.detect(gameState, evaluationProfile);
-    const ending = EndingSummaryManager.getEndingSummary(gameState, placedBuildings);
+    const ending = EndingSummaryManager.getEndingSummary(gameState, placedBuildings, evaluationProfile);
     const exploredNames = explorationPlaces
       .filter((place) => progress.exploredPlaces.includes(place.id))
       .map((place) => place.name);

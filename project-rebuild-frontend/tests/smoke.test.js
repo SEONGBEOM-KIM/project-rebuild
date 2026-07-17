@@ -2330,6 +2330,9 @@ function testPlacementViewManager() {
   assert.match(sideEffectSceneSource, /IssueDetector\.detect\(gameState, evaluationProfile\)/, 'side effect scene should detect issues with active evaluation profile');
   const endingSceneSource = readProjectFile('src', 'scenes', 'EndingScene.js');
   assert.match(endingSceneSource, /selectedStrategyId/, 'ending scene should recover EP2 strategy from learning progress');
+  assert.match(endingSceneSource, /getPlacementConfig/, 'ending scene should resolve active placement config');
+  assert.match(endingSceneSource, /getEvaluationProfile/, 'ending scene should resolve evaluation profile from active placement config');
+  assert.match(endingSceneSource, /formatStateSummary\(gameState, ending, placementConfig\.stateKeys, evaluationProfile\)/, 'ending scene should summarize state with active placement config');
   const reflectionSceneSource = readProjectFile('src', 'scenes', 'ReflectionScene.js');
   assert.match(reflectionSceneSource, /selectedStrategyId/, 'reflection scene should recover EP2 strategy from learning progress');
   assert.match(reflectionSceneSource, /getPlacementConfig/, 'reflection scene should resolve active placement config');
@@ -2779,6 +2782,12 @@ function testEndingSummaryManager() {
   const reflectionChoice = EP1_REFLECTION_CHOICES.find((choice) => choice.id === 'budget_balance');
   assert.match(EndingSummaryManager.formatFinalTakeaway({ gameState: finalState, ending, reflectionChoice }), /균형형 회복안/);
   assert.match(EndingSummaryManager.formatFinalTakeaway({ gameState: { ...finalState, budget: 400 }, ending, reflectionChoice }), /우선 보완: 예산 부족/);
+  assert.match(EndingSummaryManager.formatFinalTakeaway({
+    gameState: GameState.createInitialState(),
+    ending,
+    reflectionChoice,
+    evaluationProfile: { ...getEvaluationProfile(), issueThresholds: { ...ISSUE_THRESHOLDS, budgetMin: 1100 } },
+  }), /우선 보완: 예산 부족/);
   assert.match(EndingSummaryManager.formatFinalTakeaway({ gameState: finalState, ending, reflectionChoice }), new RegExp(reflectionChoice.nextActionLabel));
   const strategyTakeaway = EndingSummaryManager.formatFinalTakeaway({
     gameState: finalState,
@@ -2793,6 +2802,9 @@ function testEndingSummaryManager() {
   assert.match(EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice), /배치한 시설: 3개/);
   assert.match(EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice), /다음 보완 방향:/);
   assert.match(EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice), new RegExp(reflectionChoice.nextAction));
+  const focusedStateSummary = EndingSummaryManager.formatStateSummary(finalState, ending, ['budget'], getEvaluationProfile());
+  assert.match(focusedStateSummary, /최종 상태:\n• 예산: 560/);
+  assert.doesNotMatch(focusedStateSummary, /• 인구:/);
 
   const strategyChoiceSummary = EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice, EP2_MISSION_BRIEFING.strategies[0]);
   assert.match(strategyChoiceSummary, /EP2 전략: 일자리와 생활 기반/);
