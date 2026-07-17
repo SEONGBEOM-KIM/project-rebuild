@@ -2,8 +2,7 @@ import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import { EP1_NEXT_DEVELOPMENT_GOALS, EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
-import { getPlacementConfig } from '../data/episodePlacementConfigs.js';
-import { getEvaluationProfile } from '../data/evaluationRules.js';
+import PlacementContextManager from '../systems/PlacementContextManager.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import EndingSummaryManager from '../systems/EndingSummaryManager.js';
 import EndingSummaryViewManager from '../systems/EndingSummaryViewManager.js';
@@ -27,8 +26,11 @@ export default class EndingScene extends Phaser.Scene {
     const reflectionChoice = this.registry.get('reflectionChoice');
     const learningProgress = LearningProgress.update(this.registry, { completed: true });
     const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, this.registry.get('ep2StrategyId') ?? learningProgress.selectedStrategyId, selectedPolicy?.id);
-    const placementConfig = getPlacementConfig(this.registry.get('placementConfigId') ?? learningProgress.placementConfigId);
-    const evaluationProfile = getEvaluationProfile(placementConfig.evaluationProfileId);
+    const { placementConfig, evaluationProfile } = PlacementContextManager.resolve({
+      registry: this.registry,
+      progress: learningProgress,
+      selectedStrategy,
+    });
     const ending = EndingSummaryManager.getEndingSummary(gameState, placedBuildings, evaluationProfile);
 
     const layout = EndingSummaryViewManager.getScreenLayout(width);
