@@ -20,10 +20,10 @@ export default class Ep2BriefingRenderer {
     });
   }
 
-  static renderStrategyCard(scene, strategy, index) {
+  static renderStrategyCard(scene, strategy, index, selectedStrategyId = null, onSelect = null) {
     const layout = Ep2BriefingViewManager.getStrategyCardLayout(index);
-    const style = Ep2BriefingViewManager.getCardStyle();
-    createPanelBackground(scene, layout.panel, { ...style, strokeColor: strategy.color });
+    const style = Ep2BriefingViewManager.getCardStyle(strategy.id, selectedStrategyId, strategy.color);
+    const background = createPanelBackground(scene, layout.panel, style).setInteractive({ useHandCursor: true });
     const icon = createLayoutText(scene, layout.icon, {
       text: strategy.icon,
       style: { fontSize: '48px' },
@@ -52,7 +52,23 @@ export default class Ep2BriefingRenderer {
       },
     });
 
-    return { icon, title, body, check };
+    const selectionLabel = createLayoutText(scene, layout.selection, {
+      text: Ep2BriefingViewManager.formatSelectionLabel(strategy.id, selectedStrategyId),
+      style: Ep2BriefingViewManager.getSelectionLabelStyle(strategy.id === selectedStrategyId),
+      origin: 0.5,
+    });
+
+    if (onSelect) {
+      const select = () => onSelect(strategy);
+      background.on('pointerdown', select);
+      icon.setInteractive({ useHandCursor: true }).on('pointerdown', select);
+      title.setInteractive({ useHandCursor: true }).on('pointerdown', select);
+      body.setInteractive({ useHandCursor: true }).on('pointerdown', select);
+      check.setInteractive({ useHandCursor: true }).on('pointerdown', select);
+      selectionLabel.setInteractive({ useHandCursor: true }).on('pointerdown', select);
+    }
+
+    return { background, icon, title, body, check, selectionLabel, strategy };
   }
 
   static renderControls(scene, centerX) {

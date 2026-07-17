@@ -2420,12 +2420,25 @@ function testEp2BriefingRenderer() {
   assert.ok(introFixture.calls.some((call) => call[0] === 'text' && call[3].includes('EP1에서')));
 
   const cardFixture = createRendererSceneSpy();
-  const card = Ep2BriefingRenderer.renderStrategyCard(cardFixture.scene, EP2_MISSION_BRIEFING.strategies[0], 0);
+  const selectedStrategyIds = [];
+  const card = Ep2BriefingRenderer.renderStrategyCard(
+    cardFixture.scene,
+    EP2_MISSION_BRIEFING.strategies[0],
+    0,
+    EP2_MISSION_BRIEFING.strategies[0].id,
+    (strategy) => selectedStrategyIds.push(strategy.id),
+  );
+  assert.equal(card.background.type, 'rectangle');
   assert.equal(card.icon.type, 'text');
   assert.equal(card.title.type, 'text');
   assert.equal(card.body.type, 'text');
   assert.equal(card.check.type, 'text');
+  assert.equal(card.selectionLabel.type, 'text');
   assert.ok(cardFixture.calls.some((call) => call[0] === 'text' && call[3] === EP2_MISSION_BRIEFING.strategies[0].title));
+  assert.ok(cardFixture.calls.some((call) => call[0] === 'text' && call[3] === '선택된 전략'));
+  card.background.events.get('pointerdown')();
+  card.selectionLabel.events.get('pointerdown')();
+  assert.deepEqual(selectedStrategyIds, [EP2_MISSION_BRIEFING.strategies[0].id, EP2_MISSION_BRIEFING.strategies[0].id]);
 
   const controlsFixture = createRendererSceneSpy();
   const controls = Ep2BriefingRenderer.renderControls(controlsFixture.scene, 960);
@@ -2447,8 +2460,12 @@ function testEp2BriefingViewManager() {
   assert.equal(Ep2BriefingViewManager.getScreenLayout(1920).progressStep, 'ending');
   assert.equal(Ep2BriefingViewManager.getIntroPanelLayout().title.text, '다음 미션');
   assert.equal(Ep2BriefingViewManager.getStrategyCardLayout(1).panel.x, 960);
+  assert.equal(Ep2BriefingViewManager.getStrategyCardLayout(0).selection.y, 717);
   assert.equal(Ep2BriefingViewManager.getPanelStyle().bodyFontSize, '24px');
   assert.equal(Ep2BriefingViewManager.getCardStyle().titleColor, '#172554');
+  assert.deepEqual(Ep2BriefingViewManager.getCardStyle('jobs_services', 'jobs_services', 0x38bdf8).selected, true);
+  assert.equal(Ep2BriefingViewManager.getCardStyle('jobs_services', 'jobs_services', 0x38bdf8).strokeWidth, 7);
+  assert.equal(Ep2BriefingViewManager.getCardStyle('jobs_services', 'balanced_growth', 0x38bdf8).selected, false);
   assert.deepEqual(Ep2BriefingViewManager.getControlLayout(960).start, {
     x: 1210,
     y: 950,
@@ -2460,6 +2477,11 @@ function testEp2BriefingViewManager() {
   assert.match(Ep2BriefingViewManager.formatIntroText(EP2_MISSION_BRIEFING), /EP2에서는/);
   assert.match(Ep2BriefingViewManager.formatStrategyBody(EP2_MISSION_BRIEFING.strategies[0]), /상태 변화:/);
   assert.match(Ep2BriefingViewManager.formatStrategyCheck(EP2_MISSION_BRIEFING.strategies[0]), /생각할 점:/);
+  assert.equal(Ep2BriefingViewManager.formatSelectionLabel('jobs_services', 'jobs_services'), '선택된 전략');
+  assert.equal(Ep2BriefingViewManager.formatSelectionLabel('jobs_services', 'balanced_growth'), '클릭해서 선택');
+  assert.equal(Ep2BriefingViewManager.findStrategyById(EP2_MISSION_BRIEFING, 'housing_mobility').policyId, 'mobility_access');
+  assert.equal(Ep2BriefingViewManager.findStrategyById(EP2_MISSION_BRIEFING, 'missing'), null);
+  assert.equal(Ep2BriefingViewManager.getDefaultStrategy(EP2_MISSION_BRIEFING).id, 'jobs_services');
 }
 
 function testEndingSummaryManager() {

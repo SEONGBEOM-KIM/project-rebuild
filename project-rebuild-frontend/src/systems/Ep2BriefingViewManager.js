@@ -21,7 +21,11 @@ const EP2_BRIEFING_PANEL_STYLE = {
 const EP2_BRIEFING_CARD_STYLE = {
   fillColor: 0xffffff,
   fillAlpha: 0.96,
+  selectedFillColor: 0xecfdf5,
+  selectedFillAlpha: 1,
   strokeWidth: 4,
+  selectedStrokeWidth: 7,
+  strokeColor: 0x93c5fd,
   titleFontSize: '29px',
   titleColor: '#172554',
   titleFontStyle: 'bold',
@@ -49,8 +53,16 @@ export default class Ep2BriefingViewManager {
     return { ...EP2_BRIEFING_PANEL_STYLE };
   }
 
-  static getCardStyle() {
-    return { ...EP2_BRIEFING_CARD_STYLE };
+  static getCardStyle(strategyId = null, selectedStrategyId = null, strategyColor = EP2_BRIEFING_CARD_STYLE.strokeColor) {
+    const selected = Boolean(selectedStrategyId && strategyId === selectedStrategyId);
+    return {
+      ...EP2_BRIEFING_CARD_STYLE,
+      fillColor: selected ? EP2_BRIEFING_CARD_STYLE.selectedFillColor : EP2_BRIEFING_CARD_STYLE.fillColor,
+      fillAlpha: selected ? EP2_BRIEFING_CARD_STYLE.selectedFillAlpha : EP2_BRIEFING_CARD_STYLE.fillAlpha,
+      strokeWidth: selected ? EP2_BRIEFING_CARD_STYLE.selectedStrokeWidth : EP2_BRIEFING_CARD_STYLE.strokeWidth,
+      strokeColor: selected ? strategyColor : EP2_BRIEFING_CARD_STYLE.strokeColor,
+      selected,
+    };
   }
 
   static getButtonStyle() {
@@ -77,8 +89,29 @@ export default class Ep2BriefingViewManager {
       icon: { x: position.x, y: position.y - 135 },
       title: { x: position.x, y: position.y - 78, wordWrapWidth: 360 },
       body: { x: position.x - 180, y: position.y - 25, wordWrapWidth: 360 },
-      check: { x: position.x - 180, y: position.y + 125, wordWrapWidth: 360 },
+      check: { x: position.x - 180, y: position.y + 112, wordWrapWidth: 360 },
+      selection: { x: position.x, y: position.y + 162 },
     };
+  }
+
+  static getSelectionLabelStyle(selected) {
+    return {
+      fontSize: '20px',
+      color: selected ? '#166534' : '#64748b',
+      fontStyle: 'bold',
+    };
+  }
+
+  static formatSelectionLabel(strategyId, selectedStrategyId) {
+    return strategyId === selectedStrategyId ? '선택된 전략' : '클릭해서 선택';
+  }
+
+  static findStrategyById(briefing, strategyId) {
+    return briefing.strategies.find((strategy) => strategy.id === strategyId) ?? null;
+  }
+
+  static getDefaultStrategy(briefing) {
+    return briefing.strategies[0] ?? null;
   }
 
   static getControlLayout(centerX) {
