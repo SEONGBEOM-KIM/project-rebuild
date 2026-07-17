@@ -17,6 +17,7 @@ import CauseQuizPanelRenderer from '../src/systems/CauseQuizPanelRenderer.js';
 import SelectionViewManager from '../src/systems/SelectionViewManager.js';
 import SelectionPolicyCardRenderer from '../src/systems/SelectionPolicyCardRenderer.js';
 import ProblemSummaryViewManager from '../src/systems/ProblemSummaryViewManager.js';
+import ProblemSummaryRenderer from '../src/systems/ProblemSummaryRenderer.js';
 import ExplorationViewManager from '../src/systems/ExplorationViewManager.js';
 import ExplorationMapRenderer from '../src/systems/ExplorationMapRenderer.js';
 import DataBriefingViewManager from '../src/systems/DataBriefingViewManager.js';
@@ -520,6 +521,24 @@ function testSelectionPolicyCardRenderer() {
   assert.ok(fixture.calls.some((call) => call[0] === 'container.add' && call[1].length === 7));
   cardObjects.background.events.get('pointerdown')();
   assert.deepEqual(selected, [policy.id]);
+}
+
+function testProblemSummaryRenderer() {
+  const gridFixture = createRendererSceneSpy();
+  ProblemSummaryRenderer.renderProblemGrid(gridFixture.scene, EP1_PROBLEM_ITEMS);
+  assert.ok(gridFixture.calls.some((call) => call[0] === 'text' && call[3] === '확인한 지역 문제'));
+  assert.ok(gridFixture.calls.some((call) => call[0] === 'text' && call[3] === EP1_PROBLEM_ITEMS[0].title));
+  assert.ok(gridFixture.calls.some((call) => call[0] === 'text' && call[3] === EP1_PROBLEM_ITEMS[0].detail));
+
+  const recordFixture = createRendererSceneSpy();
+  ProblemSummaryRenderer.renderLearningRecord(recordFixture.scene, '탐색한 장소: 3곳');
+  assert.ok(recordFixture.calls.some((call) => call[0] === 'text' && call[3] === '학습 기록'));
+  assert.ok(recordFixture.calls.some((call) => call[0] === 'text' && call[3] === '탐색한 장소: 3곳'));
+
+  const missionFixture = createRendererSceneSpy();
+  ProblemSummaryRenderer.renderNextMission(missionFixture.scene, EP1_NEXT_MISSION);
+  assert.ok(missionFixture.calls.some((call) => call[0] === 'text' && call[3] === '다음 미션'));
+  assert.ok(missionFixture.calls.some((call) => call[0] === 'text' && call[3] === EP1_NEXT_MISSION.join('\n')));
 }
 
 function testProblemSummaryViewManager() {
@@ -3119,6 +3138,7 @@ async function run() {
   testCauseQuizManager();
   testSelectionViewManager();
   testSelectionPolicyCardRenderer();
+  testProblemSummaryRenderer();
   testProblemSummaryViewManager();
   testExplorationViewManager();
   testExplorationMapRenderer();
