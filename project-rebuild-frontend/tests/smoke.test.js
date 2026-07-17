@@ -53,8 +53,10 @@ import PlacementUiRenderer from '../src/systems/PlacementUiRenderer.js';
 import PlacementSceneBootstrap from '../src/systems/PlacementSceneBootstrap.js';
 import SaveManager, { LEARNING_SAVE_STORAGE_KEY } from '../src/systems/SaveManager.js';
 import SavedDataViewManager from '../src/systems/SavedDataViewManager.js';
+import SavedDataRenderer from '../src/systems/SavedDataRenderer.js';
 import StorageSummaryManager from '../src/systems/StorageSummaryManager.js';
 import StorageManagerViewManager from '../src/systems/StorageManagerViewManager.js';
+import StorageManagerRenderer from '../src/systems/StorageManagerRenderer.js';
 import SideEffectIssueRenderer from '../src/systems/SideEffectIssueRenderer.js';
 import { buildings } from '../src/data/buildings.js';
 import { policies } from '../src/data/policies.js';
@@ -2728,6 +2730,19 @@ function testLearningDataRestoreManager() {
 
 
 
+function testSavedDataRenderer() {
+  const layout = SavedDataViewManager.getLayout(1920);
+  const fixture = createRendererSceneSpy();
+  SavedDataRenderer.renderBodyPanel(fixture.scene, layout, { data: { episode: 1 }, savedAt: 'now' });
+  assert.ok(fixture.calls.some((call) => call[0] === 'rectangle' && call[1] === layout.bodyPanel.x && call[2] === layout.bodyPanel.y));
+  assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3].includes('episode')));
+
+  const statusFixture = createRendererSceneSpy();
+  const statusText = SavedDataRenderer.renderStatusText(statusFixture.scene, layout);
+  assert.equal(statusText.type, 'text');
+  assert.ok(statusFixture.calls.some((call) => call[0] === 'origin' && call[2] === 0.5));
+}
+
 function testSavedDataViewManager() {
   assert.equal(SavedDataViewManager.formatBody(null), '저장된 데이터가 없습니다.');
   assert.equal(SavedDataViewManager.canContinue(null), false);
@@ -2776,6 +2791,18 @@ function testSavedDataViewManager() {
   assert.match(SavedDataViewManager.formatBody(saved), /"episode": 1/);
   assert.equal(SavedDataViewManager.getImportErrorMessage(new Error('bad json')), 'bad json');
   assert.equal(SavedDataViewManager.getImportErrorMessage(null), 'JSON 가져오기에 실패했습니다.');
+}
+
+function testStorageManagerRenderer() {
+  const layout = StorageManagerViewManager.getPanelLayout().saved;
+  const fixture = createRendererSceneSpy();
+  StorageManagerRenderer.renderPanel(fixture.scene, layout, ['상태: 저장 데이터 있음', 'Episode: 1']);
+  assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3] === '학습 저장 데이터'));
+  assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3] === '상태: 저장 데이터 있음\nEpisode: 1'));
+
+  const statusFixture = createRendererSceneSpy();
+  StorageManagerRenderer.renderStatus(statusFixture.scene, StorageManagerViewManager.getControlLayout(), '저장 관리 상태');
+  assert.ok(statusFixture.calls.some((call) => call[0] === 'text' && call[3] === '저장 관리 상태'));
 }
 
 function testStorageManagerViewManager() {
@@ -3224,7 +3251,9 @@ async function run() {
   testMockApiClient();
   testMockApiClientLogSafety();
   testLearningDataRestoreManager();
+  testSavedDataRenderer();
   testSavedDataViewManager();
+  testStorageManagerRenderer();
   testStorageManagerViewManager();
   testStorageSummaryManager();
   testSaveImport();

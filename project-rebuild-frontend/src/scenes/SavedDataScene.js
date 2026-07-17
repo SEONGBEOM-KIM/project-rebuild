@@ -3,9 +3,9 @@ import { createScreenBackground } from '../ui/ScreenBackground.js';
 import SaveManager from '../systems/SaveManager.js';
 import LearningDataRestoreManager from '../systems/LearningDataRestoreManager.js';
 import SavedDataViewManager from '../systems/SavedDataViewManager.js';
+import SavedDataRenderer from '../systems/SavedDataRenderer.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
-import { createPanelBackground } from '../ui/PanelRenderer.js';
 
 export default class SavedDataScene extends Phaser.Scene {
   constructor() {
@@ -13,7 +13,7 @@ export default class SavedDataScene extends Phaser.Scene {
   }
 
   create() {
-    const { width, height } = this.scale;
+    const { width } = this.scale;
     const saved = SaveManager.load();
 
     const layout = SavedDataViewManager.getLayout(width);
@@ -21,24 +21,8 @@ export default class SavedDataScene extends Phaser.Scene {
     createLayoutText(this, layout.title, { origin: 0.5 });
     createLayoutText(this, layout.subtitle, { origin: 0.5 });
 
-    createPanelBackground(this, layout.bodyPanel, {
-      fillColor: layout.bodyPanel.fillColor,
-      fillAlpha: layout.bodyPanel.alpha,
-      strokeWidth: layout.bodyPanel.strokeWidth,
-      strokeColor: layout.bodyPanel.strokeColor,
-    });
-
-    const body = SavedDataViewManager.formatBody(saved);
-
-    createLayoutText(this, layout.bodyText, {
-      text: body,
-      style: SavedDataViewManager.getBodyTextStyle(),
-    });
-
-    this.importStatusText = createLayoutText(this, layout.status, {
-      style: SavedDataViewManager.getStatusTextStyle(),
-      origin: 0.5,
-    });
+    SavedDataRenderer.renderBodyPanel(this, layout, saved);
+    this.importStatusText = SavedDataRenderer.renderStatusText(this, layout);
 
     const buttonLayout = SavedDataViewManager.getButtonLayout(width);
     const continueButtonState = SavedDataViewManager.getContinueButtonState(saved);

@@ -4,9 +4,9 @@ import SaveManager from '../systems/SaveManager.js';
 import MockApiClient from '../systems/MockApiClient.js';
 import StorageSummaryManager from '../systems/StorageSummaryManager.js';
 import StorageManagerViewManager from '../systems/StorageManagerViewManager.js';
+import StorageManagerRenderer from '../systems/StorageManagerRenderer.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
-import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
 
 export default class StorageManagerScene extends Phaser.Scene {
   constructor() {
@@ -14,7 +14,7 @@ export default class StorageManagerScene extends Phaser.Scene {
   }
 
   create() {
-    const { width, height } = this.scale;
+    const { width } = this.scale;
     this.saved = SaveManager.load();
     this.submissions = MockApiClient.listSubmissions();
 
@@ -29,40 +29,24 @@ export default class StorageManagerScene extends Phaser.Scene {
   }
 
   drawSavedDataPanel() {
-    const layout = StorageManagerViewManager.getPanelLayout().saved;
-    const panelStyle = StorageManagerViewManager.getPanelStyle();
-    createPanelBackground(this, layout.panel, panelStyle);
-    createPanelTitle(this, layout.title, panelStyle, { origin: 0.5 });
-
-    const rows = StorageSummaryManager.formatSavedDataRows(this.saved);
-
-    createLayoutText(this, layout.body, {
-      text: rows.join('\n'),
-      style: StorageManagerViewManager.getBodyTextStyle(),
-    });
+    StorageManagerRenderer.renderPanel(
+      this,
+      StorageManagerViewManager.getPanelLayout().saved,
+      StorageSummaryManager.formatSavedDataRows(this.saved),
+    );
   }
 
   drawSubmissionPanel() {
-    const layout = StorageManagerViewManager.getPanelLayout().submissions;
-    const panelStyle = StorageManagerViewManager.getPanelStyle();
-    createPanelBackground(this, layout.panel, panelStyle);
-    createPanelTitle(this, layout.title, panelStyle, { origin: 0.5 });
-
-    const rows = StorageSummaryManager.formatSubmissionRows(this.submissions);
-
-    createLayoutText(this, layout.body, {
-      text: rows.join('\n'),
-      style: StorageManagerViewManager.getBodyTextStyle(),
-    });
+    StorageManagerRenderer.renderPanel(
+      this,
+      StorageManagerViewManager.getPanelLayout().submissions,
+      StorageSummaryManager.formatSubmissionRows(this.submissions),
+    );
   }
 
   drawControls() {
     const layout = StorageManagerViewManager.getControlLayout();
-    this.statusText = createLayoutText(this, layout.status, {
-      text: StorageSummaryManager.formatStatusText(),
-      style: StorageManagerViewManager.getStatusTextStyle(),
-      origin: 0.5,
-    });
+    this.statusText = StorageManagerRenderer.renderStatus(this, layout, StorageSummaryManager.formatStatusText());
 
     const clearSaveButton = createTextButton(this, layout.clearSave, StorageManagerViewManager.getButtonStyle());
     clearSaveButton.on('pointerdown', () => {
