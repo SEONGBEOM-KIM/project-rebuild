@@ -3313,6 +3313,18 @@ function testSaveImport() {
   assert.deepEqual(SaveManager.load().data.exploredPlaces, learningData.exploredPlaces);
 
   SaveManager.importJsonText(JSON.stringify({ data: learningData }));
+
+  const apiPayload = LearningApiPayloadManager.build(createCompleteLearningData());
+  const importedApiPayload = SaveManager.importJsonText(JSON.stringify(apiPayload));
+  assert.equal(importedApiPayload.data.episode, apiPayload.episode_id);
+  assert.deepEqual(importedApiPayload.data.exploredPlaces, apiPayload.learning_steps.explored_places);
+  assert.equal(importedApiPayload.data.quizResult.questionId, apiPayload.learning_steps.quiz_result.question_id);
+  assert.equal(importedApiPayload.data.selectedPolicy.id, apiPayload.selected_policy.id);
+  assert.equal(importedApiPayload.data.selectedStrategy.id, apiPayload.selected_strategy.id);
+  assert.equal(importedApiPayload.data.selectedStrategy.stateFocus, apiPayload.selected_strategy.state_focus);
+  assert.equal(importedApiPayload.data.placements[0].buildingId, apiPayload.placements[0].building_id);
+  assert.deepEqual(importedApiPayload.data.gameState, apiPayload.final_state);
+
   assert.throws(() => SaveManager.importJsonText('{"episode":1}'), /학습 데이터 JSON 형식/);
   assert.throws(() => SaveManager.importJsonText('{broken json'), SyntaxError);
 

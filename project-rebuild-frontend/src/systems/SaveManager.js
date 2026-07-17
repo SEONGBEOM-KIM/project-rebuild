@@ -27,11 +27,21 @@ export default class SaveManager {
 
   static importJsonText(jsonText) {
     const parsed = JSON.parse(jsonText);
-    const data = parsed?.data ?? parsed;
+    const data = SaveManager.normalizeImportedData(parsed?.data ?? parsed);
     if (!SaveManager.isLearningDataShape(data)) {
       throw new Error('학습 데이터 JSON 형식이 아닙니다.');
     }
     return SaveManager.save(data);
+  }
+
+  static normalizeImportedData(data) {
+    if (SaveManager.isLearningDataShape(data)) {
+      return data;
+    }
+    if (SaveManager.isApiPayloadShape(data)) {
+      return SaveManager.fromApiPayload(data);
+    }
+    return data;
   }
 
   static isLearningDataShape(data) {
@@ -42,6 +52,96 @@ export default class SaveManager {
       && Array.isArray(data.exploredPlaces)
       && Array.isArray(data.placements)
     );
+  }
+
+  static isApiPayloadShape(data) {
+    return Boolean(
+      data
+      && typeof data === 'object'
+      && Number.isFinite(data.episode_id)
+      && Array.isArray(data.learning_steps?.explored_places)
+      && Array.isArray(data.placements)
+    );
+  }
+
+  static fromApiPayload(payload) {
+    return {
+      episode: payload.episode_id,
+      summary: SaveManager.fromApiSummary(payload.summary),
+      exploredPlaces: payload.learning_steps.explored_places,
+      dataViewed: Boolean(payload.learning_steps.data_viewed),
+      quizResult: SaveManager.fromApiQuizResult(payload.learning_steps.quiz_result),
+      problemSummaryCompleted: Boolean(payload.learning_steps.problem_summary_completed),
+      selectedPolicy: SaveManager.fromApiPolicy(payload.selected_policy),
+      selectedStrategy: SaveManager.fromApiStrategy(payload.selected_strategy),
+      placements: payload.placements.map((placement) => ({
+        buildingId: placement.building_id,
+        buildingName: placement.building_name,
+        position: placement.position,
+        effect: placement.effect,
+      })),
+      gameState: payload.final_state ?? null,
+      reflectionChoice: SaveManager.fromApiReflectionChoice(payload.learning_steps.reflection_choice),
+      completed: Boolean(payload.completed),
+    };
+  }
+
+  static fromApiSummary(summary) {
+    if (!summary) {
+      return null;
+    }
+    return {
+      outcomeType: summary.outcome_type,
+      outcomeMessage: summary.outcome_message,
+      priorityIssue: summary.priority_issue,
+      selectedPolicyName: summary.selected_policy_name,
+      selectedStrategyTitle: summary.selected_strategy_title,
+      placementCount: summary.placement_count,
+      nextAction: summary.next_action,
+    };
+  }
+
+  static fromApiQuizResult(quizResult) {
+    if (!quizResult) {
+      return null;
+    }
+    return {
+      questionId: quizResult.question_id,
+      selected: quizResult.selected,
+      correct: Boolean(quizResult.correct),
+    };
+  }
+
+  static fromApiPolicy(policy) {
+    if (!policy) {
+      return null;
+    }
+    return {
+      id: policy.id,
+      name: policy.name,
+    };
+  }
+
+  static fromApiStrategy(strategy) {
+    if (!strategy) {
+      return null;
+    }
+    return {
+      id: strategy.id,
+      title: strategy.title,
+      stateFocus: strategy.state_focus,
+      policyId: strategy.policy_id,
+    };
+  }
+
+  static fromApiReflectionChoice(reflectionChoice) {
+    if (!reflectionChoice) {
+      return null;
+    }
+    return {
+      id: reflectionChoice.id,
+      title: reflectionChoice.title,
+    };
   }
 
   static clear() {
