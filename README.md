@@ -79,6 +79,7 @@ npm run verify
 - `docs/SCENE_FLOW.md`: Phaser Scene 순서와 전환 조건
 - `docs/QA_CHECKLIST.md`: 브라우저 수동 QA 체크리스트
 - `docs/EVALUATION_RULES.md`: 상태값/결과 평가/부작용 감지 기준
+- `docs/EPISODE_CONFIGS.md`: 에피소드별 배치 config/evaluation profile 확장 가이드
 
 ## 화면 코드 구조 원칙
 
