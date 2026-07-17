@@ -3759,6 +3759,12 @@ function testSaveImport() {
   assert.equal(importedApiPayload.data.selectedPolicy.id, apiPayload.selected_policy.id);
   assert.equal(importedApiPayload.data.selectedStrategy.id, apiPayload.selected_strategy.id);
   assert.equal(importedApiPayload.data.selectedStrategy.stateFocus, apiPayload.selected_strategy.state_focus);
+  assert.equal(importedApiPayload.data.selectedStrategy.placementConfigId, apiPayload.selected_strategy.placement_config_id);
+  assert.equal(importedApiPayload.data.placementConfig.id, apiPayload.placement_config.id);
+  assert.equal(importedApiPayload.data.placementConfig.requiredPlacements, apiPayload.placement_config.required_placements);
+  assert.deepEqual(importedApiPayload.data.placementConfig.stateKeys, apiPayload.placement_config.state_keys);
+  assert.equal(importedApiPayload.data.placementConfig.evaluationProfileId, apiPayload.placement_config.evaluation_profile_id);
+  assert.equal(importedApiPayload.data.evaluationProfile.id, apiPayload.evaluation_profile.id);
   assert.equal(importedApiPayload.data.placements[0].buildingId, apiPayload.placements[0].building_id);
   assert.deepEqual(importedApiPayload.data.gameState, apiPayload.final_state);
 
@@ -3785,15 +3791,23 @@ function testApiContract() {
     'learning_steps',
     'selected_policy',
     'selected_strategy',
+    'placement_config',
+    'evaluation_profile',
     'placements',
     'final_state',
   ]);
   assert.equal(API_CONTRACT.requestExample.summary.selected_strategy_title, '균형 성장');
   assert.equal(API_CONTRACT.requestExample.selected_strategy.id, 'balanced_growth');
+  assert.equal(API_CONTRACT.requestExample.selected_strategy.placement_config_id, DEFAULT_PLACEMENT_CONFIG_ID);
+  assert.equal(API_CONTRACT.requestExample.placement_config.id, DEFAULT_PLACEMENT_CONFIG_ID);
+  assert.equal(API_CONTRACT.requestExample.placement_config.evaluation_profile_id, DEFAULT_EVALUATION_PROFILE_ID);
+  assert.equal(API_CONTRACT.requestExample.evaluation_profile.id, DEFAULT_EVALUATION_PROFILE_ID);
   assert.equal(LearningApiPayloadManager.validate(API_CONTRACT.requestExample).every((row) => row.ok), true);
   assert.equal(MockApiClient.validatePayload(API_CONTRACT.requestExample).ok, true);
   assert.match(formatContractRequest(), /POST \/api\/learning-records\//);
   assert.match(formatContractRequest(), /selected_strategy/);
+  assert.match(formatContractRequest(), /placement_config/);
+  assert.match(formatContractRequest(), /evaluation_profile/);
   assert.match(formatContractResponse(), /201 Created/);
 }
 

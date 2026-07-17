@@ -74,6 +74,8 @@ export default class SaveManager {
       problemSummaryCompleted: Boolean(payload.learning_steps.problem_summary_completed),
       selectedPolicy: SaveManager.fromApiPolicy(payload.selected_policy),
       selectedStrategy: SaveManager.fromApiStrategy(payload.selected_strategy),
+      placementConfig: SaveManager.fromApiPlacementConfig(payload.placement_config),
+      evaluationProfile: SaveManager.fromApiEvaluationProfile(payload.evaluation_profile),
       placements: payload.placements.map((placement) => ({
         buildingId: placement.building_id,
         buildingName: placement.building_name,
@@ -131,6 +133,30 @@ export default class SaveManager {
       title: strategy.title,
       stateFocus: strategy.state_focus,
       policyId: strategy.policy_id,
+      placementConfigId: strategy.placement_config_id ?? null,
+    };
+  }
+
+  static fromApiPlacementConfig(placementConfig) {
+    if (!placementConfig) {
+      return null;
+    }
+    return {
+      id: placementConfig.id,
+      episodeId: placementConfig.episode_id,
+      title: placementConfig.title,
+      requiredPlacements: placementConfig.required_placements,
+      stateKeys: placementConfig.state_keys,
+      evaluationProfileId: placementConfig.evaluation_profile_id,
+    };
+  }
+
+  static fromApiEvaluationProfile(evaluationProfile) {
+    if (!evaluationProfile) {
+      return null;
+    }
+    return {
+      id: evaluationProfile.id,
     };
   }
 

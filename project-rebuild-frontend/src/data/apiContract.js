@@ -43,6 +43,18 @@ export const API_CONTRACT = {
       title: '균형 성장',
       state_focus: '환경 유지 만족도↑ 오염↓',
       policy_id: 'green_recovery',
+      placement_config_id: 'ep2_population_recovery',
+    },
+    placement_config: {
+      id: 'ep2_population_recovery',
+      episode_id: 'ep2',
+      title: '푸른군 인구 회복 배치 실험',
+      required_placements: 3,
+      state_keys: ['population', 'economy', 'environment', 'satisfaction', 'budget', 'traffic', 'pollution'],
+      evaluation_profile_id: 'ep2_population_recovery_default',
+    },
+    evaluation_profile: {
+      id: 'ep2_population_recovery_default',
     },
     placements: [
       {
