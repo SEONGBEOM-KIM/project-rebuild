@@ -3085,6 +3085,11 @@ function testLearningDataManager() {
   assert.equal(data.summary.selectedPolicyName, '청년 생활 지원');
   assert.equal(data.summary.selectedStrategyTitle, '일자리와 생활 기반');
   assert.equal(data.selectedStrategy.id, 'jobs_services');
+  assert.equal(data.selectedStrategy.placementConfigId, DEFAULT_PLACEMENT_CONFIG_ID);
+  assert.equal(data.placementConfig.id, DEFAULT_PLACEMENT_CONFIG_ID);
+  assert.equal(data.placementConfig.evaluationProfileId, DEFAULT_EVALUATION_PROFILE_ID);
+  assert.deepEqual(data.placementConfig.stateKeys, DEFAULT_STATE_KEYS);
+  assert.equal(data.evaluationProfile.id, DEFAULT_EVALUATION_PROFILE_ID);
   assert.equal(data.summary.placementCount, 3);
   assert.equal(data.summary.nextAction.title, '예산 균형 보완');
   assert.equal(LearningDataManager.isReadyToSave(data), true);

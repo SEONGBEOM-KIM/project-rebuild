@@ -4,7 +4,8 @@ import IssueDetector from './IssueDetector.js';
 import LearningProgress from './LearningProgress.js';
 import EndingSummaryManager from './EndingSummaryManager.js';
 import Ep2BriefingViewManager from './Ep2BriefingViewManager.js';
-import { getPlacementConfigIdForStrategy } from '../data/episodePlacementConfigs.js';
+import { getPlacementConfig, getPlacementConfigIdForStrategy } from '../data/episodePlacementConfigs.js';
+import { getEvaluationProfile } from '../data/evaluationRules.js';
 
 export default class LearningDataManager {
   static build(registry) {
@@ -12,10 +13,13 @@ export default class LearningDataManager {
     const quizResult = registry.get('quizResult');
     const selectedPolicy = registry.get('selectedPolicy');
     const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, registry.get('ep2StrategyId') ?? progress.selectedStrategyId, selectedPolicy?.id);
+    const placementConfigId = registry.get('placementConfigId') ?? progress.placementConfigId ?? getPlacementConfigIdForStrategy(selectedStrategy);
+    const placementConfig = getPlacementConfig(placementConfigId);
+    const evaluationProfile = getEvaluationProfile(placementConfig.evaluationProfileId);
     const placedBuildings = registry.get('placedBuildings') ?? [];
     const gameState = registry.get('gameState');
     const reflectionChoice = registry.get('reflectionChoice');
-    const issues = IssueDetector.detect(gameState);
+    const issues = IssueDetector.detect(gameState, evaluationProfile);
     const ending = EndingSummaryManager.getEndingSummary(gameState, placedBuildings);
     const exploredPlaceNames = explorationPlaces
       .filter((place) => progress.exploredPlaces.includes(place.id))
@@ -45,8 +49,19 @@ export default class LearningDataManager {
         title: selectedStrategy.title,
         stateFocus: selectedStrategy.stateFocus,
         policyId: selectedStrategy.policyId,
-        placementConfigId: getPlacementConfigIdForStrategy(selectedStrategy),
+        placementConfigId: placementConfig.id,
       } : null,
+      placementConfig: {
+        id: placementConfig.id,
+        episodeId: placementConfig.episodeId,
+        title: placementConfig.title,
+        requiredPlacements: placementConfig.requiredPlacements,
+        stateKeys: placementConfig.stateKeys,
+        evaluationProfileId: placementConfig.evaluationProfileId,
+      },
+      evaluationProfile: {
+        id: evaluationProfile.id,
+      },
       placements: placedBuildings.map((record) => ({
         buildingId: record.building.id,
         buildingName: record.building.name,
