@@ -6,9 +6,7 @@ import { CURRENT_EPISODE } from '../data/episodes.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import ExplorationViewManager from '../systems/ExplorationViewManager.js';
 import ExplorationMapRenderer from '../systems/ExplorationMapRenderer.js';
-import { createTextButton } from '../ui/TextButton.js';
-import { createLayoutText } from '../ui/LayoutText.js';
-import { createPanelBackground } from '../ui/PanelRenderer.js';
+import ExplorationRenderer from '../systems/ExplorationRenderer.js';
 
 export default class ExplorationScene extends Phaser.Scene {
   constructor() {
@@ -16,7 +14,6 @@ export default class ExplorationScene extends Phaser.Scene {
   }
 
   create() {
-    const { width, height } = this.scale;
     this.exploredPlaces = new Set(this.registry.get('exploredPlaces') ?? []);
     this.placeObjects = new Map();
 
@@ -25,7 +22,7 @@ export default class ExplorationScene extends Phaser.Scene {
     createScreenBackground(this, layout.background.color);
     ProgressStepper.render(this, layout.progressStep);
     this.drawMapBackdrop();
-    this.drawHeader();
+    ExplorationRenderer.renderHeader(this);
     this.drawPlaces();
     this.drawInfoPanel();
     this.drawControls();
@@ -33,14 +30,6 @@ export default class ExplorationScene extends Phaser.Scene {
 
     const firstUnvisited = explorationPlaces.find((place) => !this.exploredPlaces.has(place.id)) ?? explorationPlaces[0];
     this.selectPlace(firstUnvisited);
-  }
-
-  drawHeader() {
-    const layout = ExplorationViewManager.getScreenLayout();
-    createLayoutText(this, layout.title, { text: CURRENT_EPISODE.shortTitle });
-    createLayoutText(this, layout.subtitle, {
-      text: ExplorationViewManager.formatSubtitle(CURRENT_EPISODE.regionName),
-    });
   }
 
   drawMapBackdrop() {
@@ -58,33 +47,24 @@ export default class ExplorationScene extends Phaser.Scene {
   }
 
   drawInfoPanel() {
-    const layout = ExplorationViewManager.getInfoPanelLayout();
-    const textStyles = ExplorationViewManager.getTextStyles();
-    createPanelBackground(this, layout.panel, layout.panel);
-    this.panelTitle = createLayoutText(this, layout.title, {
-      style: textStyles.panelTitle,
-    });
-    this.panelBody = createLayoutText(this, layout.body, {
-      style: textStyles.panelBody,
-    });
-    this.progressText = createLayoutText(this, layout.progress, {
-      style: textStyles.progress,
-    });
+    const infoPanel = ExplorationRenderer.renderInfoPanel(this);
+    this.panelTitle = infoPanel.panelTitle;
+    this.panelBody = infoPanel.panelBody;
+    this.progressText = infoPanel.progressText;
   }
 
   drawControls() {
-    const layout = ExplorationViewManager.getControlLayout();
-    const backButton = createTextButton(this, layout.back, ExplorationViewManager.getButtonStyle());
-    backButton.on('pointerdown', () => this.scene.start(layout.back.target));
+    const controls = ExplorationRenderer.renderControls(this);
+    controls.backButton.on('pointerdown', () => this.scene.start(controls.layout.back.target));
 
-    this.nextButton = createTextButton(this, layout.next, ExplorationViewManager.getButtonStyle());
+    this.nextButton = controls.nextButton;
     this.nextButton.on('pointerdown', () => {
       if (this.exploredPlaces.size < CURRENT_EPISODE.requiredExploredCount) {
         this.showNeedMoreMessage();
         return;
       }
       this.registry.set('exploredPlaces', [...this.exploredPlaces]);
-      this.scene.start(layout.next.target);
+      this.scene.start(controls.layout.next.target);
     });
   }
 

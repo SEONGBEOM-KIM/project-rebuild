@@ -23,6 +23,7 @@ import ProblemSummaryViewManager from '../src/systems/ProblemSummaryViewManager.
 import ProblemSummaryRenderer from '../src/systems/ProblemSummaryRenderer.js';
 import ExplorationViewManager from '../src/systems/ExplorationViewManager.js';
 import ExplorationMapRenderer from '../src/systems/ExplorationMapRenderer.js';
+import ExplorationRenderer from '../src/systems/ExplorationRenderer.js';
 import DataBriefingViewManager from '../src/systems/DataBriefingViewManager.js';
 import DataBriefingRenderer from '../src/systems/DataBriefingRenderer.js';
 import ReflectionViewManager from '../src/systems/ReflectionViewManager.js';
@@ -742,6 +743,32 @@ function createRendererSceneSpy() {
       },
     },
   };
+}
+
+
+function testExplorationRenderer() {
+  const headerFixture = createRendererSceneSpy();
+  const header = ExplorationRenderer.renderHeader(headerFixture.scene);
+  assert.equal(header.title.type, 'text');
+  assert.equal(header.subtitle.type, 'text');
+  assert.ok(headerFixture.calls.some((call) => call[0] === 'text' && call[3] === CURRENT_EPISODE.shortTitle));
+  assert.ok(headerFixture.calls.some((call) => call[0] === 'text' && call[3].includes(CURRENT_EPISODE.regionName)));
+
+  const panelFixture = createRendererSceneSpy();
+  const panel = ExplorationRenderer.renderInfoPanel(panelFixture.scene);
+  assert.equal(panel.panel.type, 'rectangle');
+  assert.equal(panel.panelTitle.type, 'text');
+  assert.equal(panel.panelBody.type, 'text');
+  assert.equal(panel.progressText.type, 'text');
+  assert.ok(panelFixture.calls.some((call) => call[0] === 'rectangle' && call[1] === ExplorationViewManager.getInfoPanelLayout().panel.x));
+
+  const controlsFixture = createRendererSceneSpy();
+  const controls = ExplorationRenderer.renderControls(controlsFixture.scene);
+  assert.equal(controls.backButton.type, 'text');
+  assert.equal(controls.nextButton.type, 'text');
+  assert.deepEqual(controls.layout, ExplorationViewManager.getControlLayout());
+  assert.ok(controlsFixture.calls.some((call) => call[0] === 'text' && call[3] === '스토리 다시 보기'));
+  assert.ok(controlsFixture.calls.some((call) => call[0] === 'text' && call[3] === '자료 확인'));
 }
 
 function testExplorationMapRenderer() {
@@ -3451,6 +3478,7 @@ async function run() {
   testProblemSummaryRenderer();
   testProblemSummaryViewManager();
   testExplorationViewManager();
+  testExplorationRenderer();
   testExplorationMapRenderer();
   testDataBriefingRenderer();
   testDataBriefingViewManager();
