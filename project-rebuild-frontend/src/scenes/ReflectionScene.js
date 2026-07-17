@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import { EP1_REFLECTION_CHOICES } from '../data/episodeContent.js';
+import IssueDetector from '../systems/IssueDetector.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import ReflectionViewManager from '../systems/ReflectionViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
@@ -15,6 +16,10 @@ export default class ReflectionScene extends Phaser.Scene {
 
   create() {
     const { width, height } = this.scale;
+    const gameState = this.registry.get('gameState');
+    const issues = IssueDetector.detect(gameState);
+    const selectedPolicy = this.registry.get('selectedPolicy');
+    const placedBuildings = this.registry.get('placedBuildings') ?? [];
     this.selectedChoice = this.registry.get('reflectionChoice');
     this.choiceObjects = new Map();
 
@@ -26,6 +31,8 @@ export default class ReflectionScene extends Phaser.Scene {
     createLayoutText(this, layout.title, { origin: 0.5 });
 
     createLayoutText(this, layout.subtitle, { origin: 0.5 });
+
+    this.drawRunSummary({ gameState, issues, selectedPolicy, placedBuildings }, layout);
 
     EP1_REFLECTION_CHOICES.forEach((choice, index) => {
       const { x, y } = ReflectionViewManager.getChoiceCardPosition(index);
@@ -40,6 +47,17 @@ export default class ReflectionScene extends Phaser.Scene {
 
     this.drawControls();
     this.updateSelectionUi();
+  }
+
+  drawRunSummary(summaryData, layout) {
+    const panelStyle = ReflectionViewManager.getSummaryPanelStyle();
+    const textStyles = ReflectionViewManager.getSummaryTextStyles();
+    createPanelBackground(this, layout.summaryPanel, panelStyle);
+    createPanelTitle(this, layout.summaryTitle, textStyles.title);
+    createLayoutText(this, layout.summaryBody, {
+      text: ReflectionViewManager.formatRunSummary(summaryData),
+      style: textStyles.body,
+    });
   }
 
   createChoiceCard(choice, x, y) {

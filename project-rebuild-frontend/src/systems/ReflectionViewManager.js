@@ -3,7 +3,16 @@ const REFLECTION_SCREEN_LAYOUT = {
   progressStep: 'ending',
   title: { y: 82, text: '생각 정리', fontSize: '60px', color: '#ffffff', fontStyle: 'bold' },
   subtitle: { y: 150, text: '이번 선택을 돌아보고, 다음 개발에서 가장 먼저 보완할 부분을 고르세요.', fontSize: '27px', color: '#bfdbfe' },
-  feedback: { y: 790, wordWrapWidth: 1150 },
+  summaryPanel: { x: 960, y: 238, width: 1510, height: 96, strokeColor: 0x93c5fd },
+  summaryTitle: { x: 265, y: 205, text: '이번 결과 요약' },
+  summaryBody: { x: 470, y: 204, wordWrapWidth: 1240 },
+  feedback: { y: 825, wordWrapWidth: 1150 },
+};
+
+const REFLECTION_SUMMARY_PANEL_STYLE = {
+  fillColor: 0x0f172a,
+  fillAlpha: 0.9,
+  strokeWidth: 3,
 };
 
 const REFLECTION_CHOICE_CARD_LAYOUT = {
@@ -12,6 +21,11 @@ const REFLECTION_CHOICE_CARD_LAYOUT = {
   iconOffset: { x: -250, y: -35 },
   titleOffset: { x: -200, y: -62 },
   descriptionOffset: { x: -200, y: -12, wordWrapWidth: 470 },
+};
+
+const REFLECTION_SUMMARY_TEXT_STYLES = {
+  title: { fontSize: '24px', color: '#fde68a', fontStyle: 'bold' },
+  body: { fontSize: '21px', color: '#e0f2fe', lineSpacing: 5 },
 };
 
 const REFLECTION_FEEDBACK_TEXT_STYLE = {
@@ -25,6 +39,8 @@ const REFLECTION_CHOICE_TEXT_STYLES = {
   description: { fontSize: '23px', color: '#dbeafe', lineSpacing: 8 },
 };
 
+const REFLECTION_ISSUE_PRIORITY_ORDER = ['budget', 'environment', 'traffic', 'satisfaction'];
+
 const REFLECTION_BUTTON_STYLE = {
   fontSize: '32px',
   padding: { x: 34, y: 18 },
@@ -37,6 +53,9 @@ export default class ReflectionViewManager {
       progressStep: REFLECTION_SCREEN_LAYOUT.progressStep,
       title: { x: width / 2, ...REFLECTION_SCREEN_LAYOUT.title },
       subtitle: { x: width / 2, ...REFLECTION_SCREEN_LAYOUT.subtitle },
+      summaryPanel: { ...REFLECTION_SCREEN_LAYOUT.summaryPanel, x: width / 2 },
+      summaryTitle: { ...REFLECTION_SCREEN_LAYOUT.summaryTitle },
+      summaryBody: { ...REFLECTION_SCREEN_LAYOUT.summaryBody },
       feedback: { x: width / 2, ...REFLECTION_SCREEN_LAYOUT.feedback },
     };
   }
@@ -51,6 +70,17 @@ export default class ReflectionViewManager {
         y: y + REFLECTION_CHOICE_CARD_LAYOUT.descriptionOffset.y,
         wordWrapWidth: REFLECTION_CHOICE_CARD_LAYOUT.descriptionOffset.wordWrapWidth,
       },
+    };
+  }
+
+  static getSummaryPanelStyle() {
+    return { ...REFLECTION_SUMMARY_PANEL_STYLE };
+  }
+
+  static getSummaryTextStyles() {
+    return {
+      title: { ...REFLECTION_SUMMARY_TEXT_STYLES.title },
+      body: { ...REFLECTION_SUMMARY_TEXT_STYLES.body },
     };
   }
 
@@ -91,8 +121,31 @@ export default class ReflectionViewManager {
       col,
       row,
       x: 610 + col * 700,
-      y: 385 + row * 250,
+      y: 420 + row * 230,
     };
+  }
+
+  static getPriorityIssue(issues) {
+    if (!issues.length) {
+      return null;
+    }
+
+    return [...issues].sort((a, b) => {
+      const rankA = REFLECTION_ISSUE_PRIORITY_ORDER.indexOf(a.id);
+      const rankB = REFLECTION_ISSUE_PRIORITY_ORDER.indexOf(b.id);
+      return (rankA === -1 ? REFLECTION_ISSUE_PRIORITY_ORDER.length : rankA) - (rankB === -1 ? REFLECTION_ISSUE_PRIORITY_ORDER.length : rankB);
+    })[0];
+  }
+
+  static formatRunSummary({ gameState, issues = [], selectedPolicy = null, placedBuildings = [] }) {
+    const priorityIssue = ReflectionViewManager.getPriorityIssue(issues);
+    const issueText = priorityIssue ? priorityIssue.title : '큰 부작용 신호 없음';
+    const policyName = selectedPolicy?.name ?? '기본 배치 연습';
+
+    return [
+      `선택 방향: ${policyName}  |  배치: ${placedBuildings.length}개  |  우선 보완: ${issueText}`,
+      `최종 상태: 인구 ${gameState.population}, 경제 ${gameState.economy}, 만족도 ${gameState.satisfaction}, 예산 ${gameState.budget}`,
+    ].join('\n');
   }
 
   static formatInitialFeedback() {

@@ -772,7 +772,9 @@ function testReflectionViewManager() {
     fontStyle: 'bold',
   });
   assert.equal(ReflectionViewManager.getScreenLayout(1920).progressStep, 'ending');
-  assert.deepEqual(ReflectionViewManager.getScreenLayout(1920).feedback, { x: 960, y: 790, wordWrapWidth: 1150 });
+  assert.deepEqual(ReflectionViewManager.getScreenLayout(1920).summaryPanel, { x: 960, y: 238, width: 1510, height: 96, strokeColor: 0x93c5fd });
+  assert.equal(ReflectionViewManager.getScreenLayout(1920).summaryTitle.text, '이번 결과 요약');
+  assert.deepEqual(ReflectionViewManager.getScreenLayout(1920).feedback, { x: 960, y: 825, wordWrapWidth: 1150 });
   assert.deepEqual(ReflectionViewManager.getFeedbackTextStyle('initial', 1150), {
     fontSize: '28px',
     align: 'center',
@@ -780,14 +782,16 @@ function testReflectionViewManager() {
     wordWrap: { width: 1150 },
   });
   assert.equal(ReflectionViewManager.getChoiceTextStyles().description.lineSpacing, 8);
+  assert.equal(ReflectionViewManager.getSummaryPanelStyle().strokeWidth, 3);
+  assert.equal(ReflectionViewManager.getSummaryTextStyles().title.color, '#fde68a');
   assert.deepEqual(ReflectionViewManager.getButtonStyle(), {
     fontSize: '32px',
     padding: { x: 34, y: 18 },
   });
-  assert.deepEqual(ReflectionViewManager.getChoiceCardPosition(0), { col: 0, row: 0, x: 610, y: 385 });
-  assert.deepEqual(ReflectionViewManager.getChoiceCardPosition(3), { col: 1, row: 1, x: 1310, y: 635 });
-  assert.deepEqual(ReflectionViewManager.getChoiceCardLayout(610, 385).background, { x: 610, y: 385, width: 620, height: 190 });
-  assert.deepEqual(ReflectionViewManager.getChoiceCardLayout(610, 385).description, { x: 410, y: 373, wordWrapWidth: 470 });
+  assert.deepEqual(ReflectionViewManager.getChoiceCardPosition(0), { col: 0, row: 0, x: 610, y: 420 });
+  assert.deepEqual(ReflectionViewManager.getChoiceCardPosition(3), { col: 1, row: 1, x: 1310, y: 650 });
+  assert.deepEqual(ReflectionViewManager.getChoiceCardLayout(610, 420).background, { x: 610, y: 420, width: 620, height: 190 });
+  assert.deepEqual(ReflectionViewManager.getChoiceCardLayout(610, 420).description, { x: 410, y: 408, wordWrapWidth: 470 });
   assert.deepEqual(ReflectionViewManager.getControlLayout().next, {
     x: 1160,
     y: 940,
@@ -798,6 +802,15 @@ function testReflectionViewManager() {
   });
   assert.equal(ReflectionViewManager.getControlLayout().back.target, 'SideEffectScene');
   assert.equal(ReflectionViewManager.formatInitialFeedback(), '하나를 선택하면 학습 기록에 저장됩니다.');
+  const runSummary = ReflectionViewManager.formatRunSummary({
+    gameState: { ...GameState.createInitialState(), population: 1240, economy: 80, satisfaction: 96, budget: 460 },
+    issues: IssueDetector.detect({ ...GameState.createInitialState(), budget: 460, satisfaction: 96 }),
+    selectedPolicy: policies[0],
+    placedBuildings: [createPlacementRecord('youth_center')],
+  });
+  assert.match(runSummary, /선택 방향: 청년 생활 지원/);
+  assert.match(runSummary, /우선 보완: 예산 부족/);
+  assert.match(runSummary, /최종 상태: 인구 1240/);
   assert.match(ReflectionViewManager.formatSelectedFeedback(selectedChoice), new RegExp(`선택됨: ${selectedChoice.title}`));
   assert.match(ReflectionViewManager.formatSelectedFeedback(selectedChoice), new RegExp(selectedChoice.description));
   assert.match(ReflectionViewManager.formatSelectedFeedback(selectedChoice), new RegExp(selectedChoice.nextAction));
