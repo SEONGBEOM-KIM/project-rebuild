@@ -2610,6 +2610,15 @@ function testEndingSummaryManager() {
   assert.match(EndingSummaryManager.formatFinalTakeaway({ gameState: finalState, ending, reflectionChoice }), /균형형 회복안/);
   assert.match(EndingSummaryManager.formatFinalTakeaway({ gameState: { ...finalState, budget: 400 }, ending, reflectionChoice }), /우선 보완: 예산 부족/);
   assert.match(EndingSummaryManager.formatFinalTakeaway({ gameState: finalState, ending, reflectionChoice }), new RegExp(reflectionChoice.nextActionLabel));
+  const strategyTakeaway = EndingSummaryManager.formatFinalTakeaway({
+    gameState: finalState,
+    ending,
+    reflectionChoice,
+    selectedStrategy: EP2_MISSION_BRIEFING.strategies[0],
+  });
+  assert.match(strategyTakeaway, /EP2 전략: 일자리와 생활 기반/);
+  assert.match(strategyTakeaway, /목표: 인구·경제 동시 개선/);
+  assert.match(strategyTakeaway, /다음 액션: 예산 안의 우선순위 정하기/);
   assert.match(EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice), /선택 방향: 청년 생활 지원/);
   assert.match(EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice), /배치한 시설: 3개/);
   assert.match(EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice), /다음 보완 방향:/);

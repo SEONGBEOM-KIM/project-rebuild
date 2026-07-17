@@ -43,14 +43,19 @@ export default class EndingSummaryManager {
     return issues[0] ?? null;
   }
 
-  static formatFinalTakeaway({ gameState, ending, reflectionChoice }) {
+  static formatFinalTakeaway({ gameState, ending, reflectionChoice, selectedStrategy = null }) {
     const issue = EndingSummaryManager.getPriorityIssue(gameState);
     const issueText = issue ? issue.title : '큰 부작용 신호 없음';
     const actionText = reflectionChoice?.nextActionLabel ?? '다음 보완 방향 선택 필요';
+    const strategyText = selectedStrategy
+      ? `EP2 전략: ${selectedStrategy.title} / 목표: ${selectedStrategy.placementGoalShort ?? selectedStrategy.stateFocus}`
+      : null;
 
     return [
       `${ending.title}: ${ending.message}`,
-      `우선 보완: ${issueText} / 다음 액션: ${actionText}`,
+      strategyText
+        ? `${strategyText} / 우선 보완: ${issueText} / 다음 액션: ${actionText}`
+        : `우선 보완: ${issueText} / 다음 액션: ${actionText}`,
     ].join('\n');
   }
 
