@@ -2,6 +2,7 @@ import { explorationPlaces } from '../data/explorationPlaces.js';
 import { STATE_LABELS } from '../data/stateLabels.js';
 import IssueDetector from './IssueDetector.js';
 import LearningProgress from './LearningProgress.js';
+import EndingSummaryManager from './EndingSummaryManager.js';
 
 const TEACHER_REPORT_DOWNLOAD_CONFIG = {
   mimeType: 'text/plain;charset=utf-8',
@@ -40,6 +41,7 @@ export default class TeacherReportManager {
     const reflectionChoice = registry.get('reflectionChoice');
     const quizResult = registry.get('quizResult') ?? progress.quizResult;
     const issues = IssueDetector.detect(gameState);
+    const ending = EndingSummaryManager.getEndingSummary(gameState, placedBuildings);
     const exploredNames = explorationPlaces
       .filter((place) => progress.exploredPlaces.includes(place.id))
       .map((place) => place.name);
@@ -52,8 +54,24 @@ export default class TeacherReportManager {
       reflectionChoice,
       quizResult,
       issues,
+      ending,
       exploredNames,
     };
+  }
+
+  static formatClassSummaryReport(report) {
+    const priorityIssue = report.issues[0];
+    const issueText = priorityIssue ? priorityIssue.title : '큰 부작용 신호 없음';
+    const actionText = report.reflectionChoice?.nextActionLabel
+      ?? report.reflectionChoice?.title
+      ?? '보완 방향 미선택';
+
+    return [
+      `${report.ending.title}: ${report.ending.message}`,
+      `우선 보완: ${issueText}`,
+      `학생 다음 액션: ${actionText}`,
+      `회복 방향: ${report.selectedPolicy?.name ?? '미선택'} / 배치 ${report.placedBuildings.length}개`,
+    ].join('\n');
   }
 
   static formatProgressReport(report) {
@@ -115,6 +133,9 @@ export default class TeacherReportManager {
   static buildReportText(report) {
     return [
       '[프로젝트 리빌드 EP1 교사용 요약]',
+      '',
+      '0. 수업 결론',
+      TeacherReportManager.formatClassSummaryReport(report),
       '',
       '1. 학습 진행',
       TeacherReportManager.formatProgressReport(report),

@@ -27,11 +27,25 @@ export default class TeacherReportScene extends Phaser.Scene {
 
     createLayoutText(this, layout.subtitle, { origin: 0.5 });
 
+    this.drawSummaryStrip(width / 2, TeacherReportManager.formatClassSummaryReport(report));
+
     const panels = TeacherReportViewManager.getPanelLayout();
     this.drawPanel(panels.progress, TeacherReportManager.formatProgressReport(report));
     this.drawPanel(panels.choice, TeacherReportManager.formatChoiceReport(report));
     this.drawPanel(panels.teaching, TeacherReportManager.formatTeachingPointReport(report));
     this.drawControls();
+  }
+
+  drawSummaryStrip(centerX, body) {
+    const layout = TeacherReportViewManager.getSummaryLayout(centerX);
+    const summaryStyle = TeacherReportViewManager.getSummaryStyle();
+    const textStyles = TeacherReportViewManager.getTextStyles();
+    createPanelBackground(this, layout.panel, summaryStyle);
+    createPanelTitle(this, layout.title, textStyles.summaryTitle);
+    createLayoutText(this, layout.body, {
+      text: body,
+      style: textStyles.summaryBody,
+    });
   }
 
   drawPanel(panel, body) {

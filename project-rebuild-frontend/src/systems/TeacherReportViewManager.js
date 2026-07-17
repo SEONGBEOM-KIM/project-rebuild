@@ -5,6 +5,14 @@ const TEACHER_REPORT_SCREEN_LAYOUT = {
   subtitle: { y: 145, text: '수업 중 학생 활동을 빠르게 확인하기 위한 임시 리포트 화면입니다.', fontSize: '26px', color: '#bfdbfe' },
 };
 
+const TEACHER_REPORT_SUMMARY_STYLE = {
+  fillColor: 0x1e293b,
+  fillAlpha: 0.96,
+  strokeWidth: 3,
+  strokeColor: 0xfde68a,
+  title: '수업 결론',
+};
+
 const TEACHER_REPORT_PANEL_STYLE = {
   fillColor: 0xffffff,
   fillAlpha: 0.96,
@@ -13,7 +21,9 @@ const TEACHER_REPORT_PANEL_STYLE = {
 };
 
 const TEACHER_REPORT_TEXT_STYLES = {
-  panelTitle: { fontSize: '34px', color: '#172554', fontStyle: 'bold' },
+  summaryTitle: { fontSize: '25px', color: '#fde68a', fontStyle: 'bold' },
+  summaryBody: { fontSize: '21px', color: '#e0f2fe', lineSpacing: 5 },
+  panelTitle: { fontSize: '31px', color: '#172554', fontStyle: 'bold' },
   status: { fontSize: '24px', color: '#bfdbfe', align: 'center' },
 };
 
@@ -37,12 +47,18 @@ export default class TeacherReportViewManager {
     };
   }
 
+  static getSummaryStyle() {
+    return { ...TEACHER_REPORT_SUMMARY_STYLE };
+  }
+
   static getPanelStyle() {
     return { ...TEACHER_REPORT_PANEL_STYLE };
   }
 
   static getTextStyles() {
     return {
+      summaryTitle: { ...TEACHER_REPORT_TEXT_STYLES.summaryTitle },
+      summaryBody: { ...TEACHER_REPORT_TEXT_STYLES.summaryBody },
       panelTitle: { ...TEACHER_REPORT_TEXT_STYLES.panelTitle },
       status: { ...TEACHER_REPORT_TEXT_STYLES.status },
     };
@@ -59,11 +75,19 @@ export default class TeacherReportViewManager {
     };
   }
 
+  static getSummaryLayout(centerX) {
+    return {
+      panel: { x: centerX, y: 205, width: 1660, height: 82 },
+      title: { x: centerX - 790, y: 178, text: TEACHER_REPORT_SUMMARY_STYLE.title },
+      body: { x: centerX - 620, y: 176, wordWrapWidth: 1410 },
+    };
+  }
+
   static getPanelLayout() {
     return {
-      progress: { x: 400, y: 450, width: 580, height: 560, title: '학습 진행' },
-      choice: { x: 1010, y: 450, width: 580, height: 560, title: '선택과 결과' },
-      teaching: { x: 1620, y: 450, width: 420, height: 560, title: '지도 포인트' },
+      progress: { x: 400, y: 485, width: 580, height: 500, title: '학습 진행' },
+      choice: { x: 1010, y: 485, width: 580, height: 500, title: '선택과 결과' },
+      teaching: { x: 1620, y: 485, width: 420, height: 500, title: '지도 포인트' },
     };
   }
 
@@ -83,9 +107,9 @@ export default class TeacherReportViewManager {
 
   static getPanelBodyStyle(panel) {
     return {
-      fontSize: '23px',
+      fontSize: '20px',
       color: '#1e293b',
-      lineSpacing: 10,
+      lineSpacing: 6,
       wordWrap: { width: panel.width - 76 },
     };
   }

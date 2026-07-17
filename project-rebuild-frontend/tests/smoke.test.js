@@ -2199,13 +2199,17 @@ function testTeacherReportViewManager() {
     fontStyle: 'bold',
   });
   assert.equal(TeacherReportViewManager.getScreenLayout(1920).progressStep, 'ending');
+  assert.equal(TeacherReportViewManager.getSummaryStyle().title, '수업 결론');
   assert.equal(TeacherReportViewManager.getPanelStyle().strokeColor, 0x60a5fa);
   const panels = TeacherReportViewManager.getPanelLayout();
   assert.equal(panels.progress.title, '학습 진행');
   assert.equal(panels.teaching.width, 420);
-  assert.deepEqual(TeacherReportViewManager.getPanelTitlePosition(panels.progress), { x: 400, y: 214 });
-  assert.deepEqual(TeacherReportViewManager.getPanelBodyPosition(panels.progress), { x: 148, y: 270 });
+  assert.deepEqual(TeacherReportViewManager.getSummaryLayout(960).title, { x: 170, y: 178, text: '수업 결론' });
+  assert.deepEqual(TeacherReportViewManager.getPanelTitlePosition(panels.progress), { x: 400, y: 279 });
+  assert.deepEqual(TeacherReportViewManager.getPanelBodyPosition(panels.progress), { x: 148, y: 335 });
+  assert.equal(TeacherReportViewManager.getPanelBodyStyle(panels.progress).fontSize, '20px');
   assert.equal(TeacherReportViewManager.getPanelBodyStyle(panels.progress).wordWrap.width, 504);
+  assert.equal(TeacherReportViewManager.getTextStyles().summaryBody.color, '#e0f2fe');
   assert.equal(TeacherReportViewManager.getTextStyles().panelTitle.color, '#172554');
   assert.equal(TeacherReportViewManager.getStatusColor('success'), '#bbf7d0');
   assert.equal(TeacherReportViewManager.getStatusColor('failure'), '#fecaca');
@@ -2270,13 +2274,18 @@ function testTeacherReportManager() {
   assert.equal(report.selectedPolicy.id, 'youth_living_support');
   assert.equal(report.placedBuildings.length, 3);
   assert.equal(report.issues.length, 0);
+  assert.equal(report.ending.title, '균형형 회복안');
 
+  assert.match(TeacherReportManager.formatClassSummaryReport(report), /균형형 회복안/);
+  assert.match(TeacherReportManager.formatClassSummaryReport(report), /학생 다음 액션: 예산 균형 보완/);
+  assert.match(TeacherReportManager.formatClassSummaryReport({ ...report, gameState: { ...finalState, budget: 400 }, issues: IssueDetector.detect({ ...finalState, budget: 400 }) }), /우선 보완: 예산 부족/);
   assert.match(TeacherReportManager.formatProgressReport(report), /탐색 장소: 3\/5/);
   assert.match(TeacherReportManager.formatProgressReport(report), /EP1 완료: 예/);
   assert.match(TeacherReportManager.formatChoiceReport(report), /회복 방향: 청년 생활 지원/);
   assert.match(TeacherReportManager.formatChoiceReport(report), /1\. 청년센터/);
   assert.match(TeacherReportManager.formatTeachingPointReport(report), /큰 부작용 신호 없음/);
   assert.match(TeacherReportManager.buildReportText(report), /\[프로젝트 리빌드 EP1 교사용 요약\]/);
+  assert.match(TeacherReportManager.buildReportText(report), /0\. 수업 결론/);
 }
 
 
