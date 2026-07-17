@@ -1,3 +1,13 @@
+export const DEFAULT_STATE_KEYS = [
+  'population',
+  'economy',
+  'environment',
+  'satisfaction',
+  'budget',
+  'traffic',
+  'pollution',
+];
+
 export const STATE_LABELS = {
   population: '인구',
   economy: '경제',

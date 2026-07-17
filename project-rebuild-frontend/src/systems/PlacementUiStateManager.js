@@ -1,4 +1,4 @@
-import { STATE_LABELS, formatEffect, formatSignedValue } from '../data/stateLabels.js';
+import { DEFAULT_STATE_KEYS, STATE_LABELS, formatEffect, formatSignedValue } from '../data/stateLabels.js';
 import { REQUIRED_PLACEMENTS, TILE_LABELS, ZONE_LABELS } from './PlacementViewManager.js';
 
 export default class PlacementUiStateManager {
@@ -44,16 +44,12 @@ export default class PlacementUiStateManager {
     };
   }
 
-  static formatStatusText(state) {
+  static formatStatusText(state, stateKeys = DEFAULT_STATE_KEYS) {
+    const rows = stateKeys.map((key) => `${STATE_LABELS[key] ?? key}: ${state[key] ?? 0}`);
+
     return [
       '현재 상태',
-      `인구: ${state.population}`,
-      `경제: ${state.economy}`,
-      `환경: ${state.environment}`,
-      `만족도: ${state.satisfaction}`,
-      `예산: ${state.budget}`,
-      `교통: ${state.traffic}`,
-      `오염: ${state.pollution}`,
+      ...rows,
     ].join('\n');
   }
 

@@ -83,6 +83,7 @@ import SCENE_KEYS from '../src/data/sceneKeys.js';
 import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES, EP2_MISSION_BRIEFING } from '../src/data/episodeContent.js';
 import ProgressStepper from '../src/ui/ProgressStepper.js';
 import { getTextButtonColor } from '../src/ui/TextButton.js';
+import { DEFAULT_STATE_KEYS } from '../src/data/stateLabels.js';
 import { copyTextToClipboard, downloadTextFile } from '../src/ui/BrowserFileActions.js';
 import { getLayoutTextStyle } from '../src/ui/LayoutText.js';
 import { createPanelBackground, createPanelTitle, getPanelTitleStyle } from '../src/ui/PanelRenderer.js';
@@ -1571,7 +1572,7 @@ function testEpisodePlacementConfigs() {
   assert.equal(config.map.width, mapData.width, 'episode config should expose current sample map');
   assert.equal(config.map.height, mapData.height);
   assert.equal(config.requiredPlacements, 3, 'episode config should declare the current placement target');
-  assert.ok(config.stateKeys.includes('budget'), 'episode config should declare tracked state keys');
+  assert.deepEqual(config.stateKeys, DEFAULT_STATE_KEYS, 'default episode config should use the canonical state display order');
   assert.equal(getPlacementConfig('missing_config').id, DEFAULT_PLACEMENT_CONFIG_ID, 'unknown config ids should fall back safely');
   for (const strategy of EP2_MISSION_BRIEFING.strategies) {
     assert.equal(getPlacementConfigIdForStrategy(strategy), DEFAULT_PLACEMENT_CONFIG_ID, `${strategy.id} should declare a valid placement config`);
@@ -2070,6 +2071,9 @@ function testPlacementUiUpdater() {
   updater.updateStatusBar(GameState.createInitialState());
   assert.match(statusText.text, /현재 상태\n인구: 1000/);
 
+  updater.updateStatusBar(GameState.createInitialState(), ['budget', 'pollution']);
+  assert.equal(statusText.text, '현재 상태\n예산: 1000\n오염: 10');
+
   const youthCenter = buildings.find((building) => building.id === 'youth_center');
   updater.updateLastChangePanel({
     building: youthCenter,
@@ -2217,6 +2221,7 @@ function testPlacementViewManager() {
   assert.match(placementSceneSource, /getPlacementConfig/, 'placement scene should resolve swappable episode placement config');
   assert.match(placementSceneSource, /availableBuildings/, 'placement scene should render buildings from the active episode config');
   assert.match(placementSceneSource, /requiredPlacements/, 'placement scene should apply required placement count from the active episode config');
+  assert.match(placementSceneSource, /stateKeys/, 'placement scene should apply state display keys from the active episode config');
   assert.match(placementSceneSource, /selectedStrategyId/, 'placement scene should recover EP2 strategy from learning progress');
   const resultSceneSource = readProjectFile('src', 'scenes', 'ResultScene.js');
   assert.match(resultSceneSource, /selectedStrategyId/, 'result scene should recover EP2 strategy from learning progress');
@@ -2286,6 +2291,7 @@ function testPlacementViewManager() {
     color: '#bbf7d0',
   });
   assert.match(PlacementUiStateManager.formatStatusText(GameState.createInitialState()), /현재 상태\n인구: 1000/);
+  assert.equal(PlacementUiStateManager.formatStatusText(GameState.createInitialState(), ['economy', 'customMetric']), '현재 상태\n경제: 50\ncustomMetric: 0');
   assert.equal(PlacementUiStateManager.formatLastChangeState(null).color, '#fde68a');
   assert.equal(PlacementUiStateManager.formatPlacementHistoryState([]).color, '#bfdbfe');
 

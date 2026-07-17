@@ -36,12 +36,12 @@ export default class PlacementUiUpdater {
     this.cursorInfoText.setColor(cursorState.color);
   }
 
-  updateStatusBar(state) {
+  updateStatusBar(state, stateKeys = undefined) {
     if (!this.statusText) {
       return;
     }
 
-    this.statusText.setText(this.uiStateManager.formatStatusText(state));
+    this.statusText.setText(this.uiStateManager.formatStatusText(state, stateKeys));
   }
 
   updateLastChangePanel(lastPlacementResult) {

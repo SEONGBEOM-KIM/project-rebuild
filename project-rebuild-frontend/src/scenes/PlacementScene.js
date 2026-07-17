@@ -60,7 +60,7 @@ export default class PlacementScene extends Phaser.Scene {
     });
     this.uiCamera = this.bootstrap.setupCamera(this.objectRegistry);
     this.registerPlacementInput();
-    this.uiUpdater.updateStatusBar(this.registry.get('gameState'));
+    this.uiUpdater.updateStatusBar(this.registry.get('gameState'), this.placementConfig.stateKeys);
     this.uiUpdater.updateLastChangePanel(this.registry.get('lastPlacementResult'));
     this.uiUpdater.updatePlacementHistoryPanel(this.placedBuildings);
     this.updateSelectedBuildingUi();
@@ -154,7 +154,7 @@ export default class PlacementScene extends Phaser.Scene {
     this.placedBuildings = action.placedBuildings;
     this.worldRenderer.drawPlacedBuilding(this.selectedBuilding, action.tile.x, action.tile.y);
     this.worldRenderer.drawImpactMarkers(this.selectedBuilding, action.tile.x, action.tile.y);
-    this.uiUpdater.updateStatusBar(this.registry.get('gameState'));
+    this.uiUpdater.updateStatusBar(this.registry.get('gameState'), this.placementConfig.stateKeys);
     this.uiUpdater.updateLastChangePanel(this.registry.get('lastPlacementResult'));
     this.uiUpdater.updatePlacementHistoryPanel(this.placedBuildings);
     this.uiUpdater.updateContinueButton(
