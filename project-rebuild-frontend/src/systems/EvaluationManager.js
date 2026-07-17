@@ -164,9 +164,10 @@ export default class EvaluationManager {
     }, {});
   }
 
-  static getTopEffectRows(totals) {
+  static getTopEffectRows(totals, stateKeys = null) {
+    const visibleStateKeys = stateKeys ? new Set(stateKeys) : null;
     return Object.entries(totals)
-      .filter(([, value]) => value !== 0)
+      .filter(([key, value]) => value !== 0 && (!visibleStateKeys || visibleStateKeys.has(key)))
       .sort(([, a], [, b]) => Math.abs(b) - Math.abs(a))
       .slice(0, 5)
       .map(([key, value]) => `• ${STATE_LABELS[key] ?? key}: ${formatSignedValue(value)}`);
@@ -223,13 +224,13 @@ export default class EvaluationManager {
   }
 
 
-  static formatChoiceTrendRows(placedBuildings, selectedPolicy = null, selectedStrategy = null) {
+  static formatChoiceTrendRows(placedBuildings, selectedPolicy = null, selectedStrategy = null, stateKeys = null) {
     if (!placedBuildings.length) {
       return '배치 없음';
     }
 
     const totals = EvaluationManager.calculateEffectTotals(placedBuildings);
-    const focusRows = EvaluationManager.getTopEffectRows(totals);
+    const focusRows = EvaluationManager.getTopEffectRows(totals, stateKeys);
     const placementRows = placedBuildings
       .slice(-5)
       .map((record, index) => `${Math.max(1, placedBuildings.length - 4) + index}. ${record.building.name} (${record.position.x}, ${record.position.y})`)

@@ -1355,6 +1355,7 @@ function testEvaluationManager() {
   });
   assert.equal(EvaluationManager.getChoiceTrendMessage(totals, placedBuildings), '경향: 생활·환경을 함께 고려했습니다.');
   assert.ok(EvaluationManager.getTopEffectRows(totals)[0].includes('예산'), 'largest absolute effect should be shown first');
+  assert.deepEqual(EvaluationManager.getTopEffectRows(totals, ['pollution', 'traffic']), ['• 오염: -4', '• 교통: -3']);
   assert.match(EvaluationManager.formatKeyInterpretation(finalState), /인구 회복과 주민 체감/);
   assert.match(EvaluationManager.formatKeyInterpretation({ ...finalState, budget: 300 }), /예산 부족 신호/);
   const trendRows = EvaluationManager.formatChoiceTrendRows(placedBuildings, youthPolicy);
@@ -1363,6 +1364,10 @@ function testEvaluationManager() {
   assert.match(trendRows, /다음 실험:/);
   assert.match(trendRows, /예산 소모를 줄이면서/);
   assert.match(trendRows, /최근 배치:/);
+  const focusedTrendRows = EvaluationManager.formatChoiceTrendRows(placedBuildings, youthPolicy, null, ['environment', 'pollution']);
+  assert.match(focusedTrendRows, /• 환경: \+12/);
+  assert.match(focusedTrendRows, /• 오염: -4/);
+  assert.doesNotMatch(focusedTrendRows, /• 예산: -440/);
   const strategyTrendRows = EvaluationManager.formatChoiceTrendRows(placedBuildings, youthPolicy, EP2_MISSION_BRIEFING.strategies[0]);
   assert.match(strategyTrendRows, /EP2 전략: 일자리와 생활 기반/);
   assert.match(strategyTrendRows, /목표: 인구·경제 동시 개선/);
