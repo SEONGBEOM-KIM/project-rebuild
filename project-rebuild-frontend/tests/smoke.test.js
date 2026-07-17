@@ -1981,6 +1981,11 @@ function testPlacementUiUpdater() {
   assert.match(placementHistoryText.text, /총 배치: 1개/);
   assert.equal(placementHistoryText.color, '#e0f2fe');
 
+  updater.updateContinueButton(1, policies[0], EP2_MISSION_BRIEFING.strategies[0]);
+  assert.match(missionText.text, /EP2 전략: 일자리와 생활 기반/);
+  assert.match(missionText.text, /선택 방향: 청년 생활 지원/);
+  assert.match(missionText.text, /추천 시설: 청년센터, 버스정류장/);
+
   updater.updateContinueButton(3, null);
   assert.match(missionText.text, /종합 결과 확인 가능/);
   assert.equal(continueButton.text, '종합 결과 확인');
@@ -2185,6 +2190,11 @@ function testPlacementViewManager() {
   assert.equal(continueState.enabled, false);
   assert.equal(continueState.buttonText, '시설 1개 더 배치');
   assert.match(continueState.missionText, /추천 시설: 작은 공원/);
+
+  const strategyContinueState = PlacementUiStateManager.getContinueState(1, policies[0], EP2_MISSION_BRIEFING.strategies[0]);
+  assert.match(strategyContinueState.missionText, /EP2 전략: 일자리와 생활 기반/);
+  assert.match(strategyContinueState.missionText, /선택 방향: 청년 생활 지원/);
+  assert.match(strategyContinueState.missionText, /추천 시설: 청년센터, 버스정류장/);
   assert.equal(PlacementUiStateManager.canContinue(2), false);
   assert.equal(PlacementUiStateManager.canContinue(3), true);
   assert.equal(PlacementUiStateManager.getContinueState(3, null).buttonText, '종합 결과 확인');

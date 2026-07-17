@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { buildings } from '../data/buildings.js';
+import { EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
 import PlacementViewManager from '../systems/PlacementViewManager.js';
 import CameraController from '../systems/CameraController.js';
 import PlacementUiStateManager from '../systems/PlacementUiStateManager.js';
@@ -8,6 +9,7 @@ import PlacementUiUpdater from '../systems/PlacementUiUpdater.js';
 import PlacementUiRenderer from '../systems/PlacementUiRenderer.js';
 import PlacementSceneBootstrap from '../systems/PlacementSceneBootstrap.js';
 import PlacementActionManager from '../systems/PlacementActionManager.js';
+import Ep2BriefingViewManager from '../systems/Ep2BriefingViewManager.js';
 import { PLACEMENT_ACTION_STATUS } from '../systems/PlacementActionManager.js';
 
 export default class PlacementScene extends Phaser.Scene {
@@ -18,6 +20,7 @@ export default class PlacementScene extends Phaser.Scene {
   create() {
     this.selectedBuilding = buildings[0];
     this.selectedPolicy = this.registry.get('selectedPolicy');
+    this.selectedStrategy = Ep2BriefingViewManager.findStrategyById(EP2_MISSION_BRIEFING, this.registry.get('ep2StrategyId'));
     this.placedBuildings = [...(this.registry.get('placedBuildings') ?? [])];
     this.bootstrap = new PlacementSceneBootstrap({ scene: this, cameraControllerClass: CameraController });
 
@@ -53,7 +56,7 @@ export default class PlacementScene extends Phaser.Scene {
     this.uiUpdater.updateLastChangePanel(this.registry.get('lastPlacementResult'));
     this.uiUpdater.updatePlacementHistoryPanel(this.placedBuildings);
     this.updateSelectedBuildingUi();
-    this.uiUpdater.updateContinueButton(this.placedBuildings.length, this.selectedPolicy);
+    this.uiUpdater.updateContinueButton(this.placedBuildings.length, this.selectedPolicy, this.selectedStrategy);
   }
 
   createUi() {
@@ -137,7 +140,7 @@ export default class PlacementScene extends Phaser.Scene {
     this.uiUpdater.updateStatusBar(this.registry.get('gameState'));
     this.uiUpdater.updateLastChangePanel(this.registry.get('lastPlacementResult'));
     this.uiUpdater.updatePlacementHistoryPanel(this.placedBuildings);
-    this.uiUpdater.updateContinueButton(this.placedBuildings.length, this.selectedPolicy);
+    this.uiUpdater.updateContinueButton(this.placedBuildings.length, this.selectedPolicy, this.selectedStrategy);
     this.uiUpdater.showMessage(PlacementUiStateManager.formatPlacementSuccessMessage(this.selectedBuilding, this.placedBuildings.length), '#bbf7d0');
     this.updatePreview(pointer);
   }

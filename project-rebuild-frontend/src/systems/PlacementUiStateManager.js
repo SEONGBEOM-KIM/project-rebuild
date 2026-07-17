@@ -122,9 +122,12 @@ export default class PlacementUiStateManager {
     return placedCount >= requiredPlacements;
   }
 
-  static getContinueState(placedCount, selectedPolicy, requiredPlacements = REQUIRED_PLACEMENTS) {
-    const enabled = PlacementUiStateManager.canContinue(placedCount, requiredPlacements);
-    const remaining = Math.max(0, requiredPlacements - placedCount);
+  static getContinueState(placedCount, selectedPolicy, selectedStrategy = null, requiredPlacements = REQUIRED_PLACEMENTS) {
+    const resolvedRequiredPlacements = typeof selectedStrategy === 'number' ? selectedStrategy : requiredPlacements;
+    const strategy = typeof selectedStrategy === 'number' ? null : selectedStrategy;
+    const enabled = PlacementUiStateManager.canContinue(placedCount, resolvedRequiredPlacements);
+    const remaining = Math.max(0, resolvedRequiredPlacements - placedCount);
+    const strategyLine = strategy ? `EP2 전략: ${strategy.title}` : null;
     const policyLine = selectedPolicy ? `선택 방향: ${selectedPolicy.name}` : '선택 방향: 기본 배치 연습';
     const recommendedLine = selectedPolicy ? `추천 시설: ${selectedPolicy.recommendedBuildings.join(', ')}` : null;
 
@@ -132,11 +135,10 @@ export default class PlacementUiStateManager {
       enabled,
       remaining,
       missionText: [
+        strategyLine,
         policyLine,
         recommendedLine,
-        `미션: 시설 ${requiredPlacements}개를 배치해`,
-        '지역 상태 변화를 비교하세요.',
-        `진행: ${placedCount}/${requiredPlacements}`,
+        `미션: 시설 ${resolvedRequiredPlacements}개 배치 (${placedCount}/${resolvedRequiredPlacements})`,
         remaining > 0 ? `남은 배치: ${remaining}개` : '종합 결과 확인 가능',
       ].filter(Boolean).join('\n'),
       buttonText: enabled ? '종합 결과 확인' : `시설 ${remaining}개 더 배치`,
