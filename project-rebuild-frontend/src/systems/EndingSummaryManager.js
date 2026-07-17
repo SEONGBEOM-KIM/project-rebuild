@@ -38,6 +38,22 @@ export default class EndingSummaryManager {
     };
   }
 
+  static getPriorityIssue(gameState) {
+    const issues = IssueDetector.detect(gameState);
+    return issues[0] ?? null;
+  }
+
+  static formatFinalTakeaway({ gameState, ending, reflectionChoice }) {
+    const issue = EndingSummaryManager.getPriorityIssue(gameState);
+    const issueText = issue ? issue.title : '큰 부작용 신호 없음';
+    const actionText = reflectionChoice?.nextActionLabel ?? '다음 보완 방향 선택 필요';
+
+    return [
+      `${ending.title}: ${ending.message}`,
+      `우선 보완: ${issueText} / 다음 액션: ${actionText}`,
+    ].join('\n');
+  }
+
   static formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice = null) {
     const buildingCounts = placedBuildings.reduce((counts, record) => {
       counts[record.building.name] = (counts[record.building.name] ?? 0) + 1;

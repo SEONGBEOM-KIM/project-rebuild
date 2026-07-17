@@ -33,12 +33,26 @@ export default class EndingScene extends Phaser.Scene {
 
     createLayoutText(this, layout.subtitle, { origin: 0.5 });
 
+    this.drawTakeawayStrip(width / 2, EndingSummaryManager.formatFinalTakeaway({ gameState, ending, reflectionChoice }));
+
     const panels = EndingSummaryViewManager.getPanelLayout();
     this.drawPanel(panels.choice, EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice));
     this.drawPanel(panels.state, EndingSummaryManager.formatStateSummary(gameState, ending));
     this.drawNextMissionPanel(panels.nextMission);
     this.drawLearningRecordStrip(width / 2, learningProgress, exploredPlaces, quizResult, reflectionChoice);
     this.drawControls(width / 2);
+  }
+
+  drawTakeawayStrip(centerX, body) {
+    const layout = EndingSummaryViewManager.getTakeawayLayout(centerX);
+    const takeawayStyle = EndingSummaryViewManager.getTakeawayStyle();
+    const textStyles = EndingSummaryViewManager.getTextStyles();
+    createPanelBackground(this, layout.panel, takeawayStyle);
+    createPanelTitle(this, layout.title, textStyles.takeawayTitle);
+    createLayoutText(this, layout.body, {
+      text: body,
+      style: textStyles.takeawayBody,
+    });
   }
 
   drawPanel(panel, body) {

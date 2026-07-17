@@ -2111,16 +2111,20 @@ function testEndingSummaryViewManager() {
     fontStyle: 'bold',
   });
   assert.equal(EndingSummaryViewManager.getScreenLayout(1920).progressStep, 'ending');
+  assert.equal(EndingSummaryViewManager.getTakeawayStyle().title, '학습 결론');
   assert.equal(EndingSummaryViewManager.getPanelStyle().strokeColor, 0x60a5fa);
   assert.equal(EndingSummaryViewManager.getLearningRecordStyle().title, '학습 기록');
   assert.equal(EndingSummaryViewManager.getNextMissionStyle().strokeColor, 0xbbf7d0);
   const panels = EndingSummaryViewManager.getPanelLayout();
   assert.equal(panels.choice.title, '오늘의 선택 요약');
   assert.equal(panels.nextMission.width, 360);
-  assert.deepEqual(EndingSummaryViewManager.getPanelTitlePosition(panels.choice), { x: 430, y: 195 });
-  assert.deepEqual(EndingSummaryViewManager.getPanelBodyPosition(panels.choice), { x: 175, y: 255 });
+  assert.deepEqual(EndingSummaryViewManager.getTakeawayLayout(960).title, { x: 170, y: 178, text: '학습 결론' });
+  assert.deepEqual(EndingSummaryViewManager.getPanelTitlePosition(panels.choice), { x: 430, y: 265 });
+  assert.deepEqual(EndingSummaryViewManager.getPanelBodyPosition(panels.choice), { x: 175, y: 325 });
+  assert.equal(EndingSummaryViewManager.getPanelBodyStyle(panels.choice).fontSize, '20px');
   assert.equal(EndingSummaryViewManager.getPanelBodyStyle(panels.choice).wordWrap.width, 510);
   assert.equal(EndingSummaryViewManager.getNextMissionBodyStyle(panels.nextMission).wordWrap.width, 296);
+  assert.equal(EndingSummaryViewManager.getTextStyles().takeawayBody.color, '#e0f2fe');
   assert.equal(EndingSummaryViewManager.getTextStyles().learningRecordBody.lineSpacing, 9);
   assert.deepEqual(EndingSummaryViewManager.getButtonStyle(), {
     fontSize: '29px',
@@ -2153,6 +2157,9 @@ function testEndingSummaryManager() {
 
   assert.equal(ending.title, '균형형 회복안');
   const reflectionChoice = EP1_REFLECTION_CHOICES.find((choice) => choice.id === 'budget_balance');
+  assert.match(EndingSummaryManager.formatFinalTakeaway({ gameState: finalState, ending, reflectionChoice }), /균형형 회복안/);
+  assert.match(EndingSummaryManager.formatFinalTakeaway({ gameState: { ...finalState, budget: 400 }, ending, reflectionChoice }), /우선 보완: 예산 부족/);
+  assert.match(EndingSummaryManager.formatFinalTakeaway({ gameState: finalState, ending, reflectionChoice }), new RegExp(reflectionChoice.nextActionLabel));
   assert.match(EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice), /선택 방향: 청년 생활 지원/);
   assert.match(EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice), /배치한 시설: 3개/);
   assert.match(EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice), /다음 보완 방향:/);

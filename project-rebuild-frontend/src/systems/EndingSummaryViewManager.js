@@ -5,6 +5,14 @@ const ENDING_SCREEN_LAYOUT = {
   subtitle: { y: 145, text: 'EP1 탐색부터 시설 배치까지의 학습 기록을 요약합니다.', fontSize: '26px', color: '#bfdbfe' },
 };
 
+const ENDING_TAKEAWAY_STYLE = {
+  fillColor: 0x1e293b,
+  fillAlpha: 0.96,
+  strokeWidth: 3,
+  strokeColor: 0x93c5fd,
+  title: '학습 결론',
+};
+
 const ENDING_PANEL_STYLE = {
   fillColor: 0xffffff,
   fillAlpha: 0.96,
@@ -28,7 +36,9 @@ const ENDING_NEXT_MISSION_STYLE = {
 };
 
 const ENDING_TEXT_STYLES = {
-  panelTitle: { fontSize: '34px', color: '#172554', fontStyle: 'bold' },
+  takeawayTitle: { fontSize: '25px', color: '#fde68a', fontStyle: 'bold' },
+  takeawayBody: { fontSize: '22px', color: '#e0f2fe', lineSpacing: 5 },
+  panelTitle: { fontSize: '32px', color: '#172554', fontStyle: 'bold' },
   learningRecordTitle: { fontSize: '28px', color: '#fde68a', fontStyle: 'bold' },
   learningRecordBody: { fontSize: '22px', color: '#ffffff', lineSpacing: 9 },
   nextMissionTitle: { fontSize: '32px', color: '#ffffff', fontStyle: 'bold' },
@@ -49,6 +59,10 @@ export default class EndingSummaryViewManager {
     };
   }
 
+  static getTakeawayStyle() {
+    return { ...ENDING_TAKEAWAY_STYLE };
+  }
+
   static getPanelStyle() {
     return { ...ENDING_PANEL_STYLE };
   }
@@ -63,6 +77,8 @@ export default class EndingSummaryViewManager {
 
   static getTextStyles() {
     return {
+      takeawayTitle: { ...ENDING_TEXT_STYLES.takeawayTitle },
+      takeawayBody: { ...ENDING_TEXT_STYLES.takeawayBody },
       panelTitle: { ...ENDING_TEXT_STYLES.panelTitle },
       learningRecordTitle: { ...ENDING_TEXT_STYLES.learningRecordTitle },
       learningRecordBody: { ...ENDING_TEXT_STYLES.learningRecordBody },
@@ -77,11 +93,19 @@ export default class EndingSummaryViewManager {
     };
   }
 
+  static getTakeawayLayout(centerX) {
+    return {
+      panel: { x: centerX, y: 205, width: 1660, height: 82 },
+      title: { x: centerX - 790, y: 178, text: ENDING_TAKEAWAY_STYLE.title },
+      body: { x: centerX - 620, y: 176, wordWrapWidth: 1410 },
+    };
+  }
+
   static getPanelLayout() {
     return {
-      choice: { x: 430, y: 430, width: 600, height: 560, title: '오늘의 선택 요약' },
-      state: { x: 1110, y: 430, width: 600, height: 560, title: '지역 상태 요약' },
-      nextMission: { x: 1585, y: 430, width: 360, height: 560, title: '다음 개발 목표' },
+      choice: { x: 430, y: 470, width: 600, height: 500, title: '오늘의 선택 요약' },
+      state: { x: 1110, y: 470, width: 600, height: 500, title: '지역 상태 요약' },
+      nextMission: { x: 1585, y: 470, width: 360, height: 500, title: '다음 개발 목표' },
     };
   }
 
@@ -101,18 +125,18 @@ export default class EndingSummaryViewManager {
 
   static getPanelBodyStyle(panel) {
     return {
-      fontSize: '22px',
+      fontSize: '20px',
       color: '#1e293b',
-      lineSpacing: 7,
+      lineSpacing: 5,
       wordWrap: { width: panel.width - 90 },
     };
   }
 
   static getNextMissionBodyStyle(panel) {
     return {
-      fontSize: '22px',
+      fontSize: '20px',
       color: '#dbeafe',
-      lineSpacing: 11,
+      lineSpacing: 8,
       wordWrap: { width: panel.width - 64 },
     };
   }
