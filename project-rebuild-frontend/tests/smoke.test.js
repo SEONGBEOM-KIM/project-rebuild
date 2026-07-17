@@ -2315,6 +2315,10 @@ function testPlacementViewManager() {
   assert.match(resultSceneSource, /getEvaluationProfile/, 'result scene should resolve evaluation profile from active placement config');
   assert.match(resultSceneSource, /formatEvaluationRows\(evaluation, gameState, placedBuildings, selectedPolicy, selectedStrategy, evaluationProfile\)/, 'result scene should pass evaluation profile into result copy');
   assert.match(resultSceneSource, /stateKeys/, 'result scene should apply state display keys from active placement config');
+  const sideEffectSceneSource = readProjectFile('src', 'scenes', 'SideEffectScene.js');
+  assert.match(sideEffectSceneSource, /getPlacementConfig/, 'side effect scene should resolve active placement config');
+  assert.match(sideEffectSceneSource, /getEvaluationProfile/, 'side effect scene should resolve evaluation profile from active placement config');
+  assert.match(sideEffectSceneSource, /IssueDetector\.detect\(gameState, evaluationProfile\)/, 'side effect scene should detect issues with active evaluation profile');
   const endingSceneSource = readProjectFile('src', 'scenes', 'EndingScene.js');
   assert.match(endingSceneSource, /selectedStrategyId/, 'ending scene should recover EP2 strategy from learning progress');
   const reflectionSceneSource = readProjectFile('src', 'scenes', 'ReflectionScene.js');

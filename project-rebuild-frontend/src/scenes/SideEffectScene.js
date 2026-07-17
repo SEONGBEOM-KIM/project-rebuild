@@ -7,6 +7,8 @@ import SideEffectRenderer from '../systems/SideEffectRenderer.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 import { EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
+import { getPlacementConfig } from '../data/episodePlacementConfigs.js';
+import { getEvaluationProfile } from '../data/evaluationRules.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import Ep2BriefingViewManager from '../systems/Ep2BriefingViewManager.js';
 
@@ -18,7 +20,6 @@ export default class SideEffectScene extends Phaser.Scene {
   create() {
     const { width } = this.scale;
     const gameState = this.registry.get('gameState');
-    const issues = IssueDetector.detect(gameState);
     const selectedPolicy = this.registry.get('selectedPolicy');
     const learningProgress = LearningProgress.get(this.registry);
     const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(
@@ -26,6 +27,9 @@ export default class SideEffectScene extends Phaser.Scene {
       this.registry.get('ep2StrategyId') ?? learningProgress.selectedStrategyId,
       selectedPolicy?.id,
     );
+    const placementConfig = getPlacementConfig(this.registry.get('placementConfigId') ?? learningProgress.placementConfigId);
+    const evaluationProfile = getEvaluationProfile(placementConfig.evaluationProfileId);
+    const issues = IssueDetector.detect(gameState, evaluationProfile);
 
     const layout = SideEffectViewManager.getScreenLayout(width);
 
