@@ -2771,6 +2771,8 @@ function testLearningDataViewManager() {
   });
   assert.match(LearningDataViewManager.formatJson(completeData), /"episode": 1/);
   assert.match(LearningDataViewManager.formatSummaryText(completeData), /환경 우선 회복안/);
+  assert.match(LearningDataViewManager.formatSummaryText(completeData), /EP2 전략: 균형 성장/);
+  assert.match(LearningDataViewManager.formatSummaryText(completeData), /회복 방향: 녹색 회복 계획/);
   assert.match(LearningDataViewManager.formatSummaryText(completeData), /우선 보완/);
   const completeSummary = LearningDataViewManager.getValidationSummary(completeData);
   assert.equal(completeSummary.ok, true);

@@ -191,8 +191,11 @@ export default class LearningDataViewManager {
 
     const issueText = summary.priorityIssue?.title ?? '큰 부작용 신호 없음';
     const actionText = summary.nextAction?.label ?? '다음 액션 미선택';
+    const policyText = summary.selectedPolicyName ?? '회복 방향 미선택';
+    const strategyText = summary.selectedStrategyTitle ?? learningData.selectedStrategy?.title ?? 'EP2 전략 미선택';
     return [
       `${summary.outcomeType}: ${summary.outcomeMessage}`,
+      `EP2 전략: ${strategyText} / 회복 방향: ${policyText}`,
       `우선 보완: ${issueText} / 다음 액션: ${actionText} / 배치 ${summary.placementCount}개`,
     ].join('\n');
   }
