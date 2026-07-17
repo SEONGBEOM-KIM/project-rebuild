@@ -10,7 +10,7 @@ export default class LearningDataManager {
     const progress = LearningProgress.get(registry);
     const quizResult = registry.get('quizResult');
     const selectedPolicy = registry.get('selectedPolicy');
-    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, registry.get('ep2StrategyId'), selectedPolicy?.id);
+    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, registry.get('ep2StrategyId') ?? progress.selectedStrategyId, selectedPolicy?.id);
     const placedBuildings = registry.get('placedBuildings') ?? [];
     const gameState = registry.get('gameState');
     const reflectionChoice = registry.get('reflectionChoice');

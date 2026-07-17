@@ -2645,6 +2645,7 @@ function testTeacherReportManager() {
     quizResult,
     problemSummaryCompleted: true,
     selectedPolicyId: selectedPolicy.id,
+    selectedStrategyId: 'jobs_services',
     placedBuildingIds: placedBuildings.map((record) => record.building.id),
     reflectionChoice,
     completed: true,
@@ -2808,13 +2809,13 @@ function testLearningDataManager() {
     quizResult: { questionId: 'ep1_q1', selected: 'lack_jobs_services', correct: true },
     problemSummaryCompleted: true,
     selectedPolicyId: 'youth_living_support',
+    selectedStrategyId: 'jobs_services',
     placedBuildingIds: ['youth_center', 'bus_station', 'small_park'],
     reflectionChoice: { id: 'budget_balance', title: '예산 균형 보완' },
     completed: true,
   });
   registry.set('quizResult', { questionId: 'ep1_q1', selected: 'lack_jobs_services', correct: true });
   registry.set('selectedPolicy', { id: 'youth_living_support', name: '청년 생활 지원' });
-  registry.set('ep2StrategyId', 'jobs_services');
   registry.set('gameState', GameState.createInitialState());
   registry.set('reflectionChoice', { id: 'budget_balance', title: '예산 균형 보완' });
   registry.set('placedBuildings', [
