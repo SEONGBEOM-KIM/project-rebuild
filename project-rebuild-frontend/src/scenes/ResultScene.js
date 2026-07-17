@@ -3,9 +3,9 @@ import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import EvaluationManager from '../systems/EvaluationManager.js';
 import ResultViewManager from '../systems/ResultViewManager.js';
+import ResultRenderer from '../systems/ResultRenderer.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
-import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
 
 export default class ResultScene extends Phaser.Scene {
   constructor() {
@@ -13,7 +13,7 @@ export default class ResultScene extends Phaser.Scene {
   }
 
   create() {
-    const { width, height } = this.scale;
+    const { width } = this.scale;
     const gameState = this.registry.get('gameState');
     const lastPlacementResult = this.registry.get('lastPlacementResult');
     const placedBuildings = this.registry.get('placedBuildings') ?? [];
@@ -33,24 +33,13 @@ export default class ResultScene extends Phaser.Scene {
     });
 
     const panels = ResultViewManager.getPanelLayout(width / 2);
-    this.drawStatePanel(panels.beforeAfter, EvaluationManager.formatBeforeAfterRows(lastPlacementResult, gameState));
-    this.drawStatePanel(panels.evaluation, EvaluationManager.formatEvaluationRows(evaluation, gameState, placedBuildings, selectedPolicy));
-    this.drawStatePanel(panels.trend, EvaluationManager.formatChoiceTrendRows(placedBuildings, selectedPolicy));
-    this.drawResidentReactionStrip(width / 2, EvaluationManager.formatResidentReactions(gameState, placedBuildings));
+    ResultRenderer.renderStatePanel(this, panels.beforeAfter, EvaluationManager.formatBeforeAfterRows(lastPlacementResult, gameState));
+    ResultRenderer.renderStatePanel(this, panels.evaluation, EvaluationManager.formatEvaluationRows(evaluation, gameState, placedBuildings, selectedPolicy));
+    ResultRenderer.renderStatePanel(this, panels.trend, EvaluationManager.formatChoiceTrendRows(placedBuildings, selectedPolicy));
+    ResultRenderer.renderResidentReactionStrip(this, width / 2, EvaluationManager.formatResidentReactions(gameState, placedBuildings));
     this.drawControls(width / 2);
   }
 
-  drawResidentReactionStrip(centerX, rows) {
-    const layout = ResultViewManager.getResidentReactionLayout(centerX);
-    const reactionStyle = ResultViewManager.getResidentReactionStyle();
-    const textStyles = ResultViewManager.getResidentReactionTextStyles();
-    createPanelBackground(this, layout.panel, reactionStyle);
-    createPanelTitle(this, layout.title, textStyles.title);
-    createLayoutText(this, layout.body, {
-      text: rows,
-      style: textStyles.body,
-    });
-  }
 
   drawControls(centerX) {
     const controls = ResultViewManager.getControlLayout(centerX);
@@ -61,18 +50,7 @@ export default class ResultScene extends Phaser.Scene {
   }
 
 
-  drawStatePanel(panel, rows) {
-    const panelStyle = ResultViewManager.getPanelStyle();
-    createPanelBackground(this, { ...panel, y: panel.y + panelStyle.yOffset }, panelStyle);
-    const titlePosition = ResultViewManager.getPanelTitlePosition(panel);
-    createPanelTitle(this, titlePosition, ResultViewManager.getPanelTitleTextStyle(), { text: panel.title, origin: 0.5 });
-    const bodyPosition = ResultViewManager.getPanelBodyPosition(panel);
-    createLayoutText(this, bodyPosition, {
-      text: rows,
-      style: ResultViewManager.getPanelBodyStyle(panel),
-      origin: [0.5, 0],
-    });
-  }
+
 
 
 

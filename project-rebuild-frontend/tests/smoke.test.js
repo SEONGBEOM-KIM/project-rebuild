@@ -6,8 +6,10 @@ import GameState from '../src/systems/GameState.js';
 import BootFlowManager from '../src/systems/BootFlowManager.js';
 import IssueDetector from '../src/systems/IssueDetector.js';
 import SideEffectViewManager from '../src/systems/SideEffectViewManager.js';
+import SideEffectRenderer from '../src/systems/SideEffectRenderer.js';
 import EvaluationManager from '../src/systems/EvaluationManager.js';
 import ResultViewManager from '../src/systems/ResultViewManager.js';
+import ResultRenderer from '../src/systems/ResultRenderer.js';
 import EndingSummaryManager from '../src/systems/EndingSummaryManager.js';
 import EndingSummaryViewManager from '../src/systems/EndingSummaryViewManager.js';
 import EndingSummaryRenderer from '../src/systems/EndingSummaryRenderer.js';
@@ -1108,6 +1110,19 @@ function createPlacementRecord(buildingId, position = { x: 1, y: 1 }) {
   return { building, position, delta: building.effect };
 }
 
+function testResultRenderer() {
+  const panels = ResultViewManager.getPanelLayout(960);
+  const panelFixture = createRendererSceneSpy();
+  ResultRenderer.renderStatePanel(panelFixture.scene, panels.evaluation, '종합 평가 본문');
+  assert.ok(panelFixture.calls.some((call) => call[0] === 'text' && call[3] === '종합 평가'));
+  assert.ok(panelFixture.calls.some((call) => call[0] === 'text' && call[3] === '종합 평가 본문'));
+
+  const reactionFixture = createRendererSceneSpy();
+  ResultRenderer.renderResidentReactionStrip(reactionFixture.scene, 960, '주민 반응 본문');
+  assert.ok(reactionFixture.calls.some((call) => call[0] === 'text' && call[3] === '주민 반응'));
+  assert.ok(reactionFixture.calls.some((call) => call[0] === 'text' && call[3] === '주민 반응 본문'));
+}
+
 function testResultViewManager() {
   assert.deepEqual(ResultViewManager.getScreenLayout(1920).title, {
     x: 960,
@@ -1216,6 +1231,24 @@ function testEvaluationManager() {
   assert.match(EvaluationManager.getNextExperimentSuggestion({ population: 80 }, [createPlacementRecord('youth_center')], youthPolicy), /추천 시설 버스정류장/);
 }
 
+
+function testSideEffectRenderer() {
+  const emptyFixture = createRendererSceneSpy();
+  SideEffectRenderer.renderIssueArea(emptyFixture.scene, []);
+  assert.ok(emptyFixture.calls.some((call) => call[0] === 'text' && call[3] === '감지된 주의 신호'));
+  assert.ok(emptyFixture.calls.some((call) => call[0] === 'text' && call[3].includes('현재 큰 부작용 신호는 없습니다')));
+
+  const issues = IssueDetector.detect({ ...GameState.createInitialState(), budget: 400, environment: 48 });
+  const issueFixture = createRendererSceneSpy();
+  SideEffectRenderer.renderIssueArea(issueFixture.scene, issues);
+  assert.ok(issueFixture.calls.some((call) => call[0] === 'text' && call[3].includes('우선 확인: 예산 부족')));
+  assert.ok(issueFixture.calls.some((call) => call[0] === 'text' && call[3] === SideEffectViewManager.getIssuePriorityLabel(issues[0])));
+
+  const hintFixture = createRendererSceneSpy();
+  SideEffectRenderer.renderConceptPanel(hintFixture.scene, issues);
+  assert.ok(hintFixture.calls.some((call) => call[0] === 'text' && call[3] === '다음 선택 힌트'));
+  assert.ok(hintFixture.calls.some((call) => call[0] === 'text' && call[3].includes('대응:')));
+}
 
 function testSideEffectViewManager() {
   assert.deepEqual(SideEffectViewManager.getScreenLayout(1920).title, {
