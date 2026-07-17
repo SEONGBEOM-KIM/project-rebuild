@@ -44,7 +44,7 @@ export default class EndingScene extends Phaser.Scene {
     EndingSummaryRenderer.renderLearningRecordStrip(
       this,
       width / 2,
-      EndingSummaryManager.formatLearningRecordRows(learningProgress, exploredPlaces, quizResult, reflectionChoice),
+      EndingSummaryManager.formatLearningRecordRows(learningProgress, exploredPlaces, quizResult, reflectionChoice, selectedStrategy),
     );
     this.drawControls(width / 2);
   }

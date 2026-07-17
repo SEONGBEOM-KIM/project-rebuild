@@ -113,7 +113,7 @@ export default class EndingSummaryManager {
     ].join('\n');
   }
 
-  static formatLearningRecordRows(learningProgress, exploredPlaces, quizResult, reflectionChoice) {
+  static formatLearningRecordRows(learningProgress, exploredPlaces, quizResult, reflectionChoice, selectedStrategy = null) {
     const exploredNames = explorationPlaces
       .filter((place) => exploredPlaces.includes(place.id))
       .map((place) => place.name)
@@ -124,6 +124,7 @@ export default class EndingSummaryManager {
       `탐색: ${exploredPlaces.length}/${explorationPlaces.length}곳 확인 (${exploredNames})`,
       `자료 확인: ${learningProgress.dataViewed ? '완료' : '미완료'} / 인구 감소 · 지역 불균형 · 고령화 자료 카드 확인`,
       `원인 질문: ${quizStatus} / 문제 정리: ${learningProgress.problemSummaryCompleted ? '완료' : '미완료'} / EP1 완료: ${learningProgress.completed ? '예' : '아니오'}`,
+      `EP2 전략: ${selectedStrategy?.title ?? '미선택'}${selectedStrategy?.stateFocus ? ` / 초점: ${selectedStrategy.stateFocus}` : ''}`,
       `배치 기록: ${learningProgress.placedBuildingIds.length}개 시설 배치 / 생각 정리: ${reflectionChoice?.title ?? '미선택'} / 다음 액션: ${reflectionChoice?.nextActionLabel ?? '미정'}`,
     ];
   }

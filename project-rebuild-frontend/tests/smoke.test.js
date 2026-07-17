@@ -2559,12 +2559,15 @@ function testEndingSummaryManager() {
     ['school', 'market', 'bus_stop'],
     { selected: 'lack_jobs_services', correct: true },
     reflectionChoice,
+    EP2_MISSION_BRIEFING.strategies[0],
   );
-  assert.equal(rows.length, 4);
+  assert.equal(rows.length, 5);
   assert.match(rows[0], /탐색: 3\/5곳 확인/);
   assert.match(rows[2], /원인 질문: 정답/);
-  assert.match(rows[3], /생각 정리: 예산 균형 보완/);
-  assert.match(rows[3], new RegExp(reflectionChoice.nextActionLabel));
+  assert.match(rows[3], /EP2 전략: 일자리와 생활 기반/);
+  assert.match(rows[3], /초점: 인구↑ 경제↑ 예산↓/);
+  assert.match(rows[4], /생각 정리: 예산 균형 보완/);
+  assert.match(rows[4], new RegExp(reflectionChoice.nextActionLabel));
 }
 
 function testTeacherReportRenderer() {
