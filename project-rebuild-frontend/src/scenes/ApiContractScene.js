@@ -4,9 +4,9 @@ import ProgressStepper from '../ui/ProgressStepper.js';
 
 import { formatContractRequest, formatContractResponse } from '../data/apiContract.js';
 import ApiContractViewManager from '../systems/ApiContractViewManager.js';
+import ApiContractRenderer from '../systems/ApiContractRenderer.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
-import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
 
 export default class ApiContractScene extends Phaser.Scene {
   constructor() {
@@ -14,7 +14,7 @@ export default class ApiContractScene extends Phaser.Scene {
   }
 
   create() {
-    const { width, height } = this.scale;
+    const { width } = this.scale;
     const screenLayout = ApiContractViewManager.getScreenLayout(width);
     createScreenBackground(this, screenLayout.backgroundColor);
     ProgressStepper.render(this, screenLayout.progressStep);
@@ -23,41 +23,12 @@ export default class ApiContractScene extends Phaser.Scene {
     createLayoutText(this, screenLayout.subtitle, { origin: 0.5 });
 
     const panels = ApiContractViewManager.getPanelLayout();
-    this.drawPanel(panels.request, formatContractRequest());
-    this.drawPanel(panels.response, formatContractResponse());
-    this.drawNotes();
+    ApiContractRenderer.renderPanel(this, panels.request, formatContractRequest());
+    ApiContractRenderer.renderPanel(this, panels.response, formatContractResponse());
+    ApiContractRenderer.renderNotes(this);
     this.drawControls();
   }
 
-  drawPanel(panel, body) {
-    const panelStyle = ApiContractViewManager.getPanelStyle();
-    createPanelBackground(this, panel, panelStyle);
-    const titlePosition = ApiContractViewManager.getPanelTitlePosition(panel);
-    createPanelTitle(this, titlePosition, panelStyle, { text: panel.title });
-    const bodyPosition = ApiContractViewManager.getPanelBodyPosition(panel);
-    createLayoutText(this, bodyPosition, {
-      text: body,
-      style: ApiContractViewManager.getPanelBodyStyle(panel),
-    });
-  }
-
-  drawNotes() {
-    const layout = ApiContractViewManager.getNotesLayout();
-    const noteStyle = ApiContractViewManager.getNoteStyle();
-    createPanelBackground(this, layout.panel, noteStyle);
-    createPanelTitle(this, layout.title, noteStyle);
-    createLayoutText(this, {
-      x: layout.body.x,
-      y: layout.body.y,
-      wordWrapWidth: layout.body.width,
-    }, {
-      text: ApiContractViewManager.formatBackendNote(),
-      style: {
-        fontSize: noteStyle.bodyFontSize,
-        color: noteStyle.bodyColor,
-      },
-    });
-  }
 
   drawControls() {
     const layout = ApiContractViewManager.getControlLayout();

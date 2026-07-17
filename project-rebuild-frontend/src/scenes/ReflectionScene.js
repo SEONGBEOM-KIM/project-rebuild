@@ -5,9 +5,9 @@ import { EP1_REFLECTION_CHOICES } from '../data/episodeContent.js';
 import IssueDetector from '../systems/IssueDetector.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import ReflectionViewManager from '../systems/ReflectionViewManager.js';
+import ReflectionRenderer from '../systems/ReflectionRenderer.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
-import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
 
 export default class ReflectionScene extends Phaser.Scene {
   constructor() {
@@ -15,7 +15,7 @@ export default class ReflectionScene extends Phaser.Scene {
   }
 
   create() {
-    const { width, height } = this.scale;
+    const { width } = this.scale;
     const gameState = this.registry.get('gameState');
     const issues = IssueDetector.detect(gameState);
     const selectedPolicy = this.registry.get('selectedPolicy');
@@ -32,59 +32,27 @@ export default class ReflectionScene extends Phaser.Scene {
 
     createLayoutText(this, layout.subtitle, { origin: 0.5 });
 
-    this.drawRunSummary({ gameState, issues, selectedPolicy, placedBuildings }, layout);
+    ReflectionRenderer.renderRunSummary(this, { gameState, issues, selectedPolicy, placedBuildings }, layout);
 
     EP1_REFLECTION_CHOICES.forEach((choice, index) => {
       const { x, y } = ReflectionViewManager.getChoiceCardPosition(index);
-      this.createChoiceCard(choice, x, y);
+      const cardObjects = ReflectionRenderer.renderChoiceCard(
+        this,
+        choice,
+        this.selectedChoice,
+        x,
+        y,
+        (selected) => this.selectChoice(selected),
+      );
+      this.choiceObjects.set(choice.id, cardObjects);
     });
 
-    this.feedbackText = createLayoutText(this, layout.feedback, {
-      text: ReflectionViewManager.formatInitialFeedback(),
-      style: ReflectionViewManager.getFeedbackTextStyle('initial', layout.feedback.wordWrapWidth),
-      origin: 0.5,
-    });
+    this.feedbackText = ReflectionRenderer.renderFeedback(this, layout);
 
     this.drawControls();
     this.updateSelectionUi();
   }
 
-  drawRunSummary(summaryData, layout) {
-    const panelStyle = ReflectionViewManager.getSummaryPanelStyle();
-    const textStyles = ReflectionViewManager.getSummaryTextStyles();
-    createPanelBackground(this, layout.summaryPanel, panelStyle);
-    createPanelTitle(this, layout.summaryTitle, textStyles.title);
-    createLayoutText(this, layout.summaryBody, {
-      text: ReflectionViewManager.formatRunSummary(summaryData),
-      style: textStyles.body,
-    });
-  }
-
-  createChoiceCard(choice, x, y) {
-    const layout = ReflectionViewManager.getChoiceCardLayout(x, y);
-    const initialStyle = ReflectionViewManager.getChoiceCardStyle(choice.id, this.selectedChoice);
-    const textStyles = ReflectionViewManager.getChoiceTextStyles();
-    const background = createPanelBackground(this, layout.background, initialStyle)
-      .setInteractive({ useHandCursor: true });
-    const icon = createLayoutText(this, layout.icon, {
-      text: choice.icon,
-      style: textStyles.icon,
-      origin: 0.5,
-    });
-    const title = createPanelTitle(this, layout.title, textStyles.title, { text: choice.title });
-    const description = createLayoutText(this, layout.description, {
-      text: choice.description,
-      style: textStyles.description,
-    });
-
-    const select = () => this.selectChoice(choice);
-    background.on('pointerdown', select);
-    icon.setInteractive({ useHandCursor: true }).on('pointerdown', select);
-    title.setInteractive({ useHandCursor: true }).on('pointerdown', select);
-    description.setInteractive({ useHandCursor: true }).on('pointerdown', select);
-
-    this.choiceObjects.set(choice.id, { background, choice });
-  }
 
   selectChoice(choice) {
     this.selectedChoice = choice;

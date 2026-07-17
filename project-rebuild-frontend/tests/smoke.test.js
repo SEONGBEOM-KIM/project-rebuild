@@ -26,12 +26,14 @@ import ExplorationMapRenderer from '../src/systems/ExplorationMapRenderer.js';
 import DataBriefingViewManager from '../src/systems/DataBriefingViewManager.js';
 import DataBriefingRenderer from '../src/systems/DataBriefingRenderer.js';
 import ReflectionViewManager from '../src/systems/ReflectionViewManager.js';
+import ReflectionRenderer from '../src/systems/ReflectionRenderer.js';
 import TitleViewManager from '../src/systems/TitleViewManager.js';
 import AuthViewManager from '../src/systems/AuthViewManager.js';
 import AuthRenderer from '../src/systems/AuthRenderer.js';
 import StoryViewManager from '../src/systems/StoryViewManager.js';
 import StoryRenderer from '../src/systems/StoryRenderer.js';
 import ApiContractViewManager from '../src/systems/ApiContractViewManager.js';
+import ApiContractRenderer from '../src/systems/ApiContractRenderer.js';
 import LearningDataManager from '../src/systems/LearningDataManager.js';
 import LearningDataViewManager from '../src/systems/LearningDataViewManager.js';
 import TeacherReportManager from '../src/systems/TeacherReportManager.js';
@@ -831,6 +833,42 @@ function testDataBriefingViewManager() {
   assert.equal(DataBriefingViewManager.validateCards([{ id: 'broken', bars: [] }])[0].ok, false);
 }
 
+
+function testReflectionRenderer() {
+  const layout = ReflectionViewManager.getScreenLayout(1920);
+  const summaryFixture = createRendererSceneSpy();
+  ReflectionRenderer.renderRunSummary(summaryFixture.scene, {
+    gameState: { ...GameState.createInitialState(), population: 1240, economy: 80, satisfaction: 96, budget: 460 },
+    issues: IssueDetector.detect({ ...GameState.createInitialState(), budget: 460, satisfaction: 96 }),
+    selectedPolicy: policies[0],
+    placedBuildings: [createPlacementRecord('youth_center')],
+  }, layout);
+  assert.ok(summaryFixture.calls.some((call) => call[0] === 'text' && call[3] === '이번 결과 요약'));
+  assert.ok(summaryFixture.calls.some((call) => call[0] === 'text' && call[3].includes('선택 방향')));
+
+  const selected = [];
+  const choice = EP1_REFLECTION_CHOICES[0];
+  const cardFixture = createRendererSceneSpy();
+  const rendered = ReflectionRenderer.renderChoiceCard(
+    cardFixture.scene,
+    choice,
+    null,
+    610,
+    420,
+    (selectedChoice) => selected.push(selectedChoice.id),
+  );
+  assert.equal(rendered.background.type, 'rectangle');
+  assert.ok(cardFixture.calls.some((call) => call[0] === 'text' && call[3] === choice.title));
+  rendered.background.events.get('pointerdown')();
+  rendered.icon.events.get('pointerdown')();
+  assert.deepEqual(selected, [choice.id, choice.id]);
+
+  const feedbackFixture = createRendererSceneSpy();
+  const feedback = ReflectionRenderer.renderFeedback(feedbackFixture.scene, layout);
+  assert.equal(feedback.type, 'text');
+  assert.ok(feedbackFixture.calls.some((call) => call[0] === 'text' && call[3] === ReflectionViewManager.formatInitialFeedback()));
+}
+
 function testReflectionViewManager() {
   const selectedChoice = EP1_REFLECTION_CHOICES[0];
   const otherChoice = EP1_REFLECTION_CHOICES[1];
@@ -1002,6 +1040,22 @@ function testStoryViewManager() {
     ...layout.startButton,
     x: 960,
   });
+}
+
+
+function testApiContractRenderer() {
+  const panels = ApiContractViewManager.getPanelLayout();
+  const panelFixture = createRendererSceneSpy();
+  const panelBody = ApiContractRenderer.renderPanel(panelFixture.scene, panels.request, 'request body');
+  assert.equal(panelBody.type, 'text');
+  assert.ok(panelFixture.calls.some((call) => call[0] === 'text' && call[3] === panels.request.title));
+  assert.ok(panelFixture.calls.some((call) => call[0] === 'text' && call[3] === 'request body'));
+
+  const notesFixture = createRendererSceneSpy();
+  const notesBody = ApiContractRenderer.renderNotes(notesFixture.scene);
+  assert.equal(notesBody.type, 'text');
+  assert.ok(notesFixture.calls.some((call) => call[0] === 'text' && call[3] === '백엔드 구현 메모'));
+  assert.ok(notesFixture.calls.some((call) => call[0] === 'text' && call[3].includes('서버에서 추가')));
 }
 
 function testApiContractViewManager() {
@@ -3313,12 +3367,14 @@ async function run() {
   testExplorationMapRenderer();
   testDataBriefingRenderer();
   testDataBriefingViewManager();
+  testReflectionRenderer();
   testReflectionViewManager();
   testTitleViewManager();
   testAuthRenderer();
   testAuthViewManager();
   testStoryRenderer();
   testStoryViewManager();
+  testApiContractRenderer();
   testApiContractViewManager();
   testEvaluationRuleConstants();
   testResultViewManager();
