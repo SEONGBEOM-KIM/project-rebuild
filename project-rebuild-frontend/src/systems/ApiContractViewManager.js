@@ -1,3 +1,5 @@
+import SCENE_KEYS from '../data/sceneKeys.js';
+
 export const API_CONTRACT_SCREEN_LAYOUT = {
   backgroundColor: 0x0f172a,
   progressStep: 'ending',
@@ -98,9 +100,9 @@ export default class ApiContractViewManager {
 
   static getControlLayout() {
     return {
-      payload: { x: 650, y: 960, label: 'Payload 미리보기', target: 'ApiPayloadScene', backgroundColor: '#bbf7d0', textColor: '#123524' },
-      data: { x: 970, y: 960, label: '학습 데이터로', target: 'LearningDataScene', backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
-      ending: { x: 1280, y: 960, label: '마무리로', target: 'EndingScene', backgroundColor: '#fde68a', textColor: '#0f172a' },
+      payload: { x: 650, y: 960, label: 'Payload 미리보기', target: SCENE_KEYS.ApiPayload, backgroundColor: '#bbf7d0', textColor: '#123524' },
+      data: { x: 970, y: 960, label: '학습 데이터로', target: SCENE_KEYS.LearningData, backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
+      ending: { x: 1280, y: 960, label: '마무리로', target: SCENE_KEYS.Ending, backgroundColor: '#fde68a', textColor: '#0f172a' },
     };
   }
 }

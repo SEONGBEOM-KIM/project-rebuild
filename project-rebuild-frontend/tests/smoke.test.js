@@ -78,6 +78,7 @@ import { mapData } from '../src/data/mapData.js';
 import { ISSUE_THRESHOLDS, REACTION_THRESHOLDS, RESULT_THRESHOLDS, SCORE_RULES } from '../src/data/evaluationRules.js';
 import { API_CONTRACT, formatContractRequest, formatContractResponse } from '../src/data/apiContract.js';
 import { CURRENT_EPISODE, EPISODE_STEPS } from '../src/data/episodes.js';
+import SCENE_KEYS from '../src/data/sceneKeys.js';
 import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES, EP2_MISSION_BRIEFING } from '../src/data/episodeContent.js';
 import ProgressStepper from '../src/ui/ProgressStepper.js';
 import { getTextButtonColor } from '../src/ui/TextButton.js';
@@ -3465,6 +3466,16 @@ function testSceneReferences() {
     .map((match) => ({ className: match[1], fileName: match[2] }));
   const registeredSceneNames = new Set(registeredScenes.map((scene) => scene.fileName));
   const sceneFiles = readdirSync(SCENES_DIR).filter((file) => file.endsWith('Scene.js'));
+  const sceneKeyValues = Object.values(SCENE_KEYS);
+
+  assert.deepEqual(
+    [...new Set(sceneKeyValues)].sort(),
+    sceneKeyValues.slice().sort(),
+    'SCENE_KEYS values should be unique',
+  );
+  for (const sceneKey of sceneKeyValues) {
+    assert.ok(registeredSceneNames.has(sceneKey), `${sceneKey} from SCENE_KEYS must be registered in main.js`);
+  }
 
   assert.ok(registeredSceneNames.has('BootScene'), 'BootScene must be registered');
   assert.ok(registeredSceneNames.has('TitleScene'), 'TitleScene must be registered');

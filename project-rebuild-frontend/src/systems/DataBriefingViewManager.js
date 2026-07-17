@@ -1,3 +1,5 @@
+import SCENE_KEYS from '../data/sceneKeys.js';
+
 const DATA_BRIEFING_SCREEN_LAYOUT = {
   backgroundColor: 0x172554,
   progressStep: 'data',
@@ -99,8 +101,8 @@ export default class DataBriefingViewManager {
 
   static getControlLayout() {
     return {
-      back: { x: 760, y: 980, label: '탐색 다시 보기', target: 'ExplorationScene', backgroundColor: '#93c5fd', textColor: '#0f172a' },
-      next: { x: 1160, y: 980, label: '원인 질문 풀기', target: 'CauseQuizScene', backgroundColor: '#bbf7d0', textColor: '#123524' },
+      back: { x: 760, y: 980, label: '탐색 다시 보기', target: SCENE_KEYS.Exploration, backgroundColor: '#93c5fd', textColor: '#0f172a' },
+      next: { x: 1160, y: 980, label: '원인 질문 풀기', target: SCENE_KEYS.CauseQuiz, backgroundColor: '#bbf7d0', textColor: '#123524' },
     };
   }
 

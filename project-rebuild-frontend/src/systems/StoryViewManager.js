@@ -1,3 +1,5 @@
+import SCENE_KEYS from '../data/sceneKeys.js';
+
 export const STORY_LAYOUT = {
   backgroundColor: 0x123524,
   title: { y: 150, fontSize: '60px', color: '#ffffff', fontStyle: 'bold' },
@@ -14,7 +16,7 @@ export const STORY_LAYOUT = {
     textColor: '#123524',
     fontSize: '38px',
     fontStyle: 'bold',
-    targetScene: 'ExplorationScene',
+    targetScene: SCENE_KEYS.Exploration,
   },
 };
 

@@ -1,16 +1,18 @@
+import SCENE_KEYS from '../data/sceneKeys.js';
+
 export const TITLE_LAYOUT = {
   backgroundColor: 0x10253f,
   title: { y: 280, text: '프로젝트 리빌드', fontSize: '92px', color: '#f7fbff', fontStyle: 'bold' },
   subtitle: { y: 380, text: '균형 있게 성장하는 지역을 위하여', fontSize: '36px', color: '#b9d7ff' },
   importHint: { savedY: 700, emptyY: 700, text: '앱 저장 JSON과 API 미리보기 JSON을 가져올 수 있습니다.', fontSize: '20px', color: '#bfdbfe' },
   buttons: {
-    start: { y: 620, label: '시작하기', targetScene: 'AuthScene' },
-    load: { savedY: 745, label: '저장 데이터 확인', targetScene: 'SavedDataScene' },
+    start: { y: 620, label: '시작하기', targetScene: SCENE_KEYS.Auth },
+    load: { savedY: 745, label: '저장 데이터 확인', targetScene: SCENE_KEYS.SavedData },
     import: { savedY: 835, emptyY: 745, label: 'JSON 가져오기' },
-    storage: { savedY: 910, emptyY: 820, label: '브라우저 저장 관리', targetScene: 'StorageManagerScene' },
+    storage: { savedY: 910, emptyY: 820, label: '브라우저 저장 관리', targetScene: SCENE_KEYS.StorageManager },
   },
   importStatus: { savedY: 975, emptyY: 885 },
-  importFile: { type: 'file', accept: 'application/json,.json', successTargetScene: 'SavedDataScene' },
+  importFile: { type: 'file', accept: 'application/json,.json', successTargetScene: SCENE_KEYS.SavedData },
   importStatusStyle: { fontSize: '22px', color: '#fecaca', align: 'center' },
 };
 

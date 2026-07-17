@@ -1,3 +1,4 @@
+import SCENE_KEYS from '../data/sceneKeys.js';
 import LearningApiPayloadManager from './LearningApiPayloadManager.js';
 
 export const API_PAYLOAD_SCREEN_LAYOUT = {
@@ -143,10 +144,10 @@ export default class ApiPayloadViewManager {
       submit: { x: 350, y: 960, label: 'Mock 제출', backgroundColor: '#bbf7d0', textColor: '#123524' },
       copy: { x: 610, y: 960, label: 'Payload 복사', backgroundColor: '#93c5fd', textColor: '#0f172a' },
       download: { x: 910, y: 960, label: 'Payload 다운로드', backgroundColor: '#a7f3d0', textColor: '#064e3b' },
-      contract: { x: 1130, y: 960, label: 'API 계약', target: 'ApiContractScene', backgroundColor: '#fde68a', textColor: '#0f172a' },
-      log: { x: 1335, y: 960, label: '제출 로그', target: 'MockSubmissionLogScene', backgroundColor: '#bfdbfe', textColor: '#0f172a' },
-      data: { x: 1545, y: 960, label: '학습 데이터', target: 'LearningDataScene', backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
-      ending: { x: 1745, y: 960, label: '마무리', target: 'EndingScene', backgroundColor: '#fde68a', textColor: '#0f172a' },
+      contract: { x: 1130, y: 960, label: 'API 계약', target: SCENE_KEYS.ApiContract, backgroundColor: '#fde68a', textColor: '#0f172a' },
+      log: { x: 1335, y: 960, label: '제출 로그', target: SCENE_KEYS.MockSubmissionLog, backgroundColor: '#bfdbfe', textColor: '#0f172a' },
+      data: { x: 1545, y: 960, label: '학습 데이터', target: SCENE_KEYS.LearningData, backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
+      ending: { x: 1745, y: 960, label: '마무리', target: SCENE_KEYS.Ending, backgroundColor: '#fde68a', textColor: '#0f172a' },
     };
   }
 

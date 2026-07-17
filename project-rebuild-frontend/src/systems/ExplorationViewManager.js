@@ -1,3 +1,5 @@
+import SCENE_KEYS from '../data/sceneKeys.js';
+
 const EXPLORATION_SCREEN_LAYOUT = {
   backgroundColor: 0x0f2f3f,
   progressStep: 'exploration',
@@ -94,8 +96,8 @@ export default class ExplorationViewManager {
 
   static getControlLayout() {
     return {
-      back: { x: 1230, y: 955, label: '스토리 다시 보기', target: 'StoryScene', backgroundColor: '#93c5fd', textColor: '#0f172a' },
-      next: { x: 1600, y: 955, label: '자료 확인', target: 'DataBriefingScene', backgroundColor: '#94a3b8', textColor: '#0f172a' },
+      back: { x: 1230, y: 955, label: '스토리 다시 보기', target: SCENE_KEYS.Story, backgroundColor: '#93c5fd', textColor: '#0f172a' },
+      next: { x: 1600, y: 955, label: '자료 확인', target: SCENE_KEYS.DataBriefing, backgroundColor: '#94a3b8', textColor: '#0f172a' },
     };
   }
 

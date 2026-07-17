@@ -1,3 +1,5 @@
+import SCENE_KEYS from '../data/sceneKeys.js';
+
 const PROBLEM_SUMMARY_SCREEN_LAYOUT = {
   backgroundColor: 0x10253f,
   progressStep: 'summary',
@@ -95,8 +97,8 @@ export default class ProblemSummaryViewManager {
 
   static getControlLayout() {
     return {
-      back: { x: 750, y: 955, label: '원인 질문 다시 보기', target: 'CauseQuizScene', backgroundColor: '#93c5fd', textColor: '#0f172a' },
-      next: { x: 1180, y: 955, label: '회복 방향 선택', target: 'SelectionScene', backgroundColor: '#bbf7d0', textColor: '#123524' },
+      back: { x: 750, y: 955, label: '원인 질문 다시 보기', target: SCENE_KEYS.CauseQuiz, backgroundColor: '#93c5fd', textColor: '#0f172a' },
+      next: { x: 1180, y: 955, label: '회복 방향 선택', target: SCENE_KEYS.Selection, backgroundColor: '#bbf7d0', textColor: '#123524' },
     };
   }
 

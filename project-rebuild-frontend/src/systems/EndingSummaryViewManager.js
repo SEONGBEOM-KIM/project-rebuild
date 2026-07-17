@@ -1,3 +1,5 @@
+import SCENE_KEYS from '../data/sceneKeys.js';
+
 const ENDING_SCREEN_LAYOUT = {
   backgroundColor: 0x0f172a,
   progressStep: 'ending',
@@ -151,11 +153,11 @@ export default class EndingSummaryViewManager {
 
   static getControlLayout(centerX) {
     return {
-      retry: { x: centerX - 680, y: 955, label: '배치 다시 조정', target: 'PlacementScene', backgroundColor: '#c4b5fd', textColor: '#0f172a' },
-      report: { x: centerX - 340, y: 955, label: '교사용 요약', target: 'TeacherReportScene', backgroundColor: '#93c5fd', textColor: '#0f172a' },
-      data: { x: centerX, y: 955, label: '학습 데이터 보기', target: 'LearningDataScene', backgroundColor: '#bbf7d0', textColor: '#0f172a' },
-      ep2: { x: centerX + 340, y: 955, label: 'EP2 미션 보기', target: 'Ep2BriefingScene', backgroundColor: '#a7f3d0', textColor: '#064e3b' },
-      restart: { x: centerX + 680, y: 955, label: '처음부터 다시', target: 'BootScene', backgroundColor: '#fde68a', textColor: '#0f172a' },
+      retry: { x: centerX - 680, y: 955, label: '배치 다시 조정', target: SCENE_KEYS.Placement, backgroundColor: '#c4b5fd', textColor: '#0f172a' },
+      report: { x: centerX - 340, y: 955, label: '교사용 요약', target: SCENE_KEYS.TeacherReport, backgroundColor: '#93c5fd', textColor: '#0f172a' },
+      data: { x: centerX, y: 955, label: '학습 데이터 보기', target: SCENE_KEYS.LearningData, backgroundColor: '#bbf7d0', textColor: '#0f172a' },
+      ep2: { x: centerX + 340, y: 955, label: 'EP2 미션 보기', target: SCENE_KEYS.Ep2Briefing, backgroundColor: '#a7f3d0', textColor: '#064e3b' },
+      restart: { x: centerX + 680, y: 955, label: '처음부터 다시', target: SCENE_KEYS.Boot, backgroundColor: '#fde68a', textColor: '#0f172a' },
     };
   }
 }

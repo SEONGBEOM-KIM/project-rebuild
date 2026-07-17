@@ -1,3 +1,4 @@
+import SCENE_KEYS from '../data/sceneKeys.js';
 import LearningDataManager from './LearningDataManager.js';
 
 export const LEARNING_DATA_SCREEN_LAYOUT = {
@@ -164,12 +165,12 @@ export default class LearningDataViewManager {
 
   static getControlLayout() {
     return {
-      api: { x: 260, y: 960, label: 'API 미리보기', target: 'ApiPayloadScene', backgroundColor: '#fde68a', textColor: '#0f172a' },
+      api: { x: 260, y: 960, label: 'API 미리보기', target: SCENE_KEYS.ApiPayload, backgroundColor: '#fde68a', textColor: '#0f172a' },
       save: { x: 520, y: 960, label: '임시 저장', backgroundColor: '#bbf7d0', textColor: '#123524' },
       copy: { x: 760, y: 960, label: 'JSON 복사', backgroundColor: '#93c5fd', textColor: '#0f172a' },
       download: { x: 1015, y: 960, label: 'JSON 다운로드', backgroundColor: '#a7f3d0', textColor: '#064e3b' },
       clear: { x: 1275, y: 960, label: '저장 삭제', backgroundColor: '#fecaca', textColor: '#7f1d1d' },
-      ending: { x: 1545, y: 960, label: '마무리로', target: 'EndingScene', backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
+      ending: { x: 1545, y: 960, label: '마무리로', target: SCENE_KEYS.Ending, backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
     };
   }
 

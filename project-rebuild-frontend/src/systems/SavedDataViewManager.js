@@ -1,3 +1,5 @@
+import SCENE_KEYS from '../data/sceneKeys.js';
+
 export const SAVED_DATA_LAYOUT = {
   backgroundColor: 0x10253f,
   title: { y: 90, text: '저장 데이터 확인', fontSize: '60px', color: '#ffffff', fontStyle: 'bold' },
@@ -15,9 +17,9 @@ export const SAVED_DATA_BUTTON_STYLE = {
 };
 
 export const SAVED_DATA_BUTTONS = {
-  back: { offsetX: -600, y: 940, label: '제목으로', backgroundColor: '#c4b5fd', textColor: '#1e1b4b', targetScene: 'TitleScene' },
+  back: { offsetX: -600, y: 940, label: '제목으로', backgroundColor: '#c4b5fd', textColor: '#1e1b4b', targetScene: SCENE_KEYS.Title },
   import: { offsetX: -200, y: 940, label: 'JSON 가져오기', backgroundColor: '#bfdbfe', textColor: '#0f172a' },
-  continue: { offsetX: 175, y: 940, label: '이어보기', targetScene: 'ExplorationScene' },
+  continue: { offsetX: 175, y: 940, label: '이어보기', targetScene: SCENE_KEYS.Exploration },
   clear: { offsetX: 560, y: 940, label: '저장 삭제', backgroundColor: '#fecaca', textColor: '#7f1d1d' },
 };
 
@@ -147,39 +149,39 @@ export default class SavedDataViewManager {
       return null;
     }
     if (data.completed) {
-      return 'EndingScene';
+      return SCENE_KEYS.Ending;
     }
     if ((data.placements?.length ?? 0) >= 3) {
-      return 'ResultScene';
+      return SCENE_KEYS.Result;
     }
     if (data.selectedPolicy?.id) {
-      return 'PlacementScene';
+      return SCENE_KEYS.Placement;
     }
     if (data.problemSummaryCompleted) {
-      return 'Ep2BriefingScene';
+      return SCENE_KEYS.Ep2Briefing;
     }
     if (data.quizResult) {
-      return 'ProblemSummaryScene';
+      return SCENE_KEYS.ProblemSummary;
     }
     if (data.dataViewed) {
-      return 'CauseQuizScene';
+      return SCENE_KEYS.CauseQuiz;
     }
     if ((data.exploredPlaces?.length ?? 0) >= 3) {
-      return 'DataBriefingScene';
+      return SCENE_KEYS.DataBriefing;
     }
-    return 'ExplorationScene';
+    return SCENE_KEYS.Exploration;
   }
 
   static formatContinueLabel(targetScene) {
     return {
-      ExplorationScene: '탐색 이어보기',
-      DataBriefingScene: '자료 확인 이어보기',
-      CauseQuizScene: '원인 질문 이어보기',
-      ProblemSummaryScene: '문제 정리 이어보기',
-      Ep2BriefingScene: 'EP2 미션 이어보기',
-      PlacementScene: '배치 이어보기',
-      ResultScene: '결과 이어보기',
-      EndingScene: '마무리 이어보기',
+      [SCENE_KEYS.Exploration]: '탐색 이어보기',
+      [SCENE_KEYS.DataBriefing]: '자료 확인 이어보기',
+      [SCENE_KEYS.CauseQuiz]: '원인 질문 이어보기',
+      [SCENE_KEYS.ProblemSummary]: '문제 정리 이어보기',
+      [SCENE_KEYS.Ep2Briefing]: 'EP2 미션 이어보기',
+      [SCENE_KEYS.Placement]: '배치 이어보기',
+      [SCENE_KEYS.Result]: '결과 이어보기',
+      [SCENE_KEYS.Ending]: '마무리 이어보기',
     }[targetScene] ?? '이어보기';
   }
 

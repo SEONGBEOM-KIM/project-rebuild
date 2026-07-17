@@ -1,3 +1,5 @@
+import SCENE_KEYS from '../data/sceneKeys.js';
+
 export const STORAGE_SCREEN_LAYOUT = {
   backgroundColor: 0x0f172a,
   title: { y: 90, text: '브라우저 저장 관리', fontSize: '60px', color: '#ffffff', fontStyle: 'bold' },
@@ -26,8 +28,8 @@ export const STORAGE_CONTROL_BUTTONS = {
   clearSave: { x: 360, y: 930, label: '학습 저장 삭제', backgroundColor: '#fecaca', textColor: '#7f1d1d' },
   clearLog: { x: 710, y: 930, label: '제출 로그 삭제', backgroundColor: '#fed7aa', textColor: '#7c2d12' },
   clearAll: { x: 1050, y: 930, label: '전체 초기화', backgroundColor: '#fca5a5', textColor: '#7f1d1d' },
-  title: { x: 1370, y: 930, label: '제목으로', backgroundColor: '#c4b5fd', textColor: '#1e1b4b', targetScene: 'TitleScene' },
-  savedData: { x: 1640, y: 930, label: '저장 확인', backgroundColor: '#bbf7d0', textColor: '#123524', targetScene: 'SavedDataScene' },
+  title: { x: 1370, y: 930, label: '제목으로', backgroundColor: '#c4b5fd', textColor: '#1e1b4b', targetScene: SCENE_KEYS.Title },
+  savedData: { x: 1640, y: 930, label: '저장 확인', backgroundColor: '#bbf7d0', textColor: '#123524', targetScene: SCENE_KEYS.SavedData },
 };
 
 export default class StorageManagerViewManager {

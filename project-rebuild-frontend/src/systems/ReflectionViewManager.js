@@ -1,3 +1,5 @@
+import SCENE_KEYS from '../data/sceneKeys.js';
+
 const REFLECTION_SCREEN_LAYOUT = {
   backgroundColor: 0x172554,
   progressStep: 'ending',
@@ -86,8 +88,8 @@ export default class ReflectionViewManager {
 
   static getControlLayout() {
     return {
-      back: { x: 760, y: 940, label: '부작용 다시 보기', target: 'SideEffectScene', backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
-      next: { x: 1160, y: 940, label: '학습 마무리', target: 'EndingScene', backgroundColor: '#bbf7d0', textColor: '#123524' },
+      back: { x: 760, y: 940, label: '부작용 다시 보기', target: SCENE_KEYS.SideEffect, backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
+      next: { x: 1160, y: 940, label: '학습 마무리', target: SCENE_KEYS.Ending, backgroundColor: '#bbf7d0', textColor: '#123524' },
     };
   }
 

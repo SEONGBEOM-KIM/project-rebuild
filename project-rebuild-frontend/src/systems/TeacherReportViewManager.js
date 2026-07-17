@@ -1,3 +1,5 @@
+import SCENE_KEYS from '../data/sceneKeys.js';
+
 const TEACHER_REPORT_SCREEN_LAYOUT = {
   backgroundColor: 0x0b1727,
   progressStep: 'ending',
@@ -119,8 +121,8 @@ export default class TeacherReportViewManager {
       status: { x: 960, y: 855 },
       copy: { x: 520, y: 940, label: '리포트 복사', backgroundColor: '#93c5fd', textColor: '#0f172a' },
       download: { x: 820, y: 940, label: 'TXT 다운로드', backgroundColor: '#a7f3d0', textColor: '#064e3b' },
-      ending: { x: 1140, y: 940, label: '마무리로 돌아가기', target: 'EndingScene', backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
-      data: { x: 1490, y: 940, label: '학습 데이터 보기', target: 'LearningDataScene', backgroundColor: '#bbf7d0', textColor: '#123524' },
+      ending: { x: 1140, y: 940, label: '마무리로 돌아가기', target: SCENE_KEYS.Ending, backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
+      data: { x: 1490, y: 940, label: '학습 데이터 보기', target: SCENE_KEYS.LearningData, backgroundColor: '#bbf7d0', textColor: '#123524' },
     };
   }
 }

@@ -1,3 +1,5 @@
+import SCENE_KEYS from '../data/sceneKeys.js';
+
 const SELECTION_SCREEN_LAYOUT = {
   backgroundColor: 0x172554,
   progressStep: 'selection',
@@ -66,8 +68,8 @@ export default class SelectionViewManager {
 
   static getControlLayout(centerX) {
     return {
-      back: { x: centerX - 180, y: 955, label: 'EP2 미션 보기', target: 'Ep2BriefingScene', backgroundColor: 0x93c5fd, textColor: '#0f172a' },
-      start: { x: centerX + 180, y: 955, label: '배치 연습 시작', target: 'PlacementScene', backgroundColor: 0xbbf7d0, textColor: '#123524' },
+      back: { x: centerX - 180, y: 955, label: 'EP2 미션 보기', target: SCENE_KEYS.Ep2Briefing, backgroundColor: 0x93c5fd, textColor: '#0f172a' },
+      start: { x: centerX + 180, y: 955, label: '배치 연습 시작', target: SCENE_KEYS.Placement, backgroundColor: 0xbbf7d0, textColor: '#123524' },
     };
   }
 

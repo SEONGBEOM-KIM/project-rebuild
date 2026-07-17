@@ -1,3 +1,5 @@
+import SCENE_KEYS from '../data/sceneKeys.js';
+
 export const EP2_BRIEFING_LAYOUT = {
   backgroundColor: 0x10253f,
   progressStep: 'ending',
@@ -125,8 +127,8 @@ export default class Ep2BriefingViewManager {
 
   static getControlLayout(centerX) {
     return {
-      ending: { x: centerX - 250, y: 950, label: 'EP1 마무리로', target: 'EndingScene', backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
-      start: { x: centerX + 250, y: 950, label: '전략 선택으로', target: 'SelectionScene', backgroundColor: '#bbf7d0', textColor: '#123524' },
+      ending: { x: centerX - 250, y: 950, label: 'EP1 마무리로', target: SCENE_KEYS.Ending, backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
+      start: { x: centerX + 250, y: 950, label: '전략 선택으로', target: SCENE_KEYS.Selection, backgroundColor: '#bbf7d0', textColor: '#123524' },
     };
   }
 

@@ -1,7 +1,8 @@
+import SCENE_KEYS from '../data/sceneKeys.js';
 import GameState from './GameState.js';
 import LearningProgress from './LearningProgress.js';
 
-export const BOOT_TARGET_SCENE = 'TitleScene';
+export const BOOT_TARGET_SCENE = SCENE_KEYS.Title;
 
 export default class BootFlowManager {
   static getTargetScene() {

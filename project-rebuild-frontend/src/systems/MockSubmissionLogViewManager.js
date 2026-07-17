@@ -1,3 +1,5 @@
+import SCENE_KEYS from '../data/sceneKeys.js';
+
 const MOCK_SUBMISSION_LOG_SCREEN_LAYOUT = {
   backgroundColor: 0x0f172a,
   progressStep: 'ending',
@@ -99,8 +101,8 @@ export default class MockSubmissionLogViewManager {
       copy: { x: 420, y: 940, label: '로그 복사', backgroundColor: '#93c5fd', textColor: '#0f172a' },
       download: { x: 700, y: 940, label: '로그 다운로드', backgroundColor: '#a7f3d0', textColor: '#064e3b' },
       clear: { x: 1010, y: 940, label: '로그 삭제', backgroundColor: '#fecaca', textColor: '#7f1d1d' },
-      api: { x: 1300, y: 940, label: 'API 미리보기', target: 'ApiPayloadScene', backgroundColor: '#bbf7d0', textColor: '#123524' },
-      ending: { x: 1580, y: 940, label: '마무리로', target: 'EndingScene', backgroundColor: '#fde68a', textColor: '#0f172a' },
+      api: { x: 1300, y: 940, label: 'API 미리보기', target: SCENE_KEYS.ApiPayload, backgroundColor: '#bbf7d0', textColor: '#123524' },
+      ending: { x: 1580, y: 940, label: '마무리로', target: SCENE_KEYS.Ending, backgroundColor: '#fde68a', textColor: '#0f172a' },
     };
   }
 

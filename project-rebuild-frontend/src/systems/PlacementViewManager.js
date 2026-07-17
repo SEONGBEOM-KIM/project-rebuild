@@ -1,3 +1,4 @@
+import SCENE_KEYS from '../data/sceneKeys.js';
 import { formatEffect } from '../data/stateLabels.js';
 
 
@@ -92,7 +93,7 @@ export const PLACEMENT_UI_LAYOUT = {
   status: { x: 40, y: 690 },
   cursorInfo: { x: 40, y: 842, text: '커서 타일: 지도 위로 이동하세요.', wordWrapWidth: 320 },
   message: { x: 40, y: 925, text: '아직 배치된 건물이 없습니다.', wordWrapWidth: 325 },
-  continueButton: { x: 1615, y: 985, width: 300, height: 72, text: '시설 3개 더 배치', target: 'ResultScene', backgroundColor: 0x94a3b8, alpha: 1, strokeColor: 0xe2e8f0 },
+  continueButton: { x: 1615, y: 985, width: 300, height: 72, text: '시설 3개 더 배치', target: SCENE_KEYS.Result, backgroundColor: 0x94a3b8, alpha: 1, strokeColor: 0xe2e8f0 },
   legendPanel: { x: 1615, y: 150, width: 330, height: 190, fillColor: 0x111827, alpha: 0.88, strokeColor: 0x475569 },
   legendTitle: { x: 1480, y: 76, text: '타일 범례' },
   legendSwatch: { x: 1492, yOffset: 10, width: 26, height: 20 },

@@ -1,3 +1,5 @@
+import SCENE_KEYS from '../data/sceneKeys.js';
+
 const SIDE_EFFECT_SCREEN_LAYOUT = {
   backgroundColor: 0x111827,
   progressStep: 'result',
@@ -123,8 +125,8 @@ export default class SideEffectViewManager {
 
   static getControlLayout() {
     return {
-      back: { x: 760, y: 955, label: '결과 다시 보기', target: 'ResultScene', backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
-      next: { x: 1160, y: 955, label: '생각 정리', target: 'ReflectionScene', backgroundColor: '#bbf7d0', textColor: '#123524' },
+      back: { x: 760, y: 955, label: '결과 다시 보기', target: SCENE_KEYS.Result, backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
+      next: { x: 1160, y: 955, label: '생각 정리', target: SCENE_KEYS.Reflection, backgroundColor: '#bbf7d0', textColor: '#123524' },
     };
   }
 

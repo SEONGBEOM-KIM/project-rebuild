@@ -1,0 +1,26 @@
+const SCENE_KEYS = Object.freeze({
+  Boot: 'BootScene',
+  Title: 'TitleScene',
+  SavedData: 'SavedDataScene',
+  StorageManager: 'StorageManagerScene',
+  Auth: 'AuthScene',
+  Story: 'StoryScene',
+  Exploration: 'ExplorationScene',
+  DataBriefing: 'DataBriefingScene',
+  CauseQuiz: 'CauseQuizScene',
+  ProblemSummary: 'ProblemSummaryScene',
+  Ep2Briefing: 'Ep2BriefingScene',
+  Selection: 'SelectionScene',
+  Placement: 'PlacementScene',
+  Result: 'ResultScene',
+  SideEffect: 'SideEffectScene',
+  Reflection: 'ReflectionScene',
+  Ending: 'EndingScene',
+  LearningData: 'LearningDataScene',
+  ApiPayload: 'ApiPayloadScene',
+  ApiContract: 'ApiContractScene',
+  MockSubmissionLog: 'MockSubmissionLogScene',
+  TeacherReport: 'TeacherReportScene',
+});
+
+export default SCENE_KEYS;

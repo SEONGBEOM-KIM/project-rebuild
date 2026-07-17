@@ -1,3 +1,5 @@
+import SCENE_KEYS from '../data/sceneKeys.js';
+
 const RESULT_SCREEN_LAYOUT = {
   backgroundColor: 0x1e1b4b,
   progressStep: 'result',
@@ -114,9 +116,9 @@ export default class ResultViewManager {
 
   static getControlLayout(centerX) {
     return {
-      retry: { x: centerX - 310, y: 940, label: '배치 더 하기', target: 'PlacementScene', backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
-      sideEffect: { x: centerX, y: 940, label: '부작용 검토', target: 'SideEffectScene', backgroundColor: '#bbf7d0', textColor: '#1e1b4b' },
-      restart: { x: centerX + 310, y: 940, label: '처음부터 다시', target: 'BootScene', backgroundColor: '#fde68a', textColor: '#1e1b4b' },
+      retry: { x: centerX - 310, y: 940, label: '배치 더 하기', target: SCENE_KEYS.Placement, backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
+      sideEffect: { x: centerX, y: 940, label: '부작용 검토', target: SCENE_KEYS.SideEffect, backgroundColor: '#bbf7d0', textColor: '#1e1b4b' },
+      restart: { x: centerX + 310, y: 940, label: '처음부터 다시', target: SCENE_KEYS.Boot, backgroundColor: '#fde68a', textColor: '#1e1b4b' },
     };
   }
 

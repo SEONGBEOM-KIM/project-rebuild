@@ -1,3 +1,5 @@
+import SCENE_KEYS from '../data/sceneKeys.js';
+
 export const AUTH_LAYOUT = {
   backgroundColor: 0x0b1727,
   title: { y: 170, text: '학습자 입장', fontSize: '68px', color: '#ffffff', fontStyle: 'bold' },
@@ -27,7 +29,7 @@ export const AUTH_LAYOUT = {
     fieldLabelColor: '#64748b',
     sampleButton: { offsetY: 130, width: 210, height: 58, color: 0x38bdf8, label: 'UI 샘플', fontSize: '26px', textColor: '#0f172a' },
   },
-  proceedButton: { y: 850, text: '인증 없이 계속하기', targetScene: 'StoryScene', fontSize: '36px', textColor: '#10253f', backgroundColor: '#fde68a', padding: { x: 36, y: 18 } },
+  proceedButton: { y: 850, text: '인증 없이 계속하기', targetScene: SCENE_KEYS.Story, fontSize: '36px', textColor: '#10253f', backgroundColor: '#fde68a', padding: { x: 36, y: 18 } },
 };
 
 export default class AuthViewManager {

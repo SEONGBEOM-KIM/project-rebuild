@@ -1,3 +1,5 @@
+import SCENE_KEYS from '../data/sceneKeys.js';
+
 const CAUSE_QUIZ_SCREEN_LAYOUT = {
   backgroundColor: 0x111827,
   progressStep: 'quiz',
@@ -86,9 +88,9 @@ export default class CauseQuizViewManager {
 
   static getControlLayout() {
     return {
-      back: { x: 760, y: 955, label: '자료 다시 보기', target: 'DataBriefingScene', backgroundColor: '#93c5fd', textColor: '#0f172a' },
+      back: { x: 760, y: 955, label: '자료 다시 보기', target: SCENE_KEYS.DataBriefing, backgroundColor: '#93c5fd', textColor: '#0f172a' },
       nextDisabled: { x: 1160, y: 955, label: '답 선택 필요', backgroundColor: '#94a3b8', textColor: '#0f172a' },
-      nextEnabled: { label: '문제 정리', target: 'ProblemSummaryScene', backgroundColor: '#bbf7d0' },
+      nextEnabled: { label: '문제 정리', target: SCENE_KEYS.ProblemSummary, backgroundColor: '#bbf7d0' },
     };
   }
 
