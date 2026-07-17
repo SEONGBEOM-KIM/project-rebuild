@@ -64,19 +64,28 @@ export default class PlacementScene extends Phaser.Scene {
     this.uiUpdater.updateLastChangePanel(this.registry.get('lastPlacementResult'));
     this.uiUpdater.updatePlacementHistoryPanel(this.placedBuildings);
     this.updateSelectedBuildingUi();
-    this.uiUpdater.updateContinueButton(this.placedBuildings.length, this.selectedPolicy, this.selectedStrategy);
+    this.uiUpdater.updateContinueButton(
+      this.placedBuildings.length,
+      this.selectedPolicy,
+      this.selectedStrategy,
+      this.placementConfig.requiredPlacements,
+    );
   }
 
   createUi() {
     this.uiRenderer = new PlacementUiRenderer({
       objectRegistry: this.objectRegistry,
       buildings: this.availableBuildings,
+      requiredPlacements: this.placementConfig.requiredPlacements,
       selectedPolicy: this.selectedPolicy,
       getPlacedCount: () => this.placedBuildings.length,
       onSelectBuilding: (building) => this.selectBuilding(building),
       onContinue: (target) => this.scene.start(target),
       onContinueBlocked: (placedCount) => {
-        this.uiUpdater.showMessage(PlacementUiStateManager.formatNeedMoreMessage(placedCount), '#fecaca');
+        this.uiUpdater.showMessage(
+          PlacementUiStateManager.formatNeedMoreMessage(placedCount, this.placementConfig.requiredPlacements),
+          '#fecaca',
+        );
       },
     });
 
@@ -148,7 +157,12 @@ export default class PlacementScene extends Phaser.Scene {
     this.uiUpdater.updateStatusBar(this.registry.get('gameState'));
     this.uiUpdater.updateLastChangePanel(this.registry.get('lastPlacementResult'));
     this.uiUpdater.updatePlacementHistoryPanel(this.placedBuildings);
-    this.uiUpdater.updateContinueButton(this.placedBuildings.length, this.selectedPolicy, this.selectedStrategy);
+    this.uiUpdater.updateContinueButton(
+      this.placedBuildings.length,
+      this.selectedPolicy,
+      this.selectedStrategy,
+      this.placementConfig.requiredPlacements,
+    );
     this.uiUpdater.showMessage(PlacementUiStateManager.formatPlacementSuccessMessage(this.selectedBuilding, this.placedBuildings.length), '#bbf7d0');
     this.updatePreview(pointer);
   }

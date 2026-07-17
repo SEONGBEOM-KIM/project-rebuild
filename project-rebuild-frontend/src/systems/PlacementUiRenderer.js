@@ -7,6 +7,7 @@ export default class PlacementUiRenderer {
     buildings,
     selectedPolicy,
     getPlacedCount,
+    requiredPlacements,
     onSelectBuilding,
     onContinue,
     onContinueBlocked,
@@ -17,6 +18,7 @@ export default class PlacementUiRenderer {
     this.buildings = buildings;
     this.selectedPolicy = selectedPolicy;
     this.getPlacedCount = getPlacedCount;
+    this.requiredPlacements = requiredPlacements;
     this.onSelectBuilding = onSelectBuilding;
     this.onContinue = onContinue;
     this.onContinueBlocked = onContinueBlocked;
@@ -77,7 +79,7 @@ export default class PlacementUiRenderer {
       .setInteractive({ useHandCursor: true });
 
     const handleContinue = () => {
-      if (!this.uiStateManager.canContinue(this.getPlacedCount())) {
+      if (!this.uiStateManager.canContinue(this.getPlacedCount(), this.requiredPlacements)) {
         this.onContinueBlocked?.(this.getPlacedCount());
         return;
       }

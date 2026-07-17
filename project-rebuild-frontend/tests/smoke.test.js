@@ -1989,6 +1989,25 @@ function testPlacementUiRenderer() {
   ui.continueButtonBg.handlers.get('pointerdown')();
   assert.deepEqual(continueTargets, ['ResultScene']);
 
+  const customObjectRegistry = createPlacementUiRendererRegistrySpy();
+  const customContinueTargets = [];
+  let customPlacedCount = 1;
+  const customRenderer = new PlacementUiRenderer({
+    objectRegistry: customObjectRegistry,
+    buildings,
+    selectedPolicy: null,
+    requiredPlacements: 2,
+    getPlacedCount: () => customPlacedCount,
+    onContinue: (target) => customContinueTargets.push(target),
+    onContinueBlocked: (count) => blockedCounts.push(count),
+  });
+  const customUi = customRenderer.create();
+  customUi.continueButton.handlers.get('pointerdown')();
+  assert.deepEqual(customContinueTargets, [], 'custom required placement count should block until reached');
+  customPlacedCount = 2;
+  customUi.continueButton.handlers.get('pointerdown')();
+  assert.deepEqual(customContinueTargets, ['ResultScene'], 'custom required placement count should enable continue at two placements');
+
   renderer.updateSelectedBuildingCards(ui.cardObjects, buildings.find((building) => building.id === 'small_park'));
   assert.deepEqual(ui.cardObjects.get('small_park').card.strokeStyle, [5, 0xfde68a]);
   assert.deepEqual(ui.cardObjects.get('youth_center').card.strokeStyle, [4, 0xf59e0b]);
@@ -2073,6 +2092,9 @@ function testPlacementUiUpdater() {
   assert.match(missionText.text, /배치: 1\/3 · 남은 2개/);
   assert.doesNotMatch(missionText.text, /선택 방향: 청년 생활 지원/);
   assert.doesNotMatch(missionText.text, /추천 시설: 청년센터, 버스정류장/);
+
+  updater.updateContinueButton(1, policies[0], EP2_MISSION_BRIEFING.strategies[0], 2);
+  assert.match(missionText.text, /배치: 1\/2 · 남은 1개/);
 
   updater.updateContinueButton(3, null);
   assert.match(missionText.text, /종합 결과 확인 가능/);
@@ -2194,6 +2216,7 @@ function testPlacementViewManager() {
   assert.match(placementSceneSource, /PlacementSceneBootstrap/, 'placement scene should delegate setup through bootstrap');
   assert.match(placementSceneSource, /getPlacementConfig/, 'placement scene should resolve swappable episode placement config');
   assert.match(placementSceneSource, /availableBuildings/, 'placement scene should render buildings from the active episode config');
+  assert.match(placementSceneSource, /requiredPlacements/, 'placement scene should apply required placement count from the active episode config');
   assert.match(placementSceneSource, /selectedStrategyId/, 'placement scene should recover EP2 strategy from learning progress');
   const resultSceneSource = readProjectFile('src', 'scenes', 'ResultScene.js');
   assert.match(resultSceneSource, /selectedStrategyId/, 'result scene should recover EP2 strategy from learning progress');
