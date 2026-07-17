@@ -1,8 +1,9 @@
 import { buildings } from './buildings.js';
 import { mapData } from './mapData.js';
-import { DEFAULT_EVALUATION_PROFILE_ID } from './evaluationRules.js';
+import { DEFAULT_EVALUATION_PROFILE_ID, ENVIRONMENT_EVALUATION_PROFILE_ID } from './evaluationRules.js';
 
 export const DEFAULT_PLACEMENT_CONFIG_ID = 'ep2_population_recovery';
+export const ENVIRONMENT_PLACEMENT_CONFIG_ID = 'ep2_environment_focus';
 
 export const episodePlacementConfigs = {
   [DEFAULT_PLACEMENT_CONFIG_ID]: {
@@ -21,6 +22,20 @@ export const episodePlacementConfigs = {
       'budget',
       'traffic',
       'pollution',
+    ],
+  },
+  [ENVIRONMENT_PLACEMENT_CONFIG_ID]: {
+    id: ENVIRONMENT_PLACEMENT_CONFIG_ID,
+    episodeId: 'ep2',
+    title: '푸른군 환경 균형 배치 실험',
+    map: mapData,
+    buildings,
+    requiredPlacements: 2,
+    evaluationProfileId: ENVIRONMENT_EVALUATION_PROFILE_ID,
+    stateKeys: [
+      'environment',
+      'pollution',
+      'budget',
     ],
   },
 };

@@ -76,8 +76,8 @@ import { buildings } from '../src/data/buildings.js';
 import { policies } from '../src/data/policies.js';
 import { explorationPlaces } from '../src/data/explorationPlaces.js';
 import { mapData } from '../src/data/mapData.js';
-import { DEFAULT_PLACEMENT_CONFIG_ID, episodePlacementConfigs, getPlacementConfig, getPlacementConfigIdForStrategy } from '../src/data/episodePlacementConfigs.js';
-import { DEFAULT_EVALUATION_PROFILE_ID, ISSUE_THRESHOLDS, REACTION_THRESHOLDS, RESULT_THRESHOLDS, SCORE_RULES, evaluationProfiles, getEvaluationProfile } from '../src/data/evaluationRules.js';
+import { DEFAULT_PLACEMENT_CONFIG_ID, ENVIRONMENT_PLACEMENT_CONFIG_ID, episodePlacementConfigs, getPlacementConfig, getPlacementConfigIdForStrategy } from '../src/data/episodePlacementConfigs.js';
+import { DEFAULT_EVALUATION_PROFILE_ID, ENVIRONMENT_EVALUATION_PROFILE_ID, ISSUE_THRESHOLDS, REACTION_THRESHOLDS, RESULT_THRESHOLDS, SCORE_RULES, evaluationProfiles, getEvaluationProfile } from '../src/data/evaluationRules.js';
 import { API_CONTRACT, formatContractRequest, formatContractResponse } from '../src/data/apiContract.js';
 import { CURRENT_EPISODE, EPISODE_STEPS } from '../src/data/episodes.js';
 import SCENE_KEYS from '../src/data/sceneKeys.js';
@@ -1274,6 +1274,10 @@ function testEvaluationRuleConstants() {
   assert.equal(defaultProfile.scoreRules, SCORE_RULES);
   assert.equal(defaultProfile.resultThresholds, RESULT_THRESHOLDS);
   assert.equal(defaultProfile.reactionThresholds, REACTION_THRESHOLDS);
+  const environmentProfile = getEvaluationProfile(ENVIRONMENT_EVALUATION_PROFILE_ID);
+  assert.equal(environmentProfile.id, ENVIRONMENT_EVALUATION_PROFILE_ID);
+  assert.equal(environmentProfile.issueThresholds.environmentMin, 75);
+  assert.equal(environmentProfile.resultThresholds.budgetSafe, 650);
   assert.equal(getEvaluationProfile('missing_profile').id, DEFAULT_EVALUATION_PROFILE_ID);
 }
 
@@ -1658,6 +1662,11 @@ function testEpisodePlacementConfigs() {
   assert.equal(config.requiredPlacements, 3, 'episode config should declare the current placement target');
   assert.equal(config.evaluationProfileId, DEFAULT_EVALUATION_PROFILE_ID, 'episode config should declare its result evaluation profile');
   assert.deepEqual(config.stateKeys, DEFAULT_STATE_KEYS, 'default episode config should use the canonical state display order');
+  const environmentConfig = getPlacementConfig(ENVIRONMENT_PLACEMENT_CONFIG_ID);
+  assert.equal(environmentConfig.id, ENVIRONMENT_PLACEMENT_CONFIG_ID);
+  assert.equal(environmentConfig.requiredPlacements, 2);
+  assert.deepEqual(environmentConfig.stateKeys, ['environment', 'pollution', 'budget']);
+  assert.equal(environmentConfig.evaluationProfileId, ENVIRONMENT_EVALUATION_PROFILE_ID);
   assert.equal(getPlacementConfig('missing_config').id, DEFAULT_PLACEMENT_CONFIG_ID, 'unknown config ids should fall back safely');
   for (const strategy of EP2_MISSION_BRIEFING.strategies) {
     assert.equal(getPlacementConfigIdForStrategy(strategy), DEFAULT_PLACEMENT_CONFIG_ID, `${strategy.id} should declare a valid placement config`);
@@ -1686,6 +1695,11 @@ function testPlacementContextManager() {
   const fromRegistryProgress = PlacementContextManager.resolve({ registry });
   assert.equal(fromRegistryProgress.placementConfig.id, DEFAULT_PLACEMENT_CONFIG_ID);
   assert.equal(fromRegistryProgress.evaluationProfile.id, DEFAULT_EVALUATION_PROFILE_ID);
+
+  registry.set('placementConfigId', ENVIRONMENT_PLACEMENT_CONFIG_ID);
+  const alternateContext = PlacementContextManager.resolve({ registry });
+  assert.equal(alternateContext.placementConfig.requiredPlacements, 2);
+  assert.equal(alternateContext.evaluationProfile.id, ENVIRONMENT_EVALUATION_PROFILE_ID);
 }
 
 function testPolicyData() {
@@ -2469,6 +2483,7 @@ function testPlacementViewManager() {
   assert.doesNotMatch(strategyContinueState.missionText, /선택 방향: 청년 생활 지원/);
   assert.doesNotMatch(strategyContinueState.missionText, /추천 시설: 청년센터, 버스정류장/);
   assert.equal(PlacementUiStateManager.canContinue(2), false);
+  assert.equal(PlacementUiStateManager.canContinue(2, getPlacementConfig(ENVIRONMENT_PLACEMENT_CONFIG_ID).requiredPlacements), true);
   assert.equal(PlacementUiStateManager.canContinue(3), true);
   assert.equal(PlacementUiStateManager.getContinueState(3, null).buttonText, '종합 결과 확인');
   assert.equal(PlacementUiStateManager.formatPlacementSuccessMessage('청년센터', 3), '청년센터 배치 완료\n종합 결과를 확인할 수 있습니다.');

@@ -37,6 +37,7 @@ export const REACTION_THRESHOLDS = Object.freeze({
 });
 
 export const DEFAULT_EVALUATION_PROFILE_ID = 'ep2_population_recovery_default';
+export const ENVIRONMENT_EVALUATION_PROFILE_ID = 'ep2_environment_focus';
 
 export const evaluationProfiles = Object.freeze({
   [DEFAULT_EVALUATION_PROFILE_ID]: Object.freeze({
@@ -45,6 +46,31 @@ export const evaluationProfiles = Object.freeze({
     resultThresholds: RESULT_THRESHOLDS,
     scoreRules: SCORE_RULES,
     reactionThresholds: REACTION_THRESHOLDS,
+  }),
+  [ENVIRONMENT_EVALUATION_PROFILE_ID]: Object.freeze({
+    id: ENVIRONMENT_EVALUATION_PROFILE_ID,
+    issueThresholds: Object.freeze({
+      ...ISSUE_THRESHOLDS,
+      environmentMin: 75,
+      pollutionMax: 10,
+      budgetMin: 650,
+    }),
+    resultThresholds: Object.freeze({
+      ...RESULT_THRESHOLDS,
+      environmentGood: 85,
+      satisfactionBalanced: 75,
+      budgetSafe: 650,
+    }),
+    scoreRules: Object.freeze({
+      ...SCORE_RULES,
+      environmentBase: 70,
+      satisfactionBase: 65,
+    }),
+    reactionThresholds: Object.freeze({
+      ...REACTION_THRESHOLDS,
+      satisfactionHigh: 90,
+      satisfactionModerate: 75,
+    }),
   }),
 });
 
