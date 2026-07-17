@@ -3142,9 +3142,12 @@ function testLearningDataRestoreManager() {
 function testSavedDataRenderer() {
   const layout = SavedDataViewManager.getLayout(1920);
   const fixture = createRendererSceneSpy();
-  SavedDataRenderer.renderBodyPanel(fixture.scene, layout, { data: { episode: 1 }, savedAt: 'now' });
+  const bodyResult = SavedDataRenderer.renderBodyPanel(fixture.scene, layout, { data: { episode: 1 }, savedAt: 'now' });
+  assert.equal(bodyResult.summaryText.type, 'text');
+  assert.equal(bodyResult.bodyText.type, 'text');
   assert.ok(fixture.calls.some((call) => call[0] === 'rectangle' && call[1] === layout.bodyPanel.x && call[2] === layout.bodyPanel.y));
-  assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3].includes('episode')));
+  assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3].includes('Episode 1')));
+  assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3].includes('원본 JSON 미리보기')));
 
   const statusFixture = createRendererSceneSpy();
   const statusText = SavedDataRenderer.renderStatusText(statusFixture.scene, layout);
@@ -3168,6 +3171,7 @@ function testSavedDataRenderer() {
 
 function testSavedDataViewManager() {
   assert.equal(SavedDataViewManager.formatBody(null), '저장된 데이터가 없습니다.');
+  assert.match(SavedDataViewManager.formatSummary(null), /JSON 가져오기/);
   assert.equal(SavedDataViewManager.canContinue(null), false);
   assert.equal(SavedDataViewManager.getContinueButtonColor(null), '#94a3b8');
   assert.deepEqual(SavedDataViewManager.getContinueButtonState(null), {
@@ -3193,7 +3197,11 @@ function testSavedDataViewManager() {
     continue: { offsetX: 175, x: 1135, y: 940, label: '이어보기', targetScene: 'EndingScene' },
     clear: { offsetX: 560, x: 1520, y: 940, label: '저장 삭제', backgroundColor: '#fecaca', textColor: '#7f1d1d' },
   });
+  assert.deepEqual(SavedDataViewManager.getLayout(1920).summaryText, { x: 340, y: 235 });
+  assert.deepEqual(SavedDataViewManager.getLayout(1920).bodyText, { x: 340, y: 350 });
+  assert.equal(SavedDataViewManager.getSummaryTextStyle().color, '#fef3c7');
   assert.equal(SavedDataViewManager.getBodyTextStyle().fontFamily, 'monospace');
+  assert.equal(SavedDataViewManager.getBodyTextStyle().fontSize, '18px');
   assert.equal(SavedDataViewManager.getStatusTextStyle().color, '#fecaca');
 
   const saved = {
@@ -3212,7 +3220,21 @@ function testSavedDataViewManager() {
     backgroundColor: '#bbf7d0',
     textColor: '#123524',
   });
+  const fullSaved = {
+    savedAt: 'bad-date',
+    data: createCompleteLearningData({
+      selectedPolicy: { id: 'youth_living_support', name: '청년 생활 지원' },
+    }),
+  };
+  assert.match(SavedDataViewManager.formatSummary(saved), /Episode 1/);
+  assert.match(SavedDataViewManager.formatSummary(saved), /탐색 3곳/);
+  assert.match(SavedDataViewManager.formatSummary(fullSaved), /청년 생활 지원/);
+  assert.match(SavedDataViewManager.formatSummary(fullSaved), /균형 성장/);
+  assert.equal(SavedDataViewManager.formatSavedAt(null), '알 수 없음');
+  assert.equal(SavedDataViewManager.formatSavedAt('bad-date'), 'bad-date');
+  assert.match(SavedDataViewManager.formatBody(saved), /원본 JSON 미리보기/);
   assert.match(SavedDataViewManager.formatBody(saved), /"episode": 1/);
+  assert.match(SavedDataViewManager.formatBody({ data: createCompleteLearningData() }, 3), /줄 더 있음/);
   assert.equal(SavedDataViewManager.getImportErrorMessage(new Error('bad json')), 'bad json');
   assert.equal(SavedDataViewManager.getImportErrorMessage(null), 'JSON 가져오기에 실패했습니다.');
 }

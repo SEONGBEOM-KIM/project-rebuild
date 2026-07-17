@@ -12,10 +12,16 @@ export default class SavedDataRenderer {
       strokeColor: layout.bodyPanel.strokeColor,
     });
 
-    return createLayoutText(scene, layout.bodyText, {
+    const summaryText = createLayoutText(scene, layout.summaryText, {
+      text: SavedDataViewManager.formatSummary(saved),
+      style: SavedDataViewManager.getSummaryTextStyle(),
+    });
+    const bodyText = createLayoutText(scene, layout.bodyText, {
       text: SavedDataViewManager.formatBody(saved),
       style: SavedDataViewManager.getBodyTextStyle(),
     });
+
+    return { summaryText, bodyText };
   }
 
   static renderStatusText(scene, layout) {
