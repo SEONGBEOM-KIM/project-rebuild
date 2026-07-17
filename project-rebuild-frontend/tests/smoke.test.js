@@ -13,12 +13,14 @@ import EndingSummaryViewManager from '../src/systems/EndingSummaryViewManager.js
 import LearningProgress from '../src/systems/LearningProgress.js';
 import CauseQuizManager from '../src/systems/CauseQuizManager.js';
 import CauseQuizViewManager from '../src/systems/CauseQuizViewManager.js';
+import CauseQuizPanelRenderer from '../src/systems/CauseQuizPanelRenderer.js';
 import SelectionViewManager from '../src/systems/SelectionViewManager.js';
 import SelectionPolicyCardRenderer from '../src/systems/SelectionPolicyCardRenderer.js';
 import ProblemSummaryViewManager from '../src/systems/ProblemSummaryViewManager.js';
 import ExplorationViewManager from '../src/systems/ExplorationViewManager.js';
 import ExplorationMapRenderer from '../src/systems/ExplorationMapRenderer.js';
 import DataBriefingViewManager from '../src/systems/DataBriefingViewManager.js';
+import DataBriefingRenderer from '../src/systems/DataBriefingRenderer.js';
 import ReflectionViewManager from '../src/systems/ReflectionViewManager.js';
 import TitleViewManager from '../src/systems/TitleViewManager.js';
 import AuthViewManager from '../src/systems/AuthViewManager.js';
@@ -405,6 +407,25 @@ function testCauseQuizViewManager() {
   });
 }
 
+function testCauseQuizPanelRenderer() {
+  const summaryFixture = createRendererSceneSpy();
+  CauseQuizPanelRenderer.renderExplorationSummary(summaryFixture.scene, ['확인한 장소: 3곳', '', '단서 A']);
+  assert.ok(summaryFixture.calls.some((call) => call[0] === 'text' && call[3] === '탐색에서 확인한 단서'));
+  assert.ok(summaryFixture.calls.some((call) => call[0] === 'text' && call[3].includes('단서 A')));
+
+  const selectedChoices = [];
+  const questionFixture = createRendererSceneSpy();
+  const rendered = CauseQuizPanelRenderer.renderQuestionPanel(
+    questionFixture.scene,
+    EP1_CAUSE_QUESTION,
+    (choice) => selectedChoices.push(choice.id),
+  );
+  assert.equal(rendered.choiceObjects.size, EP1_CAUSE_QUESTION.choices.length);
+  assert.ok(questionFixture.calls.some((call) => call[0] === 'text' && call[3] === EP1_CAUSE_QUESTION.prompt));
+  rendered.choiceObjects.get(EP1_CAUSE_QUESTION.choices[0].id).background.events.get('pointerdown')();
+  assert.deepEqual(selectedChoices, [EP1_CAUSE_QUESTION.choices[0].id]);
+}
+
 function testCauseQuizManager() {
   const correctChoice = EP1_CAUSE_QUESTION.choices.find((choice) => choice.correct);
   const wrongChoice = EP1_CAUSE_QUESTION.choices.find((choice) => !choice.correct);
@@ -710,6 +731,20 @@ function testExplorationMapRenderer() {
   assert.ok(markerFixture.calls.some((call) => call[0] === 'container.add'));
   markerObjects.marker.events.get('pointerdown')();
   assert.deepEqual(selectedPlaces, [place.id]);
+}
+
+function testDataBriefingRenderer() {
+  const cardFixture = createRendererSceneSpy();
+  DataBriefingRenderer.renderDataCard(cardFixture.scene, EP1_DATA_CARDS[0], 390, 500);
+  assert.ok(cardFixture.calls.some((call) => call[0] === 'rectangle' && call[3] === 500 && call[4] === 560));
+  assert.ok(cardFixture.calls.some((call) => call[0] === 'text' && call[3] === EP1_DATA_CARDS[0].title));
+  assert.ok(cardFixture.calls.some((call) => call[0] === 'text' && call[3] === '읽어야 할 점'));
+  assert.equal(cardFixture.calls.filter((call) => call[0] === 'origin' && call[2] === 0).length >= 4, true);
+
+  const conceptFixture = createRendererSceneSpy();
+  DataBriefingRenderer.renderConceptBox(conceptFixture.scene, EP1_CORE_CONCEPT);
+  assert.ok(conceptFixture.calls.some((call) => call[0] === 'text' && call[3] === '핵심 개념'));
+  assert.ok(conceptFixture.calls.some((call) => call[0] === 'text' && call[3] === EP1_CORE_CONCEPT));
 }
 
 function testDataBriefingViewManager() {
@@ -3080,12 +3115,14 @@ async function run() {
   testEpisodeMetadata();
   testEpisodeContent();
   testCauseQuizViewManager();
+  testCauseQuizPanelRenderer();
   testCauseQuizManager();
   testSelectionViewManager();
   testSelectionPolicyCardRenderer();
   testProblemSummaryViewManager();
   testExplorationViewManager();
   testExplorationMapRenderer();
+  testDataBriefingRenderer();
   testDataBriefingViewManager();
   testReflectionViewManager();
   testTitleViewManager();

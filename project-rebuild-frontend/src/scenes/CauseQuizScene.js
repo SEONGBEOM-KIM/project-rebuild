@@ -4,11 +4,11 @@ import ProgressStepper from '../ui/ProgressStepper.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import CauseQuizManager from '../systems/CauseQuizManager.js';
 import CauseQuizViewManager from '../systems/CauseQuizViewManager.js';
+import CauseQuizPanelRenderer from '../systems/CauseQuizPanelRenderer.js';
 
 import { EP1_CAUSE_QUESTION, EP1_EXPLORATION_CLUES } from '../data/episodeContent.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
-import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
 
 export default class CauseQuizScene extends Phaser.Scene {
   constructor() {
@@ -16,7 +16,7 @@ export default class CauseQuizScene extends Phaser.Scene {
   }
 
   create() {
-    const { width, height } = this.scale;
+    const { width } = this.scale;
     this.selectedChoice = null;
     this.choiceObjects = new Map();
 
@@ -35,53 +35,18 @@ export default class CauseQuizScene extends Phaser.Scene {
 
   drawExplorationSummary() {
     const exploredCount = (this.registry.get('exploredPlaces') ?? []).length;
-    const layout = CauseQuizViewManager.getExplorationSummaryLayout();
-    const textStyles = CauseQuizViewManager.getTextStyles();
-    createPanelBackground(this, layout.panel, layout.panel);
-    createPanelTitle(this, layout.title, textStyles.summaryTitle, { origin: 0.5 });
-
     const rows = CauseQuizManager.formatExplorationSummaryRows(exploredCount, EP1_EXPLORATION_CLUES);
-
-    createLayoutText(this, layout.body, {
-      text: rows.join('\n'),
-      style: textStyles.summaryBody,
-    });
+    CauseQuizPanelRenderer.renderExplorationSummary(this, rows);
   }
 
   drawQuestionPanel() {
-    const layout = CauseQuizViewManager.getQuestionLayout();
-    const textStyles = CauseQuizViewManager.getTextStyles();
-    createPanelBackground(this, layout.panel, layout.panel);
-    createLayoutText(this, layout.prompt, {
-      text: EP1_CAUSE_QUESTION.prompt,
-      style: textStyles.prompt,
-      origin: 0.5,
-    });
-
-    EP1_CAUSE_QUESTION.choices.forEach((choice, index) => {
-      this.createChoice(choice, index, index + 1);
-    });
-
-    this.feedbackText = createLayoutText(this, layout.feedback, {
-      style: textStyles.feedback,
-    });
-  }
-
-  createChoice(choice, index, number) {
-    const layout = CauseQuizViewManager.getChoiceLayout(index);
-    const textStyles = CauseQuizViewManager.getTextStyles();
-    const background = createPanelBackground(this, layout.background, layout.background)
-      .setInteractive({ useHandCursor: true });
-    const text = createLayoutText(this, layout.text, {
-      text: `${number}. ${choice.text}`,
-      style: textStyles.choice,
-      origin: [0, 0.5],
-    });
-
-    const select = () => this.selectChoice(choice);
-    background.on('pointerdown', select);
-    text.setInteractive({ useHandCursor: true }).on('pointerdown', select);
-    this.choiceObjects.set(choice.id, { background, text });
+    const renderedPanel = CauseQuizPanelRenderer.renderQuestionPanel(
+      this,
+      EP1_CAUSE_QUESTION,
+      (choice) => this.selectChoice(choice),
+    );
+    this.choiceObjects = renderedPanel.choiceObjects;
+    this.feedbackText = renderedPanel.feedbackText;
   }
 
   drawControls() {
