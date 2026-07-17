@@ -1370,6 +1370,10 @@ function testEvaluationManager() {
   assert.ok(EvaluationManager.getTopEffectRows(totals)[0].includes('예산'), 'largest absolute effect should be shown first');
   assert.deepEqual(EvaluationManager.getTopEffectRows(totals, ['pollution', 'traffic']), ['• 오염: -4', '• 교통: -3']);
   assert.match(EvaluationManager.formatKeyInterpretation(finalState), /인구 회복과 주민 체감/);
+  assert.match(EvaluationManager.formatKeyInterpretation(finalState, {
+    ...getEvaluationProfile(),
+    resultThresholds: { ...RESULT_THRESHOLDS, populationImproved: 1300, satisfactionHigh: 100, environmentGood: 95 },
+  }), /아직 뚜렷한 강점보다 보완할 지표/);
   assert.match(EvaluationManager.formatKeyInterpretation({ ...finalState, budget: 300 }), /예산 부족 신호/);
   const trendRows = EvaluationManager.formatChoiceTrendRows(placedBuildings, youthPolicy);
   assert.match(trendRows, /누적 효과 상위:/);

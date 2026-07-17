@@ -85,17 +85,19 @@ export default class EvaluationManager {
     return issues.map((issue) => `• ${issue.title}: ${issue.message}`);
   }
 
-  static formatKeyInterpretation(gameState) {
+  static formatKeyInterpretation(gameState, evaluationProfile = getEvaluationProfile()) {
     const issues = IssueDetector.detect(gameState);
     if (issues.length) {
       return `핵심 해석: ${issues[0].title} 신호가 가장 먼저 보입니다. 다음 선택은 이 위험을 줄이는 방향이어야 합니다.`;
     }
 
-    if (gameState.population >= RESULT_THRESHOLDS.populationImproved && gameState.satisfaction >= RESULT_THRESHOLDS.satisfactionHigh) {
+    const resultThresholds = evaluationProfile.resultThresholds;
+
+    if (gameState.population >= resultThresholds.populationImproved && gameState.satisfaction >= resultThresholds.satisfactionHigh) {
       return '핵심 해석: 인구 회복과 주민 체감이 함께 좋아졌습니다. 다음에는 이 균형이 유지되는지 확인합니다.';
     }
 
-    if (gameState.environment >= RESULT_THRESHOLDS.environmentGood) {
+    if (gameState.environment >= resultThresholds.environmentGood) {
       return '핵심 해석: 환경 조건은 안정적입니다. 다음에는 인구·경제 회복 효과도 함께 비교합니다.';
     }
 
@@ -111,7 +113,7 @@ export default class EvaluationManager {
       `배치 수: ${placedBuildings.length}개`,
       policyAlignment.label,
       `균형 점수: ${evaluation.score}/100`,
-      EvaluationManager.formatKeyInterpretation(gameState),
+      EvaluationManager.formatKeyInterpretation(gameState, evaluationProfile),
       '',
       '주의 신호:',
       ...EvaluationManager.formatIssueRows(gameState),
