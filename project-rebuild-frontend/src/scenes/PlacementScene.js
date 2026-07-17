@@ -62,7 +62,7 @@ export default class PlacementScene extends Phaser.Scene {
     this.registerPlacementInput();
     this.uiUpdater.updateStatusBar(this.registry.get('gameState'), this.placementConfig.stateKeys);
     this.uiUpdater.updateLastChangePanel(this.registry.get('lastPlacementResult'), this.placementConfig.stateKeys);
-    this.uiUpdater.updatePlacementHistoryPanel(this.placedBuildings);
+    this.uiUpdater.updatePlacementHistoryPanel(this.placedBuildings, this.placementConfig.stateKeys);
     this.updateSelectedBuildingUi();
     this.uiUpdater.updateContinueButton(
       this.placedBuildings.length,
@@ -156,7 +156,7 @@ export default class PlacementScene extends Phaser.Scene {
     this.worldRenderer.drawImpactMarkers(this.selectedBuilding, action.tile.x, action.tile.y);
     this.uiUpdater.updateStatusBar(this.registry.get('gameState'), this.placementConfig.stateKeys);
     this.uiUpdater.updateLastChangePanel(this.registry.get('lastPlacementResult'), this.placementConfig.stateKeys);
-    this.uiUpdater.updatePlacementHistoryPanel(this.placedBuildings);
+    this.uiUpdater.updatePlacementHistoryPanel(this.placedBuildings, this.placementConfig.stateKeys);
     this.uiUpdater.updateContinueButton(
       this.placedBuildings.length,
       this.selectedPolicy,

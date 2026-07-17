@@ -93,7 +93,16 @@ export default class PlacementUiStateManager {
     };
   }
 
-  static formatPlacementHistoryState(placedBuildings) {
+
+  static formatPlacementDeltaSummary(delta = {}, stateKeys = null) {
+    const visibleStateKeys = stateKeys ? new Set(stateKeys) : null;
+    return Object.entries(delta)
+      .filter(([key, value]) => value !== 0 && (!visibleStateKeys || visibleStateKeys.has(key)))
+      .map(([key, value]) => `${STATE_LABELS[key] ?? key} ${formatSignedValue(value)}`)
+      .join(' / ');
+  }
+
+  static formatPlacementHistoryState(placedBuildings, stateKeys = null) {
     if (!placedBuildings.length) {
       return PlacementUiStateManager.getEmptyPlacementHistoryState();
     }
@@ -102,7 +111,11 @@ export default class PlacementUiStateManager {
       .slice(-5)
       .map((record, index) => {
         const order = Math.max(1, placedBuildings.length - 4) + index;
-        return `${order}. ${record.building.name} (${record.position.x}, ${record.position.y})`;
+        const deltaSummary = PlacementUiStateManager.formatPlacementDeltaSummary(record.delta, stateKeys);
+        return [
+          `${order}. ${record.building.name} (${record.position.x}, ${record.position.y})`,
+          deltaSummary ? `   ${deltaSummary}` : null,
+        ].filter(Boolean).join('\n');
       });
 
     return {

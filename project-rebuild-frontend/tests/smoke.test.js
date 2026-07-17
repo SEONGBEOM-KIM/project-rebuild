@@ -2095,9 +2095,14 @@ function testPlacementUiUpdater() {
   assert.match(lastChangeText.text, /만족도: 60 → 72/);
   assert.doesNotMatch(lastChangeText.text, /예산: 1000 → 820/);
 
-  updater.updatePlacementHistoryPanel([{ building: youthCenter, position: { x: 1, y: 1 } }]);
+  updater.updatePlacementHistoryPanel([{ building: youthCenter, position: { x: 1, y: 1 }, delta: youthCenter.effect }]);
   assert.match(placementHistoryText.text, /총 배치: 1개/);
+  assert.match(placementHistoryText.text, /인구 \+80/);
   assert.equal(placementHistoryText.color, '#e0f2fe');
+
+  updater.updatePlacementHistoryPanel([{ building: youthCenter, position: { x: 1, y: 1 }, delta: youthCenter.effect }], ['budget']);
+  assert.match(placementHistoryText.text, /예산 -180/);
+  assert.doesNotMatch(placementHistoryText.text, /인구 \+80/);
 
   updater.updateContinueButton(1, policies[0], EP2_MISSION_BRIEFING.strategies[0]);
   assert.match(missionText.text, /EP2 전략: 일자리와 생활 기반/);

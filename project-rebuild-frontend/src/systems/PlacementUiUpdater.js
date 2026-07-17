@@ -54,12 +54,12 @@ export default class PlacementUiUpdater {
     this.lastChangeText.setColor(lastChangeState.color);
   }
 
-  updatePlacementHistoryPanel(placedBuildings) {
+  updatePlacementHistoryPanel(placedBuildings, stateKeys = null) {
     if (!this.placementHistoryText) {
       return;
     }
 
-    const historyState = this.uiStateManager.formatPlacementHistoryState(placedBuildings);
+    const historyState = this.uiStateManager.formatPlacementHistoryState(placedBuildings, stateKeys);
     this.placementHistoryText.setText(historyState.text);
     this.placementHistoryText.setColor(historyState.color);
   }
