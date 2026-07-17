@@ -35,7 +35,7 @@ export default class ResultScene extends Phaser.Scene {
     const panels = ResultViewManager.getPanelLayout(width / 2);
     this.drawStatePanel(panels.beforeAfter, EvaluationManager.formatBeforeAfterRows(lastPlacementResult, gameState));
     this.drawStatePanel(panels.evaluation, EvaluationManager.formatEvaluationRows(evaluation, gameState, placedBuildings, selectedPolicy));
-    this.drawStatePanel(panels.trend, EvaluationManager.formatChoiceTrendRows(placedBuildings));
+    this.drawStatePanel(panels.trend, EvaluationManager.formatChoiceTrendRows(placedBuildings, selectedPolicy));
     this.drawResidentReactionStrip(width / 2, EvaluationManager.formatResidentReactions(gameState, placedBuildings));
     this.drawControls(width / 2);
   }

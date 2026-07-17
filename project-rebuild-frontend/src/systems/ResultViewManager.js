@@ -92,11 +92,14 @@ export default class ResultViewManager {
   }
 
   static getPanelBodyStyle(panel) {
+    const compactBodyTitles = new Set(['종합 평가', '선택 경향']);
+    const isCompactBody = compactBodyTitles.has(panel.title);
+
     return {
-      fontSize: '22px',
+      fontSize: isCompactBody ? '19px' : '22px',
       color: '#1e293b',
       align: 'left',
-      lineSpacing: 6,
+      lineSpacing: isCompactBody ? 3 : 6,
       wordWrap: { width: panel.width - 80 },
     };
   }

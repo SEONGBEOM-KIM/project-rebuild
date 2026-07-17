@@ -1019,6 +1019,9 @@ function testResultViewManager() {
   assert.deepEqual(ResultViewManager.getPanelTitlePosition(panels.evaluation), { x: 960, y: 270 });
   assert.deepEqual(ResultViewManager.getPanelBodyPosition(panels.evaluation), { x: 960, y: 340 });
   assert.equal(ResultViewManager.getPanelBodyStyle(panels.evaluation).wordWrap.width, 465);
+  assert.equal(ResultViewManager.getPanelBodyStyle(panels.evaluation).fontSize, '19px');
+  assert.equal(ResultViewManager.getPanelBodyStyle(panels.trend).lineSpacing, 3);
+  assert.equal(ResultViewManager.getPanelBodyStyle(panels.beforeAfter).fontSize, '22px');
   assert.deepEqual(ResultViewManager.getEvaluationTitleTextStyle('#22c55e'), {
     fontSize: '30px',
     align: 'center',
@@ -1077,15 +1080,17 @@ function testEvaluationManager() {
   assert.ok(EvaluationManager.getTopEffectRows(totals)[0].includes('예산'), 'largest absolute effect should be shown first');
   assert.match(EvaluationManager.formatKeyInterpretation(finalState), /인구 회복과 주민 체감/);
   assert.match(EvaluationManager.formatKeyInterpretation({ ...finalState, budget: 300 }), /예산 부족 신호/);
-  const trendRows = EvaluationManager.formatChoiceTrendRows(placedBuildings);
+  const trendRows = EvaluationManager.formatChoiceTrendRows(placedBuildings, youthPolicy);
   assert.match(trendRows, /누적 효과 상위:/);
   assert.match(trendRows, /선택 유형 수: 3종/);
+  assert.match(trendRows, /다음 실험:/);
+  assert.match(trendRows, /예산 소모를 줄이면서/);
   assert.match(trendRows, /최근 배치:/);
   assert.equal(EvaluationManager.formatChoiceTrendRows([]), '배치 없음');
   assert.match(EvaluationManager.formatResidentReactions(finalState, placedBuildings), /생활이 더 편리/);
   assert.match(EvaluationManager.formatResidentReactions(finalState, [createPlacementRecord('bus_station')]), /이동이 쉬워지면/);
   assert.match(EvaluationManager.formatResidentReactions({ ...finalState, traffic: 10 }, [createPlacementRecord('small_park')]), /쉴 수 있는 공간/);
-  assert.match(EvaluationManager.formatBeforeAfterRows({ before: GameState.createInitialState(), after: finalState }, finalState), /인구: 1000 → 1120 \(\+120\)/);
+  assert.match(EvaluationManager.formatBeforeAfterRows({ before: { ...finalState, population: 1080 }, after: finalState }, finalState), /인구: 1000 → 1120 \(\+120\)/);
   assert.deepEqual(EvaluationManager.formatJudgementRows(finalState), [
     '• 인구 변화: 증가 확인',
     '• 경제 수준: 개선됨',
@@ -1101,6 +1106,7 @@ function testEvaluationManager() {
   assert.match(evaluationRows, /주의 신호:/);
   assert.match(evaluationRows, /학습 포인트:/);
   assert.deepEqual(EvaluationManager.formatIssueRows(finalState), ['• 현재 큰 부작용 신호는 없습니다.']);
+  assert.match(EvaluationManager.getNextExperimentSuggestion({ population: 80 }, [createPlacementRecord('youth_center')], youthPolicy), /추천 시설 버스정류장/);
 }
 
 

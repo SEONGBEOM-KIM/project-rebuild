@@ -1,6 +1,7 @@
 import { REACTION_THRESHOLDS, RESULT_THRESHOLDS, SCORE_RULES } from '../data/evaluationRules.js';
 import { STATE_LABELS, formatSignedValue } from '../data/stateLabels.js';
 import IssueDetector from './IssueDetector.js';
+import GameState from './GameState.js';
 
 export default class EvaluationManager {
   static calculateScore(gameState) {
@@ -48,17 +49,11 @@ export default class EvaluationManager {
   }
 
 
-  static formatBeforeAfterRows(lastPlacementResult, fallbackState) {
-    if (!lastPlacementResult) {
-      return Object.entries(STATE_LABELS)
-        .map(([key, label]) => `${label}: ${fallbackState[key]}`)
-        .join('\n');
-    }
-
+  static formatBeforeAfterRows(_lastPlacementResult, finalState, initialState = GameState.createInitialState()) {
     return Object.entries(STATE_LABELS)
       .map(([key, label]) => {
-        const before = lastPlacementResult.before[key];
-        const after = lastPlacementResult.after[key];
+        const before = initialState[key];
+        const after = finalState[key];
         const delta = after - before;
         const marker = delta === 0 ? '' : ` (${formatSignedValue(delta)})`;
         return `${label}: ${before} → ${after}${marker}`;
@@ -188,8 +183,27 @@ export default class EvaluationManager {
     return '경향: 아직 선택 경향이 뚜렷하지 않습니다.';
   }
 
+  static getNextExperimentSuggestion(totals, placedBuildings, selectedPolicy) {
+    const placedIds = new Set(placedBuildings.map((record) => record.building.id));
+    const missingRecommended = selectedPolicy?.recommendedBuildings?.filter((_, index) => !placedIds.has(selectedPolicy.recommendedBuildingIds[index])) ?? [];
 
-  static formatChoiceTrendRows(placedBuildings) {
+    if (missingRecommended.length) {
+      return `추천 시설 ${missingRecommended.join(', ')}도 포함한 조합을 비교하세요.`;
+    }
+
+    if ((totals.budget ?? 0) <= -400) {
+      return '예산 소모를 줄이면서 핵심 지표를 유지하는 조합을 비교하세요.';
+    }
+
+    if ((totals.environment ?? 0) <= 0) {
+      return '환경 회복 시설을 추가했을 때 만족도와 오염이 어떻게 달라지는지 비교하세요.';
+    }
+
+    return '같은 방향으로 시설 순서와 위치를 바꾸어 결과 차이를 비교하세요.';
+  }
+
+
+  static formatChoiceTrendRows(placedBuildings, selectedPolicy = null) {
     if (!placedBuildings.length) {
       return '배치 없음';
     }
@@ -207,6 +221,9 @@ export default class EvaluationManager {
       '',
       `선택 유형 수: ${new Set(placedBuildings.map((record) => record.building.id)).size}종`,
       EvaluationManager.getChoiceTrendMessage(totals, placedBuildings),
+      '',
+      '다음 실험:',
+      `• ${EvaluationManager.getNextExperimentSuggestion(totals, placedBuildings, selectedPolicy)}`,
       '',
       '최근 배치:',
       placementRows,
