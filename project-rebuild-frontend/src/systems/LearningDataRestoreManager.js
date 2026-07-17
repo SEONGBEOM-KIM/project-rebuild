@@ -2,10 +2,13 @@ import GameState from './GameState.js';
 import LearningProgress from './LearningProgress.js';
 import { policies } from '../data/policies.js';
 import { buildings } from '../data/buildings.js';
+import { EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
+import Ep2BriefingViewManager from './Ep2BriefingViewManager.js';
 
 export default class LearningDataRestoreManager {
   static restore(registry, data) {
     const selectedPolicy = policies.find((policy) => policy.id === data.selectedPolicy?.id) ?? null;
+    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, data.selectedStrategy?.id, selectedPolicy?.id);
     const restoredPlacements = LearningDataRestoreManager.restorePlacements(data.placements ?? []);
     const progress = LearningDataRestoreManager.buildProgress(data, selectedPolicy, restoredPlacements);
 
@@ -13,6 +16,7 @@ export default class LearningDataRestoreManager {
     registry.set('lastPlacementResult', null);
     registry.set('placedBuildings', restoredPlacements);
     registry.set('selectedPolicy', selectedPolicy);
+    registry.set('ep2StrategyId', selectedStrategy?.id ?? null);
     registry.set('exploredPlaces', progress.exploredPlaces);
     registry.set('quizResult', progress.quizResult);
     registry.set('reflectionChoice', progress.reflectionChoice);
@@ -20,6 +24,7 @@ export default class LearningDataRestoreManager {
 
     return {
       selectedPolicy,
+      selectedStrategy,
       placedBuildings: restoredPlacements,
       learningProgress: progress,
     };

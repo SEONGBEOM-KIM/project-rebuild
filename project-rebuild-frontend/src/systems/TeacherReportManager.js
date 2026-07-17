@@ -1,8 +1,10 @@
 import { explorationPlaces } from '../data/explorationPlaces.js';
+import { EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
 import { STATE_LABELS } from '../data/stateLabels.js';
 import IssueDetector from './IssueDetector.js';
 import LearningProgress from './LearningProgress.js';
 import EndingSummaryManager from './EndingSummaryManager.js';
+import Ep2BriefingViewManager from './Ep2BriefingViewManager.js';
 
 const TEACHER_REPORT_DOWNLOAD_CONFIG = {
   mimeType: 'text/plain;charset=utf-8',
@@ -36,6 +38,7 @@ export default class TeacherReportManager {
   static build(registry) {
     const progress = LearningProgress.get(registry);
     const selectedPolicy = registry.get('selectedPolicy');
+    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, registry.get('ep2StrategyId'), selectedPolicy?.id);
     const placedBuildings = registry.get('placedBuildings') ?? [];
     const gameState = registry.get('gameState');
     const reflectionChoice = registry.get('reflectionChoice');
@@ -49,6 +52,7 @@ export default class TeacherReportManager {
     return {
       progress,
       selectedPolicy,
+      selectedStrategy,
       placedBuildings,
       gameState,
       reflectionChoice,
@@ -70,6 +74,7 @@ export default class TeacherReportManager {
       `${report.ending.title}: ${report.ending.message}`,
       `우선 보완: ${issueText}`,
       `학생 다음 액션: ${actionText}`,
+      `EP2 전략: ${report.selectedStrategy?.title ?? '미선택'}`,
       `회복 방향: ${report.selectedPolicy?.name ?? '미선택'} / 배치 ${report.placedBuildings.length}개`,
     ].join('\n');
   }
@@ -101,6 +106,8 @@ export default class TeacherReportManager {
       .join(' / ');
 
     return [
+      `EP2 전략: ${report.selectedStrategy?.title ?? '미선택'}`,
+      report.selectedStrategy ? `전략 초점: ${report.selectedStrategy.stateFocus}` : null,
       `회복 방향: ${report.selectedPolicy?.name ?? '미선택'}`,
       '',
       '배치 시설:',
@@ -108,7 +115,7 @@ export default class TeacherReportManager {
       '',
       '최종 상태:',
       stateRows,
-    ].join('\n');
+    ].filter((row) => row !== null).join('\n');
   }
 
   static formatTeachingPointReport(report) {

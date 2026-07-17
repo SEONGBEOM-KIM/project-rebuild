@@ -1,13 +1,16 @@
 import { explorationPlaces } from '../data/explorationPlaces.js';
+import { EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
 import IssueDetector from './IssueDetector.js';
 import LearningProgress from './LearningProgress.js';
 import EndingSummaryManager from './EndingSummaryManager.js';
+import Ep2BriefingViewManager from './Ep2BriefingViewManager.js';
 
 export default class LearningDataManager {
   static build(registry) {
     const progress = LearningProgress.get(registry);
     const quizResult = registry.get('quizResult');
     const selectedPolicy = registry.get('selectedPolicy');
+    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, registry.get('ep2StrategyId'), selectedPolicy?.id);
     const placedBuildings = registry.get('placedBuildings') ?? [];
     const gameState = registry.get('gameState');
     const reflectionChoice = registry.get('reflectionChoice');
@@ -23,6 +26,7 @@ export default class LearningDataManager {
         ending,
         issues,
         selectedPolicy,
+        selectedStrategy,
         placedBuildings,
         reflectionChoice,
       }),
@@ -34,6 +38,12 @@ export default class LearningDataManager {
       selectedPolicy: selectedPolicy ? {
         id: selectedPolicy.id,
         name: selectedPolicy.name,
+      } : null,
+      selectedStrategy: selectedStrategy ? {
+        id: selectedStrategy.id,
+        title: selectedStrategy.title,
+        stateFocus: selectedStrategy.stateFocus,
+        policyId: selectedStrategy.policyId,
       } : null,
       placements: placedBuildings.map((record) => ({
         buildingId: record.building.id,
@@ -47,7 +57,7 @@ export default class LearningDataManager {
     };
   }
 
-  static buildSummary({ ending, issues, selectedPolicy, placedBuildings, reflectionChoice }) {
+  static buildSummary({ ending, issues, selectedPolicy, selectedStrategy, placedBuildings, reflectionChoice }) {
     const priorityIssue = issues[0] ?? null;
     return {
       outcomeType: ending.title,
@@ -57,6 +67,7 @@ export default class LearningDataManager {
         title: priorityIssue.title,
       } : null,
       selectedPolicyName: selectedPolicy?.name ?? null,
+      selectedStrategyTitle: selectedStrategy?.title ?? null,
       placementCount: placedBuildings.length,
       nextAction: reflectionChoice ? {
         id: reflectionChoice.id,
@@ -64,6 +75,11 @@ export default class LearningDataManager {
         label: reflectionChoice.nextActionLabel ?? reflectionChoice.title,
       } : null,
     };
+  }
+
+  static hasSelectedStrategy(data) {
+    return Boolean(data.selectedStrategy?.id)
+      || Boolean(Ep2BriefingViewManager.findStrategyByPolicyId(EP2_MISSION_BRIEFING, data.selectedPolicy?.id));
   }
 
   static validate(data) {
@@ -102,6 +118,11 @@ export default class LearningDataManager {
         ok: Boolean(data.selectedPolicy?.id),
         label: '회복 방향 선택',
         message: '선택한 회복 방향이 없습니다.',
+      },
+      {
+        ok: LearningDataManager.hasSelectedStrategy(data),
+        label: 'EP2 전략 선택',
+        message: '선택한 EP2 전략이 없습니다.',
       },
       {
         ok: Array.isArray(data.placements) && data.placements.length >= 3,

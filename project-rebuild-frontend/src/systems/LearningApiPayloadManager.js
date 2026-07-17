@@ -9,6 +9,7 @@ export default class LearningApiPayloadManager {
         outcome_message: learningData.summary.outcomeMessage,
         priority_issue: learningData.summary.priorityIssue,
         selected_policy_name: learningData.summary.selectedPolicyName,
+        selected_strategy_title: learningData.summary.selectedStrategyTitle,
         placement_count: learningData.summary.placementCount,
         next_action: learningData.summary.nextAction,
       } : null,
@@ -29,6 +30,12 @@ export default class LearningApiPayloadManager {
       selected_policy: learningData.selectedPolicy ? {
         id: learningData.selectedPolicy.id,
         name: learningData.selectedPolicy.name,
+      } : null,
+      selected_strategy: learningData.selectedStrategy ? {
+        id: learningData.selectedStrategy.id,
+        title: learningData.selectedStrategy.title,
+        state_focus: learningData.selectedStrategy.stateFocus,
+        policy_id: learningData.selectedStrategy.policyId,
       } : null,
       placements: (learningData.placements ?? []).map((placement, index) => ({
         order: index + 1,
@@ -72,6 +79,11 @@ export default class LearningApiPayloadManager {
         ok: payload.selected_policy === null || Boolean(payload.selected_policy.id),
         label: '정책 선택 구조 확인',
         message: 'selected_policy.id 값이 없습니다.',
+      },
+      {
+        ok: payload.selected_strategy == null || Boolean(payload.selected_strategy.id),
+        label: 'EP2 전략 구조 확인',
+        message: 'selected_strategy.id 값이 없습니다.',
       },
       {
         ok: Array.isArray(payload.placements),

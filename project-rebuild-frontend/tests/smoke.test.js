@@ -130,6 +130,7 @@ function createCompleteLearningData(overrides = {}) {
       outcomeMessage: '생활 환경 개선 효과가 뚜렷합니다.',
       priorityIssue: null,
       selectedPolicyName: '녹색 회복 계획',
+      selectedStrategyTitle: '균형 성장',
       placementCount: 1,
       nextAction: { id: 'environment', title: '환경 보완', label: '개발 효과와 환경 부담 비교' },
     },
@@ -138,6 +139,7 @@ function createCompleteLearningData(overrides = {}) {
     quizResult: { questionId: 'ep1_q1', selected: 'lack_jobs_services', correct: true },
     problemSummaryCompleted: true,
     selectedPolicy: { id: 'green_recovery', name: '녹색 회복 계획' },
+    selectedStrategy: { id: 'balanced_growth', title: '균형 성장', stateFocus: '환경 유지 만족도↑ 오염↓', policyId: 'green_recovery' },
     placements: [
       { buildingId: 'small_park', buildingName: '작은 공원', position: { x: 6, y: 1 }, effect: { environment: 12 } },
     ],
@@ -2652,16 +2654,19 @@ function testTeacherReportManager() {
   const report = TeacherReportManager.build(registry);
   assert.equal(report.exploredNames.length, 3);
   assert.equal(report.selectedPolicy.id, 'youth_living_support');
+  assert.equal(report.selectedStrategy.id, 'jobs_services');
   assert.equal(report.placedBuildings.length, 3);
   assert.equal(report.issues.length, 0);
   assert.equal(report.ending.title, '균형형 회복안');
 
   assert.match(TeacherReportManager.formatClassSummaryReport(report), /균형형 회복안/);
   assert.match(TeacherReportManager.formatClassSummaryReport(report), /학생 다음 액션: 예산 균형 보완/);
+  assert.match(TeacherReportManager.formatClassSummaryReport(report), /EP2 전략: 일자리와 생활 기반/);
   assert.match(TeacherReportManager.formatClassSummaryReport({ ...report, gameState: { ...finalState, budget: 400 }, issues: IssueDetector.detect({ ...finalState, budget: 400 }) }), /우선 보완: 예산 부족/);
   assert.match(TeacherReportManager.formatProgressReport(report), /탐색 장소: 3\/5/);
   assert.match(TeacherReportManager.formatProgressReport(report), /EP1 완료: 예/);
   assert.match(TeacherReportManager.formatChoiceReport(report), /회복 방향: 청년 생활 지원/);
+  assert.match(TeacherReportManager.formatChoiceReport(report), /전략 초점: 인구↑ 경제↑ 예산↓/);
   assert.match(TeacherReportManager.formatChoiceReport(report), /1\. 청년센터/);
   assert.match(TeacherReportManager.formatTeachingPointReport(report), /큰 부작용 신호 없음/);
   assert.match(TeacherReportManager.buildReportText(report), /\[프로젝트 리빌드 EP1 교사용 요약\]/);
@@ -2803,6 +2808,7 @@ function testLearningDataManager() {
   });
   registry.set('quizResult', { questionId: 'ep1_q1', selected: 'lack_jobs_services', correct: true });
   registry.set('selectedPolicy', { id: 'youth_living_support', name: '청년 생활 지원' });
+  registry.set('ep2StrategyId', 'jobs_services');
   registry.set('gameState', GameState.createInitialState());
   registry.set('reflectionChoice', { id: 'budget_balance', title: '예산 균형 보완' });
   registry.set('placedBuildings', [
@@ -2816,10 +2822,14 @@ function testLearningDataManager() {
   assert.equal(data.exploredPlaceNames.length, 3);
   assert.equal(data.placements.length, 3);
   assert.equal(data.summary.selectedPolicyName, '청년 생활 지원');
+  assert.equal(data.summary.selectedStrategyTitle, '일자리와 생활 기반');
+  assert.equal(data.selectedStrategy.id, 'jobs_services');
   assert.equal(data.summary.placementCount, 3);
   assert.equal(data.summary.nextAction.title, '예산 균형 보완');
   assert.equal(LearningDataManager.isReadyToSave(data), true);
   assert.equal(LearningDataManager.validate({ ...data, summary: null }).some((row) => !row.ok && row.label === '학습 결론 요약'), true);
+  assert.equal(LearningDataManager.validate({ ...data, selectedStrategy: null }).every((row) => row.ok), true, 'saved data without selectedStrategy should be accepted when policy maps to an EP2 strategy');
+  assert.equal(LearningDataManager.validate({ ...data, selectedPolicy: null, selectedStrategy: null }).some((row) => !row.ok && row.label === 'EP2 전략 선택'), true);
 
   const incompleteData = { ...data, reflectionChoice: null };
   assert.equal(LearningDataManager.isReadyToSave(incompleteData), false);
@@ -2920,6 +2930,9 @@ function testLearningApiPayloadManager() {
   assert.equal(payload.episode_id, 1);
   assert.equal(payload.summary.outcome_type, '환경 우선 회복안');
   assert.equal(payload.summary.next_action.label, '개발 효과와 환경 부담 비교');
+  assert.equal(payload.summary.selected_strategy_title, '균형 성장');
+  assert.equal(payload.selected_strategy.id, 'balanced_growth');
+  assert.equal(payload.selected_strategy.policy_id, 'green_recovery');
   assert.equal(payload.learning_steps.quiz_result.question_id, 'ep1_q1');
   assert.equal(payload.placements[0].building_id, 'small_park');
   assert.equal(payload.placements[0].order, 1);
@@ -3059,6 +3072,7 @@ function testLearningDataRestoreManager() {
       outcomeMessage: '생활 환경 개선 효과가 뚜렷합니다.',
       priorityIssue: null,
       selectedPolicyName: '녹색 회복 계획',
+      selectedStrategyTitle: '균형 성장',
       placementCount: 1,
       nextAction: { id: 'environment', title: '환경 보완', label: '개발 효과와 환경 부담 비교' },
     },
@@ -3067,6 +3081,7 @@ function testLearningDataRestoreManager() {
     quizResult: { questionId: 'ep1_q1', selected: 'lack_jobs_services', correct: true },
     problemSummaryCompleted: true,
     selectedPolicy: { id: 'green_recovery', name: '녹색 회복 계획' },
+    selectedStrategy: { id: 'balanced_growth', title: '균형 성장', stateFocus: '환경 유지 만족도↑ 오염↓', policyId: 'green_recovery' },
     placements: [
       { buildingId: 'small_park', position: { x: 6, y: 1 }, effect: { environment: 12, satisfaction: 14, pollution: -4, budget: -140 } },
       { buildingId: 'unknown_building', position: { x: 9, y: 9 }, effect: {} },
@@ -3078,6 +3093,8 @@ function testLearningDataRestoreManager() {
 
   const restored = LearningDataRestoreManager.restore(registry, data);
   assert.equal(restored.selectedPolicy.id, 'green_recovery');
+  assert.equal(restored.selectedStrategy.id, 'balanced_growth');
+  assert.equal(registry.get('ep2StrategyId'), 'balanced_growth');
   assert.equal(restored.placedBuildings.length, 1, 'unknown building ids should be skipped safely');
   assert.equal(registry.get('gameState').environment, 92);
   assert.deepEqual(registry.get('exploredPlaces'), ['school', 'market', 'bus_stop']);
@@ -3264,6 +3281,7 @@ function testSaveImport() {
       outcomeMessage: '생활 환경 개선 효과가 뚜렷합니다.',
       priorityIssue: null,
       selectedPolicyName: '녹색 회복 계획',
+      selectedStrategyTitle: '균형 성장',
       placementCount: 1,
       nextAction: { id: 'environment', title: '환경 보완', label: '개발 효과와 환경 부담 비교' },
     },
