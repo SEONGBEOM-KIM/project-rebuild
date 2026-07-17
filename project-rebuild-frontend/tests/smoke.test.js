@@ -3316,14 +3316,19 @@ function testApiContract() {
     'schema_version',
     'episode_id',
     'completed',
+    'summary',
     'learning_steps',
     'selected_policy',
+    'selected_strategy',
     'placements',
     'final_state',
   ]);
+  assert.equal(API_CONTRACT.requestExample.summary.selected_strategy_title, '균형 성장');
+  assert.equal(API_CONTRACT.requestExample.selected_strategy.id, 'balanced_growth');
   assert.equal(LearningApiPayloadManager.validate(API_CONTRACT.requestExample).every((row) => row.ok), true);
   assert.equal(MockApiClient.validatePayload(API_CONTRACT.requestExample).ok, true);
   assert.match(formatContractRequest(), /POST \/api\/learning-records\//);
+  assert.match(formatContractRequest(), /selected_strategy/);
   assert.match(formatContractResponse(), /201 Created/);
 }
 

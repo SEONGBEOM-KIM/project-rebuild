@@ -7,6 +7,19 @@ export const API_CONTRACT = {
     schema_version: 1,
     episode_id: 1,
     completed: true,
+    summary: {
+      outcome_type: '환경 우선 회복안',
+      outcome_message: '생활 환경 개선 효과가 뚜렷합니다.',
+      priority_issue: null,
+      selected_policy_name: '녹색 회복 계획',
+      selected_strategy_title: '균형 성장',
+      placement_count: 1,
+      next_action: {
+        id: 'environment',
+        title: '환경 보완',
+        label: '개발 효과와 환경 부담 비교',
+      },
+    },
     learning_steps: {
       explored_places: ['school', 'market', 'bus_stop'],
       data_viewed: true,
@@ -24,6 +37,12 @@ export const API_CONTRACT = {
     selected_policy: {
       id: 'green_recovery',
       name: '녹색 회복 계획',
+    },
+    selected_strategy: {
+      id: 'balanced_growth',
+      title: '균형 성장',
+      state_focus: '환경 유지 만족도↑ 오염↓',
+      policy_id: 'green_recovery',
     },
     placements: [
       {
