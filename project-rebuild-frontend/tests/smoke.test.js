@@ -105,6 +105,14 @@ function installLocalStorageMock() {
 function createCompleteLearningData(overrides = {}) {
   return {
     episode: 1,
+    summary: {
+      outcomeType: '환경 우선 회복안',
+      outcomeMessage: '생활 환경 개선 효과가 뚜렷합니다.',
+      priorityIssue: null,
+      selectedPolicyName: '녹색 회복 계획',
+      placementCount: 1,
+      nextAction: { id: 'environment', title: '환경 보완', label: '개발 효과와 환경 부담 비교' },
+    },
     exploredPlaces: ['school', 'market', 'bus_stop'],
     dataViewed: true,
     quizResult: { questionId: 'ep1_q1', selected: 'lack_jobs_services', correct: true },
@@ -2301,6 +2309,7 @@ function testLearningDataViewManager() {
   assert.equal(LearningDataViewManager.getScreenLayout(1920).progressStep, 'ending');
   assert.deepEqual(LearningDataViewManager.getDownloadConfig(), { mimeType: 'application/json' });
   assert.equal(LearningDataViewManager.getDarkPanelStyle().strokeWidth, 5);
+  assert.equal(LearningDataViewManager.getSummaryStyle().title, '저장 요약');
   assert.equal(LearningDataViewManager.getLightPanelStyle().titleColor, '#172554');
   assert.equal(LearningDataViewManager.getValidationTextStyle(440).wordWrap.width, 440);
   assert.equal(LearningDataViewManager.getSummaryBoxStyle(390).bodyFontSize, '20px');
@@ -2308,11 +2317,13 @@ function testLearningDataViewManager() {
   assert.deepEqual(LearningDataViewManager.getButtonStyle().padding, { x: 22, y: 15 });
   assert.equal(LearningDataViewManager.getFeedbackColor('success'), '#bbf7d0');
   assert.equal(LearningDataViewManager.getFeedbackColor('error'), '#fecaca');
+  assert.deepEqual(LearningDataViewManager.getSummaryLayout(960).title, { x: 170, y: 178, text: '저장 요약' });
   assert.equal(LearningDataViewManager.getDataPanelLayout().panel.width, 1120);
   assert.equal(LearningDataViewManager.getDataPanelLayout().title.text, '저장 후보 데이터');
+  assert.equal(LearningDataViewManager.getDataPanelLayout().title.y, 315);
   assert.equal(LearningDataViewManager.getValidationPanelLayout().title.text, '데이터 검증');
   assert.equal(LearningDataViewManager.getValidationPanelLayout().summaryBody.wordWrapWidth, 390);
-  assert.equal(LearningDataViewManager.getSavePanelLayout().panel.height, 150);
+  assert.equal(LearningDataViewManager.getSavePanelLayout().panel.height, 120);
   assert.equal(LearningDataViewManager.getSavePanelLayout().title.text, '임시 저장 상태');
   assert.deepEqual(LearningDataViewManager.getControlLayout().api, {
     x: 260,
@@ -2331,6 +2342,7 @@ function testLearningDataViewManager() {
     textColor: '#1e1b4b',
   });
   assert.equal(LearningDataViewManager.getJsonTextStyle(1030).fontFamily, 'monospace');
+  assert.equal(LearningDataViewManager.getJsonTextStyle(1030).fontSize, '18px');
   assert.equal(LearningDataViewManager.formatSaveCleared(), '저장된 학습 데이터를 삭제했습니다.');
   assert.match(LearningDataViewManager.formatCopySuccess(), /클립보드/);
   assert.match(LearningDataViewManager.formatCopyFailure(), /권한/);
@@ -2345,6 +2357,8 @@ function testLearningDataViewManager() {
     ],
   });
   assert.match(LearningDataViewManager.formatJson(completeData), /"episode": 1/);
+  assert.match(LearningDataViewManager.formatSummaryText(completeData), /환경 우선 회복안/);
+  assert.match(LearningDataViewManager.formatSummaryText(completeData), /우선 보완/);
   const completeSummary = LearningDataViewManager.getValidationSummary(completeData);
   assert.equal(completeSummary.ok, true);
   assert.equal(completeSummary.title, '저장 준비 상태');
@@ -2393,7 +2407,11 @@ function testLearningDataManager() {
   assert.equal(data.episode, 1);
   assert.equal(data.exploredPlaceNames.length, 3);
   assert.equal(data.placements.length, 3);
+  assert.equal(data.summary.selectedPolicyName, '청년 생활 지원');
+  assert.equal(data.summary.placementCount, 3);
+  assert.equal(data.summary.nextAction.title, '예산 균형 보완');
   assert.equal(LearningDataManager.isReadyToSave(data), true);
+  assert.equal(LearningDataManager.validate({ ...data, summary: null }).some((row) => !row.ok && row.label === '학습 결론 요약'), true);
 
   const incompleteData = { ...data, reflectionChoice: null };
   assert.equal(LearningDataManager.isReadyToSave(incompleteData), false);
@@ -2473,6 +2491,8 @@ function testLearningApiPayloadManager() {
   const payload = LearningApiPayloadManager.build(learningData);
   assert.equal(payload.schema_version, 1);
   assert.equal(payload.episode_id, 1);
+  assert.equal(payload.summary.outcome_type, '환경 우선 회복안');
+  assert.equal(payload.summary.next_action.label, '개발 효과와 환경 부담 비교');
   assert.equal(payload.learning_steps.quiz_result.question_id, 'ep1_q1');
   assert.equal(payload.placements[0].building_id, 'small_park');
   assert.equal(payload.placements[0].order, 1);
@@ -2583,6 +2603,14 @@ function testLearningDataRestoreManager() {
   const registry = createMemoryRegistry();
   const data = {
     episode: 1,
+    summary: {
+      outcomeType: '환경 우선 회복안',
+      outcomeMessage: '생활 환경 개선 효과가 뚜렷합니다.',
+      priorityIssue: null,
+      selectedPolicyName: '녹색 회복 계획',
+      placementCount: 1,
+      nextAction: { id: 'environment', title: '환경 보완', label: '개발 효과와 환경 부담 비교' },
+    },
     exploredPlaces: ['school', 'market', 'bus_stop'],
     dataViewed: true,
     quizResult: { questionId: 'ep1_q1', selected: 'lack_jobs_services', correct: true },
@@ -2729,6 +2757,14 @@ function testSaveImport() {
   const store = installLocalStorageMock();
   const learningData = {
     episode: 1,
+    summary: {
+      outcomeType: '환경 우선 회복안',
+      outcomeMessage: '생활 환경 개선 효과가 뚜렷합니다.',
+      priorityIssue: null,
+      selectedPolicyName: '녹색 회복 계획',
+      placementCount: 1,
+      nextAction: { id: 'environment', title: '환경 보완', label: '개발 효과와 환경 부담 비교' },
+    },
     exploredPlaces: ['school', 'market', 'bus_stop'],
     placements: [
       { buildingId: 'youth_center', buildingName: '청년센터', position: { x: 1, y: 1 }, effect: { population: 80 } },

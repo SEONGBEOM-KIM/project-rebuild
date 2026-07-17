@@ -1,5 +1,7 @@
 import { explorationPlaces } from '../data/explorationPlaces.js';
+import IssueDetector from './IssueDetector.js';
 import LearningProgress from './LearningProgress.js';
+import EndingSummaryManager from './EndingSummaryManager.js';
 
 export default class LearningDataManager {
   static build(registry) {
@@ -9,12 +11,21 @@ export default class LearningDataManager {
     const placedBuildings = registry.get('placedBuildings') ?? [];
     const gameState = registry.get('gameState');
     const reflectionChoice = registry.get('reflectionChoice');
+    const issues = IssueDetector.detect(gameState);
+    const ending = EndingSummaryManager.getEndingSummary(gameState, placedBuildings);
     const exploredPlaceNames = explorationPlaces
       .filter((place) => progress.exploredPlaces.includes(place.id))
       .map((place) => place.name);
 
     return {
       episode: progress.episode,
+      summary: LearningDataManager.buildSummary({
+        ending,
+        issues,
+        selectedPolicy,
+        placedBuildings,
+        reflectionChoice,
+      }),
       exploredPlaces: progress.exploredPlaces,
       exploredPlaceNames,
       dataViewed: progress.dataViewed,
@@ -36,12 +47,36 @@ export default class LearningDataManager {
     };
   }
 
+  static buildSummary({ ending, issues, selectedPolicy, placedBuildings, reflectionChoice }) {
+    const priorityIssue = issues[0] ?? null;
+    return {
+      outcomeType: ending.title,
+      outcomeMessage: ending.message,
+      priorityIssue: priorityIssue ? {
+        id: priorityIssue.id,
+        title: priorityIssue.title,
+      } : null,
+      selectedPolicyName: selectedPolicy?.name ?? null,
+      placementCount: placedBuildings.length,
+      nextAction: reflectionChoice ? {
+        id: reflectionChoice.id,
+        title: reflectionChoice.title,
+        label: reflectionChoice.nextActionLabel ?? reflectionChoice.title,
+      } : null,
+    };
+  }
+
   static validate(data) {
     return [
       {
         ok: data.episode === 1,
         label: 'episode 값 확인',
         message: 'episode 값이 EP1로 저장되지 않았습니다.',
+      },
+      {
+        ok: Boolean(data.summary?.outcomeType),
+        label: '학습 결론 요약',
+        message: 'summary.outcomeType 결론 요약이 없습니다.',
       },
       {
         ok: Array.isArray(data.exploredPlaces) && data.exploredPlaces.length >= 3,

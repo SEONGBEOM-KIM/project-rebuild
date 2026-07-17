@@ -4,6 +4,14 @@ export default class LearningApiPayloadManager {
       schema_version: 1,
       episode_id: learningData.episode,
       completed: Boolean(learningData.completed),
+      summary: learningData.summary ? {
+        outcome_type: learningData.summary.outcomeType,
+        outcome_message: learningData.summary.outcomeMessage,
+        priority_issue: learningData.summary.priorityIssue,
+        selected_policy_name: learningData.summary.selectedPolicyName,
+        placement_count: learningData.summary.placementCount,
+        next_action: learningData.summary.nextAction,
+      } : null,
       learning_steps: {
         explored_places: learningData.exploredPlaces ?? [],
         data_viewed: Boolean(learningData.dataViewed),
@@ -44,6 +52,11 @@ export default class LearningApiPayloadManager {
         ok: Number.isFinite(payload.episode_id),
         label: 'episode_id 확인',
         message: 'episode_id가 숫자가 아닙니다.',
+      },
+      {
+        ok: payload.summary == null || Boolean(payload.summary?.outcome_type),
+        label: '요약 구조 확인',
+        message: 'summary.outcome_type 값이 없습니다.',
       },
       {
         ok: Array.isArray(payload.learning_steps?.explored_places),

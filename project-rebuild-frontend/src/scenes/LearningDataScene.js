@@ -27,6 +27,7 @@ export default class LearningDataScene extends Phaser.Scene {
 
     this.learningData = learningData;
     this.learningDataJson = LearningDataViewManager.formatJson(learningData);
+    this.drawSummaryStrip(learningData, width / 2);
     this.drawDataPanel(learningData);
     this.drawValidationPanel(learningData);
     this.drawSavePanel();
@@ -35,6 +36,22 @@ export default class LearningDataScene extends Phaser.Scene {
 
   buildLearningData() {
     return LearningDataManager.build(this.registry);
+  }
+
+  drawSummaryStrip(learningData, centerX) {
+    const layout = LearningDataViewManager.getSummaryLayout(centerX);
+    const panelStyle = LearningDataViewManager.getSummaryStyle();
+    createPanelBackground(this, layout.panel, panelStyle);
+    createPanelTitle(this, layout.title, panelStyle);
+    createLayoutText(this, layout.body, {
+      text: LearningDataViewManager.formatSummaryText(learningData),
+      style: {
+        fontSize: panelStyle.bodyFontSize,
+        color: panelStyle.bodyColor,
+        lineSpacing: panelStyle.bodyLineSpacing,
+        wordWrap: { width: layout.body.wordWrapWidth },
+      },
+    });
   }
 
   drawDataPanel(_learningData) {

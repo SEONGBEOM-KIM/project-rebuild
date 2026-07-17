@@ -7,6 +7,20 @@ export const LEARNING_DATA_SCREEN_LAYOUT = {
   subtitle: { y: 145, text: '현재는 서버 저장 없이 registry에 쌓인 학습 기록을 화면에서 확인하는 UI 단계입니다.', fontSize: '26px', color: '#bfdbfe' },
 };
 
+const LEARNING_DATA_SUMMARY_STYLE = {
+  fillColor: 0x1e293b,
+  fillAlpha: 0.96,
+  strokeWidth: 3,
+  strokeColor: 0xfde68a,
+  title: '저장 요약',
+  titleFontSize: '25px',
+  titleColor: '#fde68a',
+  titleFontStyle: 'bold',
+  bodyFontSize: '21px',
+  bodyColor: '#e0f2fe',
+  bodyLineSpacing: 5,
+};
+
 const LEARNING_DATA_DARK_PANEL_STYLE = {
   fillColor: 0x111827,
   fillAlpha: 0.98,
@@ -81,6 +95,10 @@ export default class LearningDataViewManager {
     return LEARNING_DATA_DOWNLOAD_CONFIG;
   }
 
+  static getSummaryStyle() {
+    return { ...LEARNING_DATA_SUMMARY_STYLE };
+  }
+
   static getDarkPanelStyle() {
     return { ...LEARNING_DATA_DARK_PANEL_STYLE };
   }
@@ -109,30 +127,38 @@ export default class LearningDataViewManager {
     return LEARNING_DATA_FEEDBACK_COLORS[kind];
   }
 
+  static getSummaryLayout(centerX) {
+    return {
+      panel: { x: centerX, y: 205, width: 1660, height: 82, strokeColor: LEARNING_DATA_SUMMARY_STYLE.strokeColor },
+      title: { x: centerX - 790, y: 178, text: LEARNING_DATA_SUMMARY_STYLE.title },
+      body: { x: centerX - 620, y: 176, wordWrapWidth: 1410 },
+    };
+  }
+
   static getDataPanelLayout() {
     return {
-      panel: { x: 760, y: 560, width: 1120, height: 720, strokeColor: 0x60a5fa },
-      title: { x: 240, y: 235, text: '저장 후보 데이터' },
-      body: { x: 245, y: 290, wordWrapWidth: 1030 },
+      panel: { x: 760, y: 605, width: 1120, height: 630, strokeColor: 0x60a5fa },
+      title: { x: 240, y: 315, text: '저장 후보 데이터' },
+      body: { x: 245, y: 365, wordWrapWidth: 1030 },
     };
   }
 
   static getValidationPanelLayout() {
     return {
-      panel: { x: 1550, y: 560, width: 500, height: 720, strokeColor: 0xfde68a },
-      title: { x: 1550, y: 235, text: '데이터 검증' },
-      rows: { x: 1325, y: 290, wordWrapWidth: 440 },
-      summaryBox: { x: 1550, y: 620, width: 430, height: 190 },
-      summaryTitle: { x: 1355, y: 545 },
-      summaryBody: { x: 1355, y: 585, wordWrapWidth: 390 },
+      panel: { x: 1550, y: 605, width: 500, height: 630, strokeColor: 0xfde68a },
+      title: { x: 1550, y: 315, text: '데이터 검증' },
+      rows: { x: 1325, y: 365, wordWrapWidth: 440 },
+      summaryBox: { x: 1550, y: 655, width: 430, height: 170 },
+      summaryTitle: { x: 1355, y: 590 },
+      summaryBody: { x: 1355, y: 630, wordWrapWidth: 390 },
     };
   }
 
   static getSavePanelLayout() {
     return {
-      panel: { x: 1550, y: 815, width: 500, height: 150, strokeColor: 0xbbf7d0 },
-      title: { x: 1325, y: 760, text: '임시 저장 상태' },
-      body: { x: 1325, y: 800, wordWrapWidth: 440 },
+      panel: { x: 1550, y: 840, width: 500, height: 120, strokeColor: 0xbbf7d0 },
+      title: { x: 1325, y: 795, text: '임시 저장 상태' },
+      body: { x: 1325, y: 830, wordWrapWidth: 440 },
     };
   }
 
@@ -149,12 +175,26 @@ export default class LearningDataViewManager {
 
   static getJsonTextStyle(wordWrapWidth) {
     return {
-      fontSize: '20px',
+      fontSize: '18px',
       color: '#dbeafe',
       fontFamily: 'monospace',
       lineSpacing: 4,
       wordWrap: { width: wordWrapWidth },
     };
+  }
+
+  static formatSummaryText(learningData) {
+    const summary = learningData.summary;
+    if (!summary) {
+      return '저장 요약 없음: 학습 결론이 아직 생성되지 않았습니다.';
+    }
+
+    const issueText = summary.priorityIssue?.title ?? '큰 부작용 신호 없음';
+    const actionText = summary.nextAction?.label ?? '다음 액션 미선택';
+    return [
+      `${summary.outcomeType}: ${summary.outcomeMessage}`,
+      `우선 보완: ${issueText} / 다음 액션: ${actionText} / 배치 ${summary.placementCount}개`,
+    ].join('\n');
   }
 
   static formatSaveCleared() {
