@@ -222,8 +222,12 @@ export default class LearningDataViewManager {
     return 'JSON 다운로드를 시작했습니다.';
   }
 
+  static formatEpisodeFileSlug({ episodeContext = null, episode = null } = {}) {
+    return episodeContext?.current?.code ?? (episode ? `ep${episode}` : 'episode');
+  }
+
   static formatDownloadFileName(learningData) {
-    return `project-rebuild-ep${learningData.episode}-learning-data.json`;
+    return `project-rebuild-${LearningDataViewManager.formatEpisodeFileSlug(learningData)}-learning-data.json`;
   }
 
   static formatJson(learningData) {

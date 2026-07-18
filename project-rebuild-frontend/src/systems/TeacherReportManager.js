@@ -34,8 +34,12 @@ export default class TeacherReportManager {
     return '교사용 리포트 다운로드를 시작했습니다.';
   }
 
-  static formatDownloadFileName() {
-    return 'project-rebuild-ep1-teacher-report.txt';
+  static formatEpisodeFileSlug(report = null) {
+    return report?.episodeContext?.current?.code ?? CURRENT_EPISODE.code;
+  }
+
+  static formatDownloadFileName(report = null) {
+    return `project-rebuild-${TeacherReportManager.formatEpisodeFileSlug(report)}-teacher-report.txt`;
   }
 
   static build(registry) {
@@ -173,9 +177,14 @@ export default class TeacherReportManager {
     ].join('\n');
   }
 
+  static formatReportTitle(report) {
+    const currentEpisode = report.episodeContext?.current;
+    return `[프로젝트 리빌드 ${currentEpisode?.shortTitle ?? CURRENT_EPISODE.shortTitle} 교사용 요약]`;
+  }
+
   static buildReportText(report) {
     return [
-      '[프로젝트 리빌드 EP1 교사용 요약]',
+      TeacherReportManager.formatReportTitle(report),
       '',
       '0. 에피소드/설정',
       TeacherReportManager.formatEpisodeContextReport(report),

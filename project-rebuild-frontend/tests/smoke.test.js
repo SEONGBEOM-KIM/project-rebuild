@@ -3032,7 +3032,9 @@ function testTeacherReportManager() {
   assert.match(TeacherReportManager.formatChoiceReport({ ...report, placementConfig: { ...report.placementConfig, stateKeys: ['budget'] } }), /최종 상태:\n예산: 560/);
   assert.doesNotMatch(TeacherReportManager.formatChoiceReport({ ...report, placementConfig: { ...report.placementConfig, stateKeys: ['budget'] } }), /인구:/);
   assert.match(TeacherReportManager.formatTeachingPointReport(report), /큰 부작용 신호 없음/);
-  assert.match(TeacherReportManager.buildReportText(report), /\[프로젝트 리빌드 EP1 교사용 요약\]/);
+  assert.equal(TeacherReportManager.formatDownloadFileName(report), 'project-rebuild-ep1-teacher-report.txt');
+  assert.equal(TeacherReportManager.formatReportTitle(report), '[프로젝트 리빌드 EP1. 지역 위기 탐색 교사용 요약]');
+  assert.match(TeacherReportManager.buildReportText(report), /\[프로젝트 리빌드 EP1\. 지역 위기 탐색 교사용 요약\]/);
   assert.match(TeacherReportManager.buildReportText(report), /0\. 에피소드\/설정/);
   assert.match(TeacherReportManager.buildReportText(report), /1\. 수업 결론/);
   assert.match(TeacherReportManager.buildReportText(report), /4\. 지도 포인트/);
@@ -3126,6 +3128,7 @@ function testLearningDataViewManager() {
   assert.match(LearningDataViewManager.formatCopyFailure(), /권한/);
   assert.match(LearningDataViewManager.formatDownloadSuccess(), /다운로드/);
   assert.equal(LearningDataViewManager.formatDownloadFileName({ episode: 1 }), 'project-rebuild-ep1-learning-data.json');
+  assert.equal(LearningDataViewManager.formatDownloadFileName(createCompleteLearningData()), 'project-rebuild-ep1-learning-data.json');
 
   const completeData = createCompleteLearningData({
     placements: [
@@ -3289,6 +3292,7 @@ function testApiPayloadViewManager() {
   assert.match(ApiPayloadViewManager.formatCopyFailure(), /클립보드/);
   assert.equal(ApiPayloadViewManager.formatDownloadSuccess(), 'API payload 다운로드를 시작했습니다.');
   assert.equal(ApiPayloadViewManager.formatDownloadFileName(payload), 'project-rebuild-ep1-api-payload.json');
+  assert.equal(ApiPayloadViewManager.formatDownloadFileName({ episode_id: 7 }), 'project-rebuild-ep7-api-payload.json');
 
   const summary = ApiPayloadViewManager.getValidationSummary(payload);
   assert.equal(summary.ok, true);

@@ -173,8 +173,12 @@ export default class ApiPayloadViewManager {
     return 'API payload 다운로드를 시작했습니다.';
   }
 
+  static formatEpisodeFileSlug(payload = {}) {
+    return payload.episode_context?.current?.code ?? (payload.episode_id ? `ep${payload.episode_id}` : 'episode');
+  }
+
   static formatDownloadFileName(payload) {
-    return `project-rebuild-ep${payload.episode_id}-api-payload.json`;
+    return `project-rebuild-${ApiPayloadViewManager.formatEpisodeFileSlug(payload)}-api-payload.json`;
   }
 
   static formatJson(payload) {

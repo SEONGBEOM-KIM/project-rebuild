@@ -73,7 +73,7 @@ export default class TeacherReportScene extends Phaser.Scene {
     const downloadConfig = TeacherReportManager.getDownloadConfig();
     downloadTextFile({
       content: this.reportText,
-      fileName: TeacherReportManager.formatDownloadFileName(),
+      fileName: TeacherReportManager.formatDownloadFileName(this.report),
       mimeType: downloadConfig.mimeType,
     });
     this.reportStatusText.setText(TeacherReportManager.formatDownloadSuccess());
