@@ -58,6 +58,7 @@ import PlacementMapRenderer from '../src/systems/PlacementMapRenderer.js';
 import PlacementResultManager from '../src/systems/PlacementResultManager.js';
 import PlacementActionManager, { PLACEMENT_ACTION_STATUS } from '../src/systems/PlacementActionManager.js';
 import PlacementUiStateManager from '../src/systems/PlacementUiStateManager.js';
+import StateHudManager from '../src/systems/StateHudManager.js';
 import PlacementSceneObjectRegistry from '../src/systems/PlacementSceneObjectRegistry.js';
 import PlacementInputController from '../src/systems/PlacementInputController.js';
 import PlacementWorldRenderer from '../src/systems/PlacementWorldRenderer.js';
@@ -85,7 +86,7 @@ import { REGISTRY_KEYS } from '../src/data/registryKeys.js';
 import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES, EP2_MISSION_BRIEFING, EPISODE_CONTENT, getCurrentEpisodeContent, getCurrentPlacementEpisodeContent, getCurrentPlacementMissionBriefing, getEpisodeContent } from '../src/data/episodeContent.js';
 import ProgressStepper from '../src/ui/ProgressStepper.js';
 import { getTextButtonColor } from '../src/ui/TextButton.js';
-import { DEFAULT_STATE_KEYS } from '../src/data/stateLabels.js';
+import { DEFAULT_STATE_KEYS, STATE_ICONS } from '../src/data/stateLabels.js';
 import { copyTextToClipboard, downloadTextFile } from '../src/ui/BrowserFileActions.js';
 import { getLayoutTextStyle } from '../src/ui/LayoutText.js';
 import { createPanelBackground, createPanelTitle, getPanelTitleStyle } from '../src/ui/PanelRenderer.js';
@@ -1268,6 +1269,21 @@ function testEpisodeContent() {
 }
 
 
+function testStateHudManager() {
+  assert.equal(STATE_ICONS.population, '👥');
+  const initial = GameState.createInitialState();
+  const updated = { ...initial, population: 1120, budget: 780, pollution: 6 };
+  const items = StateHudManager.buildItems(updated, { previousState: initial, stateKeys: ['population', 'budget', 'pollution'] });
+
+  assert.deepEqual(items.map((item) => item.key), ['population', 'budget', 'pollution']);
+  assert.deepEqual(items.map((item) => item.icon), ['👥', '💰', '☁️']);
+  assert.deepEqual(items.map((item) => item.deltaText), ['+120', '-220', '-4']);
+  assert.deepEqual(items.map((item) => item.trend), ['up', 'down', 'down']);
+  assert.deepEqual(items.map((item) => item.tone), ['positive', 'negative', 'positive']);
+  assert.equal(StateHudManager.formatCompactText(updated, { stateKeys: ['population', 'budget'] }), '👥 인구 1120  💰 예산 780');
+  assert.equal(StateHudManager.formatStackedText(updated, { stateKeys: ['population'] }), '현재 상태\n👥 인구: 1120');
+}
+
 function testEvaluationRuleConstants() {
   assert.equal(ISSUE_THRESHOLDS.environmentMin, 60);
   assert.equal(ISSUE_THRESHOLDS.pollutionMax, 15);
@@ -2224,10 +2240,10 @@ function testPlacementUiUpdater() {
   assert.equal(cursorInfoText.color, '#bbf7d0');
 
   updater.updateStatusBar(GameState.createInitialState());
-  assert.match(statusText.text, /현재 상태\n인구: 1000/);
+  assert.match(statusText.text, /현재 상태\n👥 인구: 1000/);
 
   updater.updateStatusBar(GameState.createInitialState(), ['budget', 'pollution']);
-  assert.equal(statusText.text, '현재 상태\n예산: 1000\n오염: 10');
+  assert.equal(statusText.text, '현재 상태\n💰 예산: 1000\n☁️ 오염: 10');
 
   const youthCenter = buildings.find((building) => building.id === 'youth_center');
   updater.updateLastChangePanel({
@@ -2471,8 +2487,8 @@ function testPlacementViewManager() {
     text: '커서 타일: (1, 2)\n지형: 빈 땅 / 구역: 중심지\n판정: 배치 가능',
     color: '#bbf7d0',
   });
-  assert.match(PlacementUiStateManager.formatStatusText(GameState.createInitialState()), /현재 상태\n인구: 1000/);
-  assert.equal(PlacementUiStateManager.formatStatusText(GameState.createInitialState(), ['economy', 'customMetric']), '현재 상태\n경제: 50\ncustomMetric: 0');
+  assert.match(PlacementUiStateManager.formatStatusText(GameState.createInitialState()), /현재 상태\n👥 인구: 1000/);
+  assert.equal(PlacementUiStateManager.formatStatusText(GameState.createInitialState(), ['economy', 'customMetric']), '현재 상태\n🏪 경제: 50\n• customMetric: 0');
   assert.equal(PlacementUiStateManager.formatLastChangeState(null).color, '#fde68a');
   assert.equal(PlacementUiStateManager.formatPlacementHistoryState([]).color, '#bfdbfe');
 
@@ -4282,6 +4298,7 @@ async function run() {
   testStoryViewManager();
   testApiContractRenderer();
   testApiContractViewManager();
+  testStateHudManager();
   testEvaluationRuleConstants();
   testResultViewManager();
   testEvaluationManager();

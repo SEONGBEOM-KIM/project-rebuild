@@ -1,4 +1,5 @@
 import { DEFAULT_STATE_KEYS, STATE_LABELS, formatEffect, formatSignedValue } from '../data/stateLabels.js';
+import StateHudManager from './StateHudManager.js';
 import { REQUIRED_PLACEMENTS, TILE_LABELS, ZONE_LABELS } from './PlacementViewManager.js';
 
 export default class PlacementUiStateManager {
@@ -45,12 +46,7 @@ export default class PlacementUiStateManager {
   }
 
   static formatStatusText(state, stateKeys = DEFAULT_STATE_KEYS) {
-    const rows = stateKeys.map((key) => `${STATE_LABELS[key] ?? key}: ${state[key] ?? 0}`);
-
-    return [
-      '현재 상태',
-      ...rows,
-    ].join('\n');
+    return StateHudManager.formatStackedText(state, { stateKeys });
   }
 
   static getEmptyLastChangeState() {

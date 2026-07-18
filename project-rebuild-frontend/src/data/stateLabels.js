@@ -18,6 +18,16 @@ export const STATE_LABELS = {
   pollution: '오염',
 };
 
+export const STATE_ICONS = {
+  population: '👥',
+  economy: '🏪',
+  environment: '🌿',
+  satisfaction: '😊',
+  budget: '💰',
+  traffic: '🚌',
+  pollution: '☁️',
+};
+
 export function formatSignedValue(value) {
   return `${value > 0 ? '+' : ''}${value}`;
 }
