@@ -1,4 +1,9 @@
-import StateHudManager from './StateHudManager.js';
+import StateHudManager from '../systems/StateHudManager.js';
+
+export const STATE_HUD_RENDERER_OBJECT_REGISTRY_METHODS = [
+  'createFixedRectangleFromLayout',
+  'createFixedTextFromLayout',
+];
 
 export default class StateHudRenderer {
   static render(objectRegistry, layout, textStyles, state, { previousState = null, stateKeys = undefined } = {}) {

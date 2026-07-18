@@ -59,7 +59,7 @@ import PlacementResultManager from '../src/systems/PlacementResultManager.js';
 import PlacementActionManager, { PLACEMENT_ACTION_STATUS } from '../src/systems/PlacementActionManager.js';
 import PlacementUiStateManager from '../src/systems/PlacementUiStateManager.js';
 import StateHudManager from '../src/systems/StateHudManager.js';
-import StateHudRenderer from '../src/systems/StateHudRenderer.js';
+import StateHudRenderer, { STATE_HUD_RENDERER_OBJECT_REGISTRY_METHODS } from '../src/ui/StateHudRenderer.js';
 import PlacementSceneObjectRegistry from '../src/systems/PlacementSceneObjectRegistry.js';
 import PlacementInputController from '../src/systems/PlacementInputController.js';
 import PlacementWorldRenderer from '../src/systems/PlacementWorldRenderer.js';
@@ -2078,6 +2078,11 @@ function testPlacementSceneBootstrap() {
 }
 
 function testStateHudRenderer() {
+  assert.deepEqual(STATE_HUD_RENDERER_OBJECT_REGISTRY_METHODS, [
+    'createFixedRectangleFromLayout',
+    'createFixedTextFromLayout',
+  ]);
+
   const objectRegistry = createPlacementUiRendererRegistrySpy();
   const layout = PlacementViewManager.getUiLayout().stateHud;
   const textStyles = PlacementViewManager.getTextStyles();

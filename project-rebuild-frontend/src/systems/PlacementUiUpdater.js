@@ -1,6 +1,6 @@
 import PlacementUiStateManager from './PlacementUiStateManager.js';
 import PlacementViewManager from './PlacementViewManager.js';
-import StateHudRenderer from './StateHudRenderer.js';
+import StateHudRenderer from '../ui/StateHudRenderer.js';
 
 export default class PlacementUiUpdater {
   constructor({
