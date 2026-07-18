@@ -1,4 +1,5 @@
 import { explorationPlaces } from '../data/explorationPlaces.js';
+import { CURRENT_EPISODE, CURRENT_PLACEMENT_EPISODE } from '../data/episodes.js';
 import { EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
 import { DEFAULT_STATE_KEYS, STATE_LABELS } from '../data/stateLabels.js';
 import IssueDetector from './IssueDetector.js';
@@ -57,6 +58,10 @@ export default class TeacherReportManager {
 
     return {
       progress,
+      episodeContext: {
+        current: TeacherReportManager.serializeEpisode(CURRENT_EPISODE),
+        placement: TeacherReportManager.serializeEpisode(CURRENT_PLACEMENT_EPISODE),
+      },
       selectedPolicy,
       selectedStrategy,
       placementConfig,
@@ -69,6 +74,27 @@ export default class TeacherReportManager {
       ending,
       exploredNames,
     };
+  }
+
+  static serializeEpisode(episode) {
+    return {
+      id: episode.id,
+      code: episode.code,
+      shortTitle: episode.shortTitle,
+      title: episode.title,
+      theme: episode.theme,
+    };
+  }
+
+  static formatEpisodeContextReport(report) {
+    const currentEpisode = report.episodeContext?.current;
+    const placementEpisode = report.episodeContext?.placement;
+    return [
+      `학습 흐름: ${currentEpisode?.shortTitle ?? '알 수 없음'} (${currentEpisode?.code ?? '-'})`,
+      `배치 실험: ${placementEpisode?.shortTitle ?? '알 수 없음'} (${placementEpisode?.code ?? '-'})`,
+      `배치 설정: ${report.placementConfig?.id ?? '없음'}`,
+      `평가 기준: ${report.evaluationProfile?.id ?? '없음'}`,
+    ].join('\n');
   }
 
   static formatClassSummaryReport(report) {
@@ -150,16 +176,19 @@ export default class TeacherReportManager {
     return [
       '[프로젝트 리빌드 EP1 교사용 요약]',
       '',
-      '0. 수업 결론',
+      '0. 에피소드/설정',
+      TeacherReportManager.formatEpisodeContextReport(report),
+      '',
+      '1. 수업 결론',
       TeacherReportManager.formatClassSummaryReport(report),
       '',
-      '1. 학습 진행',
+      '2. 학습 진행',
       TeacherReportManager.formatProgressReport(report),
       '',
-      '2. 선택과 결과',
+      '3. 선택과 결과',
       TeacherReportManager.formatChoiceReport(report),
       '',
-      '3. 지도 포인트',
+      '4. 지도 포인트',
       TeacherReportManager.formatTeachingPointReport(report),
     ].join('\n');
   }

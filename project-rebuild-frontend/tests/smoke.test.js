@@ -2989,6 +2989,8 @@ function testTeacherReportManager() {
 
   const report = TeacherReportManager.build(registry);
   assert.equal(report.exploredNames.length, 3);
+  assert.equal(report.episodeContext.current.code, 'ep1');
+  assert.equal(report.episodeContext.placement.code, 'ep2');
   assert.equal(report.selectedPolicy.id, 'youth_living_support');
   assert.equal(report.selectedStrategy.id, 'jobs_services');
   assert.equal(report.placementConfig.id, DEFAULT_PLACEMENT_CONFIG_ID);
@@ -2997,6 +2999,10 @@ function testTeacherReportManager() {
   assert.equal(report.issues.length, 0);
   assert.equal(report.ending.title, '균형형 회복안');
 
+  assert.match(TeacherReportManager.formatEpisodeContextReport(report), /학습 흐름: EP1\. 지역 위기 탐색 \(ep1\)/);
+  assert.match(TeacherReportManager.formatEpisodeContextReport(report), /배치 실험: EP2\. 인구 유입 전략 \(ep2\)/);
+  assert.match(TeacherReportManager.formatEpisodeContextReport(report), /배치 설정: ep2_population_recovery/);
+  assert.match(TeacherReportManager.formatEpisodeContextReport(report), /평가 기준: ep2_population_recovery_default/);
   assert.match(TeacherReportManager.formatClassSummaryReport(report), /균형형 회복안/);
   assert.match(TeacherReportManager.formatClassSummaryReport(report), /학생 다음 액션: 예산 균형 보완/);
   assert.match(TeacherReportManager.formatClassSummaryReport(report), /EP2 전략: 일자리와 생활 기반/);
@@ -3010,7 +3016,9 @@ function testTeacherReportManager() {
   assert.doesNotMatch(TeacherReportManager.formatChoiceReport({ ...report, placementConfig: { ...report.placementConfig, stateKeys: ['budget'] } }), /인구:/);
   assert.match(TeacherReportManager.formatTeachingPointReport(report), /큰 부작용 신호 없음/);
   assert.match(TeacherReportManager.buildReportText(report), /\[프로젝트 리빌드 EP1 교사용 요약\]/);
-  assert.match(TeacherReportManager.buildReportText(report), /0\. 수업 결론/);
+  assert.match(TeacherReportManager.buildReportText(report), /0\. 에피소드\/설정/);
+  assert.match(TeacherReportManager.buildReportText(report), /1\. 수업 결론/);
+  assert.match(TeacherReportManager.buildReportText(report), /4\. 지도 포인트/);
 }
 
 
