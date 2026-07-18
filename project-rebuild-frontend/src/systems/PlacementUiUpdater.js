@@ -1,10 +1,12 @@
 import PlacementUiStateManager from './PlacementUiStateManager.js';
 import PlacementViewManager from './PlacementViewManager.js';
+import StateHudRenderer from './StateHudRenderer.js';
 
 export default class PlacementUiUpdater {
   constructor({
     missionText,
     statusText,
+    stateHud,
     cursorInfoText,
     messageText,
     lastChangeText,
@@ -16,6 +18,7 @@ export default class PlacementUiUpdater {
   }) {
     this.missionText = missionText;
     this.statusText = statusText;
+    this.stateHud = stateHud;
     this.cursorInfoText = cursorInfoText;
     this.messageText = messageText;
     this.lastChangeText = lastChangeText;
@@ -34,6 +37,10 @@ export default class PlacementUiUpdater {
     const cursorState = this.uiStateManager.formatCursorInfo(tile, mapTile, validation);
     this.cursorInfoText.setText(cursorState.text);
     this.cursorInfoText.setColor(cursorState.color);
+  }
+
+  updateStateHud(state, stateKeys = undefined) {
+    StateHudRenderer.update(this.stateHud, state, { stateKeys });
   }
 
   updateStatusBar(state, stateKeys = undefined) {

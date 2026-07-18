@@ -59,6 +59,7 @@ import PlacementResultManager from '../src/systems/PlacementResultManager.js';
 import PlacementActionManager, { PLACEMENT_ACTION_STATUS } from '../src/systems/PlacementActionManager.js';
 import PlacementUiStateManager from '../src/systems/PlacementUiStateManager.js';
 import StateHudManager from '../src/systems/StateHudManager.js';
+import StateHudRenderer from '../src/systems/StateHudRenderer.js';
 import PlacementSceneObjectRegistry from '../src/systems/PlacementSceneObjectRegistry.js';
 import PlacementInputController from '../src/systems/PlacementInputController.js';
 import PlacementWorldRenderer from '../src/systems/PlacementWorldRenderer.js';
@@ -2076,6 +2077,30 @@ function testPlacementSceneBootstrap() {
   assert.equal(cameraCalls.some(([name]) => name === 'ui.ignore'), true);
 }
 
+function testStateHudRenderer() {
+  const objectRegistry = createPlacementUiRendererRegistrySpy();
+  const layout = PlacementViewManager.getUiLayout().stateHud;
+  const textStyles = PlacementViewManager.getTextStyles();
+  const hud = StateHudRenderer.render(
+    objectRegistry,
+    layout,
+    textStyles,
+    { ...GameState.createInitialState(), population: 1080, pollution: 8 },
+    { previousState: GameState.createInitialState(), stateKeys: ['population', 'pollution'] },
+  );
+
+  assert.equal(hud.items.length, 2);
+  assert.equal(hud.items[0].deltaText, '+80');
+  assert.equal(hud.items[1].tone, 'positive');
+  assert.ok(objectRegistry.calls.some(([type, itemLayout]) => type === 'rectangle' && itemLayout === layout.panel));
+  assert.ok(objectRegistry.calls.some(([type, itemLayout, options]) => type === 'text' && itemLayout.text === '' && options.text === '👥'));
+  assert.ok(objectRegistry.calls.some(([type, itemLayout, options]) => type === 'text' && itemLayout.text === '' && options.text === '1080 (+80)'));
+
+  StateHudRenderer.update(hud, { ...GameState.createInitialState(), population: 1120, pollution: 9 }, { stateKeys: ['population', 'pollution'] });
+  assert.equal(hud.items[0].deltaText, '+120');
+  assert.equal(hud.itemObjects[0].value.text, '1120 (+120)');
+}
+
 function createPlacementUiRendererObjectSpy(type, layout = {}) {
   return {
     type,
@@ -2085,6 +2110,10 @@ function createPlacementUiRendererObjectSpy(type, layout = {}) {
     strokeStyle: null,
     fillStyle: null,
     handlers: new Map(),
+    setText(value) {
+      this.text = value;
+      return this;
+    },
     setInteractive(options) {
       this.interactive = options;
       return this;
@@ -2137,6 +2166,8 @@ function testPlacementUiRenderer() {
     objectRegistry,
     buildings,
     selectedPolicy: { recommendedBuildingIds: ['youth_center'] },
+    currentState: GameState.createInitialState(),
+    stateKeys: ['population', 'budget', 'pollution'],
     getPlacedCount: () => placedCount,
     onSelectBuilding: (building) => selected.push(building.id),
     onContinue: (target) => continueTargets.push(target),
@@ -2146,6 +2177,8 @@ function testPlacementUiRenderer() {
   const ui = renderer.create();
   assert.equal(ui.cardObjects.size, buildings.length);
   assert.ok(ui.missionText);
+  assert.equal(ui.stateHud.items.length, 3);
+  assert.deepEqual(ui.stateHud.items.map((item) => item.icon), ['👥', '💰', '☁️']);
   assert.ok(ui.continueButtonBg.interactive.useHandCursor);
   assert.equal(ui.continueButton.origin, 0.5);
   assert.equal(objectRegistry.calls.filter(([type]) => type === 'rectangle').length > 8, true);
@@ -2227,6 +2260,14 @@ function testPlacementUiUpdater() {
   const updater = new PlacementUiUpdater({
     missionText,
     statusText,
+    stateHud: {
+      itemObjects: [{
+        background: createUiTextSpy(),
+        icon: createUiTextSpy(),
+        label: createUiTextSpy(),
+        value: createUiTextSpy(),
+      }],
+    },
     cursorInfoText,
     messageText,
     lastChangeText,
@@ -2238,6 +2279,9 @@ function testPlacementUiUpdater() {
   updater.updateCursorInfo({ x: 1, y: 2 }, { type: 'empty', zone: 'center' }, { valid: true });
   assert.match(cursorInfoText.text, /커서 타일: \(1, 2\)/);
   assert.equal(cursorInfoText.color, '#bbf7d0');
+
+  updater.updateStateHud({ ...GameState.createInitialState(), population: 1090 }, ['population']);
+  assert.equal(updater.stateHud.itemObjects[0].value.text, '1090 (+90)');
 
   updater.updateStatusBar(GameState.createInitialState());
   assert.match(statusText.text, /현재 상태\n👥 인구: 1000/);
@@ -4318,6 +4362,7 @@ async function run() {
   testPlacementMapRenderer();
   testPlacementWorldRenderer();
   testPlacementSceneBootstrap();
+  testStateHudRenderer();
   testPlacementUiRenderer();
   testPlacementUiUpdater();
   testPlacementViewManager();

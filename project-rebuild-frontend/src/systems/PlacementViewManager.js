@@ -33,7 +33,7 @@ export const PLACEMENT_DRAG_THRESHOLD = 8;
 
 export const PLACEMENT_UI_BOUNDS = {
   leftPanelRight: 430,
-  topBarBottom: 98,
+  topBarBottom: 168,
   bottomUiTop: 930,
 };
 
@@ -42,7 +42,7 @@ export const PLACEMENT_SCREEN_LAYOUT = {
   progressStep: 'placement',
   topHint: {
     x: 460,
-    y: 120,
+    y: 170,
     text: '마우스 드래그: 지도 이동  |  휠: 확대/축소  |  초록: 배치 가능 / 빨강: 불가능',
     fontSize: '24px',
     color: '#bfdbfe',
@@ -85,6 +85,7 @@ export const PREVIEW_STYLES = {
 
 
 export const PLACEMENT_UI_LAYOUT = {
+  stateHud: { panel: { x: 960, y: 118, width: 960, height: 70, fillColor: 0x0f172a, alpha: 0.86, strokeColor: 0x38bdf8 }, itemStartX: 545, itemY: 118, itemWidth: 118, itemHeight: 50, itemGapX: 138 },
   leftPanel: { x: 210, y: 540, width: 380, height: 1000, fillColor: 0x111827, alpha: 0.94, strokeColor: 0x60a5fa },
   title: { x: 40, y: 54, text: '건물 선택' },
   subtitle: { x: 40, y: 100, text: '샘플 3종 중 하나를 고른 뒤\n지도 위에 배치하세요.' },
@@ -177,6 +178,9 @@ export const PLACEMENT_TEXT_STYLES = {
   subtitle: { fontSize: '22px', color: '#bfdbfe', lineSpacing: 8 },
   mission: { fontSize: '18px', color: '#fde68a', lineSpacing: 3 },
   status: { fontSize: '20px', color: '#f8fafc', lineSpacing: 8 },
+  hudIcon: { fontSize: '22px', color: '#ffffff' },
+  hudLabel: { fontSize: '14px', color: '#bfdbfe', fontStyle: 'bold' },
+  hudValue: { fontSize: '20px', color: '#ffffff', fontStyle: 'bold' },
   cursorInfo: { fontSize: '18px', color: '#bfdbfe', lineSpacing: 6 },
   message: { fontSize: '18px', color: '#fde68a', lineSpacing: 5 },
   continueButton: { fontSize: '30px', color: '#0f172a' },
@@ -241,6 +245,9 @@ export default class PlacementViewManager {
       subtitle: { ...PLACEMENT_TEXT_STYLES.subtitle },
       mission: { ...PLACEMENT_TEXT_STYLES.mission },
       status: { ...PLACEMENT_TEXT_STYLES.status },
+      hudIcon: { ...PLACEMENT_TEXT_STYLES.hudIcon },
+      hudLabel: { ...PLACEMENT_TEXT_STYLES.hudLabel },
+      hudValue: { ...PLACEMENT_TEXT_STYLES.hudValue },
       cursorInfo: { ...PLACEMENT_TEXT_STYLES.cursorInfo },
       message: { ...PLACEMENT_TEXT_STYLES.message },
       continueButton: { ...PLACEMENT_TEXT_STYLES.continueButton },

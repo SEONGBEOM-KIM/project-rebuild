@@ -1,5 +1,6 @@
 import PlacementUiStateManager from './PlacementUiStateManager.js';
 import PlacementViewManager from './PlacementViewManager.js';
+import StateHudRenderer from './StateHudRenderer.js';
 
 export default class PlacementUiRenderer {
   constructor({
@@ -8,6 +9,8 @@ export default class PlacementUiRenderer {
     selectedPolicy,
     getPlacedCount,
     requiredPlacements,
+    currentState = null,
+    stateKeys = undefined,
     onSelectBuilding,
     onContinue,
     onContinueBlocked,
@@ -19,6 +22,8 @@ export default class PlacementUiRenderer {
     this.selectedPolicy = selectedPolicy;
     this.getPlacedCount = getPlacedCount;
     this.requiredPlacements = requiredPlacements;
+    this.currentState = currentState;
+    this.stateKeys = stateKeys;
     this.onSelectBuilding = onSelectBuilding;
     this.onContinue = onContinue;
     this.onContinueBlocked = onContinueBlocked;
@@ -30,6 +35,8 @@ export default class PlacementUiRenderer {
     const cardObjects = new Map();
     const layout = this.viewManager.getUiLayout();
     const textStyles = this.viewManager.getTextStyles();
+
+    const stateHud = this.createStateHud(layout, textStyles);
 
     this.objectRegistry.createFixedRectangleFromLayout(layout.leftPanel);
     this.objectRegistry.createFixedTextFromLayout(layout.title, textStyles.title);
@@ -59,6 +66,7 @@ export default class PlacementUiRenderer {
 
     return {
       cardObjects,
+      stateHud,
       missionText,
       statusText,
       cursorInfoText,
@@ -68,6 +76,16 @@ export default class PlacementUiRenderer {
       lastChangeText,
       placementHistoryText,
     };
+  }
+
+  createStateHud(layout, textStyles) {
+    if (!this.currentState) {
+      return null;
+    }
+
+    return StateHudRenderer.render(this.objectRegistry, layout.stateHud, textStyles, this.currentState, {
+      stateKeys: this.stateKeys,
+    });
   }
 
   createContinueButton(layout, textStyles) {

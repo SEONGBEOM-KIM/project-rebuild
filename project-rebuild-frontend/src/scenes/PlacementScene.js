@@ -52,6 +52,7 @@ export default class PlacementScene extends Phaser.Scene {
     this.uiUpdater = new PlacementUiUpdater({
       missionText: this.missionText,
       statusText: this.statusText,
+      stateHud: this.stateHud,
       cursorInfoText: this.cursorInfoText,
       messageText: this.messageText,
       lastChangeText: this.lastChangeText,
@@ -61,6 +62,7 @@ export default class PlacementScene extends Phaser.Scene {
     });
     this.uiCamera = this.bootstrap.setupCamera(this.objectRegistry);
     this.registerPlacementInput();
+    this.uiUpdater.updateStateHud(this.registry.get(REGISTRY_KEYS.gameState), this.placementConfig.stateKeys);
     this.uiUpdater.updateStatusBar(this.registry.get(REGISTRY_KEYS.gameState), this.placementConfig.stateKeys);
     this.uiUpdater.updateLastChangePanel(this.registry.get(REGISTRY_KEYS.lastPlacementResult), this.placementConfig.stateKeys);
     this.uiUpdater.updatePlacementHistoryPanel(this.placedBuildings, this.placementConfig.stateKeys);
@@ -78,6 +80,8 @@ export default class PlacementScene extends Phaser.Scene {
       objectRegistry: this.objectRegistry,
       buildings: this.availableBuildings,
       requiredPlacements: this.placementConfig.requiredPlacements,
+      currentState: this.registry.get(REGISTRY_KEYS.gameState),
+      stateKeys: this.placementConfig.stateKeys,
       selectedPolicy: this.selectedPolicy,
       getPlacedCount: () => this.placedBuildings.length,
       onSelectBuilding: (building) => this.selectBuilding(building),
@@ -155,6 +159,7 @@ export default class PlacementScene extends Phaser.Scene {
     this.placedBuildings = action.placedBuildings;
     this.worldRenderer.drawPlacedBuilding(this.selectedBuilding, action.tile.x, action.tile.y);
     this.worldRenderer.drawImpactMarkers(this.selectedBuilding, action.tile.x, action.tile.y);
+    this.uiUpdater.updateStateHud(this.registry.get(REGISTRY_KEYS.gameState), this.placementConfig.stateKeys);
     this.uiUpdater.updateStatusBar(this.registry.get(REGISTRY_KEYS.gameState), this.placementConfig.stateKeys);
     this.uiUpdater.updateLastChangePanel(this.registry.get(REGISTRY_KEYS.lastPlacementResult), this.placementConfig.stateKeys);
     this.uiUpdater.updatePlacementHistoryPanel(this.placedBuildings, this.placementConfig.stateKeys);
