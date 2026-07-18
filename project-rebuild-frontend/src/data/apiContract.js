@@ -6,6 +6,24 @@ export const API_CONTRACT = {
   requestExample: {
     schema_version: 1,
     episode_id: 1,
+    episode_context: {
+      current: {
+        id: 1,
+        code: 'ep1',
+        title: '푸른군 지역 회복 프로젝트',
+        short_title: 'EP1. 지역 위기 탐색',
+        region_name: '푸른군',
+        theme: '인구 감소와 생활 기반 약화',
+      },
+      placement: {
+        id: 2,
+        code: 'ep2',
+        title: '푸른군 인구 유입 전략',
+        short_title: 'EP2. 인구 유입 전략',
+        region_name: '푸른군',
+        theme: '인구 유입 조건과 지속 가능한 회복',
+      },
+    },
     completed: true,
     summary: {
       outcome_type: '환경 우선 회복안',
@@ -79,6 +97,24 @@ export const API_CONTRACT = {
     id: 123,
     student_id: 45,
     episode_id: 1,
+    episode_context: {
+      current: {
+        id: 1,
+        code: 'ep1',
+        title: '푸른군 지역 회복 프로젝트',
+        short_title: 'EP1. 지역 위기 탐색',
+        region_name: '푸른군',
+        theme: '인구 감소와 생활 기반 약화',
+      },
+      placement: {
+        id: 2,
+        code: 'ep2',
+        title: '푸른군 인구 유입 전략',
+        short_title: 'EP2. 인구 유입 전략',
+        region_name: '푸른군',
+        theme: '인구 유입 조건과 지속 가능한 회복',
+      },
+    },
     completed: true,
     created_at: '2026-07-12T10:00:00+09:00',
     updated_at: '2026-07-12T10:00:00+09:00',

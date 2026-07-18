@@ -28,6 +28,24 @@ Content-Type: application/json
 {
   "schema_version": 1,
   "episode_id": 1,
+  "episode_context": {
+    "current": {
+      "id": 1,
+      "code": "ep1",
+      "title": "푸른군 지역 회복 프로젝트",
+      "short_title": "EP1. 지역 위기 탐색",
+      "region_name": "푸른군",
+      "theme": "인구 감소와 생활 기반 약화"
+    },
+    "placement": {
+      "id": 2,
+      "code": "ep2",
+      "title": "푸른군 인구 유입 전략",
+      "short_title": "EP2. 인구 유입 전략",
+      "region_name": "푸른군",
+      "theme": "인구 유입 조건과 지속 가능한 회복"
+    }
+  },
   "completed": true,
   "learning_steps": {
     "explored_places": ["school", "market", "bus_stop"],
@@ -91,7 +109,8 @@ Content-Type: application/json
 | 필드 | 타입 | 규칙 |
 | --- | --- | --- |
 | `schema_version` | number | 현재 `1` 고정 |
-| `episode_id` | number | 현재 EP1은 `1` |
+| `episode_id` | number | 현재 저장 기준 학습 에피소드. EP1은 `1` |
+| `episode_context` | object \| null | 현재 학습 에피소드와 배치 실험 에피소드 메타데이터 |
 | `completed` | boolean | 학습 완료 여부 |
 | `learning_steps.explored_places` | string[] | 탐색 장소 ID 배열, 완료 저장 기준 3개 이상 |
 | `learning_steps.data_viewed` | boolean | 자료 확인 완료 여부 |
@@ -112,6 +131,24 @@ Content-Type: application/json
   "id": 123,
   "student_id": 45,
   "episode_id": 1,
+  "episode_context": {
+    "current": {
+      "id": 1,
+      "code": "ep1",
+      "title": "푸른군 지역 회복 프로젝트",
+      "short_title": "EP1. 지역 위기 탐색",
+      "region_name": "푸른군",
+      "theme": "인구 감소와 생활 기반 약화"
+    },
+    "placement": {
+      "id": 2,
+      "code": "ep2",
+      "title": "푸른군 인구 유입 전략",
+      "short_title": "EP2. 인구 유입 전략",
+      "region_name": "푸른군",
+      "theme": "인구 유입 조건과 지속 가능한 회복"
+    }
+  },
   "completed": true,
   "created_at": "2026-07-12T10:00:00+09:00",
   "updated_at": "2026-07-12T10:00:00+09:00"
@@ -140,4 +177,4 @@ Content-Type: application/json
 
 ## 에피소드 config 메타데이터
 
-`placement_config`와 `evaluation_profile`은 서버가 같은 학습 결과를 어떤 배치 규칙과 평가 기준으로 해석해야 하는지 남기기 위한 메타데이터다. 실제 지도 타일/시설 전체 정의는 프론트 data registry 또는 서버 별도 마스터 데이터에서 관리하고, 학습 기록 payload에는 복원과 분석에 필요한 최소 ID/요약값만 포함한다.
+`episode_context`는 학습 흐름의 기준 에피소드와 배치 실험 에피소드를 구분하기 위한 메타데이터다. `placement_config`와 `evaluation_profile`은 서버가 같은 학습 결과를 어떤 배치 규칙과 평가 기준으로 해석해야 하는지 남기기 위한 메타데이터다. 실제 지도 타일/시설 전체 정의는 프론트 data registry 또는 서버 별도 마스터 데이터에서 관리하고, 학습 기록 payload에는 복원과 분석에 필요한 최소 ID/요약값만 포함한다.

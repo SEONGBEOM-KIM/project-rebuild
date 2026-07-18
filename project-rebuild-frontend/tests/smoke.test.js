@@ -129,6 +129,10 @@ function installLocalStorageMock() {
 function createCompleteLearningData(overrides = {}) {
   return {
     episode: 1,
+    episodeContext: {
+      current: LearningDataManager.serializeEpisode(CURRENT_EPISODE),
+      placement: LearningDataManager.serializeEpisode(CURRENT_PLACEMENT_EPISODE),
+    },
     summary: {
       outcomeType: '환경 우선 회복안',
       outcomeMessage: '생활 환경 개선 효과가 뚜렷합니다.',
@@ -3281,6 +3285,8 @@ function testLearningApiPayloadManager() {
   const payload = LearningApiPayloadManager.build(learningData);
   assert.equal(payload.schema_version, 1);
   assert.equal(payload.episode_id, 1);
+  assert.equal(payload.episode_context.current.code, 'ep1');
+  assert.equal(payload.episode_context.placement.code, 'ep2');
   assert.equal(payload.summary.outcome_type, '환경 우선 회복안');
   assert.equal(payload.summary.next_action.label, '개발 효과와 환경 부담 비교');
   assert.equal(payload.summary.selected_strategy_title, '균형 성장');
@@ -3322,6 +3328,12 @@ function testLearningApiPayloadManager() {
     placement_config: { ...payload.placement_config, required_placements: '3' },
   });
   assert.equal(invalidPlacementConfig.find((row) => row.label === '배치 설정 요구 수 확인').ok, false);
+
+  const invalidEpisodeContext = LearningApiPayloadManager.validate({
+    ...payload,
+    episode_context: { current: {}, placement: payload.episode_context.placement },
+  });
+  assert.equal(invalidEpisodeContext.find((row) => row.label === '현재 에피소드 메타 확인').ok, false);
 
   const mismatchedConfig = LearningApiPayloadManager.validate({
     ...payload,
@@ -3471,6 +3483,10 @@ function testLearningDataRestoreManager() {
   const registry = createMemoryRegistry();
   const data = {
     episode: 1,
+    episodeContext: {
+      current: LearningDataManager.serializeEpisode(CURRENT_EPISODE),
+      placement: LearningDataManager.serializeEpisode(CURRENT_PLACEMENT_EPISODE),
+    },
     summary: {
       outcomeType: '환경 우선 회복안',
       outcomeMessage: '생활 환경 개선 효과가 뚜렷합니다.',
@@ -3767,6 +3783,10 @@ function testSaveImport() {
   const store = installLocalStorageMock();
   const learningData = {
     episode: 1,
+    episodeContext: {
+      current: LearningDataManager.serializeEpisode(CURRENT_EPISODE),
+      placement: LearningDataManager.serializeEpisode(CURRENT_PLACEMENT_EPISODE),
+    },
     summary: {
       outcomeType: '환경 우선 회복안',
       outcomeMessage: '생활 환경 개선 효과가 뚜렷합니다.',
@@ -3792,6 +3812,8 @@ function testSaveImport() {
   const apiPayload = LearningApiPayloadManager.build(createCompleteLearningData());
   const importedApiPayload = SaveManager.importJsonText(JSON.stringify(apiPayload));
   assert.equal(importedApiPayload.data.episode, apiPayload.episode_id);
+  assert.equal(importedApiPayload.data.episodeContext.current.code, apiPayload.episode_context.current.code);
+  assert.equal(importedApiPayload.data.episodeContext.placement.code, apiPayload.episode_context.placement.code);
   assert.deepEqual(importedApiPayload.data.exploredPlaces, apiPayload.learning_steps.explored_places);
   assert.equal(importedApiPayload.data.quizResult.questionId, apiPayload.learning_steps.quiz_result.question_id);
   assert.equal(importedApiPayload.data.selectedPolicy.id, apiPayload.selected_policy.id);
@@ -3824,6 +3846,7 @@ function testApiContract() {
   assert.deepEqual(Object.keys(API_CONTRACT.requestExample), [
     'schema_version',
     'episode_id',
+    'episode_context',
     'completed',
     'summary',
     'learning_steps',
@@ -3834,6 +3857,8 @@ function testApiContract() {
     'placements',
     'final_state',
   ]);
+  assert.equal(API_CONTRACT.requestExample.episode_context.current.code, 'ep1');
+  assert.equal(API_CONTRACT.requestExample.episode_context.placement.code, 'ep2');
   assert.equal(API_CONTRACT.requestExample.summary.selected_strategy_title, '균형 성장');
   assert.equal(API_CONTRACT.requestExample.selected_strategy.id, 'balanced_growth');
   assert.equal(API_CONTRACT.requestExample.selected_strategy.placement_config_id, DEFAULT_PLACEMENT_CONFIG_ID);

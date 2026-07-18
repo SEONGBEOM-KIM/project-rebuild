@@ -1,4 +1,5 @@
 import { explorationPlaces } from '../data/explorationPlaces.js';
+import { CURRENT_EPISODE, CURRENT_PLACEMENT_EPISODE } from '../data/episodes.js';
 import { EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
 import IssueDetector from './IssueDetector.js';
 import LearningProgress from './LearningProgress.js';
@@ -28,6 +29,10 @@ export default class LearningDataManager {
 
     return {
       episode: progress.episode,
+      episodeContext: {
+        current: LearningDataManager.serializeEpisode(CURRENT_EPISODE),
+        placement: LearningDataManager.serializeEpisode(CURRENT_PLACEMENT_EPISODE),
+      },
       summary: LearningDataManager.buildSummary({
         ending,
         issues,
@@ -75,6 +80,17 @@ export default class LearningDataManager {
     };
   }
 
+  static serializeEpisode(episode) {
+    return {
+      id: episode.id,
+      code: episode.code,
+      title: episode.title,
+      shortTitle: episode.shortTitle,
+      regionName: episode.regionName,
+      theme: episode.theme,
+    };
+  }
+
   static buildSummary({ ending, issues, selectedPolicy, selectedStrategy, placedBuildings, reflectionChoice }) {
     const priorityIssue = issues[0] ?? null;
     return {
@@ -106,6 +122,16 @@ export default class LearningDataManager {
         ok: data.episode === 1,
         label: 'episode 값 확인',
         message: 'episode 값이 EP1로 저장되지 않았습니다.',
+      },
+      {
+        ok: data.episodeContext == null || data.episodeContext.current?.code === CURRENT_EPISODE.code,
+        label: '현재 에피소드 메타 확인',
+        message: 'episodeContext.current 값이 현재 에피소드와 다릅니다.',
+      },
+      {
+        ok: data.episodeContext == null || data.episodeContext.placement?.code === CURRENT_PLACEMENT_EPISODE.code,
+        label: '배치 에피소드 메타 확인',
+        message: 'episodeContext.placement 값이 현재 배치 에피소드와 다릅니다.',
       },
       {
         ok: Boolean(data.summary?.outcomeType),

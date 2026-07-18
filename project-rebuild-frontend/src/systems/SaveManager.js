@@ -67,6 +67,7 @@ export default class SaveManager {
   static fromApiPayload(payload) {
     return {
       episode: payload.episode_id,
+      episodeContext: SaveManager.fromApiEpisodeContext(payload.episode_context),
       summary: SaveManager.fromApiSummary(payload.summary),
       exploredPlaces: payload.learning_steps.explored_places,
       dataViewed: Boolean(payload.learning_steps.data_viewed),
@@ -85,6 +86,30 @@ export default class SaveManager {
       gameState: payload.final_state ?? null,
       reflectionChoice: SaveManager.fromApiReflectionChoice(payload.learning_steps.reflection_choice),
       completed: Boolean(payload.completed),
+    };
+  }
+
+  static fromApiEpisodeContext(episodeContext) {
+    if (!episodeContext) {
+      return null;
+    }
+    return {
+      current: SaveManager.fromApiEpisodeMetadata(episodeContext.current),
+      placement: SaveManager.fromApiEpisodeMetadata(episodeContext.placement),
+    };
+  }
+
+  static fromApiEpisodeMetadata(episode) {
+    if (!episode) {
+      return null;
+    }
+    return {
+      id: episode.id,
+      code: episode.code,
+      title: episode.title,
+      shortTitle: episode.short_title,
+      regionName: episode.region_name,
+      theme: episode.theme,
     };
   }
 

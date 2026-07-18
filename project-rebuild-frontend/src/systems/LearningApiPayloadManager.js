@@ -1,8 +1,26 @@
 export default class LearningApiPayloadManager {
+  static formatEpisodeContext(episode) {
+    if (!episode) {
+      return null;
+    }
+    return {
+      id: episode.id,
+      code: episode.code,
+      title: episode.title,
+      short_title: episode.shortTitle,
+      region_name: episode.regionName,
+      theme: episode.theme,
+    };
+  }
+
   static build(learningData) {
     return {
       schema_version: 1,
       episode_id: learningData.episode,
+      episode_context: learningData.episodeContext ? {
+        current: LearningApiPayloadManager.formatEpisodeContext(learningData.episodeContext.current),
+        placement: LearningApiPayloadManager.formatEpisodeContext(learningData.episodeContext.placement),
+      } : null,
       completed: Boolean(learningData.completed),
       summary: learningData.summary ? {
         outcome_type: learningData.summary.outcomeType,
@@ -71,6 +89,16 @@ export default class LearningApiPayloadManager {
         ok: Number.isFinite(payload.episode_id),
         label: 'episode_id 확인',
         message: 'episode_id가 숫자가 아닙니다.',
+      },
+      {
+        ok: payload.episode_context == null || Boolean(payload.episode_context?.current?.code),
+        label: '현재 에피소드 메타 확인',
+        message: 'episode_context.current.code 값이 없습니다.',
+      },
+      {
+        ok: payload.episode_context == null || Boolean(payload.episode_context?.placement?.code),
+        label: '배치 에피소드 메타 확인',
+        message: 'episode_context.placement.code 값이 없습니다.',
       },
       {
         ok: payload.summary == null || Boolean(payload.summary?.outcome_type),
