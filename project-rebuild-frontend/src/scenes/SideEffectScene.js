@@ -27,7 +27,7 @@ export default class SideEffectScene extends Phaser.Scene {
       this.registry.get(REGISTRY_KEYS.selectedPlacementStrategy) ?? learningProgress.selectedStrategyId,
       selectedPolicy?.id,
     );
-    const { evaluationProfile } = PlacementContextManager.resolve({
+    const { placementConfig, evaluationProfile } = PlacementContextManager.resolve({
       registry: this.registry,
       progress: learningProgress,
       selectedStrategy,
@@ -42,6 +42,11 @@ export default class SideEffectScene extends Phaser.Scene {
     createLayoutText(this, layout.title, { origin: 0.5 });
 
     createLayoutText(this, layout.subtitle, { origin: 0.5 });
+    createLayoutText(this, layout.contextSummary, {
+      text: SideEffectViewManager.formatContextSummary(placementConfig, evaluationProfile),
+      style: SideEffectViewManager.getContextSummaryTextStyle(),
+      origin: 0.5,
+    });
 
     SideEffectRenderer.renderIssueArea(this, issues);
     SideEffectRenderer.renderConceptPanel(this, issues, selectedStrategy);

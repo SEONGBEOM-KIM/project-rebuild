@@ -1572,6 +1572,11 @@ function testSideEffectViewManager() {
   });
   assert.equal(SideEffectViewManager.getScreenLayout(1920).progressStep, 'result');
   assert.equal(SideEffectViewManager.getScreenLayout(1920).subtitle.wordWrapWidth, 1450);
+  assert.deepEqual(SideEffectViewManager.getScreenLayout(1920).contextSummary, {
+    x: 960,
+    y: 188,
+    wordWrapWidth: 1320,
+  });
   assert.equal(SideEffectViewManager.getPanelStyle().hintFillColor, 0x1e293b);
   assert.equal(SideEffectViewManager.getIssueCardStyle().markerStrokeColor, 0xffffff);
   assert.deepEqual(SideEffectViewManager.getTextStyles().hintBody, {
@@ -1579,6 +1584,15 @@ function testSideEffectViewManager() {
     color: '#dbeafe',
     lineSpacing: 10,
   });
+  assert.deepEqual(SideEffectViewManager.getContextSummaryTextStyle(), {
+    fontSize: '21px',
+    color: '#c7d2fe',
+    align: 'center',
+  });
+  assert.equal(
+    SideEffectViewManager.formatContextSummary(getPlacementConfig(ENVIRONMENT_PLACEMENT_CONFIG_ID), getEvaluationProfile(ENVIRONMENT_EVALUATION_PROFILE_ID)),
+    '푸른군 환경 균형 배치 실험  |  필요 배치: 2개  |  평가 기준: ep2_environment_focus',
+  );
   assert.equal(SideEffectViewManager.getTextStyles().issueSummary.fontStyle, 'bold');
   assert.equal(SideEffectViewManager.getTextStyles().cardPriority.fontSize, '16px');
   assert.deepEqual(SideEffectViewManager.getButtonStyle(), {
@@ -2482,6 +2496,7 @@ function testPlacementViewManager() {
   const sideEffectSceneSource = readProjectFile('src', 'scenes', 'SideEffectScene.js');
   assert.match(sideEffectSceneSource, /PlacementContextManager/, 'side effect scene should resolve active placement context');
   assert.match(sideEffectSceneSource, /IssueDetector\.detect\(gameState, evaluationProfile\)/, 'side effect scene should detect issues with active evaluation profile');
+  assert.match(sideEffectSceneSource, /formatContextSummary\(placementConfig, evaluationProfile\)/, 'side effect scene should display active placement context summary');
   const endingSceneSource = readProjectFile('src', 'scenes', 'EndingScene.js');
   assert.match(endingSceneSource, /selectedStrategyId/, 'ending scene should recover EP2 strategy from learning progress');
   assert.match(endingSceneSource, /PlacementContextManager/, 'ending scene should resolve active placement context');

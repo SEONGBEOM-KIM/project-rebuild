@@ -5,13 +5,14 @@ const SIDE_EFFECT_SCREEN_LAYOUT = {
   progressStep: 'result',
   title: { y: 82, text: '부작용 검토', fontSize: '60px', color: '#ffffff', fontStyle: 'bold' },
   subtitle: {
-    y: 148,
+    y: 142,
     text: '좋은 선택에도 비용과 부작용이 생길 수 있습니다. 다음 선택 전에 주의 신호를 확인합니다.',
     wordWrapWidth: 1450,
     fontSize: '26px',
     color: '#bfdbfe',
     align: 'center',
   },
+  contextSummary: { y: 188, wordWrapWidth: 1320 },
 };
 
 const SIDE_EFFECT_PANEL_STYLE = {
@@ -34,6 +35,7 @@ const SIDE_EFFECT_ISSUE_CARD_STYLE = {
 
 const SIDE_EFFECT_TEXT_STYLES = {
   issueTitle: { fontSize: '38px', color: '#172554', fontStyle: 'bold' },
+  contextSummary: { fontSize: '21px', color: '#c7d2fe', align: 'center' },
   issueSummary: { fontSize: '22px', color: '#334155', fontStyle: 'bold' },
   emptyBody: { fontSize: '30px', color: '#1e293b', lineSpacing: 14 },
   cardPriority: { fontSize: '16px', color: '#475569', fontStyle: 'bold' },
@@ -64,7 +66,20 @@ export default class SideEffectViewManager {
       progressStep: SIDE_EFFECT_SCREEN_LAYOUT.progressStep,
       title: { x: width / 2, ...SIDE_EFFECT_SCREEN_LAYOUT.title },
       subtitle: { x: width / 2, ...SIDE_EFFECT_SCREEN_LAYOUT.subtitle },
+      contextSummary: { x: width / 2, ...SIDE_EFFECT_SCREEN_LAYOUT.contextSummary },
     };
+  }
+
+  static formatContextSummary(placementConfig, evaluationProfile) {
+    return [
+      placementConfig?.title ?? '배치 실험',
+      `필요 배치: ${placementConfig?.requiredPlacements ?? '-'}개`,
+      `평가 기준: ${evaluationProfile?.id ?? '기본'}`,
+    ].join('  |  ');
+  }
+
+  static getContextSummaryTextStyle() {
+    return { ...SIDE_EFFECT_TEXT_STYLES.contextSummary };
   }
 
   static getPanelStyle() {
