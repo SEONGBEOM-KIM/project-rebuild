@@ -3687,9 +3687,14 @@ function testSavedDataViewManager() {
     }),
   };
   assert.match(SavedDataViewManager.formatSummary(saved), /Episode 1/);
+  assert.match(SavedDataViewManager.formatSummary(saved), /배치 실험 미지정/);
+  assert.match(SavedDataViewManager.formatSummary(saved), /config 없음/);
   assert.match(SavedDataViewManager.formatSummary(saved), /탐색 3곳/);
   assert.match(SavedDataViewManager.formatSummary(fullSaved), /청년 생활 지원/);
   assert.match(SavedDataViewManager.formatSummary(fullSaved), /균형 성장/);
+  assert.match(SavedDataViewManager.formatSummary(fullSaved), /EP1\. 지역 위기 탐색 → EP2\. 인구 유입 전략/);
+  assert.match(SavedDataViewManager.formatSummary(fullSaved), /ep2_population_recovery/);
+  assert.match(SavedDataViewManager.formatSummary(fullSaved), /ep2_population_recovery_default/);
   assert.equal(SavedDataViewManager.formatSavedAt(null), '알 수 없음');
   assert.equal(SavedDataViewManager.formatSavedAt('bad-date'), 'bad-date');
   assert.match(SavedDataViewManager.formatBody(saved), /원본 JSON 미리보기/);
