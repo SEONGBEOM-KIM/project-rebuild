@@ -1,10 +1,11 @@
 import { getEvaluationProfile } from '../data/evaluationRules.js';
 import { getPlacementConfig, getPlacementConfigIdForStrategy } from '../data/episodePlacementConfigs.js';
 import LearningProgress from './LearningProgress.js';
+import { REGISTRY_KEYS } from '../data/registryKeys.js';
 
 export default class PlacementContextManager {
   static resolvePlacementConfigId({ registry, progress = null, selectedStrategy = null } = {}) {
-    return registry?.get('placementConfigId')
+    return registry?.get(REGISTRY_KEYS.placementConfigId)
       ?? progress?.placementConfigId
       ?? getPlacementConfigIdForStrategy(selectedStrategy);
   }

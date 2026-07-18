@@ -1,4 +1,5 @@
 import { CURRENT_EPISODE } from '../data/episodes.js';
+import { REGISTRY_KEYS } from '../data/registryKeys.js';
 
 const INITIAL_PROGRESS = Object.freeze({
   episode: CURRENT_EPISODE.id,
@@ -24,7 +25,7 @@ export default class LearningProgress {
   }
 
   static get(registry) {
-    return registry.get('learningProgress') ?? LearningProgress.createInitialProgress();
+    return registry.get(REGISTRY_KEYS.learningProgress) ?? LearningProgress.createInitialProgress();
   }
 
   static update(registry, patch) {
@@ -32,7 +33,7 @@ export default class LearningProgress {
       ...LearningProgress.get(registry),
       ...patch,
     };
-    registry.set('learningProgress', nextProgress);
+    registry.set(REGISTRY_KEYS.learningProgress, nextProgress);
     return nextProgress;
   }
 

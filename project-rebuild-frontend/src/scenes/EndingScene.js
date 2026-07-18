@@ -10,6 +10,7 @@ import EndingSummaryRenderer from '../systems/EndingSummaryRenderer.js';
 import Ep2BriefingViewManager from '../systems/Ep2BriefingViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
+import { REGISTRY_KEYS } from '../data/registryKeys.js';
 
 export default class EndingScene extends Phaser.Scene {
   constructor() {
@@ -18,14 +19,14 @@ export default class EndingScene extends Phaser.Scene {
 
   create() {
     const { width } = this.scale;
-    const gameState = this.registry.get('gameState');
-    const placedBuildings = this.registry.get('placedBuildings') ?? [];
-    const selectedPolicy = this.registry.get('selectedPolicy');
-    const exploredPlaces = this.registry.get('exploredPlaces') ?? [];
-    const quizResult = this.registry.get('quizResult');
-    const reflectionChoice = this.registry.get('reflectionChoice');
+    const gameState = this.registry.get(REGISTRY_KEYS.gameState);
+    const placedBuildings = this.registry.get(REGISTRY_KEYS.placedBuildings) ?? [];
+    const selectedPolicy = this.registry.get(REGISTRY_KEYS.selectedPolicy);
+    const exploredPlaces = this.registry.get(REGISTRY_KEYS.exploredPlaces) ?? [];
+    const quizResult = this.registry.get(REGISTRY_KEYS.quizResult);
+    const reflectionChoice = this.registry.get(REGISTRY_KEYS.reflectionChoice);
     const learningProgress = LearningProgress.update(this.registry, { completed: true });
-    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(getCurrentPlacementMissionBriefing(), this.registry.get('ep2StrategyId') ?? learningProgress.selectedStrategyId, selectedPolicy?.id);
+    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(getCurrentPlacementMissionBriefing(), this.registry.get(REGISTRY_KEYS.selectedPlacementStrategy) ?? learningProgress.selectedStrategyId, selectedPolicy?.id);
     const { placementConfig, evaluationProfile } = PlacementContextManager.resolve({
       registry: this.registry,
       progress: learningProgress,

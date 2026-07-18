@@ -7,6 +7,7 @@ import { getPlacementConfigIdForStrategy } from '../data/episodePlacementConfigs
 import Ep2BriefingViewManager from '../systems/Ep2BriefingViewManager.js';
 import Ep2BriefingRenderer from '../systems/Ep2BriefingRenderer.js';
 import { createLayoutText } from '../ui/LayoutText.js';
+import { REGISTRY_KEYS } from '../data/registryKeys.js';
 
 export default class Ep2BriefingScene extends Phaser.Scene {
   constructor() {
@@ -39,7 +40,7 @@ export default class Ep2BriefingScene extends Phaser.Scene {
   }
 
   getInitialStrategy() {
-    const savedStrategyId = this.registry.get('ep2StrategyId');
+    const savedStrategyId = this.registry.get(REGISTRY_KEYS.selectedPlacementStrategy);
     const missionBriefing = this.missionBriefing ?? getCurrentPlacementMissionBriefing();
     return Ep2BriefingViewManager.findStrategyById(missionBriefing, savedStrategyId)
       ?? Ep2BriefingViewManager.getDefaultStrategy(missionBriefing);
@@ -60,8 +61,8 @@ export default class Ep2BriefingScene extends Phaser.Scene {
 
   selectStrategy(strategy) {
     this.selectedStrategy = strategy;
-    this.registry.set('ep2StrategyId', strategy.id);
-    this.registry.set('placementConfigId', getPlacementConfigIdForStrategy(strategy));
+    this.registry.set(REGISTRY_KEYS.selectedPlacementStrategy, strategy.id);
+    this.registry.set(REGISTRY_KEYS.placementConfigId, getPlacementConfigIdForStrategy(strategy));
     this.updateStrategyUi();
   }
 
@@ -80,11 +81,11 @@ export default class Ep2BriefingScene extends Phaser.Scene {
     const strategy = this.selectedStrategy ?? Ep2BriefingViewManager.getDefaultStrategy(this.missionBriefing ?? getCurrentPlacementMissionBriefing());
     const policy = policies.find((candidate) => candidate.id === strategy?.policyId);
     if (strategy) {
-      this.registry.set('ep2StrategyId', strategy.id);
-      this.registry.set('placementConfigId', getPlacementConfigIdForStrategy(strategy));
+      this.registry.set(REGISTRY_KEYS.selectedPlacementStrategy, strategy.id);
+      this.registry.set(REGISTRY_KEYS.placementConfigId, getPlacementConfigIdForStrategy(strategy));
     }
     if (policy) {
-      this.registry.set('selectedPolicy', policy);
+      this.registry.set(REGISTRY_KEYS.selectedPolicy, policy);
     }
   }
 }

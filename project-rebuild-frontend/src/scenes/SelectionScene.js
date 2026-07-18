@@ -10,6 +10,7 @@ import SelectionPolicyCardRenderer from '../systems/SelectionPolicyCardRenderer.
 import Ep2BriefingViewManager from '../systems/Ep2BriefingViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
+import { REGISTRY_KEYS } from '../data/registryKeys.js';
 
 export default class SelectionScene extends Phaser.Scene {
   constructor() {
@@ -18,7 +19,7 @@ export default class SelectionScene extends Phaser.Scene {
 
   create() {
     const { width, height } = this.scale;
-    this.selectedPolicy = this.registry.get('selectedPolicy') ?? policies[0];
+    this.selectedPolicy = this.registry.get(REGISTRY_KEYS.selectedPolicy) ?? policies[0];
     this.cardObjects = new Map();
 
     const layout = SelectionViewManager.getScreenLayout(width);
@@ -46,7 +47,7 @@ export default class SelectionScene extends Phaser.Scene {
     const startButton = createTextButton(this, controls.start, SelectionViewManager.getButtonStyle());
     startButton.on('pointerdown', () => {
       const strategy = this.syncSelectedStrategy(this.selectedPolicy);
-      this.registry.set('selectedPolicy', this.selectedPolicy);
+      this.registry.set(REGISTRY_KEYS.selectedPolicy, this.selectedPolicy);
       LearningProgress.update(this.registry, {
         selectedPolicyId: this.selectedPolicy.id,
         selectedStrategyId: strategy?.id ?? null,
@@ -62,7 +63,7 @@ export default class SelectionScene extends Phaser.Scene {
     const cardObjects = SelectionPolicyCardRenderer.render(this, policy, this.selectedPolicy, { x, y }, {
       onSelect: (selectedPolicy) => {
         this.selectedPolicy = selectedPolicy;
-        this.registry.set('selectedPolicy', selectedPolicy);
+        this.registry.set(REGISTRY_KEYS.selectedPolicy, selectedPolicy);
         const strategy = this.syncSelectedStrategy(selectedPolicy);
         LearningProgress.update(this.registry, {
           selectedPolicyId: selectedPolicy.id,
@@ -79,8 +80,8 @@ export default class SelectionScene extends Phaser.Scene {
   syncSelectedStrategy(policy) {
     const strategy = Ep2BriefingViewManager.findStrategyByPolicyId(getCurrentPlacementMissionBriefing(), policy?.id);
     if (strategy) {
-      this.registry.set('ep2StrategyId', strategy.id);
-      this.registry.set('placementConfigId', getPlacementConfigIdForStrategy(strategy));
+      this.registry.set(REGISTRY_KEYS.selectedPlacementStrategy, strategy.id);
+      this.registry.set(REGISTRY_KEYS.placementConfigId, getPlacementConfigIdForStrategy(strategy));
     }
     return strategy;
   }

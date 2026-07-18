@@ -10,6 +10,7 @@ import ReflectionRenderer from '../systems/ReflectionRenderer.js';
 import Ep2BriefingViewManager from '../systems/Ep2BriefingViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
+import { REGISTRY_KEYS } from '../data/registryKeys.js';
 
 export default class ReflectionScene extends Phaser.Scene {
   constructor() {
@@ -18,13 +19,13 @@ export default class ReflectionScene extends Phaser.Scene {
 
   create() {
     const { width } = this.scale;
-    const gameState = this.registry.get('gameState');
-    const selectedPolicy = this.registry.get('selectedPolicy');
-    const placedBuildings = this.registry.get('placedBuildings') ?? [];
+    const gameState = this.registry.get(REGISTRY_KEYS.gameState);
+    const selectedPolicy = this.registry.get(REGISTRY_KEYS.selectedPolicy);
+    const placedBuildings = this.registry.get(REGISTRY_KEYS.placedBuildings) ?? [];
     const learningProgress = LearningProgress.get(this.registry);
     const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(
       getCurrentPlacementMissionBriefing(),
-      this.registry.get('ep2StrategyId') ?? learningProgress.selectedStrategyId,
+      this.registry.get(REGISTRY_KEYS.selectedPlacementStrategy) ?? learningProgress.selectedStrategyId,
       selectedPolicy?.id,
     );
     const { evaluationProfile } = PlacementContextManager.resolve({
@@ -33,7 +34,7 @@ export default class ReflectionScene extends Phaser.Scene {
       selectedStrategy,
     });
     const issues = IssueDetector.detect(gameState, evaluationProfile);
-    this.selectedChoice = this.registry.get('reflectionChoice');
+    this.selectedChoice = this.registry.get(REGISTRY_KEYS.reflectionChoice);
     this.choiceObjects = new Map();
 
     const layout = ReflectionViewManager.getScreenLayout(width);
@@ -69,7 +70,7 @@ export default class ReflectionScene extends Phaser.Scene {
 
   selectChoice(choice) {
     this.selectedChoice = choice;
-    this.registry.set('reflectionChoice', choice);
+    this.registry.set(REGISTRY_KEYS.reflectionChoice, choice);
     LearningProgress.update(this.registry, { reflectionChoice: choice });
     this.feedbackText.setText(ReflectionViewManager.formatSelectedFeedback(choice));
     this.feedbackText.setColor(ReflectionViewManager.getFeedbackStyle('selected').color);

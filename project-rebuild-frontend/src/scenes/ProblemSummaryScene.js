@@ -5,6 +5,7 @@ import { explorationPlaces } from '../data/explorationPlaces.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import ProblemSummaryViewManager from '../systems/ProblemSummaryViewManager.js';
 import ProblemSummaryRenderer from '../systems/ProblemSummaryRenderer.js';
+import { REGISTRY_KEYS } from '../data/registryKeys.js';
 
 import { getCurrentEpisodeContent } from '../data/episodeContent.js';
 import { createTextButton } from '../ui/TextButton.js';
@@ -17,8 +18,8 @@ export default class ProblemSummaryScene extends Phaser.Scene {
 
   create() {
     const { width } = this.scale;
-    const exploredPlaces = this.registry.get('exploredPlaces') ?? [];
-    const quizResult = this.registry.get('quizResult');
+    const exploredPlaces = this.registry.get(REGISTRY_KEYS.exploredPlaces) ?? [];
+    const quizResult = this.registry.get(REGISTRY_KEYS.quizResult);
 
     const layout = ProblemSummaryViewManager.getScreenLayout(width);
 

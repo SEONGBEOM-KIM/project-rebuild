@@ -12,6 +12,7 @@ import PlacementActionManager from '../systems/PlacementActionManager.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import Ep2BriefingViewManager from '../systems/Ep2BriefingViewManager.js';
 import { PLACEMENT_ACTION_STATUS } from '../systems/PlacementActionManager.js';
+import { REGISTRY_KEYS } from '../data/registryKeys.js';
 
 export default class PlacementScene extends Phaser.Scene {
   constructor() {
@@ -19,13 +20,13 @@ export default class PlacementScene extends Phaser.Scene {
   }
 
   create() {
-    this.placementConfig = getPlacementConfig(this.registry.get('placementConfigId'));
+    this.placementConfig = getPlacementConfig(this.registry.get(REGISTRY_KEYS.placementConfigId));
     this.availableBuildings = this.placementConfig.buildings;
     this.selectedBuilding = this.availableBuildings[0];
-    this.selectedPolicy = this.registry.get('selectedPolicy');
+    this.selectedPolicy = this.registry.get(REGISTRY_KEYS.selectedPolicy);
     const learningProgress = LearningProgress.get(this.registry);
-    this.selectedStrategy = Ep2BriefingViewManager.resolveStrategy(getCurrentPlacementMissionBriefing(), this.registry.get('ep2StrategyId') ?? learningProgress.selectedStrategyId, this.selectedPolicy?.id);
-    this.placedBuildings = [...(this.registry.get('placedBuildings') ?? [])];
+    this.selectedStrategy = Ep2BriefingViewManager.resolveStrategy(getCurrentPlacementMissionBriefing(), this.registry.get(REGISTRY_KEYS.selectedPlacementStrategy) ?? learningProgress.selectedStrategyId, this.selectedPolicy?.id);
+    this.placedBuildings = [...(this.registry.get(REGISTRY_KEYS.placedBuildings) ?? [])];
     this.bootstrap = new PlacementSceneBootstrap({
       scene: this,
       sourceMapData: this.placementConfig.map,
@@ -60,8 +61,8 @@ export default class PlacementScene extends Phaser.Scene {
     });
     this.uiCamera = this.bootstrap.setupCamera(this.objectRegistry);
     this.registerPlacementInput();
-    this.uiUpdater.updateStatusBar(this.registry.get('gameState'), this.placementConfig.stateKeys);
-    this.uiUpdater.updateLastChangePanel(this.registry.get('lastPlacementResult'), this.placementConfig.stateKeys);
+    this.uiUpdater.updateStatusBar(this.registry.get(REGISTRY_KEYS.gameState), this.placementConfig.stateKeys);
+    this.uiUpdater.updateLastChangePanel(this.registry.get(REGISTRY_KEYS.lastPlacementResult), this.placementConfig.stateKeys);
     this.uiUpdater.updatePlacementHistoryPanel(this.placedBuildings, this.placementConfig.stateKeys);
     this.updateSelectedBuildingUi();
     this.uiUpdater.updateContinueButton(
@@ -154,8 +155,8 @@ export default class PlacementScene extends Phaser.Scene {
     this.placedBuildings = action.placedBuildings;
     this.worldRenderer.drawPlacedBuilding(this.selectedBuilding, action.tile.x, action.tile.y);
     this.worldRenderer.drawImpactMarkers(this.selectedBuilding, action.tile.x, action.tile.y);
-    this.uiUpdater.updateStatusBar(this.registry.get('gameState'), this.placementConfig.stateKeys);
-    this.uiUpdater.updateLastChangePanel(this.registry.get('lastPlacementResult'), this.placementConfig.stateKeys);
+    this.uiUpdater.updateStatusBar(this.registry.get(REGISTRY_KEYS.gameState), this.placementConfig.stateKeys);
+    this.uiUpdater.updateLastChangePanel(this.registry.get(REGISTRY_KEYS.lastPlacementResult), this.placementConfig.stateKeys);
     this.uiUpdater.updatePlacementHistoryPanel(this.placedBuildings, this.placementConfig.stateKeys);
     this.uiUpdater.updateContinueButton(
       this.placedBuildings.length,

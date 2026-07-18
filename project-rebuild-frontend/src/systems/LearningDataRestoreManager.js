@@ -5,6 +5,7 @@ import { buildings } from '../data/buildings.js';
 import { getCurrentPlacementMissionBriefing } from '../data/episodeContent.js';
 import Ep2BriefingViewManager from './Ep2BriefingViewManager.js';
 import PlacementContextManager from './PlacementContextManager.js';
+import { REGISTRY_KEYS } from '../data/registryKeys.js';
 
 export default class LearningDataRestoreManager {
   static restore(registry, data) {
@@ -13,16 +14,16 @@ export default class LearningDataRestoreManager {
     const restoredPlacements = LearningDataRestoreManager.restorePlacements(data.placements ?? []);
     const progress = LearningDataRestoreManager.buildProgress(data, selectedPolicy, selectedStrategy, restoredPlacements);
 
-    registry.set('gameState', LearningDataRestoreManager.restoreGameState(data.gameState, restoredPlacements));
-    registry.set('lastPlacementResult', null);
-    registry.set('placedBuildings', restoredPlacements);
-    registry.set('selectedPolicy', selectedPolicy);
-    registry.set('ep2StrategyId', selectedStrategy?.id ?? null);
-    registry.set('placementConfigId', progress.placementConfigId);
-    registry.set('exploredPlaces', progress.exploredPlaces);
-    registry.set('quizResult', progress.quizResult);
-    registry.set('reflectionChoice', progress.reflectionChoice);
-    registry.set('learningProgress', progress);
+    registry.set(REGISTRY_KEYS.gameState, LearningDataRestoreManager.restoreGameState(data.gameState, restoredPlacements));
+    registry.set(REGISTRY_KEYS.lastPlacementResult, null);
+    registry.set(REGISTRY_KEYS.placedBuildings, restoredPlacements);
+    registry.set(REGISTRY_KEYS.selectedPolicy, selectedPolicy);
+    registry.set(REGISTRY_KEYS.selectedPlacementStrategy, selectedStrategy?.id ?? null);
+    registry.set(REGISTRY_KEYS.placementConfigId, progress.placementConfigId);
+    registry.set(REGISTRY_KEYS.exploredPlaces, progress.exploredPlaces);
+    registry.set(REGISTRY_KEYS.quizResult, progress.quizResult);
+    registry.set(REGISTRY_KEYS.reflectionChoice, progress.reflectionChoice);
+    registry.set(REGISTRY_KEYS.learningProgress, progress);
 
     return {
       selectedPolicy,

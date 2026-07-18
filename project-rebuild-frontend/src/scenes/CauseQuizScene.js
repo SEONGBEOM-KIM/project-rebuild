@@ -5,6 +5,7 @@ import LearningProgress from '../systems/LearningProgress.js';
 import CauseQuizManager from '../systems/CauseQuizManager.js';
 import CauseQuizViewManager from '../systems/CauseQuizViewManager.js';
 import CauseQuizPanelRenderer from '../systems/CauseQuizPanelRenderer.js';
+import { REGISTRY_KEYS } from '../data/registryKeys.js';
 
 import { getCurrentEpisodeContent } from '../data/episodeContent.js';
 import { createTextButton } from '../ui/TextButton.js';
@@ -34,7 +35,7 @@ export default class CauseQuizScene extends Phaser.Scene {
   }
 
   drawExplorationSummary() {
-    const exploredCount = (this.registry.get('exploredPlaces') ?? []).length;
+    const exploredCount = (this.registry.get(REGISTRY_KEYS.exploredPlaces) ?? []).length;
     const episodeContent = getCurrentEpisodeContent();
     const rows = CauseQuizManager.formatExplorationSummaryRows(exploredCount, episodeContent.explorationClues);
     CauseQuizPanelRenderer.renderExplorationSummary(this, rows);
@@ -69,7 +70,7 @@ export default class CauseQuizScene extends Phaser.Scene {
   selectChoice(choice) {
     this.selectedChoice = choice;
     const quizResult = CauseQuizManager.buildQuizResult(getCurrentEpisodeContent().causeQuestion, choice);
-    this.registry.set('quizResult', quizResult);
+    this.registry.set(REGISTRY_KEYS.quizResult, quizResult);
     LearningProgress.update(this.registry, { quizResult });
 
     for (const [choiceId, objects] of this.choiceObjects.entries()) {

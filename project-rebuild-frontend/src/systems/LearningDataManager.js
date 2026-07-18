@@ -6,21 +6,22 @@ import LearningProgress from './LearningProgress.js';
 import EndingSummaryManager from './EndingSummaryManager.js';
 import Ep2BriefingViewManager from './Ep2BriefingViewManager.js';
 import PlacementContextManager from './PlacementContextManager.js';
+import { REGISTRY_KEYS } from '../data/registryKeys.js';
 
 export default class LearningDataManager {
   static build(registry) {
     const progress = LearningProgress.get(registry);
-    const quizResult = registry.get('quizResult');
-    const selectedPolicy = registry.get('selectedPolicy');
-    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(getCurrentPlacementMissionBriefing(), registry.get('ep2StrategyId') ?? progress.selectedStrategyId, selectedPolicy?.id);
+    const quizResult = registry.get(REGISTRY_KEYS.quizResult);
+    const selectedPolicy = registry.get(REGISTRY_KEYS.selectedPolicy);
+    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(getCurrentPlacementMissionBriefing(), registry.get(REGISTRY_KEYS.selectedPlacementStrategy) ?? progress.selectedStrategyId, selectedPolicy?.id);
     const { placementConfig, evaluationProfile } = PlacementContextManager.resolve({
       registry,
       progress,
       selectedStrategy,
     });
-    const placedBuildings = registry.get('placedBuildings') ?? [];
-    const gameState = registry.get('gameState');
-    const reflectionChoice = registry.get('reflectionChoice');
+    const placedBuildings = registry.get(REGISTRY_KEYS.placedBuildings) ?? [];
+    const gameState = registry.get(REGISTRY_KEYS.gameState);
+    const reflectionChoice = registry.get(REGISTRY_KEYS.reflectionChoice);
     const issues = IssueDetector.detect(gameState, evaluationProfile);
     const ending = EndingSummaryManager.getEndingSummary(gameState, placedBuildings, evaluationProfile);
     const exploredPlaceNames = explorationPlaces

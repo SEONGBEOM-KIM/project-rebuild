@@ -7,6 +7,7 @@ import LearningProgress from '../systems/LearningProgress.js';
 import ExplorationViewManager from '../systems/ExplorationViewManager.js';
 import ExplorationMapRenderer from '../systems/ExplorationMapRenderer.js';
 import ExplorationRenderer from '../systems/ExplorationRenderer.js';
+import { REGISTRY_KEYS } from '../data/registryKeys.js';
 
 export default class ExplorationScene extends Phaser.Scene {
   constructor() {
@@ -14,7 +15,7 @@ export default class ExplorationScene extends Phaser.Scene {
   }
 
   create() {
-    this.exploredPlaces = new Set(this.registry.get('exploredPlaces') ?? []);
+    this.exploredPlaces = new Set(this.registry.get(REGISTRY_KEYS.exploredPlaces) ?? []);
     this.placeObjects = new Map();
 
     const layout = ExplorationViewManager.getScreenLayout();
@@ -63,14 +64,14 @@ export default class ExplorationScene extends Phaser.Scene {
         this.showNeedMoreMessage();
         return;
       }
-      this.registry.set('exploredPlaces', [...this.exploredPlaces]);
+      this.registry.set(REGISTRY_KEYS.exploredPlaces, [...this.exploredPlaces]);
       this.scene.start(controls.layout.next.target);
     });
   }
 
   selectPlace(place) {
     this.exploredPlaces.add(place.id);
-    this.registry.set('exploredPlaces', [...this.exploredPlaces]);
+    this.registry.set(REGISTRY_KEYS.exploredPlaces, [...this.exploredPlaces]);
     LearningProgress.addExploredPlace(this.registry, place.id);
 
     for (const [placeId, objects] of this.placeObjects.entries()) {

@@ -10,6 +10,7 @@ import LearningProgress from '../systems/LearningProgress.js';
 import Ep2BriefingViewManager from '../systems/Ep2BriefingViewManager.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
+import { REGISTRY_KEYS } from '../data/registryKeys.js';
 
 export default class ResultScene extends Phaser.Scene {
   constructor() {
@@ -18,12 +19,12 @@ export default class ResultScene extends Phaser.Scene {
 
   create() {
     const { width } = this.scale;
-    const gameState = this.registry.get('gameState');
-    const lastPlacementResult = this.registry.get('lastPlacementResult');
-    const placedBuildings = this.registry.get('placedBuildings') ?? [];
-    const selectedPolicy = this.registry.get('selectedPolicy');
+    const gameState = this.registry.get(REGISTRY_KEYS.gameState);
+    const lastPlacementResult = this.registry.get(REGISTRY_KEYS.lastPlacementResult);
+    const placedBuildings = this.registry.get(REGISTRY_KEYS.placedBuildings) ?? [];
+    const selectedPolicy = this.registry.get(REGISTRY_KEYS.selectedPolicy);
     const learningProgress = LearningProgress.get(this.registry);
-    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(getCurrentPlacementMissionBriefing(), this.registry.get('ep2StrategyId') ?? learningProgress.selectedStrategyId, selectedPolicy?.id);
+    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(getCurrentPlacementMissionBriefing(), this.registry.get(REGISTRY_KEYS.selectedPlacementStrategy) ?? learningProgress.selectedStrategyId, selectedPolicy?.id);
     const { placementConfig, evaluationProfile } = PlacementContextManager.resolve({
       registry: this.registry,
       progress: learningProgress,

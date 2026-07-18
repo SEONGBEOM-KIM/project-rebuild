@@ -10,6 +10,7 @@ import { getCurrentPlacementMissionBriefing } from '../data/episodeContent.js';
 import PlacementContextManager from '../systems/PlacementContextManager.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import Ep2BriefingViewManager from '../systems/Ep2BriefingViewManager.js';
+import { REGISTRY_KEYS } from '../data/registryKeys.js';
 
 export default class SideEffectScene extends Phaser.Scene {
   constructor() {
@@ -18,12 +19,12 @@ export default class SideEffectScene extends Phaser.Scene {
 
   create() {
     const { width } = this.scale;
-    const gameState = this.registry.get('gameState');
-    const selectedPolicy = this.registry.get('selectedPolicy');
+    const gameState = this.registry.get(REGISTRY_KEYS.gameState);
+    const selectedPolicy = this.registry.get(REGISTRY_KEYS.selectedPolicy);
     const learningProgress = LearningProgress.get(this.registry);
     const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(
       getCurrentPlacementMissionBriefing(),
-      this.registry.get('ep2StrategyId') ?? learningProgress.selectedStrategyId,
+      this.registry.get(REGISTRY_KEYS.selectedPlacementStrategy) ?? learningProgress.selectedStrategyId,
       selectedPolicy?.id,
     );
     const { evaluationProfile } = PlacementContextManager.resolve({

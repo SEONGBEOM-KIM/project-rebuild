@@ -81,6 +81,7 @@ import { DEFAULT_EVALUATION_PROFILE_ID, ENVIRONMENT_EVALUATION_PROFILE_ID, ISSUE
 import { API_CONTRACT, formatContractRequest, formatContractResponse } from '../src/data/apiContract.js';
 import { CURRENT_EPISODE, CURRENT_PLACEMENT_EPISODE, EPISODE_IDS, EPISODES, EPISODE_STEPS, getEpisode, getEpisodeStep } from '../src/data/episodes.js';
 import SCENE_KEYS from '../src/data/sceneKeys.js';
+import { REGISTRY_KEYS } from '../src/data/registryKeys.js';
 import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES, EP2_MISSION_BRIEFING, EPISODE_CONTENT, getCurrentEpisodeContent, getCurrentPlacementEpisodeContent, getCurrentPlacementMissionBriefing, getEpisodeContent } from '../src/data/episodeContent.js';
 import ProgressStepper from '../src/ui/ProgressStepper.js';
 import { getTextButtonColor } from '../src/ui/TextButton.js';
@@ -357,7 +358,7 @@ function testBootFlowManager() {
     'lastPlacementResult',
     'placedBuildings',
     'selectedPolicy',
-    'ep2StrategyId',
+    REGISTRY_KEYS.selectedPlacementStrategy,
     'exploredPlaces',
     'quizResult',
     'reflectionChoice',
@@ -369,7 +370,7 @@ function testBootFlowManager() {
   assert.deepEqual(values.get('exploredPlaces'), []);
   assert.equal(values.get('lastPlacementResult'), null);
   assert.equal(values.get('selectedPolicy'), null);
-  assert.equal(values.get('ep2StrategyId'), null);
+  assert.equal(values.get(REGISTRY_KEYS.selectedPlacementStrategy), null);
   assert.equal(values.get('quizResult'), null);
   assert.equal(values.get('reflectionChoice'), null);
   assert.equal(values.get('learningProgress').episode, 1);
@@ -3550,7 +3551,7 @@ function testLearningDataRestoreManager() {
   const restored = LearningDataRestoreManager.restore(registry, data);
   assert.equal(restored.selectedPolicy.id, 'green_recovery');
   assert.equal(restored.selectedStrategy.id, 'balanced_growth');
-  assert.equal(registry.get('ep2StrategyId'), 'balanced_growth');
+  assert.equal(registry.get(REGISTRY_KEYS.selectedPlacementStrategy), 'balanced_growth');
   assert.equal(restored.placedBuildings.length, 1, 'unknown building ids should be skipped safely');
   assert.equal(registry.get('gameState').environment, 92);
   assert.deepEqual(registry.get('exploredPlaces'), ['school', 'market', 'bus_stop']);
