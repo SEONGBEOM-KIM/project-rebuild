@@ -76,7 +76,7 @@ import { buildings } from '../src/data/buildings.js';
 import { policies } from '../src/data/policies.js';
 import { explorationPlaces } from '../src/data/explorationPlaces.js';
 import { mapData } from '../src/data/mapData.js';
-import { DEFAULT_PLACEMENT_CONFIG_ID, ENVIRONMENT_PLACEMENT_CONFIG_ID, episodePlacementConfigs, getPlacementConfig, getPlacementConfigIdForStrategy } from '../src/data/episodePlacementConfigs.js';
+import { DEFAULT_PLACEMENT_CONFIG_ID, ENVIRONMENT_PLACEMENT_CONFIG_ID, episodePlacementConfigs, getDefaultPlacementConfig, getDefaultPlacementConfigIdForEpisode, getPlacementConfig, getPlacementConfigIdForStrategy, getPlacementConfigsForEpisode } from '../src/data/episodePlacementConfigs.js';
 import { DEFAULT_EVALUATION_PROFILE_ID, ENVIRONMENT_EVALUATION_PROFILE_ID, ISSUE_THRESHOLDS, REACTION_THRESHOLDS, RESULT_THRESHOLDS, SCORE_RULES, evaluationProfiles, getEvaluationProfile } from '../src/data/evaluationRules.js';
 import { API_CONTRACT, formatContractRequest, formatContractResponse } from '../src/data/apiContract.js';
 import { CURRENT_EPISODE, CURRENT_PLACEMENT_EPISODE, EPISODE_IDS, EPISODES, EPISODE_STEPS, getEpisode, getEpisodeStep } from '../src/data/episodes.js';
@@ -1680,13 +1680,21 @@ function testEpisodePlacementConfigs() {
 
   assert.equal(config.id, DEFAULT_PLACEMENT_CONFIG_ID, 'default placement config should resolve by default');
   assert.equal(config, episodePlacementConfigs[DEFAULT_PLACEMENT_CONFIG_ID], 'default config should be registered by id');
-  assert.equal(config.episodeId, 'ep2');
+  assert.equal(config.episodeId, EPISODE_IDS.PopulationRecovery);
   assert.equal(config.buildings.length, buildings.length, 'episode config should expose current sample facilities');
   assert.equal(config.map.width, mapData.width, 'episode config should expose current sample map');
   assert.equal(config.map.height, mapData.height);
   assert.equal(config.requiredPlacements, 3, 'episode config should declare the current placement target');
   assert.equal(config.evaluationProfileId, DEFAULT_EVALUATION_PROFILE_ID, 'episode config should declare its result evaluation profile');
   assert.deepEqual(config.stateKeys, DEFAULT_STATE_KEYS, 'default episode config should use the canonical state display order');
+  assert.equal(getDefaultPlacementConfig(), config, 'default placement config should resolve through the current placement episode');
+  assert.equal(getDefaultPlacementConfigIdForEpisode(EPISODE_IDS.PopulationRecovery), DEFAULT_PLACEMENT_CONFIG_ID);
+  assert.deepEqual(
+    getPlacementConfigsForEpisode(EPISODE_IDS.PopulationRecovery).map((candidate) => candidate.id),
+    [DEFAULT_PLACEMENT_CONFIG_ID, ENVIRONMENT_PLACEMENT_CONFIG_ID],
+    'placement configs should be discoverable by episode code',
+  );
+  assert.deepEqual(getPlacementConfigsForEpisode(EPISODE_IDS.Crisis), [], 'EP1 should not expose placement configs yet');
   const environmentConfig = getPlacementConfig(ENVIRONMENT_PLACEMENT_CONFIG_ID);
   assert.equal(environmentConfig.id, ENVIRONMENT_PLACEMENT_CONFIG_ID);
   assert.equal(environmentConfig.requiredPlacements, 2);

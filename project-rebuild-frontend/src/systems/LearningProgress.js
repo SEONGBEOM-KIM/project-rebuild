@@ -1,5 +1,7 @@
+import { CURRENT_EPISODE } from '../data/episodes.js';
+
 const INITIAL_PROGRESS = Object.freeze({
-  episode: 1,
+  episode: CURRENT_EPISODE.id,
   exploredPlaces: [],
   dataViewed: false,
   quizResult: null,
