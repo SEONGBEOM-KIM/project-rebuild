@@ -13,7 +13,19 @@ export default class LearningApiPayloadManager {
     };
   }
 
+  static buildSummaryPlacementContext(learningData) {
+    const context = learningData.summary?.placementContext;
+    return {
+      placement_config_id: context?.placementConfigId ?? learningData.placementConfig?.id ?? null,
+      placement_config_title: context?.placementConfigTitle ?? learningData.placementConfig?.title ?? null,
+      required_placements: context?.requiredPlacements ?? learningData.placementConfig?.requiredPlacements ?? null,
+      evaluation_profile_id: context?.evaluationProfileId ?? learningData.evaluationProfile?.id ?? null,
+    };
+  }
+
   static build(learningData) {
+    const summaryPlacementContext = LearningApiPayloadManager.buildSummaryPlacementContext(learningData);
+
     return {
       schema_version: 1,
       episode_id: learningData.episode,
@@ -28,6 +40,7 @@ export default class LearningApiPayloadManager {
         priority_issue: learningData.summary.priorityIssue,
         selected_policy_name: learningData.summary.selectedPolicyName,
         selected_strategy_title: learningData.summary.selectedStrategyTitle,
+        placement_context: summaryPlacementContext,
         placement_count: learningData.summary.placementCount,
         next_action: learningData.summary.nextAction,
       } : null,
@@ -104,6 +117,30 @@ export default class LearningApiPayloadManager {
         ok: payload.summary == null || Boolean(payload.summary?.outcome_type),
         label: '요약 구조 확인',
         message: 'summary.outcome_type 값이 없습니다.',
+      },
+      {
+        ok: payload.summary?.placement_context == null || Boolean(payload.summary.placement_context.placement_config_id),
+        label: '요약 배치 설정 확인',
+        message: 'summary.placement_context.placement_config_id 값이 없습니다.',
+      },
+      {
+        ok: payload.summary?.placement_context == null || Boolean(payload.summary.placement_context.evaluation_profile_id),
+        label: '요약 평가 기준 확인',
+        message: 'summary.placement_context.evaluation_profile_id 값이 없습니다.',
+      },
+      {
+        ok: payload.summary?.placement_context?.placement_config_id == null
+          || payload.placement_config?.id == null
+          || payload.summary.placement_context.placement_config_id === payload.placement_config.id,
+        label: '요약-배치 설정 연결 확인',
+        message: 'summary.placement_context.placement_config_id와 placement_config.id가 다릅니다.',
+      },
+      {
+        ok: payload.summary?.placement_context?.evaluation_profile_id == null
+          || payload.evaluation_profile?.id == null
+          || payload.summary.placement_context.evaluation_profile_id === payload.evaluation_profile.id,
+        label: '요약-평가 프로필 연결 확인',
+        message: 'summary.placement_context.evaluation_profile_id와 evaluation_profile.id가 다릅니다.',
       },
       {
         ok: Array.isArray(payload.learning_steps?.explored_places),

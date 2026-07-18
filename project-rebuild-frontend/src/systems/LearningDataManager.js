@@ -41,6 +41,8 @@ export default class LearningDataManager {
         selectedStrategy,
         placedBuildings,
         reflectionChoice,
+        placementConfig,
+        evaluationProfile,
       }),
       exploredPlaces: progress.exploredPlaces,
       exploredPlaceNames,
@@ -92,7 +94,16 @@ export default class LearningDataManager {
     };
   }
 
-  static buildSummary({ ending, issues, selectedPolicy, selectedStrategy, placedBuildings, reflectionChoice }) {
+  static buildPlacementContextSummary(placementConfig, evaluationProfile) {
+    return {
+      placementConfigId: placementConfig?.id ?? null,
+      placementConfigTitle: placementConfig?.title ?? null,
+      requiredPlacements: placementConfig?.requiredPlacements ?? null,
+      evaluationProfileId: evaluationProfile?.id ?? null,
+    };
+  }
+
+  static buildSummary({ ending, issues, selectedPolicy, selectedStrategy, placedBuildings, reflectionChoice, placementConfig = null, evaluationProfile = null }) {
     const priorityIssue = issues[0] ?? null;
     return {
       outcomeType: ending.title,
@@ -103,6 +114,7 @@ export default class LearningDataManager {
       } : null,
       selectedPolicyName: selectedPolicy?.name ?? null,
       selectedStrategyTitle: selectedStrategy?.title ?? null,
+      placementContext: LearningDataManager.buildPlacementContextSummary(placementConfig, evaluationProfile),
       placementCount: placedBuildings.length,
       nextAction: reflectionChoice ? {
         id: reflectionChoice.id,
@@ -138,6 +150,16 @@ export default class LearningDataManager {
         ok: Boolean(data.summary?.outcomeType),
         label: '학습 결론 요약',
         message: 'summary.outcomeType 결론 요약이 없습니다.',
+      },
+      {
+        ok: data.summary?.placementContext == null || Boolean(data.summary.placementContext.placementConfigId),
+        label: '요약 배치 설정 확인',
+        message: 'summary.placementContext.placementConfigId 값이 없습니다.',
+      },
+      {
+        ok: data.summary?.placementContext == null || Boolean(data.summary.placementContext.evaluationProfileId),
+        label: '요약 평가 기준 확인',
+        message: 'summary.placementContext.evaluationProfileId 값이 없습니다.',
       },
       {
         ok: Array.isArray(data.exploredPlaces) && data.exploredPlaces.length >= 3,

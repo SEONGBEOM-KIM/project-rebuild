@@ -142,6 +142,12 @@ function createCompleteLearningData(overrides = {}) {
       priorityIssue: null,
       selectedPolicyName: '녹색 회복 계획',
       selectedStrategyTitle: '균형 성장',
+      placementContext: {
+        placementConfigId: DEFAULT_PLACEMENT_CONFIG_ID,
+        placementConfigTitle: '푸른군 인구 회복 배치 실험',
+        requiredPlacements: 3,
+        evaluationProfileId: DEFAULT_EVALUATION_PROFILE_ID,
+      },
       placementCount: 1,
       nextAction: { id: 'environment', title: '환경 보완', label: '개발 효과와 환경 부담 비교' },
     },
@@ -3308,6 +3314,12 @@ function testLearningDataManager() {
   assert.equal(data.placements.length, 3);
   assert.equal(data.summary.selectedPolicyName, '청년 생활 지원');
   assert.equal(data.summary.selectedStrategyTitle, '일자리와 생활 기반');
+  assert.deepEqual(data.summary.placementContext, {
+    placementConfigId: DEFAULT_PLACEMENT_CONFIG_ID,
+    placementConfigTitle: '푸른군 인구 회복 배치 실험',
+    requiredPlacements: 3,
+    evaluationProfileId: DEFAULT_EVALUATION_PROFILE_ID,
+  });
   assert.equal(data.selectedStrategy.id, 'jobs_services');
   assert.equal(data.selectedStrategy.placementConfigId, DEFAULT_PLACEMENT_CONFIG_ID);
   assert.equal(data.placementConfig.id, DEFAULT_PLACEMENT_CONFIG_ID);
@@ -3323,6 +3335,12 @@ function testLearningDataManager() {
   assert.equal(alternateData.placementConfig.requiredPlacements, 2);
   assert.deepEqual(alternateData.placementConfig.stateKeys, ['environment', 'pollution', 'budget']);
   assert.equal(alternateData.evaluationProfile.id, ENVIRONMENT_EVALUATION_PROFILE_ID);
+  assert.deepEqual(alternateData.summary.placementContext, {
+    placementConfigId: ENVIRONMENT_PLACEMENT_CONFIG_ID,
+    placementConfigTitle: '푸른군 환경 균형 배치 실험',
+    requiredPlacements: 2,
+    evaluationProfileId: ENVIRONMENT_EVALUATION_PROFILE_ID,
+  });
   assert.equal(alternateData.selectedStrategy.placementConfigId, ENVIRONMENT_PLACEMENT_CONFIG_ID);
   registry.set('placementConfigId', DEFAULT_PLACEMENT_CONFIG_ID);
 
@@ -3330,6 +3348,10 @@ function testLearningDataManager() {
   assert.equal(LearningDataManager.validate({ ...data, summary: null }).some((row) => !row.ok && row.label === '학습 결론 요약'), true);
   assert.equal(LearningDataManager.validate({ ...data, selectedStrategy: null }).every((row) => row.ok), true, 'saved data without selectedStrategy should be accepted when policy maps to an EP2 strategy');
   assert.equal(LearningDataManager.validate({ ...data, selectedPolicy: null, selectedStrategy: null }).some((row) => !row.ok && row.label === 'EP2 전략 선택'), true);
+  assert.equal(LearningDataManager.validate({
+    ...data,
+    summary: { ...data.summary, placementContext: { ...data.summary.placementContext, placementConfigId: null } },
+  }).some((row) => !row.ok && row.label === '요약 배치 설정 확인'), true);
 
   const incompleteData = { ...data, reflectionChoice: null };
   assert.equal(LearningDataManager.isReadyToSave(incompleteData), false);
@@ -3434,6 +3456,12 @@ function testLearningApiPayloadManager() {
   assert.equal(payload.summary.outcome_type, '환경 우선 회복안');
   assert.equal(payload.summary.next_action.label, '개발 효과와 환경 부담 비교');
   assert.equal(payload.summary.selected_strategy_title, '균형 성장');
+  assert.deepEqual(payload.summary.placement_context, {
+    placement_config_id: DEFAULT_PLACEMENT_CONFIG_ID,
+    placement_config_title: '푸른군 인구 회복 배치 실험',
+    required_placements: 3,
+    evaluation_profile_id: DEFAULT_EVALUATION_PROFILE_ID,
+  });
   assert.equal(payload.selected_strategy.id, 'balanced_growth');
   assert.equal(payload.selected_strategy.policy_id, 'green_recovery');
   assert.equal(payload.selected_strategy.placement_config_id, DEFAULT_PLACEMENT_CONFIG_ID);
@@ -3460,11 +3488,21 @@ function testLearningApiPayloadManager() {
       evaluationProfileId: ENVIRONMENT_EVALUATION_PROFILE_ID,
     },
     evaluationProfile: { id: ENVIRONMENT_EVALUATION_PROFILE_ID },
+    summary: {
+      ...learningData.summary,
+      placementContext: {
+        placementConfigId: ENVIRONMENT_PLACEMENT_CONFIG_ID,
+        placementConfigTitle: '푸른군 환경 균형 배치 실험',
+        requiredPlacements: 2,
+        evaluationProfileId: ENVIRONMENT_EVALUATION_PROFILE_ID,
+      },
+    },
   }));
   assert.equal(alternatePayload.selected_strategy.placement_config_id, ENVIRONMENT_PLACEMENT_CONFIG_ID);
   assert.equal(alternatePayload.placement_config.required_placements, 2);
   assert.deepEqual(alternatePayload.placement_config.state_keys, ['environment', 'pollution', 'budget']);
   assert.equal(alternatePayload.evaluation_profile.id, ENVIRONMENT_EVALUATION_PROFILE_ID);
+  assert.equal(alternatePayload.summary.placement_context.placement_config_id, ENVIRONMENT_PLACEMENT_CONFIG_ID);
   assert.equal(LearningApiPayloadManager.validate(alternatePayload).every((row) => row.ok), true);
 
   const invalidPlacementConfig = LearningApiPayloadManager.validate({
@@ -3478,6 +3516,24 @@ function testLearningApiPayloadManager() {
     episode_context: { current: {}, placement: payload.episode_context.placement },
   });
   assert.equal(invalidEpisodeContext.find((row) => row.label === '현재 에피소드 메타 확인').ok, false);
+
+  const mismatchedSummaryContext = LearningApiPayloadManager.validate({
+    ...payload,
+    summary: {
+      ...payload.summary,
+      placement_context: { ...payload.summary.placement_context, placement_config_id: ENVIRONMENT_PLACEMENT_CONFIG_ID },
+    },
+  });
+  assert.equal(mismatchedSummaryContext.find((row) => row.label === '요약-배치 설정 연결 확인').ok, false);
+
+  const mismatchedSummaryProfile = LearningApiPayloadManager.validate({
+    ...payload,
+    summary: {
+      ...payload.summary,
+      placement_context: { ...payload.summary.placement_context, evaluation_profile_id: ENVIRONMENT_EVALUATION_PROFILE_ID },
+    },
+  });
+  assert.equal(mismatchedSummaryProfile.find((row) => row.label === '요약-평가 프로필 연결 확인').ok, false);
 
   const mismatchedConfig = LearningApiPayloadManager.validate({
     ...payload,
@@ -3637,6 +3693,12 @@ function testLearningDataRestoreManager() {
       priorityIssue: null,
       selectedPolicyName: '녹색 회복 계획',
       selectedStrategyTitle: '균형 성장',
+      placementContext: {
+        placementConfigId: DEFAULT_PLACEMENT_CONFIG_ID,
+        placementConfigTitle: '푸른군 인구 회복 배치 실험',
+        requiredPlacements: 3,
+        evaluationProfileId: DEFAULT_EVALUATION_PROFILE_ID,
+      },
       placementCount: 1,
       nextAction: { id: 'environment', title: '환경 보완', label: '개발 효과와 환경 부담 비교' },
     },
@@ -3965,6 +4027,12 @@ function testSaveImport() {
       priorityIssue: null,
       selectedPolicyName: '녹색 회복 계획',
       selectedStrategyTitle: '균형 성장',
+      placementContext: {
+        placementConfigId: DEFAULT_PLACEMENT_CONFIG_ID,
+        placementConfigTitle: '푸른군 인구 회복 배치 실험',
+        requiredPlacements: 3,
+        evaluationProfileId: DEFAULT_EVALUATION_PROFILE_ID,
+      },
       placementCount: 1,
       nextAction: { id: 'environment', title: '환경 보완', label: '개발 효과와 환경 부담 비교' },
     },

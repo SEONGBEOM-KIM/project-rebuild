@@ -196,8 +196,9 @@ export default class LearningDataViewManager {
     const strategyText = summary.selectedStrategyTitle ?? learningData.selectedStrategy?.title ?? 'EP2 전략 미선택';
     const currentEpisodeText = learningData.episodeContext?.current?.shortTitle ?? `EP${learningData.episode}`;
     const placementEpisodeText = learningData.episodeContext?.placement?.shortTitle ?? '배치 실험 미지정';
-    const configText = learningData.placementConfig?.id ?? 'config 없음';
-    const profileText = learningData.evaluationProfile?.id ?? 'profile 없음';
+    const placementContext = summary.placementContext;
+    const configText = placementContext?.placementConfigId ?? learningData.placementConfig?.id ?? 'config 없음';
+    const profileText = placementContext?.evaluationProfileId ?? learningData.evaluationProfile?.id ?? 'profile 없음';
     return [
       `${summary.outcomeType}: ${summary.outcomeMessage}`,
       `${currentEpisodeText} → ${placementEpisodeText} / ${configText} / ${profileText}`,
