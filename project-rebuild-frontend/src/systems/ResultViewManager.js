@@ -4,7 +4,8 @@ const RESULT_SCREEN_LAYOUT = {
   backgroundColor: 0x1e1b4b,
   progressStep: 'result',
   title: { y: 82, text: '종합 결과', fontSize: '60px', color: '#ffffff', fontStyle: 'bold' },
-  evaluationTitle: { y: 150 },
+  evaluationTitle: { y: 142 },
+  contextSummary: { y: 184, wordWrapWidth: 1320 },
 };
 
 const RESULT_PANEL_STYLE = {
@@ -25,6 +26,7 @@ const RESIDENT_REACTION_STYLE = {
 
 const RESULT_TEXT_STYLES = {
   evaluationTitle: { fontSize: '30px', align: 'center', fontStyle: 'bold' },
+  contextSummary: { fontSize: '22px', color: '#c7d2fe', align: 'center' },
   residentTitle: { fontSize: '25px', color: '#fde68a', fontStyle: 'bold' },
   residentBody: { fontSize: '23px', color: '#ffffff', lineSpacing: 6 },
   panelTitle: { fontSize: '32px', color: '#312e81', fontStyle: 'bold' },
@@ -42,6 +44,7 @@ export default class ResultViewManager {
       progressStep: RESULT_SCREEN_LAYOUT.progressStep,
       title: { x: width / 2, ...RESULT_SCREEN_LAYOUT.title },
       evaluationTitle: { x: width / 2, ...RESULT_SCREEN_LAYOUT.evaluationTitle },
+      contextSummary: { x: width / 2, ...RESULT_SCREEN_LAYOUT.contextSummary },
     };
   }
 
@@ -58,6 +61,18 @@ export default class ResultViewManager {
       ...RESULT_TEXT_STYLES.evaluationTitle,
       color,
     };
+  }
+
+  static formatContextSummary(placementConfig, evaluationProfile) {
+    return [
+      placementConfig?.title ?? '배치 실험',
+      `필요 배치: ${placementConfig?.requiredPlacements ?? '-'}개`,
+      `평가 기준: ${evaluationProfile?.id ?? '기본'}`,
+    ].join('  |  ');
+  }
+
+  static getContextSummaryTextStyle() {
+    return { ...RESULT_TEXT_STYLES.contextSummary };
   }
 
   static getResidentReactionTextStyles() {

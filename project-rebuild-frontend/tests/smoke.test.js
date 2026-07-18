@@ -1353,6 +1353,11 @@ function testResultViewManager() {
     fontStyle: 'bold',
   });
   assert.equal(ResultViewManager.getScreenLayout(1920).progressStep, 'result');
+  assert.deepEqual(ResultViewManager.getScreenLayout(1920).contextSummary, {
+    x: 960,
+    y: 184,
+    wordWrapWidth: 1320,
+  });
   assert.equal(ResultViewManager.getPanelStyle().yOffset, 230);
   assert.equal(ResultViewManager.getResidentReactionStyle().title, '주민 반응');
   const panels = ResultViewManager.getPanelLayout(960);
@@ -1364,6 +1369,15 @@ function testResultViewManager() {
   assert.equal(ResultViewManager.getPanelBodyStyle(panels.evaluation).fontSize, '19px');
   assert.equal(ResultViewManager.getPanelBodyStyle(panels.trend).lineSpacing, 3);
   assert.equal(ResultViewManager.getPanelBodyStyle(panels.beforeAfter).fontSize, '22px');
+  assert.equal(
+    ResultViewManager.formatContextSummary(getPlacementConfig(ENVIRONMENT_PLACEMENT_CONFIG_ID), getEvaluationProfile(ENVIRONMENT_EVALUATION_PROFILE_ID)),
+    '푸른군 환경 균형 배치 실험  |  필요 배치: 2개  |  평가 기준: ep2_environment_focus',
+  );
+  assert.deepEqual(ResultViewManager.getContextSummaryTextStyle(), {
+    fontSize: '22px',
+    color: '#c7d2fe',
+    align: 'center',
+  });
   assert.deepEqual(ResultViewManager.getEvaluationTitleTextStyle('#22c55e'), {
     fontSize: '30px',
     align: 'center',
@@ -2464,6 +2478,7 @@ function testPlacementViewManager() {
   assert.match(resultSceneSource, /formatEvaluationRows\(evaluation, gameState, placedBuildings, selectedPolicy, selectedStrategy, evaluationProfile\)/, 'result scene should pass evaluation profile into result copy');
   assert.match(resultSceneSource, /formatResidentReactions\(gameState, placedBuildings, evaluationProfile\)/, 'result scene should pass evaluation profile into resident reactions');
   assert.match(resultSceneSource, /stateKeys/, 'result scene should apply state display keys from active placement config');
+  assert.match(resultSceneSource, /formatContextSummary\(placementConfig, evaluationProfile\)/, 'result scene should display active placement context summary');
   const sideEffectSceneSource = readProjectFile('src', 'scenes', 'SideEffectScene.js');
   assert.match(sideEffectSceneSource, /PlacementContextManager/, 'side effect scene should resolve active placement context');
   assert.match(sideEffectSceneSource, /IssueDetector\.detect\(gameState, evaluationProfile\)/, 'side effect scene should detect issues with active evaluation profile');

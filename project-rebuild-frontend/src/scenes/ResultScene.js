@@ -43,6 +43,11 @@ export default class ResultScene extends Phaser.Scene {
       style: ResultViewManager.getEvaluationTitleTextStyle(evaluation.color),
       origin: 0.5,
     });
+    createLayoutText(this, layout.contextSummary, {
+      text: ResultViewManager.formatContextSummary(placementConfig, evaluationProfile),
+      style: ResultViewManager.getContextSummaryTextStyle(),
+      origin: 0.5,
+    });
 
     const panels = ResultViewManager.getPanelLayout(width / 2);
     ResultRenderer.renderStatePanel(this, panels.beforeAfter, EvaluationManager.formatBeforeAfterRows(lastPlacementResult, gameState, undefined, placementConfig.stateKeys));
