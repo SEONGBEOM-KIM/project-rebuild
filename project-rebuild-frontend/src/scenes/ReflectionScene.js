@@ -28,7 +28,7 @@ export default class ReflectionScene extends Phaser.Scene {
       this.registry.get(REGISTRY_KEYS.selectedPlacementStrategy) ?? learningProgress.selectedStrategyId,
       selectedPolicy?.id,
     );
-    const { evaluationProfile } = PlacementContextManager.resolve({
+    const { placementConfig, evaluationProfile } = PlacementContextManager.resolve({
       registry: this.registry,
       progress: learningProgress,
       selectedStrategy,
@@ -45,6 +45,11 @@ export default class ReflectionScene extends Phaser.Scene {
     createLayoutText(this, layout.title, { origin: 0.5 });
 
     createLayoutText(this, layout.subtitle, { origin: 0.5 });
+    createLayoutText(this, layout.contextSummary, {
+      text: ReflectionViewManager.formatContextSummary(placementConfig, evaluationProfile),
+      style: ReflectionViewManager.getContextSummaryTextStyle(),
+      origin: 0.5,
+    });
 
     ReflectionRenderer.renderRunSummary(this, { gameState, issues, selectedPolicy, selectedStrategy, placedBuildings }, layout);
 

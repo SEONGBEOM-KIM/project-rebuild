@@ -4,10 +4,11 @@ const REFLECTION_SCREEN_LAYOUT = {
   backgroundColor: 0x172554,
   progressStep: 'ending',
   title: { y: 82, text: '생각 정리', fontSize: '60px', color: '#ffffff', fontStyle: 'bold' },
-  subtitle: { y: 150, text: '이번 선택을 돌아보고, 다음 개발에서 가장 먼저 보완할 부분을 고르세요.', fontSize: '27px', color: '#bfdbfe' },
-  summaryPanel: { x: 960, y: 238, width: 1510, height: 96, strokeColor: 0x93c5fd },
-  summaryTitle: { x: 265, y: 205, text: '이번 결과 요약' },
-  summaryBody: { x: 470, y: 204, wordWrapWidth: 1240 },
+  subtitle: { y: 142, text: '이번 선택을 돌아보고, 다음 개발에서 가장 먼저 보완할 부분을 고르세요.', fontSize: '27px', color: '#bfdbfe' },
+  contextSummary: { y: 184, wordWrapWidth: 1320 },
+  summaryPanel: { x: 960, y: 260, width: 1510, height: 96, strokeColor: 0x93c5fd },
+  summaryTitle: { x: 265, y: 227, text: '이번 결과 요약' },
+  summaryBody: { x: 470, y: 226, wordWrapWidth: 1240 },
   feedback: { y: 825, wordWrapWidth: 1150 },
 };
 
@@ -23,6 +24,12 @@ const REFLECTION_CHOICE_CARD_LAYOUT = {
   iconOffset: { x: -250, y: -35 },
   titleOffset: { x: -200, y: -62 },
   descriptionOffset: { x: -200, y: -12, wordWrapWidth: 470 },
+};
+
+const REFLECTION_CONTEXT_TEXT_STYLE = {
+  fontSize: '21px',
+  color: '#c7d2fe',
+  align: 'center',
 };
 
 const REFLECTION_SUMMARY_TEXT_STYLES = {
@@ -55,11 +62,24 @@ export default class ReflectionViewManager {
       progressStep: REFLECTION_SCREEN_LAYOUT.progressStep,
       title: { x: width / 2, ...REFLECTION_SCREEN_LAYOUT.title },
       subtitle: { x: width / 2, ...REFLECTION_SCREEN_LAYOUT.subtitle },
+      contextSummary: { x: width / 2, ...REFLECTION_SCREEN_LAYOUT.contextSummary },
       summaryPanel: { ...REFLECTION_SCREEN_LAYOUT.summaryPanel, x: width / 2 },
       summaryTitle: { ...REFLECTION_SCREEN_LAYOUT.summaryTitle },
       summaryBody: { ...REFLECTION_SCREEN_LAYOUT.summaryBody },
       feedback: { x: width / 2, ...REFLECTION_SCREEN_LAYOUT.feedback },
     };
+  }
+
+  static formatContextSummary(placementConfig, evaluationProfile) {
+    return [
+      placementConfig?.title ?? '배치 실험',
+      `필요 배치: ${placementConfig?.requiredPlacements ?? '-'}개`,
+      `평가 기준: ${evaluationProfile?.id ?? '기본'}`,
+    ].join('  |  ');
+  }
+
+  static getContextSummaryTextStyle() {
+    return { ...REFLECTION_CONTEXT_TEXT_STYLE };
   }
 
   static getChoiceCardLayout(x, y) {

@@ -958,9 +958,19 @@ function testReflectionViewManager() {
     fontStyle: 'bold',
   });
   assert.equal(ReflectionViewManager.getScreenLayout(1920).progressStep, 'ending');
-  assert.deepEqual(ReflectionViewManager.getScreenLayout(1920).summaryPanel, { x: 960, y: 238, width: 1510, height: 96, strokeColor: 0x93c5fd });
+  assert.deepEqual(ReflectionViewManager.getScreenLayout(1920).contextSummary, { x: 960, y: 184, wordWrapWidth: 1320 });
+  assert.deepEqual(ReflectionViewManager.getScreenLayout(1920).summaryPanel, { x: 960, y: 260, width: 1510, height: 96, strokeColor: 0x93c5fd });
   assert.equal(ReflectionViewManager.getScreenLayout(1920).summaryTitle.text, '이번 결과 요약');
   assert.deepEqual(ReflectionViewManager.getScreenLayout(1920).feedback, { x: 960, y: 825, wordWrapWidth: 1150 });
+  assert.equal(
+    ReflectionViewManager.formatContextSummary(getPlacementConfig(ENVIRONMENT_PLACEMENT_CONFIG_ID), getEvaluationProfile(ENVIRONMENT_EVALUATION_PROFILE_ID)),
+    '푸른군 환경 균형 배치 실험  |  필요 배치: 2개  |  평가 기준: ep2_environment_focus',
+  );
+  assert.deepEqual(ReflectionViewManager.getContextSummaryTextStyle(), {
+    fontSize: '21px',
+    color: '#c7d2fe',
+    align: 'center',
+  });
   assert.deepEqual(ReflectionViewManager.getFeedbackTextStyle('initial', 1150), {
     fontSize: '28px',
     align: 'center',
@@ -2505,6 +2515,7 @@ function testPlacementViewManager() {
   assert.match(reflectionSceneSource, /selectedStrategyId/, 'reflection scene should recover EP2 strategy from learning progress');
   assert.match(reflectionSceneSource, /PlacementContextManager/, 'reflection scene should resolve active placement context');
   assert.match(reflectionSceneSource, /IssueDetector\.detect\(gameState, evaluationProfile\)/, 'reflection scene should detect issues with active evaluation profile');
+  assert.match(reflectionSceneSource, /formatContextSummary\(placementConfig, evaluationProfile\)/, 'reflection scene should display active placement context summary');
   const placementBootstrapSource = readProjectFile('src', 'systems', 'PlacementSceneBootstrap.js');
   assert.match(placementBootstrapSource, /PlacementUiCamera/, 'placement bootstrap should render fixed UI through a separate UI camera');
   assert.match(placementBootstrapSource, /objectRegistry\.ignoreUiObjectsOnMainCamera\(\)/, 'world camera should ignore fixed UI objects through registry');
