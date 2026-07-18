@@ -79,7 +79,7 @@ import { mapData } from '../src/data/mapData.js';
 import { DEFAULT_PLACEMENT_CONFIG_ID, ENVIRONMENT_PLACEMENT_CONFIG_ID, episodePlacementConfigs, getPlacementConfig, getPlacementConfigIdForStrategy } from '../src/data/episodePlacementConfigs.js';
 import { DEFAULT_EVALUATION_PROFILE_ID, ENVIRONMENT_EVALUATION_PROFILE_ID, ISSUE_THRESHOLDS, REACTION_THRESHOLDS, RESULT_THRESHOLDS, SCORE_RULES, evaluationProfiles, getEvaluationProfile } from '../src/data/evaluationRules.js';
 import { API_CONTRACT, formatContractRequest, formatContractResponse } from '../src/data/apiContract.js';
-import { CURRENT_EPISODE, EPISODE_STEPS } from '../src/data/episodes.js';
+import { CURRENT_EPISODE, CURRENT_PLACEMENT_EPISODE, EPISODE_IDS, EPISODES, EPISODE_STEPS, getEpisode, getEpisodeStep } from '../src/data/episodes.js';
 import SCENE_KEYS from '../src/data/sceneKeys.js';
 import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES, EP2_MISSION_BRIEFING } from '../src/data/episodeContent.js';
 import ProgressStepper from '../src/ui/ProgressStepper.js';
@@ -374,9 +374,20 @@ function testBootFlowManager() {
 
 function testEpisodeMetadata() {
   assert.equal(CURRENT_EPISODE.id, 1);
+  assert.equal(CURRENT_EPISODE.code, EPISODE_IDS.Crisis);
   assert.equal(CURRENT_EPISODE.regionName, '푸른군');
   assert.equal(CURRENT_EPISODE.requiredExploredCount, 3);
   assert.ok(CURRENT_EPISODE.intro.length >= 3, 'episode intro should provide story lines');
+  assert.equal(CURRENT_PLACEMENT_EPISODE.id, 2);
+  assert.equal(CURRENT_PLACEMENT_EPISODE.code, EPISODE_IDS.PopulationRecovery);
+  assert.match(CURRENT_PLACEMENT_EPISODE.shortTitle, /EP2/);
+  assert.equal(EPISODES[EPISODE_IDS.Crisis], CURRENT_EPISODE);
+  assert.equal(EPISODES[EPISODE_IDS.PopulationRecovery], CURRENT_PLACEMENT_EPISODE);
+  assert.equal(getEpisode('ep1'), CURRENT_EPISODE);
+  assert.equal(getEpisode(1), CURRENT_EPISODE);
+  assert.equal(getEpisode('ep2'), CURRENT_PLACEMENT_EPISODE);
+  assert.equal(getEpisode(2), CURRENT_PLACEMENT_EPISODE);
+  assert.equal(getEpisode('missing'), CURRENT_EPISODE);
   assert.deepEqual(EPISODE_STEPS.map((step) => step.key), [
     'exploration',
     'data',
@@ -388,6 +399,8 @@ function testEpisodeMetadata() {
     'ending',
   ]);
   assert.equal(new Set(EPISODE_STEPS.map((step) => step.key)).size, EPISODE_STEPS.length, 'step keys should be unique');
+  assert.equal(getEpisodeStep('placement').label, '배치');
+  assert.equal(getEpisodeStep('missing'), null);
 }
 
 

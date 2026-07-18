@@ -5,6 +5,9 @@
 
 ## 핵심 파일
 
+- `project-rebuild-frontend/src/data/episodes.js`
+  - EP1/EP2 같은 에피소드 메타데이터 registry
+  - `CURRENT_EPISODE`는 현재 학습 도입/탐색 기준, `CURRENT_PLACEMENT_EPISODE`는 현재 배치 실험 기준이다.
 - `project-rebuild-frontend/src/data/episodePlacementConfigs.js`
   - 에피소드/전략별 배치 설정
   - `map`, `buildings`, `requiredPlacements`, `stateKeys`, `evaluationProfileId`를 가진다.
@@ -16,12 +19,13 @@
 
 ## 새 에피소드/전략 config 추가 순서
 
-1. 필요한 시설 목록을 `src/data/buildings.js` 또는 별도 data 파일로 준비한다.
-2. 필요한 지도 데이터를 `src/data/mapData.js` 또는 별도 data 파일로 준비한다.
-3. 필요하면 `src/data/evaluationRules.js`에 새 evaluation profile ID를 추가한다.
-4. `src/data/episodePlacementConfigs.js`에 새 placement config ID를 추가한다.
-5. 전략에서 해당 config를 쓰게 하려면 `src/data/episodeContent.js`의 strategy에 `placementConfigId`를 연결한다.
-6. `npm --prefix project-rebuild-frontend run verify`로 smoke/build를 통과시킨다.
+1. `src/data/episodes.js`에 에피소드 ID/메타데이터를 추가한다.
+2. 필요한 시설 목록을 `src/data/buildings.js` 또는 별도 data 파일로 준비한다.
+3. 필요한 지도 데이터를 `src/data/mapData.js` 또는 별도 data 파일로 준비한다.
+4. 필요하면 `src/data/evaluationRules.js`에 새 evaluation profile ID를 추가한다.
+5. `src/data/episodePlacementConfigs.js`에 새 placement config ID를 추가한다.
+6. 전략에서 해당 config를 쓰게 하려면 `src/data/episodeContent.js`의 strategy에 `placementConfigId`를 연결한다.
+7. `npm --prefix project-rebuild-frontend run verify`로 smoke/build를 통과시킨다.
 
 ## config 필드 의미
 
