@@ -3777,10 +3777,23 @@ function testStorageSummaryManager() {
     },
   });
   assert.equal(savedRows[0], '상태: 저장 데이터 있음');
-  assert.ok(savedRows.includes('Episode: 1'));
+  assert.ok(savedRows.includes('학습 흐름: Episode: 1'));
+  assert.ok(savedRows.includes('배치 실험: 배치 실험 미지정'));
+  assert.ok(savedRows.includes('배치 설정: config 없음'));
+  assert.ok(savedRows.includes('평가 기준: profile 없음'));
   assert.ok(savedRows.includes('탐색 장소: 3곳'));
   assert.ok(savedRows.includes('배치 기록: 1개'));
   assert.ok(savedRows.includes('완료 여부: 완료'));
+
+  const fullSavedRows = StorageSummaryManager.formatSavedDataRows({
+    savedAt: '2026-07-12T10:00:00+09:00',
+    version: 1,
+    data: createCompleteLearningData(),
+  });
+  assert.ok(fullSavedRows.includes('학습 흐름: EP1. 지역 위기 탐색'));
+  assert.ok(fullSavedRows.includes('배치 실험: EP2. 인구 유입 전략'));
+  assert.ok(fullSavedRows.includes(`배치 설정: ${DEFAULT_PLACEMENT_CONFIG_ID}`));
+  assert.ok(fullSavedRows.includes(`평가 기준: ${DEFAULT_EVALUATION_PROFILE_ID}`));
 
   assert.deepEqual(StorageSummaryManager.formatSubmissionRows([]), [
     '상태: 제출 로그 없음',
@@ -3791,8 +3804,18 @@ function testStorageSummaryManager() {
   const submissionRows = StorageSummaryManager.formatSubmissionRows([{ id: 'mock-1', submittedAt: '2026-07-12T10:00:00+09:00', method: 'POST', endpoint: '/api/learning-records/', payload: { episode_id: 1, placements: [{ order: 1 }] } }]);
   assert.equal(submissionRows[0], '총 로그: 1건');
   assert.ok(submissionRows.includes('ID: mock-1'));
-  assert.ok(submissionRows.includes('Episode: 1'));
+  assert.ok(submissionRows.includes('학습 흐름: Episode: 1'));
+  assert.ok(submissionRows.includes('배치 실험: 배치 실험 미지정'));
+  assert.ok(submissionRows.includes('배치 설정: config 없음'));
+  assert.ok(submissionRows.includes('평가 기준: profile 없음'));
   assert.ok(submissionRows.includes('배치 기록: 1개'));
+
+  const fullPayload = LearningApiPayloadManager.build(createCompleteLearningData());
+  const fullSubmissionRows = StorageSummaryManager.formatSubmissionRows([{ id: 'mock-2', submittedAt: '2026-07-12T10:00:00+09:00', method: 'POST', endpoint: '/api/learning-records/', payload: fullPayload }]);
+  assert.ok(fullSubmissionRows.includes('학습 흐름: EP1. 지역 위기 탐색'));
+  assert.ok(fullSubmissionRows.includes('배치 실험: EP2. 인구 유입 전략'));
+  assert.ok(fullSubmissionRows.includes(`배치 설정: ${DEFAULT_PLACEMENT_CONFIG_ID}`));
+  assert.ok(fullSubmissionRows.includes(`평가 기준: ${DEFAULT_EVALUATION_PROFILE_ID}`));
 }
 
 function testSaveImport() {

@@ -20,14 +20,23 @@ export default class StorageSummaryManager {
       ];
     }
 
+    const data = saved.data;
+    const currentEpisodeText = data?.episodeContext?.current?.shortTitle ?? `Episode: ${data?.episode ?? '알 수 없음'}`;
+    const placementEpisodeText = data?.episodeContext?.placement?.shortTitle ?? '배치 실험 미지정';
+    const configText = data?.placementConfig?.id ?? 'config 없음';
+    const profileText = data?.evaluationProfile?.id ?? 'profile 없음';
+
     return [
       '상태: 저장 데이터 있음',
       `저장 시각: ${StorageSummaryManager.formatDate(saved.savedAt)}`,
       `버전: ${saved.version}`,
-      `Episode: ${saved.data?.episode ?? '알 수 없음'}`,
-      `탐색 장소: ${saved.data?.exploredPlaces?.length ?? 0}곳`,
-      `배치 기록: ${saved.data?.placements?.length ?? 0}개`,
-      `완료 여부: ${saved.data?.completed ? '완료' : '미완료'}`,
+      `학습 흐름: ${currentEpisodeText}`,
+      `배치 실험: ${placementEpisodeText}`,
+      `배치 설정: ${configText}`,
+      `평가 기준: ${profileText}`,
+      `탐색 장소: ${data?.exploredPlaces?.length ?? 0}곳`,
+      `배치 기록: ${data?.placements?.length ?? 0}개`,
+      `완료 여부: ${data?.completed ? '완료' : '미완료'}`,
     ];
   }
 
@@ -41,12 +50,20 @@ export default class StorageSummaryManager {
       ];
     }
 
+    const currentEpisodeText = latest.payload?.episode_context?.current?.short_title ?? `Episode: ${latest.payload?.episode_id ?? '알 수 없음'}`;
+    const placementEpisodeText = latest.payload?.episode_context?.placement?.short_title ?? '배치 실험 미지정';
+    const configText = latest.payload?.placement_config?.id ?? 'config 없음';
+    const profileText = latest.payload?.evaluation_profile?.id ?? 'profile 없음';
+
     return [
       `총 로그: ${submissions.length}건`,
       `최근 제출: ${StorageSummaryManager.formatDate(latest.submittedAt)}`,
       `ID: ${latest.id}`,
       `Endpoint: ${latest.method} ${latest.endpoint}`,
-      `Episode: ${latest.payload?.episode_id ?? '알 수 없음'}`,
+      `학습 흐름: ${currentEpisodeText}`,
+      `배치 실험: ${placementEpisodeText}`,
+      `배치 설정: ${configText}`,
+      `평가 기준: ${profileText}`,
       `배치 기록: ${latest.payload?.placements?.length ?? 0}개`,
       '',
       '최근 10건까지만 보관합니다.',
