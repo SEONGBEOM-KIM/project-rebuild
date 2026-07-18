@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
-import { EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
+import { getCurrentPlacementMissionBriefing } from '../data/episodeContent.js';
 import { policies } from '../data/policies.js';
 import { getPlacementConfigIdForStrategy } from '../data/episodePlacementConfigs.js';
 import Ep2BriefingViewManager from '../systems/Ep2BriefingViewManager.js';
@@ -24,7 +24,9 @@ export default class Ep2BriefingScene extends Phaser.Scene {
     this.selectedStrategy = this.getInitialStrategy();
     this.strategyObjects = new Map();
 
-    Ep2BriefingRenderer.renderIntroPanel(this, EP2_MISSION_BRIEFING);
+    this.missionBriefing = getCurrentPlacementMissionBriefing();
+
+    Ep2BriefingRenderer.renderIntroPanel(this, this.missionBriefing);
     this.renderStrategyCards();
     this.selectedStrategyPanel = Ep2BriefingRenderer.renderSelectedStrategyPanel(this, this.selectedStrategy);
 
@@ -38,12 +40,13 @@ export default class Ep2BriefingScene extends Phaser.Scene {
 
   getInitialStrategy() {
     const savedStrategyId = this.registry.get('ep2StrategyId');
-    return Ep2BriefingViewManager.findStrategyById(EP2_MISSION_BRIEFING, savedStrategyId)
-      ?? Ep2BriefingViewManager.getDefaultStrategy(EP2_MISSION_BRIEFING);
+    const missionBriefing = this.missionBriefing ?? getCurrentPlacementMissionBriefing();
+    return Ep2BriefingViewManager.findStrategyById(missionBriefing, savedStrategyId)
+      ?? Ep2BriefingViewManager.getDefaultStrategy(missionBriefing);
   }
 
   renderStrategyCards() {
-    EP2_MISSION_BRIEFING.strategies.forEach((strategy, index) => {
+    this.missionBriefing.strategies.forEach((strategy, index) => {
       const cardObjects = Ep2BriefingRenderer.renderStrategyCard(
         this,
         strategy,
@@ -74,7 +77,7 @@ export default class Ep2BriefingScene extends Phaser.Scene {
   }
 
   applySelectedStrategy() {
-    const strategy = this.selectedStrategy ?? Ep2BriefingViewManager.getDefaultStrategy(EP2_MISSION_BRIEFING);
+    const strategy = this.selectedStrategy ?? Ep2BriefingViewManager.getDefaultStrategy(this.missionBriefing ?? getCurrentPlacementMissionBriefing());
     const policy = policies.find((candidate) => candidate.id === strategy?.policyId);
     if (strategy) {
       this.registry.set('ep2StrategyId', strategy.id);

@@ -6,7 +6,7 @@ import CauseQuizManager from '../systems/CauseQuizManager.js';
 import CauseQuizViewManager from '../systems/CauseQuizViewManager.js';
 import CauseQuizPanelRenderer from '../systems/CauseQuizPanelRenderer.js';
 
-import { EP1_CAUSE_QUESTION, EP1_EXPLORATION_CLUES } from '../data/episodeContent.js';
+import { getCurrentEpisodeContent } from '../data/episodeContent.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 
@@ -35,14 +35,15 @@ export default class CauseQuizScene extends Phaser.Scene {
 
   drawExplorationSummary() {
     const exploredCount = (this.registry.get('exploredPlaces') ?? []).length;
-    const rows = CauseQuizManager.formatExplorationSummaryRows(exploredCount, EP1_EXPLORATION_CLUES);
+    const episodeContent = getCurrentEpisodeContent();
+    const rows = CauseQuizManager.formatExplorationSummaryRows(exploredCount, episodeContent.explorationClues);
     CauseQuizPanelRenderer.renderExplorationSummary(this, rows);
   }
 
   drawQuestionPanel() {
     const renderedPanel = CauseQuizPanelRenderer.renderQuestionPanel(
       this,
-      EP1_CAUSE_QUESTION,
+      getCurrentEpisodeContent().causeQuestion,
       (choice) => this.selectChoice(choice),
     );
     this.choiceObjects = renderedPanel.choiceObjects;
@@ -67,12 +68,12 @@ export default class CauseQuizScene extends Phaser.Scene {
 
   selectChoice(choice) {
     this.selectedChoice = choice;
-    const quizResult = CauseQuizManager.buildQuizResult(EP1_CAUSE_QUESTION, choice);
+    const quizResult = CauseQuizManager.buildQuizResult(getCurrentEpisodeContent().causeQuestion, choice);
     this.registry.set('quizResult', quizResult);
     LearningProgress.update(this.registry, { quizResult });
 
     for (const [choiceId, objects] of this.choiceObjects.entries()) {
-      const style = CauseQuizViewManager.getChoiceVisualStyle(choiceId, choice, EP1_CAUSE_QUESTION);
+      const style = CauseQuizViewManager.getChoiceVisualStyle(choiceId, choice, getCurrentEpisodeContent().causeQuestion);
       objects.background.setFillStyle(style.fillColor, style.fillAlpha);
       objects.background.setStrokeStyle(style.strokeWidth, style.strokeColor);
     }

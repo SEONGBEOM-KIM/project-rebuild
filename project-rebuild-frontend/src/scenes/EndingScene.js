@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
-import { EP1_NEXT_DEVELOPMENT_GOALS, EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
+import { getCurrentEpisodeContent, getCurrentPlacementMissionBriefing } from '../data/episodeContent.js';
 import PlacementContextManager from '../systems/PlacementContextManager.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import EndingSummaryManager from '../systems/EndingSummaryManager.js';
@@ -25,7 +25,7 @@ export default class EndingScene extends Phaser.Scene {
     const quizResult = this.registry.get('quizResult');
     const reflectionChoice = this.registry.get('reflectionChoice');
     const learningProgress = LearningProgress.update(this.registry, { completed: true });
-    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, this.registry.get('ep2StrategyId') ?? learningProgress.selectedStrategyId, selectedPolicy?.id);
+    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(getCurrentPlacementMissionBriefing(), this.registry.get('ep2StrategyId') ?? learningProgress.selectedStrategyId, selectedPolicy?.id);
     const { placementConfig, evaluationProfile } = PlacementContextManager.resolve({
       registry: this.registry,
       progress: learningProgress,
@@ -46,7 +46,7 @@ export default class EndingScene extends Phaser.Scene {
     const panels = EndingSummaryViewManager.getPanelLayout();
     EndingSummaryRenderer.renderPanel(this, panels.choice, EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice, selectedStrategy));
     EndingSummaryRenderer.renderPanel(this, panels.state, EndingSummaryManager.formatStateSummary(gameState, ending, placementConfig.stateKeys, evaluationProfile));
-    EndingSummaryRenderer.renderNextMissionPanel(this, panels.nextMission, EP1_NEXT_DEVELOPMENT_GOALS);
+    EndingSummaryRenderer.renderNextMissionPanel(this, panels.nextMission, getCurrentEpisodeContent().nextDevelopmentGoals);
     EndingSummaryRenderer.renderLearningRecordStrip(
       this,
       width / 2,

@@ -6,7 +6,7 @@ import SideEffectViewManager from '../systems/SideEffectViewManager.js';
 import SideEffectRenderer from '../systems/SideEffectRenderer.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
-import { EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
+import { getCurrentPlacementMissionBriefing } from '../data/episodeContent.js';
 import PlacementContextManager from '../systems/PlacementContextManager.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import Ep2BriefingViewManager from '../systems/Ep2BriefingViewManager.js';
@@ -22,7 +22,7 @@ export default class SideEffectScene extends Phaser.Scene {
     const selectedPolicy = this.registry.get('selectedPolicy');
     const learningProgress = LearningProgress.get(this.registry);
     const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(
-      EP2_MISSION_BRIEFING,
+      getCurrentPlacementMissionBriefing(),
       this.registry.get('ep2StrategyId') ?? learningProgress.selectedStrategyId,
       selectedPolicy?.id,
     );

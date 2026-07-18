@@ -1,4 +1,5 @@
 import { DEFAULT_PLACEMENT_CONFIG_ID } from './episodePlacementConfigs.js';
+import { CURRENT_EPISODE, CURRENT_PLACEMENT_EPISODE, EPISODE_IDS } from './episodes.js';
 export const EP1_DATA_CARDS = [
   {
     id: 'population_change',
@@ -193,3 +194,37 @@ export const EP1_REFLECTION_CHOICES = [
     color: 0xfb7185,
   },
 ];
+
+
+export const EPISODE_CONTENT = Object.freeze({
+  [EPISODE_IDS.Crisis]: Object.freeze({
+    dataCards: EP1_DATA_CARDS,
+    coreConcept: EP1_CORE_CONCEPT,
+    causeQuestion: EP1_CAUSE_QUESTION,
+    explorationClues: EP1_EXPLORATION_CLUES,
+    problemItems: EP1_PROBLEM_ITEMS,
+    coreCauseSummary: EP1_CORE_CAUSE_SUMMARY,
+    nextMission: EP1_NEXT_MISSION,
+    nextDevelopmentGoals: EP1_NEXT_DEVELOPMENT_GOALS,
+    reflectionChoices: EP1_REFLECTION_CHOICES,
+  }),
+  [EPISODE_IDS.PopulationRecovery]: Object.freeze({
+    missionBriefing: EP2_MISSION_BRIEFING,
+  }),
+});
+
+export function getEpisodeContent(episodeCode = CURRENT_EPISODE.code) {
+  return EPISODE_CONTENT[episodeCode] ?? EPISODE_CONTENT[CURRENT_EPISODE.code];
+}
+
+export function getCurrentEpisodeContent() {
+  return getEpisodeContent(CURRENT_EPISODE.code);
+}
+
+export function getCurrentPlacementEpisodeContent() {
+  return getEpisodeContent(CURRENT_PLACEMENT_EPISODE.code);
+}
+
+export function getCurrentPlacementMissionBriefing() {
+  return getCurrentPlacementEpisodeContent().missionBriefing;
+}

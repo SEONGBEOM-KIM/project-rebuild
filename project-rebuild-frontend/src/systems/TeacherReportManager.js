@@ -1,6 +1,6 @@
 import { explorationPlaces } from '../data/explorationPlaces.js';
 import { CURRENT_EPISODE, CURRENT_PLACEMENT_EPISODE } from '../data/episodes.js';
-import { EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
+import { getCurrentPlacementMissionBriefing } from '../data/episodeContent.js';
 import { DEFAULT_STATE_KEYS, STATE_LABELS } from '../data/stateLabels.js';
 import IssueDetector from './IssueDetector.js';
 import LearningProgress from './LearningProgress.js';
@@ -40,7 +40,7 @@ export default class TeacherReportManager {
   static build(registry) {
     const progress = LearningProgress.get(registry);
     const selectedPolicy = registry.get('selectedPolicy');
-    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, registry.get('ep2StrategyId') ?? progress.selectedStrategyId, selectedPolicy?.id);
+    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(getCurrentPlacementMissionBriefing(), registry.get('ep2StrategyId') ?? progress.selectedStrategyId, selectedPolicy?.id);
     const { placementConfig, evaluationProfile } = PlacementContextManager.resolve({
       registry,
       progress,

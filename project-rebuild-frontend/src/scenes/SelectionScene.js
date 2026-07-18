@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
-import { EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
+import { getCurrentPlacementMissionBriefing } from '../data/episodeContent.js';
 import { policies } from '../data/policies.js';
 import { getPlacementConfigIdForStrategy } from '../data/episodePlacementConfigs.js';
 import LearningProgress from '../systems/LearningProgress.js';
@@ -77,7 +77,7 @@ export default class SelectionScene extends Phaser.Scene {
 
 
   syncSelectedStrategy(policy) {
-    const strategy = Ep2BriefingViewManager.findStrategyByPolicyId(EP2_MISSION_BRIEFING, policy?.id);
+    const strategy = Ep2BriefingViewManager.findStrategyByPolicyId(getCurrentPlacementMissionBriefing(), policy?.id);
     if (strategy) {
       this.registry.set('ep2StrategyId', strategy.id);
       this.registry.set('placementConfigId', getPlacementConfigIdForStrategy(strategy));

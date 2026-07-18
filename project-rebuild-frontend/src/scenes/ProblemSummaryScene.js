@@ -6,7 +6,7 @@ import LearningProgress from '../systems/LearningProgress.js';
 import ProblemSummaryViewManager from '../systems/ProblemSummaryViewManager.js';
 import ProblemSummaryRenderer from '../systems/ProblemSummaryRenderer.js';
 
-import { EP1_CORE_CAUSE_SUMMARY, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS } from '../data/episodeContent.js';
+import { getCurrentEpisodeContent } from '../data/episodeContent.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 
@@ -35,7 +35,7 @@ export default class ProblemSummaryScene extends Phaser.Scene {
   }
 
   drawProblemGrid() {
-    ProblemSummaryRenderer.renderProblemGrid(this, EP1_PROBLEM_ITEMS);
+    ProblemSummaryRenderer.renderProblemGrid(this, getCurrentEpisodeContent().problemItems);
   }
 
   drawLearningRecord(exploredPlaces, quizResult) {
@@ -45,13 +45,13 @@ export default class ProblemSummaryScene extends Phaser.Scene {
         explorationPlaces,
         exploredPlaces,
         quizResult,
-        EP1_CORE_CAUSE_SUMMARY,
+        getCurrentEpisodeContent().coreCauseSummary,
       ),
     );
   }
 
   drawNextMission() {
-    ProblemSummaryRenderer.renderNextMission(this, EP1_NEXT_MISSION);
+    ProblemSummaryRenderer.renderNextMission(this, getCurrentEpisodeContent().nextMission);
   }
 
   drawControls() {

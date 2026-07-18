@@ -2,14 +2,14 @@ import GameState from './GameState.js';
 import LearningProgress from './LearningProgress.js';
 import { policies } from '../data/policies.js';
 import { buildings } from '../data/buildings.js';
-import { EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
+import { getCurrentPlacementMissionBriefing } from '../data/episodeContent.js';
 import Ep2BriefingViewManager from './Ep2BriefingViewManager.js';
 import PlacementContextManager from './PlacementContextManager.js';
 
 export default class LearningDataRestoreManager {
   static restore(registry, data) {
     const selectedPolicy = policies.find((policy) => policy.id === data.selectedPolicy?.id) ?? null;
-    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, data.selectedStrategy?.id, selectedPolicy?.id);
+    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(getCurrentPlacementMissionBriefing(), data.selectedStrategy?.id, selectedPolicy?.id);
     const restoredPlacements = LearningDataRestoreManager.restorePlacements(data.placements ?? []);
     const progress = LearningDataRestoreManager.buildProgress(data, selectedPolicy, selectedStrategy, restoredPlacements);
 

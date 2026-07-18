@@ -1,6 +1,6 @@
 import { explorationPlaces } from '../data/explorationPlaces.js';
 import { CURRENT_EPISODE, CURRENT_PLACEMENT_EPISODE } from '../data/episodes.js';
-import { EP2_MISSION_BRIEFING } from '../data/episodeContent.js';
+import { getCurrentPlacementMissionBriefing } from '../data/episodeContent.js';
 import IssueDetector from './IssueDetector.js';
 import LearningProgress from './LearningProgress.js';
 import EndingSummaryManager from './EndingSummaryManager.js';
@@ -12,7 +12,7 @@ export default class LearningDataManager {
     const progress = LearningProgress.get(registry);
     const quizResult = registry.get('quizResult');
     const selectedPolicy = registry.get('selectedPolicy');
-    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, registry.get('ep2StrategyId') ?? progress.selectedStrategyId, selectedPolicy?.id);
+    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(getCurrentPlacementMissionBriefing(), registry.get('ep2StrategyId') ?? progress.selectedStrategyId, selectedPolicy?.id);
     const { placementConfig, evaluationProfile } = PlacementContextManager.resolve({
       registry,
       progress,
@@ -113,7 +113,7 @@ export default class LearningDataManager {
 
   static hasSelectedStrategy(data) {
     return Boolean(data.selectedStrategy?.id)
-      || Boolean(Ep2BriefingViewManager.findStrategyByPolicyId(EP2_MISSION_BRIEFING, data.selectedPolicy?.id));
+      || Boolean(Ep2BriefingViewManager.findStrategyByPolicyId(getCurrentPlacementMissionBriefing(), data.selectedPolicy?.id));
   }
 
   static validate(data) {
