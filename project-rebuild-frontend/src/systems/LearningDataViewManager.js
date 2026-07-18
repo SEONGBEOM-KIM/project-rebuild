@@ -17,9 +17,9 @@ const LEARNING_DATA_SUMMARY_STYLE = {
   titleFontSize: '25px',
   titleColor: '#fde68a',
   titleFontStyle: 'bold',
-  bodyFontSize: '21px',
+  bodyFontSize: '19px',
   bodyColor: '#e0f2fe',
-  bodyLineSpacing: 5,
+  bodyLineSpacing: 3,
 };
 
 const LEARNING_DATA_DARK_PANEL_STYLE = {
@@ -130,9 +130,9 @@ export default class LearningDataViewManager {
 
   static getSummaryLayout(centerX) {
     return {
-      panel: { x: centerX, y: 205, width: 1660, height: 82, strokeColor: LEARNING_DATA_SUMMARY_STYLE.strokeColor },
-      title: { x: centerX - 790, y: 178, text: LEARNING_DATA_SUMMARY_STYLE.title },
-      body: { x: centerX - 620, y: 176, wordWrapWidth: 1410 },
+      panel: { x: centerX, y: 212, width: 1660, height: 104, strokeColor: LEARNING_DATA_SUMMARY_STYLE.strokeColor },
+      title: { x: centerX - 790, y: 174, text: LEARNING_DATA_SUMMARY_STYLE.title },
+      body: { x: centerX - 620, y: 169, wordWrapWidth: 1410 },
     };
   }
 
@@ -194,8 +194,13 @@ export default class LearningDataViewManager {
     const actionText = summary.nextAction?.label ?? '다음 액션 미선택';
     const policyText = summary.selectedPolicyName ?? '회복 방향 미선택';
     const strategyText = summary.selectedStrategyTitle ?? learningData.selectedStrategy?.title ?? 'EP2 전략 미선택';
+    const currentEpisodeText = learningData.episodeContext?.current?.shortTitle ?? `EP${learningData.episode}`;
+    const placementEpisodeText = learningData.episodeContext?.placement?.shortTitle ?? '배치 실험 미지정';
+    const configText = learningData.placementConfig?.id ?? 'config 없음';
+    const profileText = learningData.evaluationProfile?.id ?? 'profile 없음';
     return [
       `${summary.outcomeType}: ${summary.outcomeMessage}`,
+      `${currentEpisodeText} → ${placementEpisodeText} / ${configText} / ${profileText}`,
       `EP2 전략: ${strategyText} / 회복 방향: ${policyText}`,
       `우선 보완: ${issueText} / 다음 액션: ${actionText} / 배치 ${summary.placementCount}개`,
     ].join('\n');

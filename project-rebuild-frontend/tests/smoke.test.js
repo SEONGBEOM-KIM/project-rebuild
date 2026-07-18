@@ -3078,7 +3078,7 @@ function testLearningDataViewManager() {
   assert.deepEqual(LearningDataViewManager.getButtonStyle().padding, { x: 22, y: 15 });
   assert.equal(LearningDataViewManager.getFeedbackColor('success'), '#bbf7d0');
   assert.equal(LearningDataViewManager.getFeedbackColor('error'), '#fecaca');
-  assert.deepEqual(LearningDataViewManager.getSummaryLayout(960).title, { x: 170, y: 178, text: '저장 요약' });
+  assert.deepEqual(LearningDataViewManager.getSummaryLayout(960).title, { x: 170, y: 174, text: '저장 요약' });
   assert.equal(LearningDataViewManager.getDataPanelLayout().panel.width, 1120);
   assert.equal(LearningDataViewManager.getDataPanelLayout().title.text, '저장 후보 데이터');
   assert.equal(LearningDataViewManager.getDataPanelLayout().title.y, 315);
@@ -3119,6 +3119,9 @@ function testLearningDataViewManager() {
   });
   assert.match(LearningDataViewManager.formatJson(completeData), /"episode": 1/);
   assert.match(LearningDataViewManager.formatSummaryText(completeData), /환경 우선 회복안/);
+  assert.match(LearningDataViewManager.formatSummaryText(completeData), /EP1\. 지역 위기 탐색 → EP2\. 인구 유입 전략/);
+  assert.match(LearningDataViewManager.formatSummaryText(completeData), /ep2_population_recovery/);
+  assert.match(LearningDataViewManager.formatSummaryText(completeData), /ep2_population_recovery_default/);
   assert.match(LearningDataViewManager.formatSummaryText(completeData), /EP2 전략: 균형 성장/);
   assert.match(LearningDataViewManager.formatSummaryText(completeData), /회복 방향: 녹색 회복 계획/);
   assert.match(LearningDataViewManager.formatSummaryText(completeData), /우선 보완/);
