@@ -2511,6 +2511,7 @@ function testPlacementViewManager() {
   assert.match(endingSceneSource, /selectedStrategyId/, 'ending scene should recover EP2 strategy from learning progress');
   assert.match(endingSceneSource, /PlacementContextManager/, 'ending scene should resolve active placement context');
   assert.match(endingSceneSource, /formatStateSummary\(gameState, ending, placementConfig\.stateKeys, evaluationProfile\)/, 'ending scene should summarize state with active placement config');
+  assert.match(endingSceneSource, /formatLearningRecordRows\(learningProgress, exploredPlaces, quizResult, reflectionChoice, selectedStrategy, placementConfig, evaluationProfile\)/, 'ending scene should record active placement context');
   const reflectionSceneSource = readProjectFile('src', 'scenes', 'ReflectionScene.js');
   assert.match(reflectionSceneSource, /selectedStrategyId/, 'reflection scene should recover EP2 strategy from learning progress');
   assert.match(reflectionSceneSource, /PlacementContextManager/, 'reflection scene should resolve active placement context');
@@ -3006,14 +3007,19 @@ function testEndingSummaryManager() {
     { selected: 'lack_jobs_services', correct: true },
     reflectionChoice,
     EP2_MISSION_BRIEFING.strategies[0],
+    getPlacementConfig(ENVIRONMENT_PLACEMENT_CONFIG_ID),
+    getEvaluationProfile(ENVIRONMENT_EVALUATION_PROFILE_ID),
   );
-  assert.equal(rows.length, 5);
-  assert.match(rows[0], /탐색: 3\/5곳 확인/);
-  assert.match(rows[2], /원인 질문: 정답/);
-  assert.match(rows[3], /EP2 전략: 일자리와 생활 기반/);
-  assert.match(rows[3], /초점: 인구↑ 경제↑ 예산↓/);
-  assert.match(rows[4], /생각 정리: 예산 균형 보완/);
-  assert.match(rows[4], new RegExp(reflectionChoice.nextActionLabel));
+  assert.equal(rows.length, 6);
+  assert.match(rows[0], /배치 실험: 푸른군 환경 균형 배치 실험/);
+  assert.match(rows[0], /필요 배치: 2개/);
+  assert.match(rows[0], /평가 기준: ep2_environment_focus/);
+  assert.match(rows[1], /탐색: 3\/5곳 확인/);
+  assert.match(rows[3], /원인 질문: 정답/);
+  assert.match(rows[4], /EP2 전략: 일자리와 생활 기반/);
+  assert.match(rows[4], /초점: 인구↑ 경제↑ 예산↓/);
+  assert.match(rows[5], /생각 정리: 예산 균형 보완/);
+  assert.match(rows[5], new RegExp(reflectionChoice.nextActionLabel));
 }
 
 function testTeacherReportRenderer() {
