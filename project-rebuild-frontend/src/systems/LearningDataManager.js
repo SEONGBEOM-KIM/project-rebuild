@@ -169,6 +169,20 @@ export default class LearningDataManager {
         message: 'summary.placementContext.evaluationProfileId 값이 없습니다.',
       },
       {
+        ok: data.summary?.placementContext?.placementConfigId == null
+          || data.placementConfig?.id == null
+          || data.summary.placementContext.placementConfigId === data.placementConfig.id,
+        label: '요약-배치 설정 연결 확인',
+        message: 'summary.placementContext.placementConfigId와 placementConfig.id가 다릅니다.',
+      },
+      {
+        ok: data.summary?.placementContext?.evaluationProfileId == null
+          || data.evaluationProfile?.id == null
+          || data.summary.placementContext.evaluationProfileId === data.evaluationProfile.id,
+        label: '요약-평가 프로필 연결 확인',
+        message: 'summary.placementContext.evaluationProfileId와 evaluationProfile.id가 다릅니다.',
+      },
+      {
         ok: Array.isArray(data.exploredPlaces) && data.exploredPlaces.length >= 3,
         label: '탐색 장소 3곳 이상',
         message: '탐색 장소 기록이 3곳 미만입니다.',
@@ -197,6 +211,20 @@ export default class LearningDataManager {
         ok: LearningDataManager.hasSelectedStrategy(data),
         label: 'EP2 전략 선택',
         message: '선택한 EP2 전략이 없습니다.',
+      },
+      {
+        ok: data.selectedStrategy?.placementConfigId == null
+          || data.placementConfig?.id == null
+          || data.selectedStrategy.placementConfigId === data.placementConfig.id,
+        label: '전략-배치 설정 연결 확인',
+        message: 'selectedStrategy.placementConfigId와 placementConfig.id가 다릅니다.',
+      },
+      {
+        ok: data.placementConfig?.evaluationProfileId == null
+          || data.evaluationProfile?.id == null
+          || data.placementConfig.evaluationProfileId === data.evaluationProfile.id,
+        label: '배치 설정-평가 프로필 연결 확인',
+        message: 'placementConfig.evaluationProfileId와 evaluationProfile.id가 다릅니다.',
       },
       {
         ok: Array.isArray(data.placements) && data.placements.length >= requiredPlacements,
