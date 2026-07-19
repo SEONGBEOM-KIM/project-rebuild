@@ -23,8 +23,9 @@ export default class StorageSummaryManager {
     const data = saved.data;
     const currentEpisodeText = data?.episodeContext?.current?.shortTitle ?? `Episode: ${data?.episode ?? '알 수 없음'}`;
     const placementEpisodeText = data?.episodeContext?.placement?.shortTitle ?? '배치 실험 미지정';
-    const configText = data?.placementConfig?.id ?? 'config 없음';
-    const profileText = data?.evaluationProfile?.id ?? 'profile 없음';
+    const context = StorageSummaryManager.getLearningDataPlacementContext(data);
+    const configText = context.placementConfigId ?? 'config 없음';
+    const profileText = context.evaluationProfileId ?? 'profile 없음';
 
     return [
       '상태: 저장 데이터 있음',
@@ -52,8 +53,9 @@ export default class StorageSummaryManager {
 
     const currentEpisodeText = latest.payload?.episode_context?.current?.short_title ?? `Episode: ${latest.payload?.episode_id ?? '알 수 없음'}`;
     const placementEpisodeText = latest.payload?.episode_context?.placement?.short_title ?? '배치 실험 미지정';
-    const configText = latest.payload?.placement_config?.id ?? 'config 없음';
-    const profileText = latest.payload?.evaluation_profile?.id ?? 'profile 없음';
+    const context = StorageSummaryManager.getApiPayloadPlacementContext(latest.payload);
+    const configText = context.placementConfigId ?? 'config 없음';
+    const profileText = context.evaluationProfileId ?? 'profile 없음';
 
     return [
       `총 로그: ${submissions.length}건`,
@@ -68,5 +70,21 @@ export default class StorageSummaryManager {
       '',
       '최근 10건까지만 보관합니다.',
     ];
+  }
+
+  static getLearningDataPlacementContext(data) {
+    const summaryContext = data?.summary?.placementContext;
+    return {
+      placementConfigId: summaryContext?.placementConfigId ?? data?.placementConfig?.id ?? null,
+      evaluationProfileId: summaryContext?.evaluationProfileId ?? data?.evaluationProfile?.id ?? null,
+    };
+  }
+
+  static getApiPayloadPlacementContext(payload) {
+    const summaryContext = payload?.summary?.placement_context;
+    return {
+      placementConfigId: summaryContext?.placement_config_id ?? payload?.placement_config?.id ?? null,
+      evaluationProfileId: summaryContext?.evaluation_profile_id ?? payload?.evaluation_profile?.id ?? null,
+    };
   }
 }

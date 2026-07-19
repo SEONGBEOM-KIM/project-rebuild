@@ -3909,6 +3909,27 @@ function testSavedDataViewManager() {
   assert.match(SavedDataViewManager.formatSummary(fullSaved), /EP1\. 지역 위기 탐색 → EP2\. 인구 유입 전략/);
   assert.match(SavedDataViewManager.formatSummary(fullSaved), /ep2_population_recovery/);
   assert.match(SavedDataViewManager.formatSummary(fullSaved), /ep2_population_recovery_default/);
+  assert.deepEqual(SavedDataViewManager.getPlacementContext({
+    summary: { placementContext: { placementConfigId: ENVIRONMENT_PLACEMENT_CONFIG_ID, evaluationProfileId: ENVIRONMENT_EVALUATION_PROFILE_ID } },
+    placementConfig: { id: DEFAULT_PLACEMENT_CONFIG_ID },
+    evaluationProfile: { id: DEFAULT_EVALUATION_PROFILE_ID },
+  }), {
+    placementConfigId: ENVIRONMENT_PLACEMENT_CONFIG_ID,
+    evaluationProfileId: ENVIRONMENT_EVALUATION_PROFILE_ID,
+  });
+  assert.match(SavedDataViewManager.formatSummary({
+    data: {
+      episode: 1,
+      exploredPlaces: [],
+      placements: [],
+      summary: {
+        placementContext: {
+          placementConfigId: ENVIRONMENT_PLACEMENT_CONFIG_ID,
+          evaluationProfileId: ENVIRONMENT_EVALUATION_PROFILE_ID,
+        },
+      },
+    },
+  }), new RegExp(ENVIRONMENT_PLACEMENT_CONFIG_ID));
   assert.equal(SavedDataViewManager.formatSavedAt(null), '알 수 없음');
   assert.equal(SavedDataViewManager.formatSavedAt('bad-date'), 'bad-date');
   assert.match(SavedDataViewManager.formatBody(saved), /원본 JSON 미리보기/);
@@ -4008,6 +4029,14 @@ function testStorageSummaryManager() {
   assert.ok(fullSavedRows.includes('배치 실험: EP2. 인구 유입 전략'));
   assert.ok(fullSavedRows.includes(`배치 설정: ${DEFAULT_PLACEMENT_CONFIG_ID}`));
   assert.ok(fullSavedRows.includes(`평가 기준: ${DEFAULT_EVALUATION_PROFILE_ID}`));
+  assert.deepEqual(StorageSummaryManager.getLearningDataPlacementContext({
+    summary: { placementContext: { placementConfigId: ENVIRONMENT_PLACEMENT_CONFIG_ID, evaluationProfileId: ENVIRONMENT_EVALUATION_PROFILE_ID } },
+    placementConfig: { id: DEFAULT_PLACEMENT_CONFIG_ID },
+    evaluationProfile: { id: DEFAULT_EVALUATION_PROFILE_ID },
+  }), {
+    placementConfigId: ENVIRONMENT_PLACEMENT_CONFIG_ID,
+    evaluationProfileId: ENVIRONMENT_EVALUATION_PROFILE_ID,
+  });
 
   assert.deepEqual(StorageSummaryManager.formatSubmissionRows([]), [
     '상태: 제출 로그 없음',
@@ -4030,6 +4059,14 @@ function testStorageSummaryManager() {
   assert.ok(fullSubmissionRows.includes('배치 실험: EP2. 인구 유입 전략'));
   assert.ok(fullSubmissionRows.includes(`배치 설정: ${DEFAULT_PLACEMENT_CONFIG_ID}`));
   assert.ok(fullSubmissionRows.includes(`평가 기준: ${DEFAULT_EVALUATION_PROFILE_ID}`));
+  assert.deepEqual(StorageSummaryManager.getApiPayloadPlacementContext({
+    summary: { placement_context: { placement_config_id: ENVIRONMENT_PLACEMENT_CONFIG_ID, evaluation_profile_id: ENVIRONMENT_EVALUATION_PROFILE_ID } },
+    placement_config: { id: DEFAULT_PLACEMENT_CONFIG_ID },
+    evaluation_profile: { id: DEFAULT_EVALUATION_PROFILE_ID },
+  }), {
+    placementConfigId: ENVIRONMENT_PLACEMENT_CONFIG_ID,
+    evaluationProfileId: ENVIRONMENT_EVALUATION_PROFILE_ID,
+  });
 }
 
 function testSaveImport() {

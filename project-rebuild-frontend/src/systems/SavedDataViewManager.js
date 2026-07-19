@@ -105,8 +105,9 @@ export default class SavedDataViewManager {
     const placementCount = data.placements?.length ?? data.summary?.placementCount ?? 0;
     const currentEpisodeText = data.episodeContext?.current?.shortTitle ?? `Episode ${data.episode ?? '-'}`;
     const placementEpisodeText = data.episodeContext?.placement?.shortTitle ?? '배치 실험 미지정';
-    const configText = data.placementConfig?.id ?? 'config 없음';
-    const profileText = data.evaluationProfile?.id ?? 'profile 없음';
+    const context = SavedDataViewManager.getPlacementContext(data);
+    const configText = context.placementConfigId ?? 'config 없음';
+    const profileText = context.evaluationProfileId ?? 'profile 없음';
 
     return [
       `저장 시각: ${savedAt} / ${currentEpisodeText} → ${placementEpisodeText}`,
@@ -114,6 +115,14 @@ export default class SavedDataViewManager {
       `회복 방향: ${policyName} / EP2 전략: ${strategyTitle}`,
       `배치 설정: ${configText} / 평가 기준: ${profileText}`,
     ].join('\n');
+  }
+
+  static getPlacementContext(data) {
+    const summaryContext = data?.summary?.placementContext;
+    return {
+      placementConfigId: summaryContext?.placementConfigId ?? data?.placementConfig?.id ?? null,
+      evaluationProfileId: summaryContext?.evaluationProfileId ?? data?.evaluationProfile?.id ?? null,
+    };
   }
 
   static formatSavedAt(savedAt) {
