@@ -91,7 +91,7 @@ import { API_CONTRACT, formatContractRequest, formatContractResponse } from '../
 import { CURRENT_EPISODE, CURRENT_PLACEMENT_EPISODE, EPISODE_IDS, EPISODES, EPISODE_STEPS, getEpisode, getEpisodeStep } from '../src/data/episodes.js';
 import SCENE_KEYS from '../src/data/sceneKeys.js';
 import { REGISTRY_KEYS } from '../src/data/registryKeys.js';
-import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES, EP2_MISSION_BRIEFING, EP2_NEXT_DEVELOPMENT_GOALS, EP3_MISSION_PREVIEW, EP3_NEXT_DEVELOPMENT_GOALS, EP3_REFLECTION_CHOICES, EPISODE_CONTENT, getCurrentEpisodeContent, getCurrentPlacementEpisodeContent, getCurrentPlacementMissionBriefing, getCurrentPlacementNextDevelopmentGoals, getEpisodeContent, getNextDevelopmentGoals, getNextEpisodeContent, getReflectionChoices } from '../src/data/episodeContent.js';
+import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES, EP2_MISSION_BRIEFING, EP2_NEXT_DEVELOPMENT_GOALS, EP3_MISSION_PREVIEW, EP3_MISSION_BRIEFING, EP3_NEXT_DEVELOPMENT_GOALS, EP3_REFLECTION_CHOICES, EPISODE_CONTENT, getCurrentEpisodeContent, getCurrentPlacementEpisodeContent, getCurrentPlacementMissionBriefing, getCurrentPlacementNextDevelopmentGoals, getEpisodeContent, getNextDevelopmentGoals, getNextEpisodeContent, getReflectionChoices } from '../src/data/episodeContent.js';
 import ProgressStepper from '../src/ui/ProgressStepper.js';
 import { getTextButtonColor } from '../src/ui/TextButton.js';
 import { DEFAULT_STATE_KEYS, STATE_ICONS } from '../src/data/stateLabels.js';
@@ -1296,6 +1296,10 @@ function testEpisodeContent() {
   assert.equal(EP3_MISSION_PREVIEW.title, '경제 성장 전략');
   assert.equal(EP3_MISSION_PREVIEW.placementConfigId, EP3_ECONOMY_PLACEMENT_CONFIG_ID);
   assert.equal(EP3_MISSION_PREVIEW.focusAreas.length, 3, 'EP3 preview should define three initial focus areas');
+  assert.equal(EP3_MISSION_BRIEFING.title, '경제 성장 전략');
+  assert.equal(EP3_MISSION_BRIEFING.placementConfigId, EP3_ECONOMY_PLACEMENT_CONFIG_ID);
+  assert.equal(EP3_MISSION_BRIEFING.strategies.length, 3, 'EP3 mission briefing should define three economy strategy paths');
+  assert.deepEqual(EP3_MISSION_BRIEFING.strategies.map((strategy) => strategy.policyId), economyPolicies.map((policy) => policy.id));
   assert.equal(EP1_REFLECTION_CHOICES.length, 4, 'EP1 should expose four reflection choices');
   assert.equal(new Set(EP1_REFLECTION_CHOICES.map((choice) => choice.id)).size, EP1_REFLECTION_CHOICES.length, 'reflection choice ids should be unique');
   assert.ok(EP1_REFLECTION_CHOICES.every((choice) => choice.title && choice.icon && choice.description && Number.isFinite(choice.color)), 'reflection choices should have title/icon/description/color');
@@ -1305,6 +1309,7 @@ function testEpisodeContent() {
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.PopulationRecovery].nextDevelopmentGoals, EP2_NEXT_DEVELOPMENT_GOALS, 'EP2 next development goals should be addressable through episode content registry');
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.PopulationRecovery].nextEpisodeId, EPISODE_IDS.EconomyGrowth, 'EP2 should point to EP3 as the next episode');
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.EconomyGrowth].missionPreview, EP3_MISSION_PREVIEW, 'EP3 mission preview should be addressable through episode content registry');
+  assert.equal(EPISODE_CONTENT[EPISODE_IDS.EconomyGrowth].missionBriefing, EP3_MISSION_BRIEFING, 'EP3 mission briefing should be addressable through episode content registry');
   assert.equal(getEpisodeContent(EPISODE_IDS.Crisis).causeQuestion, EP1_CAUSE_QUESTION);
   assert.equal(getEpisodeContent('unknown_episode').coreConcept, EP1_CORE_CONCEPT, 'unknown content ids should fall back to current episode content');
   assert.equal(getCurrentEpisodeContent().problemItems, EP1_PROBLEM_ITEMS);
@@ -3127,17 +3132,17 @@ function testEndingSummaryViewManager() {
 
 function testEp3PreviewRenderer() {
   const introFixture = createRendererSceneSpy();
-  Ep3PreviewRenderer.renderIntroPanel(introFixture.scene, EP3_MISSION_PREVIEW);
-  assert.ok(introFixture.calls.some((call) => call[0] === 'text' && call[3] === '다음 에피소드 미리보기'));
+  Ep3PreviewRenderer.renderIntroPanel(introFixture.scene, EP3_MISSION_BRIEFING);
+  assert.ok(introFixture.calls.some((call) => call[0] === 'text' && call[3] === '경제 성장 미션 브리핑'));
   assert.ok(introFixture.calls.some((call) => call[0] === 'text' && call[3].includes('EP3에서는')));
 
   const cardFixture = createRendererSceneSpy();
-  Ep3PreviewRenderer.renderFocusCard(cardFixture.scene, EP3_MISSION_PREVIEW.focusAreas[0], 0);
-  assert.ok(cardFixture.calls.some((call) => call[0] === 'text' && call[3] === EP3_MISSION_PREVIEW.focusAreas[0].title));
+  Ep3PreviewRenderer.renderFocusCard(cardFixture.scene, EP3_MISSION_BRIEFING.strategies[0], 0);
+  assert.ok(cardFixture.calls.some((call) => call[0] === 'text' && call[3] === EP3_MISSION_BRIEFING.strategies[0].title));
   assert.ok(cardFixture.calls.some((call) => call[0] === 'text' && call[3].includes('상태 초점: 경제↑ 인구↑')));
 
   const noteFixture = createRendererSceneSpy();
-  Ep3PreviewRenderer.renderTransitionNote(noteFixture.scene, EP3_MISSION_PREVIEW, economyPolicies, economyBuildings);
+  Ep3PreviewRenderer.renderTransitionNote(noteFixture.scene, EP3_MISSION_BRIEFING, economyPolicies, economyBuildings);
   assert.ok(noteFixture.calls.some((call) => call[0] === 'text' && call[3] === 'EP3 배치 준비'));
   assert.ok(noteFixture.calls.some((call) => call[0] === 'text' && call[3].includes('산업 정책 후보:')));
   assert.ok(noteFixture.calls.some((call) => call[0] === 'text' && call[3].includes('지역 산업 일자리')));
@@ -3155,7 +3160,7 @@ function testEp3PreviewViewManager() {
   assert.deepEqual(Ep3PreviewViewManager.getScreenLayout(1920).title, {
     x: 960,
     y: 76,
-    text: 'EP3. 경제 성장',
+    text: 'EP3. 경제 성장 미션',
     fontSize: '62px',
     color: '#ffffff',
     fontStyle: 'bold',
@@ -3164,7 +3169,7 @@ function testEp3PreviewViewManager() {
   assert.equal(Ep3PreviewViewManager.getPanelStyle().titleColor, '#fde68a');
   assert.equal(Ep3PreviewViewManager.getCardStyle().strokeColor, 0x93c5fd);
   assert.equal(Ep3PreviewViewManager.getNoteStyle().strokeColor, 0x86efac);
-  assert.equal(Ep3PreviewViewManager.getIntroPanelLayout().title.text, '다음 에피소드 미리보기');
+  assert.equal(Ep3PreviewViewManager.getIntroPanelLayout().title.text, '경제 성장 미션 브리핑');
   assert.deepEqual(Ep3PreviewViewManager.getFocusCardLayout(1).panel, { x: 960, y: 548, width: 440, height: 330 });
   assert.equal(Ep3PreviewViewManager.getTransitionNoteLayout().title.text, 'EP3 배치 준비');
   assert.equal(Ep3PreviewViewManager.getTransitionNoteLayout().policyBody.wordWrapWidth, 650);
@@ -3185,13 +3190,13 @@ function testEp3PreviewViewManager() {
     backgroundColor: '#bbf7d0',
     textColor: '#123524',
   });
-  assert.match(Ep3PreviewViewManager.formatIntroText(EP3_MISSION_PREVIEW), /일자리와 산업 성장/);
-  assert.match(Ep3PreviewViewManager.formatFocusBody(EP3_MISSION_PREVIEW.focusAreas[2]), /교통 부담↑ 오염 신호↑/);
-  assert.match(Ep3PreviewViewManager.formatTransitionNote(EP3_MISSION_PREVIEW), /아직 실제 산업 시설 배치/);
+  assert.match(Ep3PreviewViewManager.formatIntroText(EP3_MISSION_BRIEFING), /일자리와 산업 성장/);
+  assert.match(Ep3PreviewViewManager.formatFocusBody(EP3_MISSION_BRIEFING.strategies[2]), /교통 부담↑ 오염 신호↑/);
+  assert.match(Ep3PreviewViewManager.formatTransitionNote(EP3_MISSION_BRIEFING), /경제 성장 미션 브리핑/);
   assert.match(Ep3PreviewViewManager.formatPolicyPreviewRows(economyPolicies), /방문 경제 활성화/);
   assert.match(Ep3PreviewViewManager.formatBuildingPreviewRows(economyBuildings), /물류 센터/);
   const previewSceneSource = readProjectFile('src', 'scenes', 'Ep3PreviewScene.js');
-  assert.match(previewSceneSource, /getNextEpisodeContent/, 'EP3 preview scene should use next episode content data');
+  assert.match(previewSceneSource, /getEpisodeContent/, 'EP3 preview scene should use episode content data');
   assert.match(previewSceneSource, /Ep3PreviewRenderer\.renderFocusCard/, 'EP3 preview scene should render focus cards');
   assert.match(previewSceneSource, /economyPolicies/, 'EP3 preview scene should show economy policy candidates');
   assert.match(previewSceneSource, /economyBuildings/, 'EP3 preview scene should show economy building candidates');

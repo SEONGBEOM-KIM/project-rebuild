@@ -198,6 +198,74 @@ export const EP3_MISSION_PREVIEW = {
   ],
 };
 
+export const EP3_MISSION_BRIEFING = {
+  title: '경제 성장 전략',
+  placementConfigId: EP3_ECONOMY_PLACEMENT_CONFIG_ID,
+  intro: EP3_MISSION_PREVIEW.intro,
+  strategies: [
+    {
+      id: 'industry_jobs_growth',
+      policyId: 'local_industry_jobs',
+      placementConfigId: EP3_ECONOMY_PLACEMENT_CONFIG_ID,
+      title: '지역 산업 일자리',
+      icon: '🏭',
+      description: '지역 자원과 가공 산업을 연결해 푸른군 안에서 일할 기회를 늘립니다.',
+      stateFocus: '경제↑ 인구↑ 교통 부담↑',
+      checkQuestion: '새 일자리가 늘어날 때 교통과 오염 신호는 어느 정도까지 감당할 수 있을까요?',
+      placementGoal: '식품 가공 공장과 물류 시설을 조합해 경제 성장과 인구 유입 효과를 확인합니다.',
+      placementGoalShort: '일자리 기반 성장',
+      observationPoint: '경제 효과가 커지는 만큼 교통 부담과 오염 신호가 함께 증가하는지 비교합니다.',
+      observationPointShort: '성장 대비 부담',
+      successChecks: [
+        { key: 'economy', label: '경제 90 이상', min: 90 },
+        { key: 'population', label: '인구 1200 이상', min: 1200 },
+        { key: 'budget', label: '예산 300 이상 유지', min: 300 },
+      ],
+      color: 0xfb923c,
+    },
+    {
+      id: 'visitor_commerce_growth',
+      policyId: 'visitor_economy',
+      placementConfigId: EP3_ECONOMY_PLACEMENT_CONFIG_ID,
+      title: '방문 경제 활성화',
+      icon: '🏪',
+      description: '관광과 상권을 연결해 방문객 소비가 지역 경제와 만족도로 이어지게 합니다.',
+      stateFocus: '경제↑ 만족도↑ 환경 부담↑',
+      checkQuestion: '방문객이 늘어날 때 자연 공간과 주민 생활은 어떻게 보호해야 할까요?',
+      placementGoal: '관광 단지와 산업 시설을 비교해 상권 활기와 환경 부담을 함께 관찰합니다.',
+      placementGoalShort: '상권·방문객 성장',
+      observationPoint: '만족도와 경제 효과가 오르는 동안 자연 공간 이용 부담이 커지는지 확인합니다.',
+      observationPointShort: '상권 효과와 자연 부담',
+      successChecks: [
+        { key: 'economy', label: '경제 85 이상', min: 85 },
+        { key: 'satisfaction', label: '만족도 75 이상', min: 75 },
+        { key: 'pollution', label: '오염 16 이하', max: 16 },
+      ],
+      color: 0xa78bfa,
+    },
+    {
+      id: 'logistics_growth_hub',
+      policyId: 'distribution_growth',
+      placementConfigId: EP3_ECONOMY_PLACEMENT_CONFIG_ID,
+      title: '유통 성장 거점',
+      icon: '🚚',
+      description: '도로망을 활용해 기업 활동과 유통 효율을 높이는 빠른 성장 경로입니다.',
+      stateFocus: '경제↑ 교통 부담↑ 오염 신호↑',
+      checkQuestion: '빠른 성장을 선택하면 도로 혼잡과 생활 불편을 어떻게 줄일 수 있을까요?',
+      placementGoal: '물류 센터 중심 배치가 경제 효과를 빠르게 만들지만 어떤 부작용을 남기는지 확인합니다.',
+      placementGoalShort: '물류 중심 성장',
+      observationPoint: '경제 상승 폭과 함께 교통·오염 신호가 EP4 문제로 이어지는지 기록합니다.',
+      observationPointShort: '빠른 성장의 부작용',
+      successChecks: [
+        { key: 'economy', label: '경제 95 이상', min: 95 },
+        { key: 'traffic', label: '교통 부담 20 이하', max: 20 },
+        { key: 'budget', label: '예산 300 이상 유지', min: 300 },
+      ],
+      color: 0x60a5fa,
+    },
+  ],
+};
+
 export const EP3_REFLECTION_CHOICES = [
   {
     id: 'jobs_quality',
@@ -307,6 +375,7 @@ export const EPISODE_CONTENT = Object.freeze({
   }),
   [EPISODE_IDS.EconomyGrowth]: Object.freeze({
     missionPreview: EP3_MISSION_PREVIEW,
+    missionBriefing: EP3_MISSION_BRIEFING,
     reflectionChoices: EP3_REFLECTION_CHOICES,
     nextDevelopmentGoals: EP3_NEXT_DEVELOPMENT_GOALS,
   }),

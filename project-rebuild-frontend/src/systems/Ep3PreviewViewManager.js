@@ -3,8 +3,8 @@ import SCENE_KEYS from '../data/sceneKeys.js';
 const EP3_PREVIEW_LAYOUT = {
   backgroundColor: 0x0f172a,
   progressStep: 'ending',
-  title: { y: 76, text: 'EP3. 경제 성장', fontSize: '62px', color: '#ffffff', fontStyle: 'bold' },
-  subtitle: { y: 142, text: '생활 기반 회복 다음에는 일자리와 산업 성장을 실험합니다.', fontSize: '26px', color: '#bfdbfe' },
+  title: { y: 76, text: 'EP3. 경제 성장 미션', fontSize: '62px', color: '#ffffff', fontStyle: 'bold' },
+  subtitle: { y: 142, text: '푸른군의 일자리·상권·물류 성장 방향을 선택할 준비를 합니다.', fontSize: '26px', color: '#bfdbfe' },
 };
 
 const EP3_PREVIEW_PANEL_STYLE = {
@@ -80,7 +80,7 @@ export default class Ep3PreviewViewManager {
   static getIntroPanelLayout() {
     return {
       panel: { x: 960, y: 260, width: 1510, height: 150 },
-      title: { x: 250, y: 202, text: '다음 에피소드 미리보기' },
+      title: { x: 250, y: 202, text: '경제 성장 미션 브리핑' },
       body: { x: 250, y: 246, wordWrapWidth: 1380 },
     };
   }
@@ -121,19 +121,21 @@ export default class Ep3PreviewViewManager {
     return preview.intro.join('\n');
   }
 
-  static formatFocusBody(focusArea) {
+  static formatFocusBody(strategy) {
     return [
-      `상태 초점: ${focusArea.stateFocus}`,
-      focusArea.note,
+      `상태 초점: ${strategy.stateFocus}`,
+      strategy.description,
+      '',
+      `관찰: ${strategy.observationPointShort ?? strategy.observationPoint}`,
     ].join('\n');
   }
 
-  static formatTransitionNote(preview) {
-    const signal = preview.focusAreas.find((focusArea) => focusArea.id === 'traffic_signal');
+  static formatTransitionNote(briefing) {
     return [
-      'EP3에서는 경제 성장의 긍정적 효과를 먼저 체감합니다.',
-      signal ? `동시에 ${signal.title}(${signal.stateFocus})를 기록해 EP4 부작용 단계로 연결합니다.` : '동시에 작은 불편 신호를 기록해 EP4 부작용 단계로 연결합니다.',
-      '아직 실제 산업 시설 배치와 밸런싱은 다음 개발 단위에서 확정합니다.',
+      'EP3는 이제 예고가 아니라 경제 성장 미션 브리핑 데이터로 구성됩니다.',
+      `배치 설정: ${briefing.placementConfigId}`,
+      '이번 단계에서는 대표 성장 방향 3가지를 보여주고 기본 정책으로 배치 연습에 진입합니다.',
+      '다음 개발 단위에서 EP3 전용 정책 선택 화면으로 확장할 수 있습니다.',
     ].join('\n');
   }
 
