@@ -19,6 +19,7 @@ import Ep3PreviewViewManager from '../src/systems/Ep3PreviewViewManager.js';
 import Ep3PreviewRenderer from '../src/systems/Ep3PreviewRenderer.js';
 import LearningProgress from '../src/systems/LearningProgress.js';
 import WorldStateManager from '../src/systems/WorldStateManager.js';
+import EpisodePlacementLaunchManager from '../src/systems/EpisodePlacementLaunchManager.js';
 import CauseQuizManager from '../src/systems/CauseQuizManager.js';
 import CauseQuizViewManager from '../src/systems/CauseQuizViewManager.js';
 import CauseQuizPanelRenderer from '../src/systems/CauseQuizPanelRenderer.js';
@@ -1830,6 +1831,50 @@ function testWorldStateManager() {
   assert.equal(WorldStateManager.update(registry, { activeEpisodeId: EPISODE_IDS.EconomyGrowth }).activeEpisodeId, EPISODE_IDS.EconomyGrowth);
 }
 
+function testEpisodePlacementLaunchManager() {
+  const registry = createMemoryRegistry();
+  const placement = {
+    id: 'youth_center-1-0',
+    buildingId: 'youth_center',
+    position: { x: 1, y: 1 },
+    occupiedTiles: [{ x: 1, y: 1 }],
+  };
+  const priorWorldState = WorldStateManager.completeEpisode(
+    WorldStateManager.appendPlacements(
+      WorldStateManager.startEpisode(WorldStateManager.createInitialWorldState(), EPISODE_IDS.PopulationRecovery),
+      [placement],
+    ),
+    EPISODE_IDS.PopulationRecovery,
+    { gameState: { ...GameState.createInitialState(), population: 1080 } },
+  );
+
+  const isolatedContext = EpisodePlacementLaunchManager.buildEp3EconomyLaunchContext({ worldState: priorWorldState });
+  assert.equal(isolatedContext.episodeId, EPISODE_IDS.EconomyGrowth);
+  assert.equal(isolatedContext.placementConfigId, EP3_ECONOMY_PLACEMENT_CONFIG_ID);
+  assert.equal(isolatedContext.selectedPolicy.id, economyPolicies[0].id);
+  assert.equal(isolatedContext.selectedStrategy, null);
+  assert.deepEqual(isolatedContext.placedBuildings, [], 'current EP3 proof should stay isolated by default');
+  assert.deepEqual(isolatedContext.gameState, GameState.createInitialState());
+  assert.equal(isolatedContext.worldState.activeEpisodeId, EPISODE_IDS.EconomyGrowth);
+  assert.equal(isolatedContext.progressPatch.placementConfigId, EP3_ECONOMY_PLACEMENT_CONFIG_ID);
+
+  const cumulativeContext = EpisodePlacementLaunchManager.buildEp3EconomyLaunchContext({
+    worldState: priorWorldState,
+    cumulative: true,
+  });
+  assert.equal(cumulativeContext.gameState.population, 1080);
+  assert.deepEqual(cumulativeContext.progressPatch.placedBuildingIds, ['youth_center']);
+
+  EpisodePlacementLaunchManager.applyLaunchContext(registry, isolatedContext);
+  assert.equal(registry.get(REGISTRY_KEYS.placementConfigId), EP3_ECONOMY_PLACEMENT_CONFIG_ID);
+  assert.equal(registry.get(REGISTRY_KEYS.selectedPolicy).id, economyPolicies[0].id);
+  assert.equal(registry.get(REGISTRY_KEYS.selectedPlacementStrategy), null);
+  assert.deepEqual(registry.get(REGISTRY_KEYS.placedBuildings), []);
+  assert.deepEqual(registry.get(REGISTRY_KEYS.gameState), GameState.createInitialState());
+  assert.equal(registry.get(REGISTRY_KEYS.worldState).activeEpisodeId, EPISODE_IDS.EconomyGrowth);
+  assert.equal(LearningProgress.get(registry).selectedPolicyId, economyPolicies[0].id);
+}
+
 
 
 function testBuildingData() {
@@ -3137,8 +3182,7 @@ function testEp3PreviewViewManager() {
   assert.match(previewSceneSource, /economyPolicies/, 'EP3 preview scene should show economy policy candidates');
   assert.match(previewSceneSource, /economyBuildings/, 'EP3 preview scene should show economy building candidates');
   assert.match(previewSceneSource, /prepareEp3Placement/, 'EP3 preview scene should prepare placement context before starting placement');
-  assert.match(previewSceneSource, /EP3_ECONOMY_PLACEMENT_CONFIG_ID/, 'EP3 preview scene should select the economy placement config');
-  assert.match(previewSceneSource, /LearningProgress\.update/, 'EP3 preview scene should persist EP3 placement progress context');
+  assert.match(previewSceneSource, /EpisodePlacementLaunchManager/, 'EP3 preview scene should delegate placement launch setup');
 }
 
 
@@ -4890,6 +4934,7 @@ async function run() {
   testGameStateAndIssues();
   testLearningProgress();
   testWorldStateManager();
+  testEpisodePlacementLaunchManager();
   testBuildingData();
   testEconomyBuildingData();
   testEpisodePlacementConfigs();
