@@ -128,7 +128,37 @@ export default class PlacementUiStateManager {
     return placedCount >= requiredPlacements;
   }
 
-  static getContinueState(placedCount, selectedPolicy, selectedStrategy = null, requiredPlacements = REQUIRED_PLACEMENTS) {
+  static formatStrategySuccessProgress(strategy, currentState = null) {
+    if (!strategy?.successChecks?.length) {
+      return null;
+    }
+
+    if (!currentState) {
+      return `성공 기준: ${strategy.successChecks.map((check) => check.label).join(' · ')}`;
+    }
+
+    const checked = strategy.successChecks.map((check) => {
+      const value = currentState[check.key] ?? 0;
+      const passedMin = check.min == null || value >= check.min;
+      const passedMax = check.max == null || value <= check.max;
+      const target = check.min != null ? check.min : check.max;
+      const comparator = check.min != null ? '≥' : '≤';
+      return {
+        ...check,
+        value,
+        target,
+        comparator,
+        passed: passedMin && passedMax,
+      };
+    });
+    const passedCount = checked.filter((check) => check.passed).length;
+    const checkText = checked
+      .map((check) => `${check.passed ? '✓' : '·'} ${STATE_LABELS[check.key] ?? check.key} ${check.value}${check.comparator}${check.target}`)
+      .join(' / ');
+    return `성공 기준: ${passedCount}/${checked.length} · ${checkText}`;
+  }
+
+  static getContinueState(placedCount, selectedPolicy, selectedStrategy = null, requiredPlacements = REQUIRED_PLACEMENTS, currentState = null) {
     const resolvedRequiredPlacements = typeof selectedStrategy === 'number' ? selectedStrategy : requiredPlacements;
     const strategy = typeof selectedStrategy === 'number' ? null : selectedStrategy;
     const enabled = PlacementUiStateManager.canContinue(placedCount, resolvedRequiredPlacements);
@@ -136,9 +166,7 @@ export default class PlacementUiStateManager {
     const strategyLine = strategy ? `EP2 전략: ${strategy.title}` : null;
     const strategyGoalLine = strategy?.placementGoalShort ? `목표: ${strategy.placementGoalShort}` : null;
     const strategyObservationLine = strategy?.observationPointShort ? `관찰: ${strategy.observationPointShort}` : null;
-    const strategySuccessLine = strategy?.successChecks?.length
-      ? `성공 기준: ${strategy.successChecks.map((check) => check.label).join(' · ')}`
-      : null;
+    const strategySuccessLine = PlacementUiStateManager.formatStrategySuccessProgress(strategy, currentState);
     const policyLine = strategy ? null : selectedPolicy ? `선택 방향: ${selectedPolicy.name}` : '선택 방향: 기본 배치 연습';
     const recommendedLine = strategy ? null : selectedPolicy ? `추천 시설: ${selectedPolicy.recommendedBuildings.join(', ')}` : null;
 

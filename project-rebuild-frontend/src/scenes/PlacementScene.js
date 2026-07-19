@@ -79,6 +79,7 @@ export default class PlacementScene extends Phaser.Scene {
       this.selectedPolicy,
       this.selectedStrategy,
       this.placementConfig.requiredPlacements,
+      this.registry.get(REGISTRY_KEYS.gameState),
     );
   }
 
@@ -175,6 +176,7 @@ export default class PlacementScene extends Phaser.Scene {
       this.selectedPolicy,
       this.selectedStrategy,
       this.placementConfig.requiredPlacements,
+      this.registry.get(REGISTRY_KEYS.gameState),
     );
     this.uiUpdater.showMessage(PlacementUiStateManager.formatPlacementSuccessMessage(
       this.selectedBuilding,

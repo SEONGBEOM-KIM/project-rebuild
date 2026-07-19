@@ -71,8 +71,8 @@ export default class PlacementUiUpdater {
     this.placementHistoryText.setColor(historyState.color);
   }
 
-  updateContinueButton(placedCount, selectedPolicy, selectedStrategy = null, requiredPlacements = undefined) {
-    const continueState = this.uiStateManager.getContinueState(placedCount, selectedPolicy, selectedStrategy, requiredPlacements);
+  updateContinueButton(placedCount, selectedPolicy, selectedStrategy = null, requiredPlacements = undefined, currentState = null) {
+    const continueState = this.uiStateManager.getContinueState(placedCount, selectedPolicy, selectedStrategy, requiredPlacements, currentState);
 
     if (this.missionText) {
       this.missionText.setText(continueState.missionText);

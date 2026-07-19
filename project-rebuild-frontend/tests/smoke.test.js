@@ -2663,6 +2663,17 @@ function testPlacementViewManager() {
   assert.match(strategyContinueState.missionText, /관찰: 예산 대비 효과/);
   assert.match(strategyContinueState.missionText, /성공 기준: 인구 1100 이상 · 경제 60 이상 · 예산 500 이상 유지/);
   assert.match(strategyContinueState.missionText, /배치: 1\/3 · 남은 2개/);
+  const strategyProgressState = PlacementUiStateManager.getContinueState(
+    2,
+    policies[0],
+    EP2_MISSION_BRIEFING.strategies[0],
+    3,
+    { ...GameState.createInitialState(), population: 1120, economy: 60, budget: 490 },
+  );
+  assert.match(strategyProgressState.missionText, /성공 기준: 2\/3/);
+  assert.match(strategyProgressState.missionText, /✓ 인구 1120≥1100/);
+  assert.match(strategyProgressState.missionText, /✓ 경제 60≥60/);
+  assert.match(strategyProgressState.missionText, /· 예산 490≥500/);
   assert.doesNotMatch(strategyContinueState.missionText, /선택 방향: 청년 생활 지원/);
   assert.doesNotMatch(strategyContinueState.missionText, /추천 시설: 청년센터, 버스정류장/);
   assert.equal(PlacementUiStateManager.canContinue(2), false);
