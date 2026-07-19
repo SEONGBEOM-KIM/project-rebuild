@@ -3023,6 +3023,7 @@ function testEp3PreviewRenderer() {
   const controlsFixture = createRendererSceneSpy();
   const controls = Ep3PreviewRenderer.renderControls(controlsFixture.scene, 960);
   assert.equal(controls.layout.ending.target, 'EndingScene');
+  assert.equal(controls.layout.start.target, 'PlacementScene');
   assert.equal(controls.layout.restart.target, 'BootScene');
 }
 
@@ -3045,12 +3046,20 @@ function testEp3PreviewViewManager() {
   assert.equal(Ep3PreviewViewManager.getTransitionNoteLayout().policyBody.wordWrapWidth, 650);
   assert.equal(Ep3PreviewViewManager.getTransitionNoteLayout().buildingBody.wordWrapWidth, 650);
   assert.deepEqual(Ep3PreviewViewManager.getControlLayout(960).ending, {
-    x: 710,
+    x: 540,
     y: 955,
     label: '마무리로 돌아가기',
     target: 'EndingScene',
     backgroundColor: '#c4b5fd',
     textColor: '#1e1b4b',
+  });
+  assert.deepEqual(Ep3PreviewViewManager.getControlLayout(960).start, {
+    x: 960,
+    y: 955,
+    label: 'EP3 배치 연습 시작',
+    target: 'PlacementScene',
+    backgroundColor: '#bbf7d0',
+    textColor: '#123524',
   });
   assert.match(Ep3PreviewViewManager.formatIntroText(EP3_MISSION_PREVIEW), /일자리와 산업 성장/);
   assert.match(Ep3PreviewViewManager.formatFocusBody(EP3_MISSION_PREVIEW.focusAreas[2]), /교통 부담↑ 오염 신호↑/);
@@ -3062,6 +3071,9 @@ function testEp3PreviewViewManager() {
   assert.match(previewSceneSource, /Ep3PreviewRenderer\.renderFocusCard/, 'EP3 preview scene should render focus cards');
   assert.match(previewSceneSource, /economyPolicies/, 'EP3 preview scene should show economy policy candidates');
   assert.match(previewSceneSource, /economyBuildings/, 'EP3 preview scene should show economy building candidates');
+  assert.match(previewSceneSource, /prepareEp3Placement/, 'EP3 preview scene should prepare placement context before starting placement');
+  assert.match(previewSceneSource, /EP3_ECONOMY_PLACEMENT_CONFIG_ID/, 'EP3 preview scene should select the economy placement config');
+  assert.match(previewSceneSource, /LearningProgress\.update/, 'EP3 preview scene should persist EP3 placement progress context');
 }
 
 

@@ -71,6 +71,7 @@ export default class Ep3PreviewRenderer {
     return {
       layout,
       endingButton: createTextButton(scene, layout.ending, Ep3PreviewViewManager.getButtonStyle()),
+      startButton: createTextButton(scene, layout.start, Ep3PreviewViewManager.getButtonStyle()),
       restartButton: createTextButton(scene, layout.restart, Ep3PreviewViewManager.getButtonStyle()),
     };
   }

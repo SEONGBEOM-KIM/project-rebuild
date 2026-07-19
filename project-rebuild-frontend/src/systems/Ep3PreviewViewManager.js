@@ -111,8 +111,9 @@ export default class Ep3PreviewViewManager {
 
   static getControlLayout(centerX) {
     return {
-      ending: { x: centerX - 250, y: 955, label: '마무리로 돌아가기', target: SCENE_KEYS.Ending, backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
-      restart: { x: centerX + 250, y: 955, label: '처음부터 다시', target: SCENE_KEYS.Boot, backgroundColor: '#fde68a', textColor: '#0f172a' },
+      ending: { x: centerX - 420, y: 955, label: '마무리로 돌아가기', target: SCENE_KEYS.Ending, backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
+      start: { x: centerX, y: 955, label: 'EP3 배치 연습 시작', target: SCENE_KEYS.Placement, backgroundColor: '#bbf7d0', textColor: '#123524' },
+      restart: { x: centerX + 420, y: 955, label: '처음부터 다시', target: SCENE_KEYS.Boot, backgroundColor: '#fde68a', textColor: '#0f172a' },
     };
   }
 
