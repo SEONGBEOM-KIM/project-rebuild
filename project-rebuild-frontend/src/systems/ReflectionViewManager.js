@@ -161,7 +161,7 @@ export default class ReflectionViewManager {
 
   static formatRunContext(selectedPolicy, selectedStrategy) {
     if (selectedStrategy) {
-      return `EP2 전략: ${selectedStrategy.title}  |  목표: ${selectedStrategy.placementGoalShort ?? selectedStrategy.stateFocus}`;
+      return `배치 전략: ${selectedStrategy.title}  |  목표: ${selectedStrategy.placementGoalShort ?? selectedStrategy.stateFocus}`;
     }
 
     return `선택 방향: ${selectedPolicy?.name ?? '기본 배치 연습'}`;

@@ -172,7 +172,7 @@ export default class EvaluationManager {
   static formatEvaluationRows(evaluation, gameState, placedBuildings, selectedPolicy, selectedStrategy = null, evaluationProfile = getEvaluationProfile()) {
     const policyAlignment = EvaluationManager.calculatePolicyAlignment(selectedPolicy, placedBuildings);
     return [
-      selectedStrategy ? `EP2 전략: ${selectedStrategy.title}` : null,
+      selectedStrategy ? `배치 전략: ${selectedStrategy.title}` : null,
       `선택 방향: ${selectedPolicy?.name ?? '기본 배치 연습'}`,
       selectedStrategy ? `전략 초점: ${selectedStrategy.stateFocus}` : null,
       ...EvaluationManager.formatStrategyOutcomeRows(gameState, selectedStrategy),
@@ -289,7 +289,7 @@ export default class EvaluationManager {
     }
 
     return [
-      `EP2 전략: ${selectedStrategy.title}`,
+      `배치 전략: ${selectedStrategy.title}`,
       selectedStrategy.placementGoalShort ? `목표: ${selectedStrategy.placementGoalShort}` : null,
       selectedStrategy.observationPointShort ? `관찰: ${selectedStrategy.observationPointShort}` : null,
       '',

@@ -182,7 +182,7 @@ export default class SideEffectViewManager {
     }
 
     return [
-      `EP2 전략: ${selectedStrategy.title}`,
+      `배치 전략: ${selectedStrategy.title}`,
       selectedStrategy.observationPointShort ? `관찰 기준: ${selectedStrategy.observationPointShort}` : null,
       '',
     ].filter((row) => row !== null);

@@ -159,7 +159,7 @@ export default class LearningApiPayloadManager {
       },
       {
         ok: payload.selected_strategy == null || Boolean(payload.selected_strategy?.id),
-        label: 'EP2 전략 구조 확인',
+        label: '배치 전략 구조 확인',
         message: 'selected_strategy.id 값이 없습니다.',
       },
       {

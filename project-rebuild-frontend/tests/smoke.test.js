@@ -1033,7 +1033,7 @@ function testReflectionViewManager() {
   assert.match(runSummary, /우선 보완: 예산 부족/);
   assert.match(runSummary, /최종 상태: 인구 1240/);
   assert.equal(ReflectionViewManager.formatRunContext(policies[0], null), '선택 방향: 청년 생활 지원');
-  assert.match(ReflectionViewManager.formatRunContext(policies[0], EP2_MISSION_BRIEFING.strategies[0]), /EP2 전략: 일자리와 생활 기반/);
+  assert.match(ReflectionViewManager.formatRunContext(policies[0], EP2_MISSION_BRIEFING.strategies[0]), /배치 전략: 일자리와 생활 기반/);
   assert.match(ReflectionViewManager.formatRunContext(policies[0], EP2_MISSION_BRIEFING.strategies[0]), /목표: 인구·경제 동시 개선/);
   const strategyRunSummary = ReflectionViewManager.formatRunSummary({
     gameState: { ...GameState.createInitialState(), population: 1240, economy: 80, satisfaction: 96, budget: 460 },
@@ -1042,7 +1042,7 @@ function testReflectionViewManager() {
     selectedStrategy: EP2_MISSION_BRIEFING.strategies[0],
     placedBuildings: [createPlacementRecord('youth_center')],
   });
-  assert.match(strategyRunSummary, /EP2 전략: 일자리와 생활 기반/);
+  assert.match(strategyRunSummary, /배치 전략: 일자리와 생활 기반/);
   assert.match(strategyRunSummary, /목표: 인구·경제 동시 개선/);
   assert.doesNotMatch(strategyRunSummary, /선택 방향: 청년 생활 지원/);
   assert.match(ReflectionViewManager.formatSelectedFeedback(selectedChoice), new RegExp(`선택됨: ${selectedChoice.title}`));
@@ -1521,7 +1521,7 @@ function testEvaluationManager() {
   assert.match(focusedTrendRows, /• 오염: -4/);
   assert.doesNotMatch(focusedTrendRows, /• 예산: -440/);
   const strategyTrendRows = EvaluationManager.formatChoiceTrendRows(placedBuildings, youthPolicy, EP2_MISSION_BRIEFING.strategies[0]);
-  assert.match(strategyTrendRows, /EP2 전략: 일자리와 생활 기반/);
+  assert.match(strategyTrendRows, /배치 전략: 일자리와 생활 기반/);
   assert.match(strategyTrendRows, /목표: 인구·경제 동시 개선/);
   assert.match(strategyTrendRows, /관찰: 예산 대비 효과/);
   assert.equal(EvaluationManager.formatChoiceTrendRows([]), '배치 없음');
@@ -1578,7 +1578,7 @@ function testEvaluationManager() {
   assert.match(evaluationRows, /방향 일치: 2\/3개/);
 
   const strategyEvaluationRows = EvaluationManager.formatEvaluationRows(evaluation, finalState, placedBuildings, youthPolicy, EP2_MISSION_BRIEFING.strategies[0]);
-  assert.match(strategyEvaluationRows, /EP2 전략: 일자리와 생활 기반/);
+  assert.match(strategyEvaluationRows, /배치 전략: 일자리와 생활 기반/);
   assert.match(strategyEvaluationRows, /전략 초점: 인구↑ 경제↑ 예산↓/);
   assert.match(strategyEvaluationRows, /전략 판정: 목표 달성/);
   assert.match(strategyEvaluationRows, /다음 행동: 선택한 전략의 핵심 조건을 모두 만족/);
@@ -1653,7 +1653,7 @@ function testSideEffectRenderer() {
   const hintFixture = createRendererSceneSpy();
   SideEffectRenderer.renderConceptPanel(hintFixture.scene, issues, EP2_MISSION_BRIEFING.strategies[0]);
   assert.ok(hintFixture.calls.some((call) => call[0] === 'text' && call[3] === '다음 선택 힌트'));
-  assert.ok(hintFixture.calls.some((call) => call[0] === 'text' && call[3].includes('EP2 전략: 일자리와 생활 기반')));
+  assert.ok(hintFixture.calls.some((call) => call[0] === 'text' && call[3].includes('배치 전략: 일자리와 생활 기반')));
   assert.ok(hintFixture.calls.some((call) => call[0] === 'text' && call[3].includes('관찰 기준: 예산 대비 효과')));
   assert.ok(hintFixture.calls.some((call) => call[0] === 'text' && call[3].includes('대응:')));
 }
@@ -1719,12 +1719,12 @@ function testSideEffectViewManager() {
     '대응: 다음 미션에서는 더 많은 정책 조합을 비교합니다.',
   ]);
   assert.deepEqual(SideEffectViewManager.formatStrategyHintRows(EP2_MISSION_BRIEFING.strategies[0]), [
-    'EP2 전략: 일자리와 생활 기반',
+    '배치 전략: 일자리와 생활 기반',
     '관찰 기준: 예산 대비 효과',
     '',
   ]);
   const strategyHintRows = SideEffectViewManager.formatHintRows([], EP2_MISSION_BRIEFING.strategies[0]);
-  assert.equal(strategyHintRows[0], 'EP2 전략: 일자리와 생활 기반');
+  assert.equal(strategyHintRows[0], '배치 전략: 일자리와 생활 기반');
   assert.match(strategyHintRows.join('\n'), /인구·경제 동시 개선 목표는 유지/);
 
   const issues = IssueDetector.detect({ ...GameState.createInitialState(), budget: 400, satisfaction: 50 });
@@ -2642,7 +2642,7 @@ function testPlacementUiUpdater() {
   assert.doesNotMatch(placementHistoryText.text, /인구 \+80/);
 
   updater.updateContinueButton(1, policies[0], EP2_MISSION_BRIEFING.strategies[0]);
-  assert.match(missionText.text, /EP2 전략: 일자리와 생활 기반/);
+  assert.match(missionText.text, /배치 전략: 일자리와 생활 기반/);
   assert.match(missionText.text, /목표: 인구·경제 동시 개선/);
   assert.match(missionText.text, /관찰: 예산 대비 효과/);
   assert.match(missionText.text, /배치: 1\/3 · 남은 2개/);
@@ -2898,7 +2898,7 @@ function testPlacementViewManager() {
   assert.match(continueState.missionText, /추천 시설: 작은 공원/);
 
   const strategyContinueState = PlacementUiStateManager.getContinueState(1, policies[0], EP2_MISSION_BRIEFING.strategies[0]);
-  assert.match(strategyContinueState.missionText, /EP2 전략: 일자리와 생활 기반/);
+  assert.match(strategyContinueState.missionText, /배치 전략: 일자리와 생활 기반/);
   assert.match(strategyContinueState.missionText, /목표: 인구·경제 동시 개선/);
   assert.match(strategyContinueState.missionText, /관찰: 예산 대비 효과/);
   assert.match(strategyContinueState.missionText, /성공 기준: 인구 1100 이상 · 경제 60 이상 · 예산 500 이상 유지/);
@@ -3371,7 +3371,7 @@ function testEndingSummaryManager() {
     reflectionChoice,
     selectedStrategy: EP2_MISSION_BRIEFING.strategies[0],
   });
-  assert.match(strategyTakeaway, /EP2 전략: 일자리와 생활 기반/);
+  assert.match(strategyTakeaway, /배치 전략: 일자리와 생활 기반/);
   assert.match(strategyTakeaway, /목표: 인구·경제 동시 개선/);
   assert.match(strategyTakeaway, /다음 액션: 예산 안의 우선순위 정하기/);
   assert.match(EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice), /선택 방향: 청년 생활 지원/);
@@ -3383,7 +3383,7 @@ function testEndingSummaryManager() {
   assert.doesNotMatch(focusedStateSummary, /• 인구:/);
 
   const strategyChoiceSummary = EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice, EP2_MISSION_BRIEFING.strategies[0]);
-  assert.match(strategyChoiceSummary, /EP2 전략: 일자리와 생활 기반/);
+  assert.match(strategyChoiceSummary, /배치 전략: 일자리와 생활 기반/);
   assert.match(strategyChoiceSummary, /전략 초점: 인구↑ 경제↑ 예산↓/);
   assert.match(EndingSummaryManager.formatStateSummary(finalState, ending), /최종 상태:/);
   assert.match(EndingSummaryManager.formatStateSummary(finalState, ending), /큰 부작용 신호 없음/);
@@ -3412,7 +3412,7 @@ function testEndingSummaryManager() {
   assert.match(rows[0], /평가 기준: ep2_environment_focus/);
   assert.match(rows[1], /탐색: 3\/5곳 확인/);
   assert.match(rows[3], /원인 질문: 정답/);
-  assert.match(rows[4], /EP2 전략: 일자리와 생활 기반/);
+  assert.match(rows[4], /배치 전략: 일자리와 생활 기반/);
   assert.match(rows[4], /초점: 인구↑ 경제↑ 예산↓/);
   assert.match(rows[5], /생각 정리: 예산 균형 보완/);
   assert.match(rows[5], new RegExp(reflectionChoice.nextActionLabel));
@@ -3700,7 +3700,7 @@ function testLearningDataViewManager() {
   assert.match(LearningDataViewManager.formatSummaryText(completeData), /환경 우선 회복안/);
   assert.match(LearningDataViewManager.formatSummaryText(completeData), /EP1\. 지역 위기 탐색 → EP2\. 인구 유입 전략/);
   assert.match(LearningDataViewManager.formatSummaryText(completeData), /ep2_environment_focus/);
-  assert.match(LearningDataViewManager.formatSummaryText(completeData), /EP2 전략: 균형 성장/);
+  assert.match(LearningDataViewManager.formatSummaryText(completeData), /배치 전략: 균형 성장/);
   assert.match(LearningDataViewManager.formatSummaryText(completeData), /회복 방향: 녹색 회복 계획/);
   assert.match(LearningDataViewManager.formatSummaryText(completeData), /우선 보완/);
   const completeSummary = LearningDataViewManager.getValidationSummary(completeData);

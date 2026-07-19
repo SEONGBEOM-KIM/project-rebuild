@@ -112,7 +112,7 @@ export default class SavedDataViewManager {
     return [
       `저장 시각: ${savedAt} / ${currentEpisodeText} → ${placementEpisodeText}`,
       `탐색 ${exploredCount}곳 / 배치 ${placementCount}개 / 완료: ${data.completed ? '예' : '아니오'}`,
-      `회복 방향: ${policyName} / EP2 전략: ${strategyTitle}`,
+      `회복 방향: ${policyName} / 배치 전략: ${strategyTitle}`,
       `배치 설정: ${configText} / 평가 기준: ${profileText}`,
     ].join('\n');
   }

@@ -163,7 +163,7 @@ export default class PlacementUiStateManager {
     const strategy = typeof selectedStrategy === 'number' ? null : selectedStrategy;
     const enabled = PlacementUiStateManager.canContinue(placedCount, resolvedRequiredPlacements);
     const remaining = Math.max(0, resolvedRequiredPlacements - placedCount);
-    const strategyLine = strategy ? `EP2 전략: ${strategy.title}` : null;
+    const strategyLine = strategy ? `배치 전략: ${strategy.title}` : null;
     const strategyGoalLine = strategy?.placementGoalShort ? `목표: ${strategy.placementGoalShort}` : null;
     const strategyObservationLine = strategy?.observationPointShort ? `관찰: ${strategy.observationPointShort}` : null;
     const strategySuccessLine = PlacementUiStateManager.formatStrategySuccessProgress(strategy, currentState);
