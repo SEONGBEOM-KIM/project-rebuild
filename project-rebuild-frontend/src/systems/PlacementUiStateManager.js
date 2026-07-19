@@ -136,6 +136,9 @@ export default class PlacementUiStateManager {
     const strategyLine = strategy ? `EP2 전략: ${strategy.title}` : null;
     const strategyGoalLine = strategy?.placementGoalShort ? `목표: ${strategy.placementGoalShort}` : null;
     const strategyObservationLine = strategy?.observationPointShort ? `관찰: ${strategy.observationPointShort}` : null;
+    const strategySuccessLine = strategy?.successChecks?.length
+      ? `성공 기준: ${strategy.successChecks.map((check) => check.label).join(' · ')}`
+      : null;
     const policyLine = strategy ? null : selectedPolicy ? `선택 방향: ${selectedPolicy.name}` : '선택 방향: 기본 배치 연습';
     const recommendedLine = strategy ? null : selectedPolicy ? `추천 시설: ${selectedPolicy.recommendedBuildings.join(', ')}` : null;
 
@@ -146,6 +149,7 @@ export default class PlacementUiStateManager {
         strategyLine,
         strategyGoalLine,
         strategyObservationLine,
+        strategySuccessLine,
         policyLine,
         recommendedLine,
         remaining > 0

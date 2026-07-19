@@ -104,12 +104,44 @@ export default class EvaluationManager {
     return '핵심 해석: 아직 뚜렷한 강점보다 보완할 지표를 찾는 단계입니다.';
   }
 
+
+  static evaluateStrategySuccessChecks(gameState, selectedStrategy = null) {
+    if (!selectedStrategy?.successChecks?.length) {
+      return [];
+    }
+
+    return selectedStrategy.successChecks.map((check) => {
+      const value = gameState[check.key] ?? 0;
+      const passedMin = check.min == null || value >= check.min;
+      const passedMax = check.max == null || value <= check.max;
+      return {
+        ...check,
+        value,
+        passed: passedMin && passedMax,
+      };
+    });
+  }
+
+  static formatStrategySuccessRows(gameState, selectedStrategy = null) {
+    const checks = EvaluationManager.evaluateStrategySuccessChecks(gameState, selectedStrategy);
+    if (!checks.length) {
+      return [];
+    }
+
+    const passedCount = checks.filter((check) => check.passed).length;
+    return [
+      `전략 성공 기준: ${passedCount}/${checks.length} 충족`,
+      ...checks.map((check) => `• ${check.passed ? '충족' : '미충족'} · ${check.label} (현재 ${STATE_LABELS[check.key] ?? check.key}: ${check.value})`),
+    ];
+  }
+
   static formatEvaluationRows(evaluation, gameState, placedBuildings, selectedPolicy, selectedStrategy = null, evaluationProfile = getEvaluationProfile()) {
     const policyAlignment = EvaluationManager.calculatePolicyAlignment(selectedPolicy, placedBuildings);
     return [
       selectedStrategy ? `EP2 전략: ${selectedStrategy.title}` : null,
       `선택 방향: ${selectedPolicy?.name ?? '기본 배치 연습'}`,
       selectedStrategy ? `전략 초점: ${selectedStrategy.stateFocus}` : null,
+      ...EvaluationManager.formatStrategySuccessRows(gameState, selectedStrategy),
       `배치 수: ${placedBuildings.length}개`,
       policyAlignment.label,
       `균형 점수: ${evaluation.score}/100`,

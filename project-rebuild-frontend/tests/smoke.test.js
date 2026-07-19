@@ -1534,6 +1534,18 @@ function testEvaluationManager() {
   const strategyEvaluationRows = EvaluationManager.formatEvaluationRows(evaluation, finalState, placedBuildings, youthPolicy, EP2_MISSION_BRIEFING.strategies[0]);
   assert.match(strategyEvaluationRows, /EP2 전략: 일자리와 생활 기반/);
   assert.match(strategyEvaluationRows, /전략 초점: 인구↑ 경제↑ 예산↓/);
+  assert.match(strategyEvaluationRows, /전략 성공 기준: 3\/3 충족/);
+  assert.match(strategyEvaluationRows, /충족 · 인구 1100 이상/);
+  const environmentStrategyRows = EvaluationManager.formatStrategySuccessRows(
+    { ...finalState, environment: 84, pollution: 11, budget: 640 },
+    EP2_MISSION_BRIEFING.strategies[2],
+  );
+  assert.deepEqual(environmentStrategyRows, [
+    '전략 성공 기준: 0/3 충족',
+    '• 미충족 · 환경 85 이상 (현재 환경: 84)',
+    '• 미충족 · 오염 10 이하 (현재 오염: 11)',
+    '• 미충족 · 예산 650 이상 유지 (현재 예산: 640)',
+  ]);
   assert.match(evaluationRows, /균형 점수: 92\/100/);
   assert.match(evaluationRows, /핵심 해석:/);
   assert.match(evaluationRows, /주의 신호:/);
@@ -2649,6 +2661,7 @@ function testPlacementViewManager() {
   assert.match(strategyContinueState.missionText, /EP2 전략: 일자리와 생활 기반/);
   assert.match(strategyContinueState.missionText, /목표: 인구·경제 동시 개선/);
   assert.match(strategyContinueState.missionText, /관찰: 예산 대비 효과/);
+  assert.match(strategyContinueState.missionText, /성공 기준: 인구 1100 이상 · 경제 60 이상 · 예산 500 이상 유지/);
   assert.match(strategyContinueState.missionText, /배치: 1\/3 · 남은 2개/);
   assert.doesNotMatch(strategyContinueState.missionText, /선택 방향: 청년 생활 지원/);
   assert.doesNotMatch(strategyContinueState.missionText, /추천 시설: 청년센터, 버스정류장/);
@@ -2974,6 +2987,7 @@ function testEp2BriefingViewManager() {
   assert.equal(Ep2BriefingViewManager.resolveStrategy(EP2_MISSION_BRIEFING, 'housing_mobility', 'youth_living_support').id, 'housing_mobility');
   assert.equal(Ep2BriefingViewManager.getDefaultStrategy(EP2_MISSION_BRIEFING).id, 'jobs_services');
   assert.equal(EP2_MISSION_BRIEFING.strategies.every((strategy) => strategy.placementGoal && strategy.observationPoint), true);
+  assert.equal(EP2_MISSION_BRIEFING.strategies.every((strategy) => strategy.successChecks?.length >= 3), true);
   const briefingSceneSource = readProjectFile('src', 'scenes', 'Ep2BriefingScene.js');
   assert.match(briefingSceneSource, /renderSelectedStrategyPanel/, 'EP2 briefing should show selected strategy summary panel');
   assert.match(briefingSceneSource, /formatSelectedStrategySummary/, 'EP2 briefing should refresh selected strategy summary when selection changes');

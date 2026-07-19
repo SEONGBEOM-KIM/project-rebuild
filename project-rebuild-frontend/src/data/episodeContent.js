@@ -121,6 +121,11 @@ export const EP2_MISSION_BRIEFING = {
       placementGoalShort: '인구·경제 동시 개선',
       observationPoint: '예산 감소 폭이 커질 때 만족도와 경제 효과가 충분히 보상하는지 비교합니다.',
       observationPointShort: '예산 대비 효과',
+      successChecks: [
+        { key: 'population', label: '인구 1100 이상', min: 1100 },
+        { key: 'economy', label: '경제 60 이상', min: 60 },
+        { key: 'budget', label: '예산 500 이상 유지', min: 500 },
+      ],
       color: 0x38bdf8,
     },
     {
@@ -136,6 +141,11 @@ export const EP2_MISSION_BRIEFING = {
       placementGoalShort: '이동·만족도 개선',
       observationPoint: '이동 편의가 높아질수록 의료·교육·시장 접근성이 어떻게 좋아지는지 살펴봅니다.',
       observationPointShort: '교통 부담 변화',
+      successChecks: [
+        { key: 'satisfaction', label: '만족도 75 이상', min: 75 },
+        { key: 'traffic', label: '교통 부담 7 이하', max: 7 },
+        { key: 'budget', label: '예산 500 이상 유지', min: 500 },
+      ],
       color: 0xfacc15,
     },
     {
@@ -151,6 +161,11 @@ export const EP2_MISSION_BRIEFING = {
       placementGoalShort: '환경·만족도 균형',
       observationPoint: '개발 효과가 커질 때 환경과 오염 지표가 함께 나빠지지 않는지 확인합니다.',
       observationPointShort: '오염 지표 변화',
+      successChecks: [
+        { key: 'environment', label: '환경 85 이상', min: 85 },
+        { key: 'pollution', label: '오염 10 이하', max: 10 },
+        { key: 'budget', label: '예산 650 이상 유지', min: 650 },
+      ],
       color: 0x4ade80,
     },
   ],
