@@ -9,4 +9,5 @@ export const REGISTRY_KEYS = Object.freeze({
   quizResult: 'quizResult',
   reflectionChoice: 'reflectionChoice',
   learningProgress: 'learningProgress',
+  worldState: 'worldState',
 });

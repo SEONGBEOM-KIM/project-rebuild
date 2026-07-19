@@ -18,6 +18,7 @@ import Ep2BriefingRenderer from '../src/systems/Ep2BriefingRenderer.js';
 import Ep3PreviewViewManager from '../src/systems/Ep3PreviewViewManager.js';
 import Ep3PreviewRenderer from '../src/systems/Ep3PreviewRenderer.js';
 import LearningProgress from '../src/systems/LearningProgress.js';
+import WorldStateManager from '../src/systems/WorldStateManager.js';
 import CauseQuizManager from '../src/systems/CauseQuizManager.js';
 import CauseQuizViewManager from '../src/systems/CauseQuizViewManager.js';
 import CauseQuizPanelRenderer from '../src/systems/CauseQuizPanelRenderer.js';
@@ -1781,6 +1782,52 @@ function testLearningProgress() {
   assert.deepEqual(progress.placedBuildingIds, ['youth_center']);
   assert.equal(LearningProgress.createInitialProgress().selectedStrategyId, null);
   assert.equal(LearningProgress.createInitialProgress().placementConfigId, null);
+}
+
+function testWorldStateManager() {
+  const registry = createMemoryRegistry();
+  const worldState = WorldStateManager.createInitialWorldState();
+
+  assert.equal(worldState.regionId, 'blue-county');
+  assert.equal(worldState.regionName, '푸른군');
+  assert.deepEqual(worldState.gameState, GameState.createInitialState());
+  assert.deepEqual(worldState.placements, []);
+  assert.deepEqual(worldState.completedEpisodeIds, []);
+  assert.deepEqual(worldState.episodeRuns, {});
+
+  const ep2Started = WorldStateManager.startEpisode(worldState, EPISODE_IDS.PopulationRecovery);
+  assert.equal(ep2Started.activeEpisodeId, EPISODE_IDS.PopulationRecovery);
+  assert.deepEqual(ep2Started.episodeRuns[EPISODE_IDS.PopulationRecovery].placementIds, []);
+
+  const placement = {
+    id: 'youth_center-1-0',
+    buildingId: 'youth_center',
+    position: { x: 1, y: 1 },
+    occupiedTiles: [{ x: 1, y: 1 }],
+    effect: { population: 80, budget: -180 },
+  };
+  const withPlacements = WorldStateManager.appendPlacements(ep2Started, [placement]);
+  assert.equal(withPlacements.placements[0].episodeId, EPISODE_IDS.PopulationRecovery);
+  assert.deepEqual(withPlacements.episodeRuns[EPISODE_IDS.PopulationRecovery].placementIds, ['youth_center-1-0']);
+
+  const completed = WorldStateManager.completeEpisode(withPlacements, EPISODE_IDS.PopulationRecovery, {
+    gameState: { ...GameState.createInitialState(), population: 1080, budget: 820 },
+  });
+  assert.deepEqual(completed.completedEpisodeIds, [EPISODE_IDS.PopulationRecovery]);
+  assert.equal(completed.episodeRuns[EPISODE_IDS.PopulationRecovery].completed, true);
+  assert.equal(completed.gameState.population, 1080);
+
+  const isolatedSeed = WorldStateManager.buildPlacementSeed(completed);
+  assert.deepEqual(isolatedSeed.gameState, GameState.createInitialState(), 'isolated episode proof should start from default state');
+  assert.deepEqual(isolatedSeed.placedBuildings, [], 'isolated episode proof should not inherit prior placements');
+
+  const cumulativeSeed = WorldStateManager.buildPlacementSeed(completed, { cumulative: true });
+  assert.equal(cumulativeSeed.gameState.population, 1080);
+  assert.equal(cumulativeSeed.placedBuildings[0].id, 'youth_center-1-0');
+
+  WorldStateManager.set(registry, completed);
+  assert.equal(registry.get(REGISTRY_KEYS.worldState).regionName, '푸른군');
+  assert.equal(WorldStateManager.update(registry, { activeEpisodeId: EPISODE_IDS.EconomyGrowth }).activeEpisodeId, EPISODE_IDS.EconomyGrowth);
 }
 
 
@@ -4842,6 +4889,7 @@ async function run() {
   testSideEffectIssueRenderer();
   testGameStateAndIssues();
   testLearningProgress();
+  testWorldStateManager();
   testBuildingData();
   testEconomyBuildingData();
   testEpisodePlacementConfigs();
