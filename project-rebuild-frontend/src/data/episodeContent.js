@@ -1,4 +1,4 @@
-import { DEFAULT_PLACEMENT_CONFIG_ID } from './episodePlacementConfigs.js';
+import { DEFAULT_PLACEMENT_CONFIG_ID, ENVIRONMENT_PLACEMENT_CONFIG_ID } from './episodePlacementConfigs.js';
 import { CURRENT_EPISODE, CURRENT_PLACEMENT_EPISODE, EPISODE_IDS } from './episodes.js';
 export const EP1_DATA_CARDS = [
   {
@@ -141,7 +141,7 @@ export const EP2_MISSION_BRIEFING = {
     {
       id: 'balanced_growth',
       policyId: 'green_recovery',
-      placementConfigId: DEFAULT_PLACEMENT_CONFIG_ID,
+      placementConfigId: ENVIRONMENT_PLACEMENT_CONFIG_ID,
       title: '균형 성장',
       icon: '🌿',
       description: '개발 효과와 환경 부담을 함께 비교해 오래 지속되는 회복을 노립니다.',

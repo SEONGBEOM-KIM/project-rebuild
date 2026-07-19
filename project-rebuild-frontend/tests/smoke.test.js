@@ -1764,9 +1764,11 @@ function testEpisodePlacementConfigs() {
   assert.equal(environmentConfig.evaluationProfileId, ENVIRONMENT_EVALUATION_PROFILE_ID);
   assert.equal(getPlacementConfig('missing_config').id, DEFAULT_PLACEMENT_CONFIG_ID, 'unknown config ids should fall back safely');
   for (const strategy of EP2_MISSION_BRIEFING.strategies) {
-    assert.equal(getPlacementConfigIdForStrategy(strategy), DEFAULT_PLACEMENT_CONFIG_ID, `${strategy.id} should declare a valid placement config`);
-    assert.equal(getPlacementConfig(strategy.placementConfigId).id, DEFAULT_PLACEMENT_CONFIG_ID);
+    assert.equal(getPlacementConfig(strategy.placementConfigId).id, strategy.placementConfigId, `${strategy.id} should declare a valid placement config`);
   }
+  const balancedGrowthStrategy = EP2_MISSION_BRIEFING.strategies.find((strategy) => strategy.id === 'balanced_growth');
+  assert.equal(getPlacementConfigIdForStrategy(balancedGrowthStrategy), ENVIRONMENT_PLACEMENT_CONFIG_ID);
+  assert.equal(getPlacementConfigIdForStrategy(EP2_MISSION_BRIEFING.strategies.find((strategy) => strategy.id === 'jobs_services')), DEFAULT_PLACEMENT_CONFIG_ID);
 }
 
 
@@ -4219,18 +4221,19 @@ function testApiContract() {
   assert.equal(API_CONTRACT.requestExample.summary.selected_policy_name, examplePolicy.name);
   assert.equal(API_CONTRACT.requestExample.summary.selected_strategy_title, exampleStrategy.title);
   assert.deepEqual(API_CONTRACT.requestExample.summary.placement_context, {
-    placement_config_id: DEFAULT_PLACEMENT_CONFIG_ID,
-    placement_config_title: '푸른군 인구 회복 배치 실험',
-    required_placements: 3,
-    evaluation_profile_id: DEFAULT_EVALUATION_PROFILE_ID,
+    placement_config_id: ENVIRONMENT_PLACEMENT_CONFIG_ID,
+    placement_config_title: '푸른군 환경 균형 배치 실험',
+    required_placements: 2,
+    evaluation_profile_id: ENVIRONMENT_EVALUATION_PROFILE_ID,
   });
   assert.equal(API_CONTRACT.requestExample.learning_steps.quiz_result.question_id, EP1_CAUSE_QUESTION.id);
   assert.equal(API_CONTRACT.requestExample.learning_steps.quiz_result.selected, EP1_CAUSE_QUESTION.choices.find((choice) => choice.correct).id);
   assert.equal(API_CONTRACT.requestExample.selected_strategy.id, exampleStrategy.id);
-  assert.equal(API_CONTRACT.requestExample.selected_strategy.placement_config_id, DEFAULT_PLACEMENT_CONFIG_ID);
-  assert.equal(API_CONTRACT.requestExample.placement_config.id, DEFAULT_PLACEMENT_CONFIG_ID);
-  assert.equal(API_CONTRACT.requestExample.placement_config.evaluation_profile_id, DEFAULT_EVALUATION_PROFILE_ID);
-  assert.equal(API_CONTRACT.requestExample.evaluation_profile.id, DEFAULT_EVALUATION_PROFILE_ID);
+  assert.equal(API_CONTRACT.requestExample.selected_strategy.placement_config_id, ENVIRONMENT_PLACEMENT_CONFIG_ID);
+  assert.equal(API_CONTRACT.requestExample.placement_config.id, ENVIRONMENT_PLACEMENT_CONFIG_ID);
+  assert.equal(API_CONTRACT.requestExample.placement_config.required_placements, 2);
+  assert.equal(API_CONTRACT.requestExample.placement_config.evaluation_profile_id, ENVIRONMENT_EVALUATION_PROFILE_ID);
+  assert.equal(API_CONTRACT.requestExample.evaluation_profile.id, ENVIRONMENT_EVALUATION_PROFILE_ID);
   assert.equal(API_CONTRACT.requestExample.placements[0].building_name, exampleBuilding.name);
   assert.deepEqual(API_CONTRACT.requestExample.placements[0].effect, exampleBuilding.effect);
   assert.equal(API_CONTRACT.successResponseExample.episode_id, API_CONTRACT.requestExample.episode_id);
