@@ -1,4 +1,5 @@
 import SCENE_KEYS from '../data/sceneKeys.js';
+import { getDefaultPlacementConfig } from '../data/episodePlacementConfigs.js';
 
 const SELECTION_SCREEN_LAYOUT = {
   backgroundColor: 0x172554,
@@ -95,11 +96,12 @@ export default class SelectionViewManager {
     if (!policy) {
       return ['선택된 회복 방향이 없습니다.', '', '회복 방향을 선택한 뒤 배치 연습을 시작하세요.'];
     }
+    const requiredPlacements = getDefaultPlacementConfig().requiredPlacements;
 
     return [
       `선택됨: ${policy.name}`,
       policy.note,
-      '다음 화면에서는 이 전략에 맞는 추천 시설을 참고해 건물 3개를 배치합니다.',
+      `다음 화면에서는 이 전략에 맞는 추천 시설을 참고해 건물 ${requiredPlacements}개를 배치합니다.`,
     ];
   }
 

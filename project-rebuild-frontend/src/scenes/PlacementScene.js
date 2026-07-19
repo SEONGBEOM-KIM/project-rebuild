@@ -169,7 +169,11 @@ export default class PlacementScene extends Phaser.Scene {
       this.selectedStrategy,
       this.placementConfig.requiredPlacements,
     );
-    this.uiUpdater.showMessage(PlacementUiStateManager.formatPlacementSuccessMessage(this.selectedBuilding, this.placedBuildings.length), '#bbf7d0');
+    this.uiUpdater.showMessage(PlacementUiStateManager.formatPlacementSuccessMessage(
+      this.selectedBuilding,
+      this.placedBuildings.length,
+      this.placementConfig.requiredPlacements,
+    ), '#bbf7d0');
     this.updatePreview(pointer);
   }
 

@@ -2641,6 +2641,7 @@ function testPlacementViewManager() {
   assert.equal(PlacementUiStateManager.canContinue(3), true);
   assert.equal(PlacementUiStateManager.getContinueState(3, null).buttonText, '종합 결과 확인');
   assert.equal(PlacementUiStateManager.formatPlacementSuccessMessage('청년센터', 3), '청년센터 배치 완료\n종합 결과를 확인할 수 있습니다.');
+  assert.equal(PlacementUiStateManager.formatPlacementSuccessMessage('청년센터', 2, 2), '청년센터 배치 완료\n종합 결과를 확인할 수 있습니다.');
   assert.match(PlacementUiStateManager.formatPlacementSuccessMessage(youthCenter, 2), /변화: 인구 \+80 \/ 경제 \+10 \/ 만족도 \+12 \/ 예산 -180/);
   assert.match(PlacementUiStateManager.formatPlacementSuccessMessage(youthCenter, 2), /시설 1개를 더 배치하세요/);
   assert.equal(PlacementUiStateManager.formatNeedMoreMessage(1), '종합 결과를 보려면 시설 2개를 더 배치하세요.');
@@ -3299,6 +3300,22 @@ function testLearningDataViewManager() {
   assert.equal(incompleteSummary.title, '검토 필요');
   assert.match(incompleteSummary.body, /배치 기록이 3개 미만입니다/);
   assert.match(incompleteSummary.body, /EP1 완료 플래그가 true가 아닙니다/);
+
+  const alternateRequiredSummary = LearningDataViewManager.getValidationSummary(createCompleteLearningData({
+    placementConfig: {
+      ...completeData.placementConfig,
+      requiredPlacements: 2,
+    },
+    summary: {
+      ...completeData.summary,
+      placementContext: {
+        ...completeData.summary.placementContext,
+        requiredPlacements: 2,
+      },
+    },
+    placements: completeData.placements.slice(0, 2),
+  }));
+  assert.equal(alternateRequiredSummary.ok, true);
 
   assert.equal(LearningDataViewManager.formatSavedAt(null), '알 수 없음');
   assert.equal(LearningDataViewManager.formatSavedAt('not-a-date'), 'not-a-date');

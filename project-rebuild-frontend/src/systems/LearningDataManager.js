@@ -129,7 +129,14 @@ export default class LearningDataManager {
       || Boolean(Ep2BriefingViewManager.findStrategyByPolicyId(getCurrentPlacementMissionBriefing(), data.selectedPolicy?.id));
   }
 
+  static getRequiredPlacements(data) {
+    return data?.summary?.placementContext?.requiredPlacements
+      ?? data?.placementConfig?.requiredPlacements
+      ?? 3;
+  }
+
   static validate(data) {
+    const requiredPlacements = LearningDataManager.getRequiredPlacements(data);
     return [
       {
         ok: data.episode === 1,
@@ -192,9 +199,9 @@ export default class LearningDataManager {
         message: '선택한 EP2 전략이 없습니다.',
       },
       {
-        ok: Array.isArray(data.placements) && data.placements.length >= 3,
-        label: '시설 배치 3개 이상',
-        message: '배치 기록이 3개 미만입니다.',
+        ok: Array.isArray(data.placements) && data.placements.length >= requiredPlacements,
+        label: `시설 배치 ${requiredPlacements}개 이상`,
+        message: `배치 기록이 ${requiredPlacements}개 미만입니다.`,
       },
       {
         ok: Boolean(data.reflectionChoice?.id),
