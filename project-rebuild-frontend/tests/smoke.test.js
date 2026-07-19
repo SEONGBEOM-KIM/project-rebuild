@@ -1777,6 +1777,13 @@ function testPlacementContextManager() {
 
   assert.equal(PlacementContextManager.resolvePlacementConfigId({ selectedStrategy: strategy }), DEFAULT_PLACEMENT_CONFIG_ID);
   assert.equal(PlacementContextManager.resolvePlacementConfigIdFromLearningData({ placementConfig: { id: 'custom_config' }, selectedStrategy: { placementConfigId: 'legacy_config' } }, strategy), 'custom_config');
+  assert.equal(
+    PlacementContextManager.resolvePlacementConfigIdFromLearningData({
+      summary: { placementContext: { placementConfigId: ENVIRONMENT_PLACEMENT_CONFIG_ID } },
+      selectedStrategy: { placementConfigId: 'legacy_config' },
+    }, strategy),
+    ENVIRONMENT_PLACEMENT_CONFIG_ID,
+  );
   assert.equal(PlacementContextManager.resolvePlacementConfigIdFromLearningData({ selectedStrategy: { placementConfigId: 'legacy_config' } }, strategy), 'legacy_config');
 
   const fromStrategy = PlacementContextManager.resolve({ selectedStrategy: strategy });
@@ -3778,6 +3785,25 @@ function testLearningDataRestoreManager() {
   );
   assert.equal(legacyProgress.placementConfigId, DEFAULT_PLACEMENT_CONFIG_ID);
 
+  const summaryOnlyProgress = LearningDataRestoreManager.buildProgress(
+    {
+      ...data,
+      placementConfig: null,
+      selectedStrategy: { ...data.selectedStrategy, placementConfigId: null },
+      summary: {
+        ...data.summary,
+        placementContext: {
+          ...data.summary.placementContext,
+          placementConfigId: ENVIRONMENT_PLACEMENT_CONFIG_ID,
+        },
+      },
+    },
+    restored.selectedPolicy,
+    null,
+    restored.placedBuildings,
+  );
+  assert.equal(summaryOnlyProgress.placementConfigId, ENVIRONMENT_PLACEMENT_CONFIG_ID);
+
   const derivedRegistry = createMemoryRegistry();
   const derivedData = {
     ...data,
@@ -3891,6 +3917,7 @@ function testSavedDataViewManager() {
   assert.equal(SavedDataViewManager.getContinueTargetScene({ data: { quizResult: { correct: true } } }), 'ProblemSummaryScene');
   assert.equal(SavedDataViewManager.getContinueTargetScene({ data: { problemSummaryCompleted: true } }), 'Ep2BriefingScene');
   assert.equal(SavedDataViewManager.getContinueTargetScene({ data: { selectedPolicy: { id: 'youth_living_support' } } }), 'PlacementScene');
+  assert.equal(SavedDataViewManager.getContinueTargetScene({ data: { placements: [{}, {}], summary: { placementContext: { requiredPlacements: 2 } } } }), 'ResultScene');
   assert.equal(SavedDataViewManager.getContinueTargetScene({ data: { placements: [{}, {}, {}] } }), 'ResultScene');
   assert.equal(SavedDataViewManager.getContinueTargetScene({ data: { completed: true } }), 'EndingScene');
   assert.equal(SavedDataViewManager.formatContinueLabel('PlacementScene'), '배치 이어보기');
@@ -3910,12 +3937,13 @@ function testSavedDataViewManager() {
   assert.match(SavedDataViewManager.formatSummary(fullSaved), /ep2_population_recovery/);
   assert.match(SavedDataViewManager.formatSummary(fullSaved), /ep2_population_recovery_default/);
   assert.deepEqual(SavedDataViewManager.getPlacementContext({
-    summary: { placementContext: { placementConfigId: ENVIRONMENT_PLACEMENT_CONFIG_ID, evaluationProfileId: ENVIRONMENT_EVALUATION_PROFILE_ID } },
+    summary: { placementContext: { placementConfigId: ENVIRONMENT_PLACEMENT_CONFIG_ID, evaluationProfileId: ENVIRONMENT_EVALUATION_PROFILE_ID, requiredPlacements: 2 } },
     placementConfig: { id: DEFAULT_PLACEMENT_CONFIG_ID },
     evaluationProfile: { id: DEFAULT_EVALUATION_PROFILE_ID },
   }), {
     placementConfigId: ENVIRONMENT_PLACEMENT_CONFIG_ID,
     evaluationProfileId: ENVIRONMENT_EVALUATION_PROFILE_ID,
+    requiredPlacements: 2,
   });
   assert.match(SavedDataViewManager.formatSummary({
     data: {

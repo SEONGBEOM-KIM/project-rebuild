@@ -122,7 +122,14 @@ export default class SavedDataViewManager {
     return {
       placementConfigId: summaryContext?.placementConfigId ?? data?.placementConfig?.id ?? null,
       evaluationProfileId: summaryContext?.evaluationProfileId ?? data?.evaluationProfile?.id ?? null,
+      requiredPlacements: summaryContext?.requiredPlacements ?? data?.placementConfig?.requiredPlacements ?? null,
     };
+  }
+
+  static hasCompletedRequiredPlacements(data) {
+    const placementCount = data?.placements?.length ?? 0;
+    const requiredPlacements = SavedDataViewManager.getPlacementContext(data).requiredPlacements ?? 3;
+    return placementCount >= requiredPlacements;
   }
 
   static formatSavedAt(savedAt) {
@@ -165,7 +172,7 @@ export default class SavedDataViewManager {
     if (data.completed) {
       return SCENE_KEYS.Ending;
     }
-    if ((data.placements?.length ?? 0) >= 3) {
+    if (SavedDataViewManager.hasCompletedRequiredPlacements(data)) {
       return SCENE_KEYS.Result;
     }
     if (data.selectedPolicy?.id) {

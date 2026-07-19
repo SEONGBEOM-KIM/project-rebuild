@@ -12,6 +12,7 @@ export default class PlacementContextManager {
 
   static resolvePlacementConfigIdFromLearningData(data, selectedStrategy = null) {
     return data?.placementConfig?.id
+      ?? data?.summary?.placementContext?.placementConfigId
       ?? data?.selectedStrategy?.placementConfigId
       ?? getPlacementConfigIdForStrategy(selectedStrategy);
   }
