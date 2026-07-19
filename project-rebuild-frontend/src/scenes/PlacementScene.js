@@ -1,5 +1,4 @@
 import Phaser from 'phaser';
-import { getCurrentPlacementMissionBriefing } from '../data/episodeContent.js';
 import PlacementViewManager from '../systems/PlacementViewManager.js';
 import CameraController from '../systems/CameraController.js';
 import PlacementUiStateManager from '../systems/PlacementUiStateManager.js';
@@ -10,7 +9,7 @@ import PlacementSceneBootstrap from '../systems/PlacementSceneBootstrap.js';
 import PlacementContextManager from '../systems/PlacementContextManager.js';
 import PlacementActionManager from '../systems/PlacementActionManager.js';
 import LearningProgress from '../systems/LearningProgress.js';
-import Ep2BriefingViewManager from '../systems/Ep2BriefingViewManager.js';
+import EpisodeFlowManager from '../systems/EpisodeFlowManager.js';
 import { PLACEMENT_ACTION_STATUS } from '../systems/PlacementActionManager.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
 
@@ -22,7 +21,7 @@ export default class PlacementScene extends Phaser.Scene {
   create() {
     this.selectedPolicy = this.registry.get(REGISTRY_KEYS.selectedPolicy);
     const learningProgress = LearningProgress.get(this.registry);
-    this.selectedStrategy = Ep2BriefingViewManager.resolveStrategy(getCurrentPlacementMissionBriefing(), this.registry.get(REGISTRY_KEYS.selectedPlacementStrategy) ?? learningProgress.selectedStrategyId, this.selectedPolicy?.id);
+    this.selectedStrategy = EpisodeFlowManager.resolveSelectedStrategy({ registry: this.registry, learningProgress, selectedPolicy: this.selectedPolicy });
     const placementContext = PlacementContextManager.resolve({
       registry: this.registry,
       progress: learningProgress,

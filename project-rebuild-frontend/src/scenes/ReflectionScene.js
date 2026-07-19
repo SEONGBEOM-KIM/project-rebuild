@@ -1,13 +1,11 @@
 import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
-import { getCurrentPlacementMissionBriefing } from '../data/episodeContent.js';
 import PlacementContextManager from '../systems/PlacementContextManager.js';
 import IssueDetector from '../systems/IssueDetector.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import ReflectionViewManager from '../systems/ReflectionViewManager.js';
 import ReflectionRenderer from '../systems/ReflectionRenderer.js';
-import Ep2BriefingViewManager from '../systems/Ep2BriefingViewManager.js';
 import EpisodeFlowManager from '../systems/EpisodeFlowManager.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
@@ -24,11 +22,7 @@ export default class ReflectionScene extends Phaser.Scene {
     const selectedPolicy = this.registry.get(REGISTRY_KEYS.selectedPolicy);
     const placedBuildings = this.registry.get(REGISTRY_KEYS.placedBuildings) ?? [];
     const learningProgress = LearningProgress.get(this.registry);
-    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(
-      getCurrentPlacementMissionBriefing(),
-      this.registry.get(REGISTRY_KEYS.selectedPlacementStrategy) ?? learningProgress.selectedStrategyId,
-      selectedPolicy?.id,
-    );
+    const selectedStrategy = EpisodeFlowManager.resolveSelectedStrategy({ registry: this.registry, learningProgress, selectedPolicy });
     const { placementConfig, evaluationProfile } = PlacementContextManager.resolve({
       registry: this.registry,
       progress: learningProgress,

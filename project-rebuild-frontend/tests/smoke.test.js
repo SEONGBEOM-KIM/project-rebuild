@@ -1901,6 +1901,20 @@ function testEpisodeFlowManager() {
 
   const placementConfig = getPlacementConfig(ENVIRONMENT_PLACEMENT_CONFIG_ID);
   assert.equal(EpisodeFlowManager.resolveActivePlacementEpisodeId({ placementConfig }), EPISODE_IDS.PopulationRecovery);
+  assert.equal(EpisodeFlowManager.getMissionBriefing({ registry }), EP3_MISSION_BRIEFING);
+  assert.equal(EpisodeFlowManager.findStrategyByPolicyId(EP3_MISSION_BRIEFING, 'distribution_growth').id, 'logistics_growth_hub');
+
+  registry.set(REGISTRY_KEYS.selectedPlacementStrategy, 'logistics_growth_hub');
+  const selectedEp3Strategy = EpisodeFlowManager.resolveSelectedStrategy({
+    registry,
+    selectedPolicy: economyPolicies.find((policy) => policy.id === 'distribution_growth'),
+  });
+  assert.equal(selectedEp3Strategy.id, 'logistics_growth_hub');
+
+  const ep2Registry = createMemoryRegistry();
+  ep2Registry.set(REGISTRY_KEYS.placementConfigId, DEFAULT_PLACEMENT_CONFIG_ID);
+  ep2Registry.set(REGISTRY_KEYS.selectedPlacementStrategy, 'jobs_services');
+  assert.equal(EpisodeFlowManager.resolveSelectedStrategy({ registry: ep2Registry }).id, 'jobs_services');
 }
 
 
@@ -2761,9 +2775,9 @@ function testPlacementViewManager() {
   assert.match(placementSceneSource, /availableBuildings/, 'placement scene should render buildings from the active episode config');
   assert.match(placementSceneSource, /requiredPlacements/, 'placement scene should apply required placement count from the active episode config');
   assert.match(placementSceneSource, /stateKeys/, 'placement scene should apply state display keys from the active episode config');
-  assert.match(placementSceneSource, /selectedStrategyId/, 'placement scene should recover EP2 strategy from learning progress');
+  assert.match(placementSceneSource, /EpisodeFlowManager\.resolveSelectedStrategy/, 'placement scene should recover the active episode strategy through episode flow manager');
   const resultSceneSource = readProjectFile('src', 'scenes', 'ResultScene.js');
-  assert.match(resultSceneSource, /selectedStrategyId/, 'result scene should recover EP2 strategy from learning progress');
+  assert.match(resultSceneSource, /EpisodeFlowManager\.resolveSelectedStrategy/, 'result scene should recover the active episode strategy through episode flow manager');
   assert.match(resultSceneSource, /PlacementContextManager/, 'result scene should resolve active placement context');
   assert.match(resultSceneSource, /formatEvaluationRows\(evaluation, gameState, placedBuildings, selectedPolicy, selectedStrategy, evaluationProfile\)/, 'result scene should pass evaluation profile into result copy');
   assert.match(resultSceneSource, /formatResidentReactions\(gameState, placedBuildings, evaluationProfile\)/, 'result scene should pass evaluation profile into resident reactions');
@@ -2774,13 +2788,13 @@ function testPlacementViewManager() {
   assert.match(sideEffectSceneSource, /IssueDetector\.detect\(gameState, evaluationProfile\)/, 'side effect scene should detect issues with active evaluation profile');
   assert.match(sideEffectSceneSource, /formatContextSummary\(placementConfig, evaluationProfile\)/, 'side effect scene should display active placement context summary');
   const endingSceneSource = readProjectFile('src', 'scenes', 'EndingScene.js');
-  assert.match(endingSceneSource, /selectedStrategyId/, 'ending scene should recover EP2 strategy from learning progress');
+  assert.match(endingSceneSource, /EpisodeFlowManager\.resolveSelectedStrategy/, 'ending scene should recover the active episode strategy through episode flow manager');
   assert.match(endingSceneSource, /PlacementContextManager/, 'ending scene should resolve active placement context');
   assert.match(endingSceneSource, /EpisodeFlowManager\.getNextDevelopmentGoals/, 'ending scene should show next goals from active placement episode');
   assert.match(endingSceneSource, /formatStateSummary\(gameState, ending, placementConfig\.stateKeys, evaluationProfile\)/, 'ending scene should summarize state with active placement config');
   assert.match(endingSceneSource, /formatLearningRecordRows\(learningProgress, exploredPlaces, quizResult, reflectionChoice, selectedStrategy, placementConfig, evaluationProfile\)/, 'ending scene should record active placement context');
   const reflectionSceneSource = readProjectFile('src', 'scenes', 'ReflectionScene.js');
-  assert.match(reflectionSceneSource, /selectedStrategyId/, 'reflection scene should recover EP2 strategy from learning progress');
+  assert.match(reflectionSceneSource, /EpisodeFlowManager\.resolveSelectedStrategy/, 'reflection scene should recover the active episode strategy through episode flow manager');
   assert.match(reflectionSceneSource, /PlacementContextManager/, 'reflection scene should resolve active placement context');
   assert.match(reflectionSceneSource, /IssueDetector\.detect\(gameState, evaluationProfile\)/, 'reflection scene should detect issues with active evaluation profile');
   assert.match(reflectionSceneSource, /formatContextSummary\(placementConfig, evaluationProfile\)/, 'reflection scene should display active placement context summary');
