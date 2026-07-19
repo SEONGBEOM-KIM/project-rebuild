@@ -3549,7 +3549,7 @@ function testTeacherReportManager() {
   });
   assert.match(TeacherReportManager.formatClassSummaryReport(report), /균형형 회복안/);
   assert.match(TeacherReportManager.formatClassSummaryReport(report), /학생 다음 액션: 예산 균형 보완/);
-  assert.match(TeacherReportManager.formatClassSummaryReport(report), /EP2 전략: 일자리와 생활 기반/);
+  assert.match(TeacherReportManager.formatClassSummaryReport(report), /배치 전략: 일자리와 생활 기반/);
   assert.match(TeacherReportManager.formatClassSummaryReport({ ...report, gameState: { ...finalState, budget: 400 }, issues: IssueDetector.detect({ ...finalState, budget: 400 }) }), /우선 보완: 예산 부족/);
   assert.match(TeacherReportManager.formatProgressReport(report), /탐색 장소: 3\/5/);
   assert.match(TeacherReportManager.formatProgressReport(report), /EP1 완료: 예/);
@@ -3565,6 +3565,38 @@ function testTeacherReportManager() {
   assert.match(TeacherReportManager.buildReportText(report), /0\. 에피소드\/설정/);
   assert.match(TeacherReportManager.buildReportText(report), /1\. 수업 결론/);
   assert.match(TeacherReportManager.buildReportText(report), /4\. 지도 포인트/);
+
+
+  const ep3Registry = createMemoryRegistry();
+  const ep3PlacedBuildings = [
+    createEconomyPlacementRecord('food_factory', { x: 2, y: 1 }),
+    createEconomyPlacementRecord('tour_complex', { x: 5, y: 3 }),
+    createEconomyPlacementRecord('logistics_center', { x: 7, y: 2 }),
+  ];
+  const ep3FinalState = ep3PlacedBuildings.reduce(
+    (state, record) => GameState.applyEffect(state, record.delta),
+    GameState.createInitialState(),
+  );
+  ep3Registry.set(REGISTRY_KEYS.learningProgress, {
+    ...LearningProgress.createInitialProgress(),
+    selectedPolicyId: 'visitor_economy',
+    selectedStrategyId: 'visitor_commerce_growth',
+    placementConfigId: EP3_ECONOMY_PLACEMENT_CONFIG_ID,
+    placedBuildingIds: ep3PlacedBuildings.map((record) => record.building.id),
+    completed: true,
+  });
+  ep3Registry.set(REGISTRY_KEYS.selectedPolicy, economyPolicies.find((policy) => policy.id === 'visitor_economy'));
+  ep3Registry.set(REGISTRY_KEYS.selectedPlacementStrategy, 'visitor_commerce_growth');
+  ep3Registry.set(REGISTRY_KEYS.placementConfigId, EP3_ECONOMY_PLACEMENT_CONFIG_ID);
+  ep3Registry.set(REGISTRY_KEYS.placedBuildings, ep3PlacedBuildings);
+  ep3Registry.set(REGISTRY_KEYS.gameState, ep3FinalState);
+
+  const ep3Report = TeacherReportManager.build(ep3Registry);
+  assert.equal(ep3Report.selectedPolicy.id, 'visitor_economy');
+  assert.equal(ep3Report.selectedStrategy.id, 'visitor_commerce_growth');
+  assert.equal(ep3Report.placementConfig.id, EP3_ECONOMY_PLACEMENT_CONFIG_ID);
+  assert.match(TeacherReportManager.formatClassSummaryReport(ep3Report), /배치 전략: 방문 경제 활성화/);
+  assert.match(TeacherReportManager.formatChoiceReport(ep3Report), /배치 전략: 방문 경제 활성화/);
 }
 
 
@@ -3768,12 +3800,38 @@ function testLearningDataManager() {
   assert.equal(alternateData.selectedStrategy.placementConfigId, ENVIRONMENT_PLACEMENT_CONFIG_ID);
   registry.set('placementConfigId', DEFAULT_PLACEMENT_CONFIG_ID);
 
+
+  registry.set(REGISTRY_KEYS.selectedPolicy, economyPolicies.find((policy) => policy.id === 'distribution_growth'));
+  registry.set(REGISTRY_KEYS.selectedPlacementStrategy, 'logistics_growth_hub');
+  registry.set(REGISTRY_KEYS.placementConfigId, EP3_ECONOMY_PLACEMENT_CONFIG_ID);
+  registry.set(REGISTRY_KEYS.learningProgress, {
+    ...LearningProgress.get(registry),
+    selectedPolicyId: 'distribution_growth',
+    selectedStrategyId: 'logistics_growth_hub',
+    placementConfigId: EP3_ECONOMY_PLACEMENT_CONFIG_ID,
+  });
+  registry.set(REGISTRY_KEYS.placedBuildings, [
+    { building: economyBuildings[0], position: { x: 1, y: 1 }, delta: economyBuildings[0].effect },
+    { building: economyBuildings[1], position: { x: 3, y: 2 }, delta: economyBuildings[1].effect },
+    { building: economyBuildings[2], position: { x: 6, y: 1 }, delta: economyBuildings[2].effect },
+  ]);
+  const ep3Data = LearningDataManager.build(registry);
+  assert.equal(ep3Data.selectedPolicy.id, 'distribution_growth');
+  assert.equal(ep3Data.selectedStrategy.id, 'logistics_growth_hub');
+  assert.equal(ep3Data.selectedStrategy.placementConfigId, EP3_ECONOMY_PLACEMENT_CONFIG_ID);
+  assert.equal(ep3Data.placementConfig.id, EP3_ECONOMY_PLACEMENT_CONFIG_ID);
+  assert.equal(ep3Data.summary.selectedStrategyTitle, '유통 성장 거점');
+  assert.equal(LearningDataManager.validate({ ...ep3Data, selectedStrategy: null }).every((row) => row.ok), true, 'EP3 saved data should be accepted when policy maps to an EP3 strategy');
+
+  registry.set(REGISTRY_KEYS.selectedPolicy, { id: 'youth_living_support', name: '청년 생활 지원' });
+  registry.set(REGISTRY_KEYS.selectedPlacementStrategy, 'jobs_services');
+
   assert.equal(LearningDataManager.isReadyToSave(data), true);
   assert.equal(LearningDataManager.getRequiredPlacements(data), 3);
   assert.equal(LearningDataManager.getRequiredPlacements(alternateData), 2);
   assert.equal(LearningDataManager.validate({ ...data, summary: null }).some((row) => !row.ok && row.label === '학습 결론 요약'), true);
-  assert.equal(LearningDataManager.validate({ ...data, selectedStrategy: null }).every((row) => row.ok), true, 'saved data without selectedStrategy should be accepted when policy maps to an EP2 strategy');
-  assert.equal(LearningDataManager.validate({ ...data, selectedPolicy: null, selectedStrategy: null }).some((row) => !row.ok && row.label === 'EP2 전략 선택'), true);
+  assert.equal(LearningDataManager.validate({ ...data, selectedStrategy: null }).every((row) => row.ok), true, 'saved data without selectedStrategy should be accepted when policy maps to an active episode strategy');
+  assert.equal(LearningDataManager.validate({ ...data, selectedPolicy: null, selectedStrategy: null }).some((row) => !row.ok && row.label === '배치 전략 선택'), true);
   assert.equal(LearningDataManager.validate({
     ...data,
     summary: { ...data.summary, placementContext: { ...data.summary.placementContext, placementConfigId: null } },
@@ -4244,6 +4302,31 @@ function testLearningDataRestoreManager() {
   assert.equal(derivedRegistry.get('gameState').satisfaction, 82);
   assert.equal(derivedRegistry.get('gameState').budget, 700);
   assert.equal(derivedRegistry.get('gameState').traffic, 7);
+
+
+  const ep3Registry = createMemoryRegistry();
+  const ep3Data = {
+    ...data,
+    selectedPolicy: { id: 'local_industry_jobs', name: '지역 산업 일자리' },
+    selectedStrategy: { id: 'industry_jobs_growth', title: '지역 산업 일자리', stateFocus: '경제↑ 인구↑ 교통 부담↑', policyId: 'local_industry_jobs', placementConfigId: EP3_ECONOMY_PLACEMENT_CONFIG_ID },
+    placementConfig: {
+      id: EP3_ECONOMY_PLACEMENT_CONFIG_ID,
+      episodeId: EPISODE_IDS.EconomyGrowth,
+      title: '푸른군 경제 성장 배치 실험',
+      requiredPlacements: 3,
+      stateKeys: ['economy', 'population', 'budget', 'traffic', 'pollution', 'satisfaction'],
+      evaluationProfileId: DEFAULT_EVALUATION_PROFILE_ID,
+    },
+    placements: [
+      { buildingId: 'food_factory', position: { x: 2, y: 1 }, effect: economyBuildings[0].effect },
+      { buildingId: 'logistics_center', position: { x: 4, y: 2 }, effect: economyBuildings[2].effect },
+    ],
+  };
+  const ep3Restored = LearningDataRestoreManager.restore(ep3Registry, ep3Data);
+  assert.equal(ep3Restored.selectedPolicy.id, 'local_industry_jobs');
+  assert.equal(ep3Restored.selectedStrategy.id, 'industry_jobs_growth');
+  assert.equal(ep3Registry.get(REGISTRY_KEYS.placementConfigId), EP3_ECONOMY_PLACEMENT_CONFIG_ID);
+  assert.deepEqual(ep3Registry.get(REGISTRY_KEYS.learningProgress).placedBuildingIds, ['food_factory', 'logistics_center']);
 }
 
 

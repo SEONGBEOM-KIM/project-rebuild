@@ -1,10 +1,9 @@
 import { explorationPlaces } from '../data/explorationPlaces.js';
 import { CURRENT_EPISODE, CURRENT_PLACEMENT_EPISODE } from '../data/episodes.js';
-import { getCurrentPlacementMissionBriefing } from '../data/episodeContent.js';
 import IssueDetector from './IssueDetector.js';
 import LearningProgress from './LearningProgress.js';
 import EndingSummaryManager from './EndingSummaryManager.js';
-import Ep2BriefingViewManager from './Ep2BriefingViewManager.js';
+import EpisodeFlowManager from './EpisodeFlowManager.js';
 import PlacementContextManager from './PlacementContextManager.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
 
@@ -13,7 +12,7 @@ export default class LearningDataManager {
     const progress = LearningProgress.get(registry);
     const quizResult = registry.get(REGISTRY_KEYS.quizResult);
     const selectedPolicy = registry.get(REGISTRY_KEYS.selectedPolicy);
-    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(getCurrentPlacementMissionBriefing(), registry.get(REGISTRY_KEYS.selectedPlacementStrategy) ?? progress.selectedStrategyId, selectedPolicy?.id);
+    const selectedStrategy = EpisodeFlowManager.resolveSelectedStrategy({ registry, learningProgress: progress, selectedPolicy });
     const { placementConfig, evaluationProfile } = PlacementContextManager.resolve({
       registry,
       progress,
@@ -126,7 +125,7 @@ export default class LearningDataManager {
 
   static hasSelectedStrategy(data) {
     return Boolean(data.selectedStrategy?.id)
-      || Boolean(Ep2BriefingViewManager.findStrategyByPolicyId(getCurrentPlacementMissionBriefing(), data.selectedPolicy?.id));
+      || Boolean(EpisodeFlowManager.resolveSelectedStrategyFromLearningData(data, data.selectedPolicy));
   }
 
   static getRequiredPlacements(data) {
@@ -209,8 +208,8 @@ export default class LearningDataManager {
       },
       {
         ok: LearningDataManager.hasSelectedStrategy(data),
-        label: 'EP2 전략 선택',
-        message: '선택한 EP2 전략이 없습니다.',
+        label: '배치 전략 선택',
+        message: '선택한 배치 전략이 없습니다.',
       },
       {
         ok: data.selectedStrategy?.placementConfigId == null

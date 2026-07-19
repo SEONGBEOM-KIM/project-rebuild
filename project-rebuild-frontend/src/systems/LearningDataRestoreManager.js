@@ -1,15 +1,19 @@
 import GameState from './GameState.js';
 import LearningProgress from './LearningProgress.js';
 import { policies } from '../data/policies.js';
-import { getCurrentPlacementMissionBriefing } from '../data/episodeContent.js';
-import Ep2BriefingViewManager from './Ep2BriefingViewManager.js';
+import { economyPolicies } from '../data/economyPolicies.js';
+import EpisodeFlowManager from './EpisodeFlowManager.js';
 import PlacementContextManager from './PlacementContextManager.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
 
 export default class LearningDataRestoreManager {
+  static findPolicyById(policyId) {
+    return [...policies, ...economyPolicies].find((policy) => policy.id === policyId) ?? null;
+  }
+
   static restore(registry, data) {
-    const selectedPolicy = policies.find((policy) => policy.id === data.selectedPolicy?.id) ?? null;
-    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(getCurrentPlacementMissionBriefing(), data.selectedStrategy?.id, selectedPolicy?.id);
+    const selectedPolicy = LearningDataRestoreManager.findPolicyById(data.selectedPolicy?.id);
+    const selectedStrategy = EpisodeFlowManager.resolveSelectedStrategyFromLearningData(data, selectedPolicy);
     const placementContext = PlacementContextManager.resolveFromLearningData(data, selectedStrategy);
     const restoredPlacements = LearningDataRestoreManager.restorePlacements(
       data.placements ?? [],

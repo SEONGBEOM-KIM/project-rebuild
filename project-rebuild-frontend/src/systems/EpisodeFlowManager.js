@@ -33,6 +33,15 @@ export default class EpisodeFlowManager {
       ?? EpisodeFlowManager.findStrategyByPolicyId(briefing, selectedPolicy?.id);
   }
 
+  static resolveSelectedStrategyFromLearningData(data = {}, selectedPolicy = null) {
+    const { placementConfig } = PlacementContextManager.resolveFromLearningData(data);
+    return EpisodeFlowManager.resolveSelectedStrategy({
+      learningProgress: { selectedStrategyId: data?.selectedStrategy?.id ?? null },
+      placementConfig,
+      selectedPolicy,
+    });
+  }
+
   static getReflectionChoices(context = {}) {
     return getReflectionChoices(EpisodeFlowManager.resolveActivePlacementEpisodeId(context));
   }

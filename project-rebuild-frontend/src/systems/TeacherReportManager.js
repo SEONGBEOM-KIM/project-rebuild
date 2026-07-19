@@ -1,11 +1,10 @@
 import { explorationPlaces } from '../data/explorationPlaces.js';
 import { CURRENT_EPISODE, CURRENT_PLACEMENT_EPISODE } from '../data/episodes.js';
-import { getCurrentPlacementMissionBriefing } from '../data/episodeContent.js';
 import { DEFAULT_STATE_KEYS, STATE_LABELS } from '../data/stateLabels.js';
 import IssueDetector from './IssueDetector.js';
 import LearningProgress from './LearningProgress.js';
 import EndingSummaryManager from './EndingSummaryManager.js';
-import Ep2BriefingViewManager from './Ep2BriefingViewManager.js';
+import EpisodeFlowManager from './EpisodeFlowManager.js';
 import PlacementContextManager from './PlacementContextManager.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
 
@@ -45,7 +44,7 @@ export default class TeacherReportManager {
   static build(registry) {
     const progress = LearningProgress.get(registry);
     const selectedPolicy = registry.get(REGISTRY_KEYS.selectedPolicy);
-    const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(getCurrentPlacementMissionBriefing(), registry.get(REGISTRY_KEYS.selectedPlacementStrategy) ?? progress.selectedStrategyId, selectedPolicy?.id);
+    const selectedStrategy = EpisodeFlowManager.resolveSelectedStrategy({ registry, learningProgress: progress, selectedPolicy });
     const { placementConfig, evaluationProfile } = PlacementContextManager.resolve({
       registry,
       progress,
@@ -127,7 +126,7 @@ export default class TeacherReportManager {
       `${report.ending.title}: ${report.ending.message}`,
       `우선 보완: ${issueText}`,
       `학생 다음 액션: ${actionText}`,
-      `EP2 전략: ${report.selectedStrategy?.title ?? '미선택'}`,
+      `배치 전략: ${report.selectedStrategy?.title ?? '미선택'}`,
       `회복 방향: ${report.selectedPolicy?.name ?? '미선택'} / 배치 ${report.placedBuildings.length}개`,
     ].join('\n');
   }
@@ -160,7 +159,7 @@ export default class TeacherReportManager {
       .join(' / ');
 
     return [
-      `EP2 전략: ${report.selectedStrategy?.title ?? '미선택'}`,
+      `배치 전략: ${report.selectedStrategy?.title ?? '미선택'}`,
       report.selectedStrategy ? `전략 초점: ${report.selectedStrategy.stateFocus}` : null,
       `회복 방향: ${report.selectedPolicy?.name ?? '미선택'}`,
       '',
