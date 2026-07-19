@@ -1,5 +1,5 @@
 import SCENE_KEYS from '../data/sceneKeys.js';
-import { getDefaultPlacementConfig } from '../data/episodePlacementConfigs.js';
+import { getDefaultPlacementConfig, getPlacementConfig, getPlacementConfigIdForStrategy } from '../data/episodePlacementConfigs.js';
 
 const SELECTION_SCREEN_LAYOUT = {
   backgroundColor: 0x172554,
@@ -92,21 +92,33 @@ export default class SelectionViewManager {
     };
   }
 
-  static formatDetailRows(policy) {
+  static getStrategyPlacementContext(strategy = null) {
+    const placementConfig = strategy
+      ? getPlacementConfig(getPlacementConfigIdForStrategy(strategy))
+      : getDefaultPlacementConfig();
+    return {
+      placementConfig,
+      requiredPlacements: placementConfig.requiredPlacements,
+      evaluationProfileId: placementConfig.evaluationProfileId,
+    };
+  }
+
+  static formatDetailRows(policy, strategy = null) {
     if (!policy) {
       return ['선택된 회복 방향이 없습니다.', '', '회복 방향을 선택한 뒤 배치 연습을 시작하세요.'];
     }
-    const requiredPlacements = getDefaultPlacementConfig().requiredPlacements;
+    const context = SelectionViewManager.getStrategyPlacementContext(strategy);
 
     return [
       `선택됨: ${policy.name}`,
       policy.note,
-      `다음 화면에서는 이 전략에 맞는 추천 시설을 참고해 건물 ${requiredPlacements}개를 배치합니다.`,
+      strategy ? `EP2 전략: ${strategy.title}` : 'EP2 전략: 기본 배치 실험',
+      `배치 설정: ${context.placementConfig.title} / 필요 배치: ${context.requiredPlacements}개 / 평가 기준: ${context.evaluationProfileId}`,
     ];
   }
 
-  static formatDetailText(policy) {
-    return SelectionViewManager.formatDetailRows(policy).join('\n');
+  static formatDetailText(policy, strategy = null) {
+    return SelectionViewManager.formatDetailRows(policy, strategy).join('\n');
   }
 
   static formatFocusText(policy) {

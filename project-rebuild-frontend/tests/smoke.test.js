@@ -510,6 +510,8 @@ function testCauseQuizManager() {
 function testSelectionViewManager() {
   const selectedPolicy = policies[0];
   const otherPolicy = policies[1];
+  const jobsStrategy = EP2_MISSION_BRIEFING.strategies.find((strategy) => strategy.id === 'jobs_services');
+  const balancedStrategy = EP2_MISSION_BRIEFING.strategies.find((strategy) => strategy.id === 'balanced_growth');
 
   assert.deepEqual(SelectionViewManager.getScreenLayout(1920).title, {
     x: 960,
@@ -544,7 +546,11 @@ function testSelectionViewManager() {
   });
   assert.equal(SelectionViewManager.getControlLayout(960).back.target, 'Ep2BriefingScene');
   assert.match(SelectionViewManager.formatDetailText(selectedPolicy), new RegExp(`선택됨: ${selectedPolicy.name}`));
-  assert.match(SelectionViewManager.formatDetailText(selectedPolicy), /추천 시설을 참고해 건물 3개를 배치/);
+  assert.match(SelectionViewManager.formatDetailText(selectedPolicy, jobsStrategy), /EP2 전략: 일자리와 생활 기반/);
+  assert.match(SelectionViewManager.formatDetailText(selectedPolicy, jobsStrategy), /푸른군 인구 회복 배치 실험 \/ 필요 배치: 3개/);
+  assert.match(SelectionViewManager.formatDetailText(policies.find((policy) => policy.id === 'green_recovery'), balancedStrategy), /EP2 전략: 균형 성장/);
+  assert.match(SelectionViewManager.formatDetailText(policies.find((policy) => policy.id === 'green_recovery'), balancedStrategy), /푸른군 환경 균형 배치 실험 \/ 필요 배치: 2개/);
+  assert.equal(SelectionViewManager.getStrategyPlacementContext(balancedStrategy).placementConfig.id, ENVIRONMENT_PLACEMENT_CONFIG_ID);
   assert.match(SelectionViewManager.getScreenLayout(1920).subtitle.text, /EP2 인구 유입 전략/);
   assert.deepEqual(SelectionViewManager.formatDetailRows(null), [
     '선택된 회복 방향이 없습니다.',

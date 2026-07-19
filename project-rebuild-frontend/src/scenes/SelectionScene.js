@@ -94,7 +94,8 @@ export default class SelectionScene extends Phaser.Scene {
     }
 
     if (this.detailText) {
-      this.detailText.setText(SelectionViewManager.formatDetailText(this.selectedPolicy));
+      const strategy = Ep2BriefingViewManager.findStrategyByPolicyId(getCurrentPlacementMissionBriefing(), this.selectedPolicy?.id);
+      this.detailText.setText(SelectionViewManager.formatDetailText(this.selectedPolicy, strategy));
     }
   }
 }
