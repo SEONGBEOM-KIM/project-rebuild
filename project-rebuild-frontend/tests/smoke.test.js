@@ -1389,8 +1389,8 @@ function testResultViewManager() {
   assert.deepEqual(ResultViewManager.getPanelTitlePosition(panels.evaluation), { x: 960, y: 270 });
   assert.deepEqual(ResultViewManager.getPanelBodyPosition(panels.evaluation), { x: 960, y: 340 });
   assert.equal(ResultViewManager.getPanelBodyStyle(panels.evaluation).wordWrap.width, 465);
-  assert.equal(ResultViewManager.getPanelBodyStyle(panels.evaluation).fontSize, '19px');
-  assert.equal(ResultViewManager.getPanelBodyStyle(panels.trend).lineSpacing, 3);
+  assert.equal(ResultViewManager.getPanelBodyStyle(panels.evaluation).fontSize, '18px');
+  assert.equal(ResultViewManager.getPanelBodyStyle(panels.trend).lineSpacing, 2);
   assert.equal(ResultViewManager.getPanelBodyStyle(panels.beforeAfter).fontSize, '22px');
   assert.equal(
     ResultViewManager.formatContextSummary(getPlacementConfig(ENVIRONMENT_PLACEMENT_CONFIG_ID), getEvaluationProfile(ENVIRONMENT_EVALUATION_PROFILE_ID)),
@@ -1534,8 +1534,24 @@ function testEvaluationManager() {
   const strategyEvaluationRows = EvaluationManager.formatEvaluationRows(evaluation, finalState, placedBuildings, youthPolicy, EP2_MISSION_BRIEFING.strategies[0]);
   assert.match(strategyEvaluationRows, /EP2 전략: 일자리와 생활 기반/);
   assert.match(strategyEvaluationRows, /전략 초점: 인구↑ 경제↑ 예산↓/);
+  assert.match(strategyEvaluationRows, /전략 판정: 목표 달성/);
+  assert.match(strategyEvaluationRows, /다음 행동: 선택한 전략의 핵심 조건을 모두 만족/);
   assert.match(strategyEvaluationRows, /전략 성공 기준: 3\/3 충족/);
   assert.match(strategyEvaluationRows, /충족 · 인구 1100 이상/);
+  assert.deepEqual(EvaluationManager.formatStrategyOutcomeRows(
+    { ...finalState, environment: 86, pollution: 9, budget: 640 },
+    EP2_MISSION_BRIEFING.strategies[2],
+  ), [
+    '전략 판정: 부분 달성',
+    '다음 행동: 일부 목표는 충족했습니다. 미충족 기준을 올리는 시설 조합을 한 번 더 실험하세요.',
+  ]);
+  assert.deepEqual(EvaluationManager.formatStrategyOutcomeRows(
+    { ...finalState, environment: 84, pollution: 11, budget: 640 },
+    EP2_MISSION_BRIEFING.strategies[2],
+  ), [
+    '전략 판정: 재조정 필요',
+    '다음 행동: 선택한 전략의 핵심 기준이 부족합니다. 추천 시설과 부작용 신호를 함께 보고 다시 배치하세요.',
+  ]);
   const environmentStrategyRows = EvaluationManager.formatStrategySuccessRows(
     { ...finalState, environment: 84, pollution: 11, budget: 640 },
     EP2_MISSION_BRIEFING.strategies[2],

@@ -122,6 +122,40 @@ export default class EvaluationManager {
     });
   }
 
+
+  static getStrategyOutcome(checks) {
+    if (!checks.length) {
+      return null;
+    }
+
+    const passedCount = checks.filter((check) => check.passed).length;
+    if (passedCount === checks.length) {
+      return {
+        label: '전략 판정: 목표 달성',
+        message: '선택한 전략의 핵심 조건을 모두 만족했습니다. 다음에는 위치나 순서를 바꿔 같은 성과가 유지되는지 비교하세요.',
+      };
+    }
+    if (passedCount >= Math.ceil(checks.length / 2)) {
+      return {
+        label: '전략 판정: 부분 달성',
+        message: '일부 목표는 충족했습니다. 미충족 기준을 올리는 시설 조합을 한 번 더 실험하세요.',
+      };
+    }
+    return {
+      label: '전략 판정: 재조정 필요',
+      message: '선택한 전략의 핵심 기준이 부족합니다. 추천 시설과 부작용 신호를 함께 보고 다시 배치하세요.',
+    };
+  }
+
+  static formatStrategyOutcomeRows(gameState, selectedStrategy = null) {
+    const checks = EvaluationManager.evaluateStrategySuccessChecks(gameState, selectedStrategy);
+    const outcome = EvaluationManager.getStrategyOutcome(checks);
+    if (!outcome) {
+      return [];
+    }
+    return [outcome.label, `다음 행동: ${outcome.message}`];
+  }
+
   static formatStrategySuccessRows(gameState, selectedStrategy = null) {
     const checks = EvaluationManager.evaluateStrategySuccessChecks(gameState, selectedStrategy);
     if (!checks.length) {
@@ -141,6 +175,7 @@ export default class EvaluationManager {
       selectedStrategy ? `EP2 전략: ${selectedStrategy.title}` : null,
       `선택 방향: ${selectedPolicy?.name ?? '기본 배치 연습'}`,
       selectedStrategy ? `전략 초점: ${selectedStrategy.stateFocus}` : null,
+      ...EvaluationManager.formatStrategyOutcomeRows(gameState, selectedStrategy),
       ...EvaluationManager.formatStrategySuccessRows(gameState, selectedStrategy),
       `배치 수: ${placedBuildings.length}개`,
       policyAlignment.label,

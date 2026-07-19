@@ -113,10 +113,10 @@ export default class ResultViewManager {
     const isCompactBody = compactBodyTitles.has(panel.title);
 
     return {
-      fontSize: isCompactBody ? '19px' : '22px',
+      fontSize: isCompactBody ? '18px' : '22px',
       color: '#1e293b',
       align: 'left',
-      lineSpacing: isCompactBody ? 3 : 6,
+      lineSpacing: isCompactBody ? 2 : 6,
       wordWrap: { width: panel.width - 80 },
     };
   }
