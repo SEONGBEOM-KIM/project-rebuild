@@ -200,7 +200,7 @@ export default class EvaluationManager {
     if (!selectedPolicy?.recommendedBuildingIds?.length) {
       return {
         label: '방향 일치: 기준 없음',
-        message: '선택한 회복 방향 없이 기본 배치 연습으로 진행했습니다.',
+        message: '선택한 정책 방향 없이 기본 배치 연습으로 진행했습니다.',
       };
     }
 
@@ -211,7 +211,7 @@ export default class EvaluationManager {
     if (matchedCount >= 2) {
       return {
         label,
-        message: '선택한 회복 방향과 시설 배치가 대체로 연결되어 있습니다.',
+        message: '선택한 정책 방향과 시설 배치가 대체로 연결되어 있습니다.',
       };
     }
 
@@ -224,7 +224,7 @@ export default class EvaluationManager {
 
     return {
       label,
-      message: '선택한 방향과 실제 배치가 다릅니다. 왜 다른 시설을 선택했는지 설명해 보는 활동으로 연결할 수 있습니다.',
+      message: '선택한 정책 방향과 실제 배치가 다릅니다. 왜 다른 시설을 선택했는지 설명해 보는 활동으로 연결할 수 있습니다.',
     };
   }
 
@@ -252,7 +252,7 @@ export default class EvaluationManager {
       return '경향: 생활·환경을 함께 고려했습니다.';
     }
     if ((totals.population ?? 0) > 120 || (totals.economy ?? 0) > 20) {
-      return '경향: 인구·경제 회복을 강하게 선택했습니다.';
+      return '경향: 인구·경제 성장을 강하게 선택했습니다.';
     }
     if ((totals.environment ?? 0) > 15 || (totals.pollution ?? 0) < -5) {
       return '경향: 환경 회복을 중시했습니다.';
@@ -330,7 +330,14 @@ export default class EvaluationManager {
     const reactionThresholds = evaluationProfile.reactionThresholds;
     const placedBuildingIds = new Set(placedBuildings.map((record) => record.building.id));
 
-    if (gameState.satisfaction >= reactionThresholds.satisfactionHigh) {
+    const hasEconomyFacility = ['food_factory', 'tour_complex', 'logistics_center']
+      .some((buildingId) => placedBuildingIds.has(buildingId));
+
+    const economyActiveThreshold = reactionThresholds.economyActive ?? 80;
+
+    if (hasEconomyFacility && gameState.economy >= economyActiveThreshold) {
+      reactions.push('청년 주민: 지역 안에서도 일할 기회가 늘어날 것 같아요.');
+    } else if (gameState.satisfaction >= reactionThresholds.satisfactionHigh) {
       reactions.push('주민: 생활이 더 편리해질 것 같아요.');
     } else if (gameState.satisfaction >= reactionThresholds.satisfactionModerate) {
       reactions.push('주민: 변화가 보이지만 아직 더 필요한 시설이 있어요.');
@@ -338,7 +345,13 @@ export default class EvaluationManager {
       reactions.push('주민: 시설은 생겼지만 생활 만족도 개선은 아직 부족해요.');
     }
 
-    if (placedBuildingIds.has('bus_station') || gameState.traffic <= reactionThresholds.trafficComfortable) {
+    if (placedBuildingIds.has('logistics_center') || (hasEconomyFacility && gameState.traffic > reactionThresholds.trafficComfortable)) {
+      reactions.push('상인: 경제 활기는 커졌지만 차량과 이동 부담도 함께 늘고 있어요.');
+    } else if (placedBuildingIds.has('food_factory')) {
+      reactions.push('상인: 지역 농산물을 활용한 일자리가 생기면 시장도 활기를 찾을 수 있어요.');
+    } else if (placedBuildingIds.has('tour_complex')) {
+      reactions.push('주민: 방문객이 늘면 상권은 좋아지지만 자연 공간 관리도 필요해 보여요.');
+    } else if (placedBuildingIds.has('bus_station') || gameState.traffic <= reactionThresholds.trafficComfortable) {
       reactions.push('고령 주민: 이동이 쉬워지면 병원과 시장에 가기 좋아져요.');
     } else if (placedBuildingIds.has('small_park')) {
       reactions.push('학생 주민: 쉴 수 있는 공간이 생겨 마을 분위기가 좋아졌어요.');

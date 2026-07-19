@@ -1373,6 +1373,11 @@ function createPlacementRecord(buildingId, position = { x: 1, y: 1 }) {
   return { building, position, delta: building.effect };
 }
 
+function createEconomyPlacementRecord(buildingId, position = { x: 1, y: 1 }) {
+  const building = economyBuildings.find((item) => item.id === buildingId);
+  return { building, position, delta: building.effect };
+}
+
 function testResultRenderer() {
   const panels = ResultViewManager.getPanelLayout(960);
   const panelFixture = createRendererSceneSpy();
@@ -1519,6 +1524,19 @@ function testEvaluationManager() {
   }), /생활 만족도 개선은 아직 부족/);
   assert.match(EvaluationManager.formatResidentReactions(finalState, [createPlacementRecord('bus_station')]), /이동이 쉬워지면/);
   assert.match(EvaluationManager.formatResidentReactions({ ...finalState, traffic: 10 }, [createPlacementRecord('small_park')]), /쉴 수 있는 공간/);
+  const economyPlacedBuildings = [
+    createEconomyPlacementRecord('food_factory'),
+    createEconomyPlacementRecord('logistics_center', { x: 4, y: 2 }),
+  ];
+  const economyFinalState = economyPlacedBuildings.reduce(
+    (state, record) => GameState.applyEffect(state, record.delta),
+    GameState.createInitialState(),
+  );
+  assert.equal(EvaluationManager.getChoiceTrendMessage(EvaluationManager.calculateEffectTotals(economyPlacedBuildings), economyPlacedBuildings), '경향: 인구·경제 성장을 강하게 선택했습니다.');
+  assert.match(EvaluationManager.formatResidentReactions(economyFinalState, economyPlacedBuildings), /일할 기회가 늘어날/);
+  assert.match(EvaluationManager.formatResidentReactions(economyFinalState, economyPlacedBuildings), /차량과 이동 부담/);
+  assert.match(EvaluationManager.calculatePolicyAlignment(economyPolicies[0], economyPlacedBuildings).message, /정책 방향과 시설 배치/);
+  assert.match(EvaluationManager.calculatePolicyAlignment(null, economyPlacedBuildings).message, /정책 방향 없이/);
   assert.match(EvaluationManager.formatBeforeAfterRows({ before: { ...finalState, population: 1080 }, after: finalState }, finalState), /인구: 1000 → 1120 \(\+120\)/);
   const focusedBeforeAfterRows = EvaluationManager.formatBeforeAfterRows(null, finalState, GameState.createInitialState(), ['budget', 'pollution']);
   assert.equal(focusedBeforeAfterRows, '예산: 1000 → 560 (-440)\n오염: 10 → 6 (-4)');
