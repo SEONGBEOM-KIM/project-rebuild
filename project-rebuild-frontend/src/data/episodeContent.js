@@ -182,6 +182,21 @@ export const EP2_MISSION_BRIEFING = {
   ],
 };
 
+
+export const EP3_MISSION_PREVIEW = {
+  title: '경제 성장 전략',
+  intro: [
+    'EP2에서 생활 기반과 정주 조건을 비교했습니다.',
+    'EP3에서는 사람들이 오래 머물 수 있도록 일자리와 산업 성장을 실험합니다.',
+    '경제 효과가 커질수록 교통, 소음, 환경 같은 작은 불편 신호도 함께 확인합니다.',
+  ],
+  focusAreas: [
+    { id: 'jobs', title: '일자리 증가', icon: '🏭', stateFocus: '경제↑ 인구↑', note: '산업 시설이 지역에 새 일자리를 만드는지 확인합니다.' },
+    { id: 'commerce', title: '상권 활성화', icon: '🏪', stateFocus: '경제↑ 만족도↑', note: '방문객과 소비 증가가 시장 활기로 이어지는지 확인합니다.' },
+    { id: 'traffic_signal', title: '작은 불편 신호', icon: '🚚', stateFocus: '교통 부담↑ 오염 신호↑', note: '성장 과정에서 생기는 교통·소음 문제를 EP4 복선으로 기록합니다.' },
+  ],
+};
+
 export const EP1_REFLECTION_CHOICES = [
   {
     id: 'population_economy',
@@ -237,6 +252,10 @@ export const EPISODE_CONTENT = Object.freeze({
   [EPISODE_IDS.PopulationRecovery]: Object.freeze({
     missionBriefing: EP2_MISSION_BRIEFING,
     nextDevelopmentGoals: EP2_NEXT_DEVELOPMENT_GOALS,
+    nextEpisodeId: EPISODE_IDS.EconomyGrowth,
+  }),
+  [EPISODE_IDS.EconomyGrowth]: Object.freeze({
+    missionPreview: EP3_MISSION_PREVIEW,
   }),
 });
 
@@ -258,4 +277,9 @@ export function getCurrentPlacementMissionBriefing() {
 
 export function getCurrentPlacementNextDevelopmentGoals() {
   return getCurrentPlacementEpisodeContent().nextDevelopmentGoals ?? getCurrentEpisodeContent().nextDevelopmentGoals ?? [];
+}
+
+export function getNextEpisodeContent(episodeCode = CURRENT_PLACEMENT_EPISODE.code) {
+  const nextEpisodeId = getEpisodeContent(episodeCode).nextEpisodeId;
+  return nextEpisodeId ? getEpisodeContent(nextEpisodeId) : null;
 }

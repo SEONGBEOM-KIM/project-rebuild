@@ -84,7 +84,7 @@ import { API_CONTRACT, formatContractRequest, formatContractResponse } from '../
 import { CURRENT_EPISODE, CURRENT_PLACEMENT_EPISODE, EPISODE_IDS, EPISODES, EPISODE_STEPS, getEpisode, getEpisodeStep } from '../src/data/episodes.js';
 import SCENE_KEYS from '../src/data/sceneKeys.js';
 import { REGISTRY_KEYS } from '../src/data/registryKeys.js';
-import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES, EP2_MISSION_BRIEFING, EP2_NEXT_DEVELOPMENT_GOALS, EPISODE_CONTENT, getCurrentEpisodeContent, getCurrentPlacementEpisodeContent, getCurrentPlacementMissionBriefing, getCurrentPlacementNextDevelopmentGoals, getEpisodeContent } from '../src/data/episodeContent.js';
+import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES, EP2_MISSION_BRIEFING, EP2_NEXT_DEVELOPMENT_GOALS, EP3_MISSION_PREVIEW, EPISODE_CONTENT, getCurrentEpisodeContent, getCurrentPlacementEpisodeContent, getCurrentPlacementMissionBriefing, getCurrentPlacementNextDevelopmentGoals, getEpisodeContent, getNextEpisodeContent } from '../src/data/episodeContent.js';
 import ProgressStepper from '../src/ui/ProgressStepper.js';
 import { getTextButtonColor } from '../src/ui/TextButton.js';
 import { DEFAULT_STATE_KEYS, STATE_ICONS } from '../src/data/stateLabels.js';
@@ -397,10 +397,15 @@ function testEpisodeMetadata() {
   assert.match(CURRENT_PLACEMENT_EPISODE.shortTitle, /EP2/);
   assert.equal(EPISODES[EPISODE_IDS.Crisis], CURRENT_EPISODE);
   assert.equal(EPISODES[EPISODE_IDS.PopulationRecovery], CURRENT_PLACEMENT_EPISODE);
+  assert.equal(EPISODES[EPISODE_IDS.EconomyGrowth].id, 3);
+  assert.match(EPISODES[EPISODE_IDS.EconomyGrowth].shortTitle, /EP3/);
+  assert.match(EPISODES[EPISODE_IDS.EconomyGrowth].theme, /산업과 일자리/);
   assert.equal(getEpisode('ep1'), CURRENT_EPISODE);
   assert.equal(getEpisode(1), CURRENT_EPISODE);
   assert.equal(getEpisode('ep2'), CURRENT_PLACEMENT_EPISODE);
   assert.equal(getEpisode(2), CURRENT_PLACEMENT_EPISODE);
+  assert.equal(getEpisode('ep3'), EPISODES[EPISODE_IDS.EconomyGrowth]);
+  assert.equal(getEpisode(3), EPISODES[EPISODE_IDS.EconomyGrowth]);
   assert.equal(getEpisode('missing'), CURRENT_EPISODE);
   assert.deepEqual(EPISODE_STEPS.map((step) => step.key), [
     'exploration',
@@ -1281,6 +1286,8 @@ function testEpisodeContent() {
   assert.ok(EP1_NEXT_DEVELOPMENT_GOALS.some((line) => line.includes('EP2')), 'EP1 next development goals should mention EP2 connection');
   assert.ok(EP2_NEXT_DEVELOPMENT_GOALS.length >= 5, 'EP2 ending preview should provide visible EP3 guidance lines');
   assert.ok(EP2_NEXT_DEVELOPMENT_GOALS.some((line) => line.includes('EP3 경제 성장')), 'EP2 ending preview should mention EP3 economy growth');
+  assert.equal(EP3_MISSION_PREVIEW.title, '경제 성장 전략');
+  assert.equal(EP3_MISSION_PREVIEW.focusAreas.length, 3, 'EP3 preview should define three initial focus areas');
   assert.equal(EP1_REFLECTION_CHOICES.length, 4, 'EP1 should expose four reflection choices');
   assert.equal(new Set(EP1_REFLECTION_CHOICES.map((choice) => choice.id)).size, EP1_REFLECTION_CHOICES.length, 'reflection choice ids should be unique');
   assert.ok(EP1_REFLECTION_CHOICES.every((choice) => choice.title && choice.icon && choice.description && Number.isFinite(choice.color)), 'reflection choices should have title/icon/description/color');
@@ -1288,12 +1295,16 @@ function testEpisodeContent() {
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.Crisis].dataCards, EP1_DATA_CARDS, 'EP1 data cards should be addressable through episode content registry');
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.PopulationRecovery].missionBriefing, EP2_MISSION_BRIEFING, 'EP2 mission briefing should be addressable through episode content registry');
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.PopulationRecovery].nextDevelopmentGoals, EP2_NEXT_DEVELOPMENT_GOALS, 'EP2 next development goals should be addressable through episode content registry');
+  assert.equal(EPISODE_CONTENT[EPISODE_IDS.PopulationRecovery].nextEpisodeId, EPISODE_IDS.EconomyGrowth, 'EP2 should point to EP3 as the next episode');
+  assert.equal(EPISODE_CONTENT[EPISODE_IDS.EconomyGrowth].missionPreview, EP3_MISSION_PREVIEW, 'EP3 mission preview should be addressable through episode content registry');
   assert.equal(getEpisodeContent(EPISODE_IDS.Crisis).causeQuestion, EP1_CAUSE_QUESTION);
   assert.equal(getEpisodeContent('unknown_episode').coreConcept, EP1_CORE_CONCEPT, 'unknown content ids should fall back to current episode content');
   assert.equal(getCurrentEpisodeContent().problemItems, EP1_PROBLEM_ITEMS);
   assert.equal(getCurrentPlacementEpisodeContent().missionBriefing, EP2_MISSION_BRIEFING);
   assert.equal(getCurrentPlacementMissionBriefing(), EP2_MISSION_BRIEFING);
   assert.equal(getCurrentPlacementNextDevelopmentGoals(), EP2_NEXT_DEVELOPMENT_GOALS);
+  assert.equal(getNextEpisodeContent(EPISODE_IDS.PopulationRecovery).missionPreview, EP3_MISSION_PREVIEW);
+  assert.equal(getNextEpisodeContent(EPISODE_IDS.EconomyGrowth), null);
 }
 
 

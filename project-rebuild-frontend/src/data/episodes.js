@@ -12,6 +12,7 @@ export const EPISODE_STEPS = [
 export const EPISODE_IDS = Object.freeze({
   Crisis: 'ep1',
   PopulationRecovery: 'ep2',
+  EconomyGrowth: 'ep3',
 });
 
 export const EPISODES = Object.freeze({
@@ -42,6 +43,19 @@ export const EPISODES = Object.freeze({
     intro: [
       'EP1에서 확인한 지역 위기를 바탕으로 회복 방향을 선택합니다.',
       '정책과 시설 배치를 통해 사람들이 다시 머물 조건을 실험합니다.',
+    ],
+  },
+  [EPISODE_IDS.EconomyGrowth]: {
+    id: 3,
+    code: EPISODE_IDS.EconomyGrowth,
+    title: '푸른군 경제 성장 전략',
+    shortTitle: 'EP3. 경제 성장',
+    regionName: '푸른군',
+    theme: '산업과 일자리 중심의 지역 활성화',
+    requiredExploredCount: 0,
+    intro: [
+      '생활 기반이 조금씩 회복된 뒤에는 일자리와 경제 활력이 필요합니다.',
+      '산업 시설과 성장 전략이 인구, 경제, 교통에 어떤 변화를 만드는지 살펴봅니다.',
     ],
   },
 });
