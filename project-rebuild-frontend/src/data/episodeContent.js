@@ -1,4 +1,4 @@
-import { DEFAULT_PLACEMENT_CONFIG_ID, ENVIRONMENT_PLACEMENT_CONFIG_ID } from './episodePlacementConfigs.js';
+import { DEFAULT_PLACEMENT_CONFIG_ID, ENVIRONMENT_PLACEMENT_CONFIG_ID, EP3_ECONOMY_PLACEMENT_CONFIG_ID } from './episodePlacementConfigs.js';
 import { CURRENT_EPISODE, CURRENT_PLACEMENT_EPISODE, EPISODE_IDS } from './episodes.js';
 export const EP1_DATA_CARDS = [
   {
@@ -185,6 +185,7 @@ export const EP2_MISSION_BRIEFING = {
 
 export const EP3_MISSION_PREVIEW = {
   title: '경제 성장 전략',
+  placementConfigId: EP3_ECONOMY_PLACEMENT_CONFIG_ID,
   intro: [
     'EP2에서 생활 기반과 정주 조건을 비교했습니다.',
     'EP3에서는 사람들이 오래 머물 수 있도록 일자리와 산업 성장을 실험합니다.',

@@ -77,10 +77,12 @@ import StorageManagerViewManager from '../src/systems/StorageManagerViewManager.
 import StorageManagerRenderer from '../src/systems/StorageManagerRenderer.js';
 import SideEffectIssueRenderer from '../src/systems/SideEffectIssueRenderer.js';
 import { buildings } from '../src/data/buildings.js';
+import { economyBuildings } from '../src/data/economyBuildings.js';
 import { policies } from '../src/data/policies.js';
+import { economyPolicies } from '../src/data/economyPolicies.js';
 import { explorationPlaces } from '../src/data/explorationPlaces.js';
 import { mapData } from '../src/data/mapData.js';
-import { DEFAULT_PLACEMENT_CONFIG_ID, ENVIRONMENT_PLACEMENT_CONFIG_ID, episodePlacementConfigs, getDefaultPlacementConfig, getDefaultPlacementConfigIdForEpisode, getPlacementConfig, getPlacementConfigIdForStrategy, getPlacementConfigsForEpisode } from '../src/data/episodePlacementConfigs.js';
+import { DEFAULT_PLACEMENT_CONFIG_ID, ENVIRONMENT_PLACEMENT_CONFIG_ID, EP3_ECONOMY_PLACEMENT_CONFIG_ID, episodePlacementConfigs, getDefaultPlacementConfig, getDefaultPlacementConfigIdForEpisode, getPlacementConfig, getPlacementConfigIdForStrategy, getPlacementConfigsForEpisode } from '../src/data/episodePlacementConfigs.js';
 import { DEFAULT_EVALUATION_PROFILE_ID, ENVIRONMENT_EVALUATION_PROFILE_ID, ISSUE_THRESHOLDS, REACTION_THRESHOLDS, RESULT_THRESHOLDS, SCORE_RULES, evaluationProfiles, getEvaluationProfile } from '../src/data/evaluationRules.js';
 import { API_CONTRACT, formatContractRequest, formatContractResponse } from '../src/data/apiContract.js';
 import { CURRENT_EPISODE, CURRENT_PLACEMENT_EPISODE, EPISODE_IDS, EPISODES, EPISODE_STEPS, getEpisode, getEpisodeStep } from '../src/data/episodes.js';
@@ -1289,6 +1291,7 @@ function testEpisodeContent() {
   assert.ok(EP2_NEXT_DEVELOPMENT_GOALS.length >= 5, 'EP2 ending preview should provide visible EP3 guidance lines');
   assert.ok(EP2_NEXT_DEVELOPMENT_GOALS.some((line) => line.includes('EP3 경제 성장')), 'EP2 ending preview should mention EP3 economy growth');
   assert.equal(EP3_MISSION_PREVIEW.title, '경제 성장 전략');
+  assert.equal(EP3_MISSION_PREVIEW.placementConfigId, EP3_ECONOMY_PLACEMENT_CONFIG_ID);
   assert.equal(EP3_MISSION_PREVIEW.focusAreas.length, 3, 'EP3 preview should define three initial focus areas');
   assert.equal(EP1_REFLECTION_CHOICES.length, 4, 'EP1 should expose four reflection choices');
   assert.equal(new Set(EP1_REFLECTION_CHOICES.map((choice) => choice.id)).size, EP1_REFLECTION_CHOICES.length, 'reflection choice ids should be unique');
@@ -1788,6 +1791,29 @@ function testBuildingData() {
   assert.deepEqual(smallPark.requiresAdjacentAnyType, ['forest', 'river'], 'small park should keep nature adjacency rule');
 }
 
+function testEconomyBuildingData() {
+  assert.equal(economyBuildings.length, 3, 'EP3 should expose three economy-growth facility samples');
+  assert.equal(new Set(economyBuildings.map((building) => building.id)).size, economyBuildings.length, 'EP3 building ids should be unique');
+  assert.equal(new Set(economyBuildings.map((building) => building.name)).size, economyBuildings.length, 'EP3 building names should be unique for display');
+
+  for (const building of economyBuildings) {
+    assert.ok(building.id && building.name && building.description, 'EP3 building should have visible identity fields');
+    assert.ok(Number.isFinite(building.cost) && building.cost > 0, `${building.id} should have a positive cost`);
+    assert.ok(Number.isFinite(building.color), `${building.id} should have a numeric placeholder color`);
+    assert.ok(Number.isInteger(building.footprint.width) && building.footprint.width > 0, `${building.id} footprint width should be positive integer`);
+    assert.ok(Number.isInteger(building.footprint.height) && building.footprint.height > 0, `${building.id} footprint height should be positive integer`);
+    assert.ok(Array.isArray(building.allowedZones) && building.allowedZones.length > 0, `${building.id} should declare allowed zones`);
+    assert.ok(building.balanceNote && building.balanceSummary, `${building.id} should explain its EP3 balancing tradeoff`);
+    assert.equal(building.effect.budget, -building.cost, `${building.id} budget effect should match negative cost`);
+    assert.ok((building.effect.economy ?? 0) > 0, `${building.id} should increase economy in EP3`);
+    assert.ok(Object.values(building.effect).every(Number.isFinite), `${building.id} effects should be numeric`);
+  }
+
+  assert.equal(economyBuildings.find((building) => building.id === 'food_factory').requiresAdjacentType, 'road');
+  assert.deepEqual(economyBuildings.find((building) => building.id === 'tour_complex').requiresAdjacentAnyType, ['forest', 'river']);
+  assert.equal(economyBuildings.find((building) => building.id === 'logistics_center').requiresAdjacentType, 'road');
+}
+
 
 function testEpisodePlacementConfigs() {
   const config = getPlacementConfig();
@@ -1809,6 +1835,13 @@ function testEpisodePlacementConfigs() {
     'placement configs should be discoverable by episode code',
   );
   assert.deepEqual(getPlacementConfigsForEpisode(EPISODE_IDS.Crisis), [], 'EP1 should not expose placement configs yet');
+  assert.deepEqual(getPlacementConfigsForEpisode(EPISODE_IDS.EconomyGrowth).map((candidate) => candidate.id), [EP3_ECONOMY_PLACEMENT_CONFIG_ID], 'EP3 should expose its economy placement config');
+  const economyConfig = getPlacementConfig(EP3_ECONOMY_PLACEMENT_CONFIG_ID);
+  assert.equal(economyConfig.episodeId, EPISODE_IDS.EconomyGrowth);
+  assert.equal(economyConfig.buildings, economyBuildings);
+  assert.equal(economyConfig.requiredPlacements, 3);
+  assert.deepEqual(economyConfig.stateKeys, ['economy', 'population', 'budget', 'traffic', 'pollution', 'satisfaction']);
+  assert.equal(getDefaultPlacementConfigIdForEpisode(EPISODE_IDS.EconomyGrowth), EP3_ECONOMY_PLACEMENT_CONFIG_ID);
   const environmentConfig = getPlacementConfig(ENVIRONMENT_PLACEMENT_CONFIG_ID);
   assert.equal(environmentConfig.id, ENVIRONMENT_PLACEMENT_CONFIG_ID);
   assert.equal(environmentConfig.requiredPlacements, 2);
@@ -1880,6 +1913,27 @@ function testPolicyData() {
     }
     for (const buildingName of policy.recommendedBuildings) {
       assert.ok(buildingNames.has(buildingName), `policy ${policy.id} references unknown building name ${buildingName}`);
+    }
+  }
+}
+
+function testEconomyPolicyData() {
+  assert.equal(economyPolicies.length, 3, 'EP3 should expose three economy policy samples');
+  assert.equal(new Set(economyPolicies.map((policy) => policy.id)).size, economyPolicies.length, 'EP3 policy ids should be unique');
+  const buildingIds = new Set(economyBuildings.map((building) => building.id));
+  const buildingNames = new Set(economyBuildings.map((building) => building.name));
+
+  for (const policy of economyPolicies) {
+    assert.ok(policy.name && policy.tagline && policy.description, 'EP3 policy should have visible copy');
+    assert.ok(policy.focus.length >= 3, 'EP3 policy should declare at least three focus indicators');
+    assert.ok(policy.recommendedBuildingIds.length >= 2, 'EP3 policy should recommend at least two economy building ids');
+    assert.equal(policy.recommendedBuildings.length, policy.recommendedBuildingIds.length, 'EP3 recommended names should be derived for every id');
+    assert.match(policy.note, /EP3 전략/);
+    for (const buildingId of policy.recommendedBuildingIds) {
+      assert.ok(buildingIds.has(buildingId), `EP3 policy ${policy.id} references unknown building id ${buildingId}`);
+    }
+    for (const buildingName of policy.recommendedBuildings) {
+      assert.ok(buildingNames.has(buildingName), `EP3 policy ${policy.id} references unknown building name ${buildingName}`);
     }
   }
 }
@@ -4750,9 +4804,11 @@ async function run() {
   testGameStateAndIssues();
   testLearningProgress();
   testBuildingData();
+  testEconomyBuildingData();
   testEpisodePlacementConfigs();
   testPlacementContextManager();
   testPolicyData();
+  testEconomyPolicyData();
   testPolicyRecommendationMatchingUsesIds();
   testMapData();
   testPlacementSceneObjectRegistry();
