@@ -1,5 +1,4 @@
 import Phaser from 'phaser';
-import { getPlacementConfig } from '../data/episodePlacementConfigs.js';
 import { getCurrentPlacementMissionBriefing } from '../data/episodeContent.js';
 import PlacementViewManager from '../systems/PlacementViewManager.js';
 import CameraController from '../systems/CameraController.js';
@@ -8,6 +7,7 @@ import PlacementInputController from '../systems/PlacementInputController.js';
 import PlacementUiUpdater from '../systems/PlacementUiUpdater.js';
 import PlacementUiRenderer from '../systems/PlacementUiRenderer.js';
 import PlacementSceneBootstrap from '../systems/PlacementSceneBootstrap.js';
+import PlacementContextManager from '../systems/PlacementContextManager.js';
 import PlacementActionManager from '../systems/PlacementActionManager.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import Ep2BriefingViewManager from '../systems/Ep2BriefingViewManager.js';
@@ -20,12 +20,19 @@ export default class PlacementScene extends Phaser.Scene {
   }
 
   create() {
-    this.placementConfig = getPlacementConfig(this.registry.get(REGISTRY_KEYS.placementConfigId));
-    this.availableBuildings = this.placementConfig.buildings;
-    this.selectedBuilding = this.availableBuildings[0];
     this.selectedPolicy = this.registry.get(REGISTRY_KEYS.selectedPolicy);
     const learningProgress = LearningProgress.get(this.registry);
     this.selectedStrategy = Ep2BriefingViewManager.resolveStrategy(getCurrentPlacementMissionBriefing(), this.registry.get(REGISTRY_KEYS.selectedPlacementStrategy) ?? learningProgress.selectedStrategyId, this.selectedPolicy?.id);
+    const placementContext = PlacementContextManager.resolve({
+      registry: this.registry,
+      progress: learningProgress,
+      selectedStrategy: this.selectedStrategy,
+    });
+    this.placementConfig = placementContext.placementConfig;
+    this.evaluationProfile = placementContext.evaluationProfile;
+    this.registry.set(REGISTRY_KEYS.placementConfigId, this.placementConfig.id);
+    this.availableBuildings = this.placementConfig.buildings;
+    this.selectedBuilding = this.availableBuildings[0];
     this.placedBuildings = [...(this.registry.get(REGISTRY_KEYS.placedBuildings) ?? [])];
     this.bootstrap = new PlacementSceneBootstrap({
       scene: this,

@@ -2514,7 +2514,7 @@ function testPlacementViewManager() {
 
   const placementSceneSource = readProjectFile('src', 'scenes', 'PlacementScene.js');
   assert.match(placementSceneSource, /PlacementSceneBootstrap/, 'placement scene should delegate setup through bootstrap');
-  assert.match(placementSceneSource, /getPlacementConfig/, 'placement scene should resolve swappable episode placement config');
+  assert.match(placementSceneSource, /PlacementContextManager/, 'placement scene should resolve swappable episode placement config through placement context manager');
   assert.match(placementSceneSource, /availableBuildings/, 'placement scene should render buildings from the active episode config');
   assert.match(placementSceneSource, /requiredPlacements/, 'placement scene should apply required placement count from the active episode config');
   assert.match(placementSceneSource, /stateKeys/, 'placement scene should apply state display keys from the active episode config');
@@ -4371,7 +4371,6 @@ function testSceneRenderingBoundaries() {
 
 function testPlacementContextBoundaries() {
   const allowedDirectContextFiles = new Set([
-    'scenes/PlacementScene.js',
     'systems/PlacementContextManager.js',
     'systems/LearningDataRestoreManager.js',
   ]);
