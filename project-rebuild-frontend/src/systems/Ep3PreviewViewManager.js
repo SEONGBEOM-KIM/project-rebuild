@@ -103,8 +103,9 @@ export default class Ep3PreviewViewManager {
   static getTransitionNoteLayout() {
     return {
       panel: { x: 960, y: 805, width: 1510, height: 170 },
-      title: { x: 250, y: 740, text: 'EP4로 이어지는 복선' },
-      body: { x: 250, y: 782, wordWrapWidth: 1380 },
+      title: { x: 250, y: 740, text: 'EP3 배치 준비' },
+      policyBody: { x: 250, y: 782, wordWrapWidth: 650 },
+      buildingBody: { x: 975, y: 782, wordWrapWidth: 650 },
     };
   }
 
@@ -132,6 +133,20 @@ export default class Ep3PreviewViewManager {
       'EP3에서는 경제 성장의 긍정적 효과를 먼저 체감합니다.',
       signal ? `동시에 ${signal.title}(${signal.stateFocus})를 기록해 EP4 부작용 단계로 연결합니다.` : '동시에 작은 불편 신호를 기록해 EP4 부작용 단계로 연결합니다.',
       '아직 실제 산업 시설 배치와 밸런싱은 다음 개발 단위에서 확정합니다.',
+    ].join('\n');
+  }
+
+  static formatPolicyPreviewRows(policies) {
+    return [
+      '산업 정책 후보:',
+      ...policies.map((policy) => `• ${policy.name}: ${policy.focus.join(' · ')}`),
+    ].join('\n');
+  }
+
+  static formatBuildingPreviewRows(buildings) {
+    return [
+      '산업 시설 후보:',
+      ...buildings.map((building) => `• ${building.name}: ${building.balanceSummary}`),
     ].join('\n');
   }
 }

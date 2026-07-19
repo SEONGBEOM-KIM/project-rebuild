@@ -2,6 +2,8 @@ import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import { getNextEpisodeContent } from '../data/episodeContent.js';
+import { economyBuildings } from '../data/economyBuildings.js';
+import { economyPolicies } from '../data/economyPolicies.js';
 import Ep3PreviewViewManager from '../systems/Ep3PreviewViewManager.js';
 import Ep3PreviewRenderer from '../systems/Ep3PreviewRenderer.js';
 import { createLayoutText } from '../ui/LayoutText.js';
@@ -25,7 +27,7 @@ export default class Ep3PreviewScene extends Phaser.Scene {
     preview.focusAreas.forEach((focusArea, index) => {
       Ep3PreviewRenderer.renderFocusCard(this, focusArea, index);
     });
-    Ep3PreviewRenderer.renderTransitionNote(this, preview);
+    Ep3PreviewRenderer.renderTransitionNote(this, preview, economyPolicies, economyBuildings);
 
     const controls = Ep3PreviewRenderer.renderControls(this, width / 2);
     controls.endingButton.on('pointerdown', () => this.scene.start(controls.layout.ending.target));

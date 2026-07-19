@@ -3013,9 +3013,12 @@ function testEp3PreviewRenderer() {
   assert.ok(cardFixture.calls.some((call) => call[0] === 'text' && call[3].includes('상태 초점: 경제↑ 인구↑')));
 
   const noteFixture = createRendererSceneSpy();
-  Ep3PreviewRenderer.renderTransitionNote(noteFixture.scene, EP3_MISSION_PREVIEW);
-  assert.ok(noteFixture.calls.some((call) => call[0] === 'text' && call[3] === 'EP4로 이어지는 복선'));
-  assert.ok(noteFixture.calls.some((call) => call[0] === 'text' && call[3].includes('EP4 부작용 단계')));
+  Ep3PreviewRenderer.renderTransitionNote(noteFixture.scene, EP3_MISSION_PREVIEW, economyPolicies, economyBuildings);
+  assert.ok(noteFixture.calls.some((call) => call[0] === 'text' && call[3] === 'EP3 배치 준비'));
+  assert.ok(noteFixture.calls.some((call) => call[0] === 'text' && call[3].includes('산업 정책 후보:')));
+  assert.ok(noteFixture.calls.some((call) => call[0] === 'text' && call[3].includes('지역 산업 일자리')));
+  assert.ok(noteFixture.calls.some((call) => call[0] === 'text' && call[3].includes('산업 시설 후보:')));
+  assert.ok(noteFixture.calls.some((call) => call[0] === 'text' && call[3].includes('식품 가공 공장')));
 
   const controlsFixture = createRendererSceneSpy();
   const controls = Ep3PreviewRenderer.renderControls(controlsFixture.scene, 960);
@@ -3038,7 +3041,9 @@ function testEp3PreviewViewManager() {
   assert.equal(Ep3PreviewViewManager.getNoteStyle().strokeColor, 0x86efac);
   assert.equal(Ep3PreviewViewManager.getIntroPanelLayout().title.text, '다음 에피소드 미리보기');
   assert.deepEqual(Ep3PreviewViewManager.getFocusCardLayout(1).panel, { x: 960, y: 548, width: 440, height: 330 });
-  assert.equal(Ep3PreviewViewManager.getTransitionNoteLayout().title.text, 'EP4로 이어지는 복선');
+  assert.equal(Ep3PreviewViewManager.getTransitionNoteLayout().title.text, 'EP3 배치 준비');
+  assert.equal(Ep3PreviewViewManager.getTransitionNoteLayout().policyBody.wordWrapWidth, 650);
+  assert.equal(Ep3PreviewViewManager.getTransitionNoteLayout().buildingBody.wordWrapWidth, 650);
   assert.deepEqual(Ep3PreviewViewManager.getControlLayout(960).ending, {
     x: 710,
     y: 955,
@@ -3050,9 +3055,13 @@ function testEp3PreviewViewManager() {
   assert.match(Ep3PreviewViewManager.formatIntroText(EP3_MISSION_PREVIEW), /일자리와 산업 성장/);
   assert.match(Ep3PreviewViewManager.formatFocusBody(EP3_MISSION_PREVIEW.focusAreas[2]), /교통 부담↑ 오염 신호↑/);
   assert.match(Ep3PreviewViewManager.formatTransitionNote(EP3_MISSION_PREVIEW), /아직 실제 산업 시설 배치/);
+  assert.match(Ep3PreviewViewManager.formatPolicyPreviewRows(economyPolicies), /방문 경제 활성화/);
+  assert.match(Ep3PreviewViewManager.formatBuildingPreviewRows(economyBuildings), /물류 센터/);
   const previewSceneSource = readProjectFile('src', 'scenes', 'Ep3PreviewScene.js');
   assert.match(previewSceneSource, /getNextEpisodeContent/, 'EP3 preview scene should use next episode content data');
   assert.match(previewSceneSource, /Ep3PreviewRenderer\.renderFocusCard/, 'EP3 preview scene should render focus cards');
+  assert.match(previewSceneSource, /economyPolicies/, 'EP3 preview scene should show economy policy candidates');
+  assert.match(previewSceneSource, /economyBuildings/, 'EP3 preview scene should show economy building candidates');
 }
 
 

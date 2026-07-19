@@ -45,20 +45,25 @@ export default class Ep3PreviewRenderer {
     return { background, icon, title, body };
   }
 
-  static renderTransitionNote(scene, preview) {
+  static renderTransitionNote(scene, preview, policies = [], buildings = []) {
     const layout = Ep3PreviewViewManager.getTransitionNoteLayout();
     const style = Ep3PreviewViewManager.getNoteStyle();
     createPanelBackground(scene, layout.panel, style);
     createPanelTitle(scene, layout.title, style);
-    return createLayoutText(scene, layout.body, {
-      text: Ep3PreviewViewManager.formatTransitionNote(preview),
-      style: {
-        fontSize: style.bodyFontSize,
-        color: style.bodyColor,
-        lineSpacing: style.bodyLineSpacing,
-        wordWrap: { width: layout.body.wordWrapWidth },
-      },
+    const textStyle = {
+      fontSize: style.bodyFontSize,
+      color: style.bodyColor,
+      lineSpacing: style.bodyLineSpacing,
+    };
+    const policyBody = createLayoutText(scene, layout.policyBody, {
+      text: Ep3PreviewViewManager.formatPolicyPreviewRows(policies),
+      style: { ...textStyle, wordWrap: { width: layout.policyBody.wordWrapWidth } },
     });
+    const buildingBody = createLayoutText(scene, layout.buildingBody, {
+      text: Ep3PreviewViewManager.formatBuildingPreviewRows(buildings),
+      style: { ...textStyle, wordWrap: { width: layout.buildingBody.wordWrapWidth } },
+    });
+    return { policyBody, buildingBody };
   }
 
   static renderControls(scene, centerX) {
