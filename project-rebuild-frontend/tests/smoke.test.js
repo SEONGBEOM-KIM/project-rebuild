@@ -20,6 +20,7 @@ import Ep3PreviewRenderer from '../src/systems/Ep3PreviewRenderer.js';
 import LearningProgress from '../src/systems/LearningProgress.js';
 import WorldStateManager from '../src/systems/WorldStateManager.js';
 import EpisodePlacementLaunchManager from '../src/systems/EpisodePlacementLaunchManager.js';
+import EpisodeFlowManager from '../src/systems/EpisodeFlowManager.js';
 import CauseQuizManager from '../src/systems/CauseQuizManager.js';
 import CauseQuizViewManager from '../src/systems/CauseQuizViewManager.js';
 import CauseQuizPanelRenderer from '../src/systems/CauseQuizPanelRenderer.js';
@@ -90,7 +91,7 @@ import { API_CONTRACT, formatContractRequest, formatContractResponse } from '../
 import { CURRENT_EPISODE, CURRENT_PLACEMENT_EPISODE, EPISODE_IDS, EPISODES, EPISODE_STEPS, getEpisode, getEpisodeStep } from '../src/data/episodes.js';
 import SCENE_KEYS from '../src/data/sceneKeys.js';
 import { REGISTRY_KEYS } from '../src/data/registryKeys.js';
-import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES, EP2_MISSION_BRIEFING, EP2_NEXT_DEVELOPMENT_GOALS, EP3_MISSION_PREVIEW, EPISODE_CONTENT, getCurrentEpisodeContent, getCurrentPlacementEpisodeContent, getCurrentPlacementMissionBriefing, getCurrentPlacementNextDevelopmentGoals, getEpisodeContent, getNextEpisodeContent } from '../src/data/episodeContent.js';
+import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES, EP2_MISSION_BRIEFING, EP2_NEXT_DEVELOPMENT_GOALS, EP3_MISSION_PREVIEW, EP3_NEXT_DEVELOPMENT_GOALS, EP3_REFLECTION_CHOICES, EPISODE_CONTENT, getCurrentEpisodeContent, getCurrentPlacementEpisodeContent, getCurrentPlacementMissionBriefing, getCurrentPlacementNextDevelopmentGoals, getEpisodeContent, getNextDevelopmentGoals, getNextEpisodeContent, getReflectionChoices } from '../src/data/episodeContent.js';
 import ProgressStepper from '../src/ui/ProgressStepper.js';
 import { getTextButtonColor } from '../src/ui/TextButton.js';
 import { DEFAULT_STATE_KEYS, STATE_ICONS } from '../src/data/stateLabels.js';
@@ -1875,6 +1876,19 @@ function testEpisodePlacementLaunchManager() {
   assert.equal(LearningProgress.get(registry).selectedPolicyId, economyPolicies[0].id);
 }
 
+function testEpisodeFlowManager() {
+  const registry = createMemoryRegistry();
+  registry.set(REGISTRY_KEYS.placementConfigId, EP3_ECONOMY_PLACEMENT_CONFIG_ID);
+
+  assert.equal(EpisodeFlowManager.resolveActivePlacementEpisodeId({ registry }), EPISODE_IDS.EconomyGrowth);
+  assert.equal(EpisodeFlowManager.getReflectionChoices({ registry }), EP3_REFLECTION_CHOICES);
+  assert.equal(EpisodeFlowManager.getNextDevelopmentGoals({ registry }), EP3_NEXT_DEVELOPMENT_GOALS);
+  assert.equal(EpisodeFlowManager.resolveActivePlacementEpisodeId(), EPISODE_IDS.PopulationRecovery);
+
+  const placementConfig = getPlacementConfig(ENVIRONMENT_PLACEMENT_CONFIG_ID);
+  assert.equal(EpisodeFlowManager.resolveActivePlacementEpisodeId({ placementConfig }), EPISODE_IDS.PopulationRecovery);
+}
+
 
 
 function testBuildingData() {
@@ -2748,7 +2762,7 @@ function testPlacementViewManager() {
   const endingSceneSource = readProjectFile('src', 'scenes', 'EndingScene.js');
   assert.match(endingSceneSource, /selectedStrategyId/, 'ending scene should recover EP2 strategy from learning progress');
   assert.match(endingSceneSource, /PlacementContextManager/, 'ending scene should resolve active placement context');
-  assert.match(endingSceneSource, /getCurrentPlacementNextDevelopmentGoals/, 'ending scene should show next goals from active placement episode');
+  assert.match(endingSceneSource, /EpisodeFlowManager\.getNextDevelopmentGoals/, 'ending scene should show next goals from active placement episode');
   assert.match(endingSceneSource, /formatStateSummary\(gameState, ending, placementConfig\.stateKeys, evaluationProfile\)/, 'ending scene should summarize state with active placement config');
   assert.match(endingSceneSource, /formatLearningRecordRows\(learningProgress, exploredPlaces, quizResult, reflectionChoice, selectedStrategy, placementConfig, evaluationProfile\)/, 'ending scene should record active placement context');
   const reflectionSceneSource = readProjectFile('src', 'scenes', 'ReflectionScene.js');
@@ -4935,6 +4949,7 @@ async function run() {
   testLearningProgress();
   testWorldStateManager();
   testEpisodePlacementLaunchManager();
+  testEpisodeFlowManager();
   testBuildingData();
   testEconomyBuildingData();
   testEpisodePlacementConfigs();

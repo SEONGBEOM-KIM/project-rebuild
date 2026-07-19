@@ -1,13 +1,14 @@
 import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
-import { getCurrentEpisodeContent, getCurrentPlacementMissionBriefing } from '../data/episodeContent.js';
+import { getCurrentPlacementMissionBriefing } from '../data/episodeContent.js';
 import PlacementContextManager from '../systems/PlacementContextManager.js';
 import IssueDetector from '../systems/IssueDetector.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import ReflectionViewManager from '../systems/ReflectionViewManager.js';
 import ReflectionRenderer from '../systems/ReflectionRenderer.js';
 import Ep2BriefingViewManager from '../systems/Ep2BriefingViewManager.js';
+import EpisodeFlowManager from '../systems/EpisodeFlowManager.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
@@ -53,7 +54,7 @@ export default class ReflectionScene extends Phaser.Scene {
 
     ReflectionRenderer.renderRunSummary(this, { gameState, issues, selectedPolicy, selectedStrategy, placedBuildings }, layout);
 
-    getCurrentEpisodeContent().reflectionChoices.forEach((choice, index) => {
+    EpisodeFlowManager.getReflectionChoices({ registry: this.registry, learningProgress, placementConfig }).forEach((choice, index) => {
       const { x, y } = ReflectionViewManager.getChoiceCardPosition(index);
       const cardObjects = ReflectionRenderer.renderChoiceCard(
         this,

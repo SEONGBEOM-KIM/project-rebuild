@@ -198,6 +198,56 @@ export const EP3_MISSION_PREVIEW = {
   ],
 };
 
+export const EP3_REFLECTION_CHOICES = [
+  {
+    id: 'jobs_quality',
+    title: '일자리 질 보완',
+    icon: '🏭',
+    description: '경제 성장이 실제 주민 일자리와 정주 조건으로 이어지는지 더 확인한다.',
+    nextActionLabel: '일자리 지속성 점검',
+    nextAction: '다음 개발에서는 일자리 수뿐 아니라 이동 거리, 임금, 지역 상권 연결까지 함께 비교합니다.',
+    color: 0x38bdf8,
+  },
+  {
+    id: 'traffic_management',
+    title: '교통 부담 보완',
+    icon: '🚚',
+    description: '물류와 방문객 증가가 도로 혼잡이나 생활 불편으로 이어지지 않게 조정한다.',
+    nextActionLabel: '교통 완충 계획',
+    nextAction: '다음 개발에서는 산업 시설 주변 도로, 대중교통, 주거지 거리 조건을 함께 점검합니다.',
+    color: 0xfacc15,
+  },
+  {
+    id: 'environment_guard',
+    title: '환경 안전 보완',
+    icon: '🌿',
+    description: '산업 성장 과정에서 오염과 자연 훼손 신호가 커지지 않도록 관리한다.',
+    nextActionLabel: '환경 영향 관리',
+    nextAction: '다음 개발에서는 성장 시설과 녹지·하천 보호 조건을 함께 배치하는 기준을 세웁니다.',
+    color: 0x4ade80,
+  },
+  {
+    id: 'budget_return',
+    title: '투자 효과 보완',
+    icon: '💰',
+    description: '큰 예산을 쓴 시설이 경제 효과와 주민 만족으로 충분히 돌아오는지 따져본다.',
+    nextActionLabel: '예산 대비 성장 비교',
+    nextAction: '다음 개발에서는 시설 비용, 경제 증가, 주민 만족 변화를 함께 비교하는 평가 기준을 만듭니다.',
+    color: 0xfb7185,
+  },
+];
+
+export const EP3_NEXT_DEVELOPMENT_GOALS = [
+  'EP3 경제 성장 확장 목표',
+  '',
+  '• 산업 시설 효과와 부작용 비교',
+  '• 일자리·상권·교통 부담의 연결 확인',
+  '• 성장 이후 환경·예산 관리 기준 준비',
+  '• 다음 에피소드에서 생활 불편과 지속 가능성 검토',
+  '',
+  '다음 개발은 성장 효과가 만든 새 문제를 균형 있게 조정하는 방향으로 확장합니다.',
+];
+
 export const EP1_REFLECTION_CHOICES = [
   {
     id: 'population_economy',
@@ -257,11 +307,21 @@ export const EPISODE_CONTENT = Object.freeze({
   }),
   [EPISODE_IDS.EconomyGrowth]: Object.freeze({
     missionPreview: EP3_MISSION_PREVIEW,
+    reflectionChoices: EP3_REFLECTION_CHOICES,
+    nextDevelopmentGoals: EP3_NEXT_DEVELOPMENT_GOALS,
   }),
 });
 
 export function getEpisodeContent(episodeCode = CURRENT_EPISODE.code) {
   return EPISODE_CONTENT[episodeCode] ?? EPISODE_CONTENT[CURRENT_EPISODE.code];
+}
+
+export function getReflectionChoices(episodeCode = CURRENT_EPISODE.code) {
+  return getEpisodeContent(episodeCode).reflectionChoices ?? getCurrentEpisodeContent().reflectionChoices ?? [];
+}
+
+export function getNextDevelopmentGoals(episodeCode = CURRENT_PLACEMENT_EPISODE.code) {
+  return getEpisodeContent(episodeCode).nextDevelopmentGoals ?? getCurrentEpisodeContent().nextDevelopmentGoals ?? [];
 }
 
 export function getCurrentEpisodeContent() {
