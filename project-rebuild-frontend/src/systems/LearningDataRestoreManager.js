@@ -1,7 +1,6 @@
 import GameState from './GameState.js';
 import LearningProgress from './LearningProgress.js';
 import { policies } from '../data/policies.js';
-import { buildings } from '../data/buildings.js';
 import { getCurrentPlacementMissionBriefing } from '../data/episodeContent.js';
 import Ep2BriefingViewManager from './Ep2BriefingViewManager.js';
 import PlacementContextManager from './PlacementContextManager.js';
@@ -11,8 +10,12 @@ export default class LearningDataRestoreManager {
   static restore(registry, data) {
     const selectedPolicy = policies.find((policy) => policy.id === data.selectedPolicy?.id) ?? null;
     const selectedStrategy = Ep2BriefingViewManager.resolveStrategy(getCurrentPlacementMissionBriefing(), data.selectedStrategy?.id, selectedPolicy?.id);
-    const restoredPlacements = LearningDataRestoreManager.restorePlacements(data.placements ?? []);
-    const progress = LearningDataRestoreManager.buildProgress(data, selectedPolicy, selectedStrategy, restoredPlacements);
+    const placementContext = PlacementContextManager.resolveFromLearningData(data, selectedStrategy);
+    const restoredPlacements = LearningDataRestoreManager.restorePlacements(
+      data.placements ?? [],
+      placementContext.placementConfig.buildings,
+    );
+    const progress = LearningDataRestoreManager.buildProgress(data, selectedPolicy, selectedStrategy, restoredPlacements, placementContext);
 
     registry.set(REGISTRY_KEYS.gameState, LearningDataRestoreManager.restoreGameState(data.gameState, restoredPlacements));
     registry.set(REGISTRY_KEYS.lastPlacementResult, null);
@@ -44,10 +47,10 @@ export default class LearningDataRestoreManager {
     );
   }
 
-  static restorePlacements(placements) {
+  static restorePlacements(placements, availableBuildings) {
     return placements
       .map((placement, index) => {
-        const building = buildings.find((candidate) => candidate.id === placement.buildingId);
+        const building = availableBuildings.find((candidate) => candidate.id === placement.buildingId);
         if (!building) {
           return null;
         }
@@ -62,7 +65,7 @@ export default class LearningDataRestoreManager {
       .filter(Boolean);
   }
 
-  static buildProgress(data, selectedPolicy, selectedStrategy, restoredPlacements) {
+  static buildProgress(data, selectedPolicy, selectedStrategy, restoredPlacements, placementContext = null) {
     return {
       ...LearningProgress.createInitialProgress(),
       episode: data.episode ?? 1,
@@ -72,7 +75,7 @@ export default class LearningDataRestoreManager {
       problemSummaryCompleted: Boolean(data.problemSummaryCompleted),
       selectedPolicyId: selectedPolicy?.id ?? null,
       selectedStrategyId: selectedStrategy?.id ?? null,
-      placementConfigId: PlacementContextManager.resolvePlacementConfigIdFromLearningData(data, selectedStrategy),
+      placementConfigId: placementContext?.placementConfig.id ?? PlacementContextManager.resolvePlacementConfigIdFromLearningData(data, selectedStrategy),
       placedBuildingIds: restoredPlacements.map((record) => record.building.id),
       reflectionChoice: data.reflectionChoice ?? null,
       completed: Boolean(data.completed),

@@ -17,18 +17,28 @@ export default class PlacementContextManager {
       ?? getPlacementConfigIdForStrategy(selectedStrategy);
   }
 
-  static resolve({ registry, progress = null, selectedStrategy = null } = {}) {
-    const resolvedProgress = progress ?? (registry ? LearningProgress.get(registry) : null);
-    const placementConfig = getPlacementConfig(PlacementContextManager.resolvePlacementConfigId({
-      registry,
-      progress: resolvedProgress,
-      selectedStrategy,
-    }));
+  static buildContext(placementConfigId) {
+    const placementConfig = getPlacementConfig(placementConfigId);
     const evaluationProfile = getEvaluationProfile(placementConfig.evaluationProfileId);
 
     return {
       placementConfig,
       evaluationProfile,
     };
+  }
+
+  static resolve({ registry, progress = null, selectedStrategy = null } = {}) {
+    const resolvedProgress = progress ?? (registry ? LearningProgress.get(registry) : null);
+    return PlacementContextManager.buildContext(PlacementContextManager.resolvePlacementConfigId({
+      registry,
+      progress: resolvedProgress,
+      selectedStrategy,
+    }));
+  }
+
+  static resolveFromLearningData(data, selectedStrategy = null) {
+    return PlacementContextManager.buildContext(
+      PlacementContextManager.resolvePlacementConfigIdFromLearningData(data, selectedStrategy),
+    );
   }
 }

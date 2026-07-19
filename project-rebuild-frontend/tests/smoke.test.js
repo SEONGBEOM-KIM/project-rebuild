@@ -1811,6 +1811,12 @@ function testPlacementContextManager() {
   const alternateContext = PlacementContextManager.resolve({ registry });
   assert.equal(alternateContext.placementConfig.requiredPlacements, 2);
   assert.equal(alternateContext.evaluationProfile.id, ENVIRONMENT_EVALUATION_PROFILE_ID);
+
+  const importedContext = PlacementContextManager.resolveFromLearningData({
+    summary: { placementContext: { placementConfigId: ENVIRONMENT_PLACEMENT_CONFIG_ID } },
+  }, strategy);
+  assert.equal(importedContext.placementConfig.id, ENVIRONMENT_PLACEMENT_CONFIG_ID);
+  assert.equal(importedContext.evaluationProfile.id, ENVIRONMENT_EVALUATION_PROFILE_ID);
 }
 
 function testPolicyData() {
@@ -3799,6 +3805,13 @@ function testLearningDataRestoreManager() {
     reflectionChoice: { id: 'environment', title: '환경 보완' },
     completed: true,
   };
+
+  const configScopedPlacements = LearningDataRestoreManager.restorePlacements(
+    [{ buildingId: 'episode_only_facility', position: { x: 1, y: 2 }, effect: { population: 5 } }],
+    [{ id: 'episode_only_facility', name: '에피소드 전용 시설', effect: { population: 1 } }],
+  );
+  assert.equal(configScopedPlacements[0].building.name, '에피소드 전용 시설');
+  assert.deepEqual(configScopedPlacements[0].delta, { population: 5 });
 
   const restored = LearningDataRestoreManager.restore(registry, data);
   assert.equal(restored.selectedPolicy.id, 'green_recovery');
