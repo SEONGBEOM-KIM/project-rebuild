@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
-import { getCurrentEpisodeContent, getCurrentPlacementMissionBriefing } from '../data/episodeContent.js';
+import { getCurrentPlacementMissionBriefing, getCurrentPlacementNextDevelopmentGoals } from '../data/episodeContent.js';
 import PlacementContextManager from '../systems/PlacementContextManager.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import EndingSummaryManager from '../systems/EndingSummaryManager.js';
@@ -47,7 +47,7 @@ export default class EndingScene extends Phaser.Scene {
     const panels = EndingSummaryViewManager.getPanelLayout();
     EndingSummaryRenderer.renderPanel(this, panels.choice, EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice, selectedStrategy));
     EndingSummaryRenderer.renderPanel(this, panels.state, EndingSummaryManager.formatStateSummary(gameState, ending, placementConfig.stateKeys, evaluationProfile));
-    EndingSummaryRenderer.renderNextMissionPanel(this, panels.nextMission, getCurrentEpisodeContent().nextDevelopmentGoals);
+    EndingSummaryRenderer.renderNextMissionPanel(this, panels.nextMission, getCurrentPlacementNextDevelopmentGoals());
     EndingSummaryRenderer.renderLearningRecordStrip(
       this,
       width / 2,

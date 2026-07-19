@@ -95,7 +95,18 @@ export const EP1_NEXT_DEVELOPMENT_GOALS = [
   '• 원인 파악 선택형 질문',
   '• 문제 정리 후 EP2 연결',
   '',
-  '아직 실제 퀴즈·완성 콘텐츠는 다음 단계에서 확정합니다.',
+  '다음은 인구 유입 전략을 비교합니다.',
+];
+
+export const EP2_NEXT_DEVELOPMENT_GOALS = [
+  'EP3 경제 성장 예고',
+  '',
+  '• 지역 경제 상황 확인',
+  '• 산업·일자리 정책 카드 비교',
+  '• 산업 시설 배치 규칙 준비',
+  '• 경제 성장 효과와 작은 불편 신호 확인',
+  '',
+  '다음 개발은 생활 기반 회복 이후 일자리와 산업 성장으로 확장합니다.',
 ];
 
 
@@ -225,6 +236,7 @@ export const EPISODE_CONTENT = Object.freeze({
   }),
   [EPISODE_IDS.PopulationRecovery]: Object.freeze({
     missionBriefing: EP2_MISSION_BRIEFING,
+    nextDevelopmentGoals: EP2_NEXT_DEVELOPMENT_GOALS,
   }),
 });
 
@@ -242,4 +254,8 @@ export function getCurrentPlacementEpisodeContent() {
 
 export function getCurrentPlacementMissionBriefing() {
   return getCurrentPlacementEpisodeContent().missionBriefing;
+}
+
+export function getCurrentPlacementNextDevelopmentGoals() {
+  return getCurrentPlacementEpisodeContent().nextDevelopmentGoals ?? getCurrentEpisodeContent().nextDevelopmentGoals ?? [];
 }
