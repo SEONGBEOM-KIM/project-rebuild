@@ -4715,6 +4715,15 @@ function testApiContract() {
   assert.equal(API_CONTRACT.requestExample.evaluation_profile.id, ENVIRONMENT_EVALUATION_PROFILE_ID);
   assert.equal(API_CONTRACT.requestExample.placements[0].building_name, exampleBuilding.name);
   assert.deepEqual(API_CONTRACT.requestExample.placements[0].effect, exampleBuilding.effect);
+  assert.equal(API_CONTRACT.requestExamples.ep2, API_CONTRACT.requestExample);
+  assert.equal(API_CONTRACT.requestExamples.ep3.episode_context.placement.code, EPISODE_IDS.EconomyGrowth);
+  assert.equal(API_CONTRACT.requestExamples.ep3.selected_policy.id, 'visitor_economy');
+  assert.equal(API_CONTRACT.requestExamples.ep3.selected_strategy.id, 'visitor_commerce_growth');
+  assert.equal(API_CONTRACT.requestExamples.ep3.placement_config.id, EP3_ECONOMY_PLACEMENT_CONFIG_ID);
+  assert.equal(API_CONTRACT.requestExamples.ep3.placement_config.episode_id, EPISODE_IDS.EconomyGrowth);
+  assert.equal(API_CONTRACT.requestExamples.ep3.placements[0].building_id, 'tour_complex');
+  assert.equal(LearningApiPayloadManager.validate(API_CONTRACT.requestExamples.ep3).every((row) => row.ok), true);
+  assert.equal(MockApiClient.validatePayload(API_CONTRACT.requestExamples.ep3).ok, true);
   assert.equal(API_CONTRACT.successResponseExample.episode_id, API_CONTRACT.requestExample.episode_id);
   assert.deepEqual(API_CONTRACT.successResponseExample.episode_context, API_CONTRACT.requestExample.episode_context);
   assert.equal(LearningApiPayloadManager.validate(API_CONTRACT.requestExample).every((row) => row.ok), true);
@@ -4724,6 +4733,8 @@ function testApiContract() {
   assert.match(formatContractRequest(), /placement_context/);
   assert.match(formatContractRequest(), /placement_config/);
   assert.match(formatContractRequest(), /evaluation_profile/);
+  assert.match(formatContractRequest('ep3'), /visitor_commerce_growth/);
+  assert.match(formatContractRequest('ep3'), /ep3_economy_growth/);
   assert.match(formatContractResponse(), /201 Created/);
 }
 
