@@ -71,6 +71,7 @@ export default class TeacherReportManager {
       selectedStrategy,
       placementConfig,
       evaluationProfile,
+      placementContext: TeacherReportManager.buildPlacementContextSummary(placementConfig, evaluationProfile),
       placedBuildings,
       gameState,
       reflectionChoice,
@@ -78,6 +79,16 @@ export default class TeacherReportManager {
       issues,
       ending,
       exploredNames,
+    };
+  }
+
+  static buildPlacementContextSummary(placementConfig, evaluationProfile) {
+    return {
+      placementConfigId: placementConfig?.id ?? null,
+      placementConfigTitle: placementConfig?.title ?? null,
+      requiredPlacements: placementConfig?.requiredPlacements ?? null,
+      stateKeys: placementConfig?.stateKeys ?? [],
+      evaluationProfileId: evaluationProfile?.id ?? null,
     };
   }
 
@@ -94,11 +105,14 @@ export default class TeacherReportManager {
   static formatEpisodeContextReport(report) {
     const currentEpisode = report.episodeContext?.current;
     const placementEpisode = report.episodeContext?.placement;
+    const placementContext = report.placementContext ?? TeacherReportManager.buildPlacementContextSummary(report.placementConfig, report.evaluationProfile);
     return [
       `학습 흐름: ${currentEpisode?.shortTitle ?? '알 수 없음'} (${currentEpisode?.code ?? '-'})`,
       `배치 실험: ${placementEpisode?.shortTitle ?? '알 수 없음'} (${placementEpisode?.code ?? '-'})`,
-      `배치 설정: ${report.placementConfig?.id ?? '없음'}`,
-      `평가 기준: ${report.evaluationProfile?.id ?? '없음'}`,
+      `배치 설정: ${placementContext.placementConfigId ?? '없음'} / ${placementContext.placementConfigTitle ?? '제목 없음'}`,
+      `필요 배치: ${placementContext.requiredPlacements ?? '-'}개`,
+      `표시 지표: ${(placementContext.stateKeys ?? []).join(', ') || '없음'}`,
+      `평가 기준: ${placementContext.evaluationProfileId ?? '없음'}`,
     ].join('\n');
   }
 

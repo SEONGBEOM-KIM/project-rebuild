@@ -3130,14 +3130,33 @@ function testTeacherReportManager() {
   assert.equal(report.selectedStrategy.id, 'jobs_services');
   assert.equal(report.placementConfig.id, DEFAULT_PLACEMENT_CONFIG_ID);
   assert.equal(report.evaluationProfile.id, DEFAULT_EVALUATION_PROFILE_ID);
+  assert.deepEqual(report.placementContext, {
+    placementConfigId: DEFAULT_PLACEMENT_CONFIG_ID,
+    placementConfigTitle: '푸른군 인구 회복 배치 실험',
+    requiredPlacements: 3,
+    stateKeys: DEFAULT_STATE_KEYS,
+    evaluationProfileId: DEFAULT_EVALUATION_PROFILE_ID,
+  });
   assert.equal(report.placedBuildings.length, 3);
   assert.equal(report.issues.length, 0);
   assert.equal(report.ending.title, '균형형 회복안');
 
   assert.match(TeacherReportManager.formatEpisodeContextReport(report), /학습 흐름: EP1\. 지역 위기 탐색 \(ep1\)/);
   assert.match(TeacherReportManager.formatEpisodeContextReport(report), /배치 실험: EP2\. 인구 유입 전략 \(ep2\)/);
-  assert.match(TeacherReportManager.formatEpisodeContextReport(report), /배치 설정: ep2_population_recovery/);
+  assert.match(TeacherReportManager.formatEpisodeContextReport(report), /배치 설정: ep2_population_recovery \/ 푸른군 인구 회복 배치 실험/);
+  assert.match(TeacherReportManager.formatEpisodeContextReport(report), /필요 배치: 3개/);
+  assert.match(TeacherReportManager.formatEpisodeContextReport(report), /표시 지표: population, economy, environment/);
   assert.match(TeacherReportManager.formatEpisodeContextReport(report), /평가 기준: ep2_population_recovery_default/);
+  assert.deepEqual(TeacherReportManager.buildPlacementContextSummary(
+    getPlacementConfig(ENVIRONMENT_PLACEMENT_CONFIG_ID),
+    getEvaluationProfile(ENVIRONMENT_EVALUATION_PROFILE_ID),
+  ), {
+    placementConfigId: ENVIRONMENT_PLACEMENT_CONFIG_ID,
+    placementConfigTitle: '푸른군 환경 균형 배치 실험',
+    requiredPlacements: 2,
+    stateKeys: ['environment', 'pollution', 'budget'],
+    evaluationProfileId: ENVIRONMENT_EVALUATION_PROFILE_ID,
+  });
   assert.match(TeacherReportManager.formatClassSummaryReport(report), /균형형 회복안/);
   assert.match(TeacherReportManager.formatClassSummaryReport(report), /학생 다음 액션: 예산 균형 보완/);
   assert.match(TeacherReportManager.formatClassSummaryReport(report), /EP2 전략: 일자리와 생활 기반/);
