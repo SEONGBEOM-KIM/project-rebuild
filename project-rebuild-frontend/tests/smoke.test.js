@@ -4079,6 +4079,12 @@ function testSaveImport() {
   assert.equal(importedApiPayload.data.selectedStrategy.id, apiPayload.selected_strategy.id);
   assert.equal(importedApiPayload.data.selectedStrategy.stateFocus, apiPayload.selected_strategy.state_focus);
   assert.equal(importedApiPayload.data.selectedStrategy.placementConfigId, apiPayload.selected_strategy.placement_config_id);
+  assert.deepEqual(importedApiPayload.data.summary.placementContext, {
+    placementConfigId: apiPayload.summary.placement_context.placement_config_id,
+    placementConfigTitle: apiPayload.summary.placement_context.placement_config_title,
+    requiredPlacements: apiPayload.summary.placement_context.required_placements,
+    evaluationProfileId: apiPayload.summary.placement_context.evaluation_profile_id,
+  });
   assert.equal(importedApiPayload.data.placementConfig.id, apiPayload.placement_config.id);
   assert.equal(importedApiPayload.data.placementConfig.requiredPlacements, apiPayload.placement_config.required_placements);
   assert.deepEqual(importedApiPayload.data.placementConfig.stateKeys, apiPayload.placement_config.state_keys);
@@ -4123,6 +4129,12 @@ function testApiContract() {
   const exampleBuilding = buildings.find((building) => building.id === API_CONTRACT.requestExample.placements[0].building_id);
   assert.equal(API_CONTRACT.requestExample.summary.selected_policy_name, examplePolicy.name);
   assert.equal(API_CONTRACT.requestExample.summary.selected_strategy_title, exampleStrategy.title);
+  assert.deepEqual(API_CONTRACT.requestExample.summary.placement_context, {
+    placement_config_id: DEFAULT_PLACEMENT_CONFIG_ID,
+    placement_config_title: '푸른군 인구 회복 배치 실험',
+    required_placements: 3,
+    evaluation_profile_id: DEFAULT_EVALUATION_PROFILE_ID,
+  });
   assert.equal(API_CONTRACT.requestExample.learning_steps.quiz_result.question_id, EP1_CAUSE_QUESTION.id);
   assert.equal(API_CONTRACT.requestExample.learning_steps.quiz_result.selected, EP1_CAUSE_QUESTION.choices.find((choice) => choice.correct).id);
   assert.equal(API_CONTRACT.requestExample.selected_strategy.id, exampleStrategy.id);
@@ -4138,6 +4150,7 @@ function testApiContract() {
   assert.equal(MockApiClient.validatePayload(API_CONTRACT.requestExample).ok, true);
   assert.match(formatContractRequest(), /POST \/api\/learning-records\//);
   assert.match(formatContractRequest(), /selected_strategy/);
+  assert.match(formatContractRequest(), /placement_context/);
   assert.match(formatContractRequest(), /placement_config/);
   assert.match(formatContractRequest(), /evaluation_profile/);
   assert.match(formatContractResponse(), /201 Created/);

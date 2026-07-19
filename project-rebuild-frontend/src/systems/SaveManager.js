@@ -123,8 +123,21 @@ export default class SaveManager {
       priorityIssue: summary.priority_issue,
       selectedPolicyName: summary.selected_policy_name,
       selectedStrategyTitle: summary.selected_strategy_title,
+      placementContext: SaveManager.fromApiPlacementContext(summary.placement_context),
       placementCount: summary.placement_count,
       nextAction: summary.next_action,
+    };
+  }
+
+  static fromApiPlacementContext(placementContext) {
+    if (!placementContext) {
+      return null;
+    }
+    return {
+      placementConfigId: placementContext.placement_config_id,
+      placementConfigTitle: placementContext.placement_config_title,
+      requiredPlacements: placementContext.required_placements,
+      evaluationProfileId: placementContext.evaluation_profile_id,
     };
   }
 

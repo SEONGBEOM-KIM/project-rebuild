@@ -52,6 +52,12 @@ function buildRequestExample() {
       priority_issue: null,
       selected_policy_name: policy.name,
       selected_strategy_title: strategy.title,
+      placement_context: {
+        placement_config_id: placementConfig.id,
+        placement_config_title: placementConfig.title,
+        required_placements: placementConfig.requiredPlacements,
+        evaluation_profile_id: evaluationProfile.id,
+      },
       placement_count: 1,
       next_action: {
         id: reflectionChoice.id,
