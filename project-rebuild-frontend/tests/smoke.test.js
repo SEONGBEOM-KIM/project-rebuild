@@ -2500,6 +2500,7 @@ function testPlacementViewManager() {
   assert.match(selectedBusMessage, /효과: 인구 \+40 \/ 만족도 \+10 \/ 교통 -3 \/ 예산 -120/);
   assert.equal(PlacementViewManager.getUiLayout().legendTitle.text, '타일 범례');
   assert.equal(PlacementViewManager.getUiLayout().continueButton.target, 'ResultScene');
+  assert.equal(PlacementViewManager.getUiLayout().continueButton.text, '시설 3개 더 배치');
   assert.equal(PlacementViewManager.getUiLayout().continueButton.backgroundColor, 0x94a3b8);
 
   const placementSceneSource = readProjectFile('src', 'scenes', 'PlacementScene.js');
@@ -3388,6 +3389,8 @@ function testLearningDataManager() {
   registry.set('placementConfigId', DEFAULT_PLACEMENT_CONFIG_ID);
 
   assert.equal(LearningDataManager.isReadyToSave(data), true);
+  assert.equal(LearningDataManager.getRequiredPlacements(data), 3);
+  assert.equal(LearningDataManager.getRequiredPlacements(alternateData), 2);
   assert.equal(LearningDataManager.validate({ ...data, summary: null }).some((row) => !row.ok && row.label === '학습 결론 요약'), true);
   assert.equal(LearningDataManager.validate({ ...data, selectedStrategy: null }).every((row) => row.ok), true, 'saved data without selectedStrategy should be accepted when policy maps to an EP2 strategy');
   assert.equal(LearningDataManager.validate({ ...data, selectedPolicy: null, selectedStrategy: null }).some((row) => !row.ok && row.label === 'EP2 전략 선택'), true);
@@ -3395,6 +3398,10 @@ function testLearningDataManager() {
     ...data,
     summary: { ...data.summary, placementContext: { ...data.summary.placementContext, placementConfigId: null } },
   }).some((row) => !row.ok && row.label === '요약 배치 설정 확인'), true);
+  assert.equal(LearningDataManager.validate({
+    ...alternateData,
+    placements: alternateData.placements.slice(0, 2),
+  }).every((row) => row.ok), true);
 
   const incompleteData = { ...data, reflectionChoice: null };
   assert.equal(LearningDataManager.isReadyToSave(incompleteData), false);
