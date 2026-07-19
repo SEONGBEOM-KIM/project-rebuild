@@ -20,10 +20,10 @@ export default class Ep3PreviewRenderer {
     });
   }
 
-  static renderFocusCard(scene, focusArea, index) {
+  static renderFocusCard(scene, focusArea, index, selectedStrategyId = null, onSelect = null) {
     const layout = Ep3PreviewViewManager.getFocusCardLayout(index);
-    const style = Ep3PreviewViewManager.getCardStyle();
-    const background = createPanelBackground(scene, layout.panel, style);
+    const style = Ep3PreviewViewManager.getCardStyle(focusArea.id, selectedStrategyId, focusArea.color);
+    const background = createPanelBackground(scene, layout.panel, style).setInteractive({ useHandCursor: true });
     const icon = createLayoutText(scene, layout.icon, {
       text: focusArea.icon,
       style: { fontSize: '50px' },
@@ -42,7 +42,22 @@ export default class Ep3PreviewRenderer {
         wordWrap: { width: layout.body.wordWrapWidth },
       },
     });
-    return { background, icon, title, body };
+    const selectionLabel = createLayoutText(scene, layout.selection, {
+      text: Ep3PreviewViewManager.formatSelectionLabel(focusArea.id, selectedStrategyId),
+      style: Ep3PreviewViewManager.getSelectionLabelStyle(focusArea.id === selectedStrategyId),
+      origin: 0.5,
+    });
+
+    if (onSelect) {
+      const select = () => onSelect(focusArea);
+      background.on('pointerdown', select);
+      icon.setInteractive({ useHandCursor: true }).on('pointerdown', select);
+      title.setInteractive({ useHandCursor: true }).on('pointerdown', select);
+      body.setInteractive({ useHandCursor: true }).on('pointerdown', select);
+      selectionLabel.setInteractive({ useHandCursor: true }).on('pointerdown', select);
+    }
+
+    return { background, icon, title, body, selectionLabel, strategy: focusArea };
   }
 
   static renderTransitionNote(scene, preview, policies = [], buildings = []) {

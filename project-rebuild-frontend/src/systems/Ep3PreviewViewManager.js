@@ -23,7 +23,10 @@ const EP3_PREVIEW_PANEL_STYLE = {
 const EP3_PREVIEW_CARD_STYLE = {
   fillColor: 0xffffff,
   fillAlpha: 0.96,
+  selectedFillColor: 0xfffbeb,
+  selectedFillAlpha: 1,
   strokeWidth: 4,
+  selectedStrokeWidth: 7,
   strokeColor: 0x93c5fd,
   titleFontSize: '30px',
   titleColor: '#172554',
@@ -65,8 +68,16 @@ export default class Ep3PreviewViewManager {
     return { ...EP3_PREVIEW_PANEL_STYLE };
   }
 
-  static getCardStyle() {
-    return { ...EP3_PREVIEW_CARD_STYLE };
+  static getCardStyle(strategyId = null, selectedStrategyId = null, strategyColor = EP3_PREVIEW_CARD_STYLE.strokeColor) {
+    const selected = Boolean(selectedStrategyId && strategyId === selectedStrategyId);
+    return {
+      ...EP3_PREVIEW_CARD_STYLE,
+      fillColor: selected ? EP3_PREVIEW_CARD_STYLE.selectedFillColor : EP3_PREVIEW_CARD_STYLE.fillColor,
+      fillAlpha: selected ? EP3_PREVIEW_CARD_STYLE.selectedFillAlpha : EP3_PREVIEW_CARD_STYLE.fillAlpha,
+      strokeWidth: selected ? EP3_PREVIEW_CARD_STYLE.selectedStrokeWidth : EP3_PREVIEW_CARD_STYLE.strokeWidth,
+      strokeColor: selected ? strategyColor : EP3_PREVIEW_CARD_STYLE.strokeColor,
+      selected,
+    };
   }
 
   static getNoteStyle() {
@@ -96,7 +107,8 @@ export default class Ep3PreviewViewManager {
       panel: { x: position.x, y: position.y, width: 440, height: 330 },
       icon: { x: position.x, y: position.y - 112 },
       title: { x: position.x, y: position.y - 56, wordWrapWidth: 360 },
-      body: { x: position.x - 180, y: position.y, wordWrapWidth: 360 },
+      body: { x: position.x - 180, y: position.y - 16, wordWrapWidth: 360 },
+      selection: { x: position.x, y: position.y + 132 },
     };
   }
 
@@ -119,6 +131,26 @@ export default class Ep3PreviewViewManager {
 
   static formatIntroText(preview) {
     return preview.intro.join('\n');
+  }
+
+  static getSelectionLabelStyle(selected) {
+    return {
+      fontSize: '20px',
+      color: selected ? '#92400e' : '#64748b',
+      fontStyle: 'bold',
+    };
+  }
+
+  static formatSelectionLabel(strategyId, selectedStrategyId) {
+    return strategyId === selectedStrategyId ? '선택된 성장 전략' : '클릭해서 선택';
+  }
+
+  static getDefaultStrategy(briefing) {
+    return briefing.strategies[0] ?? null;
+  }
+
+  static findStrategyById(briefing, strategyId) {
+    return briefing.strategies.find((strategy) => strategy.id === strategyId) ?? null;
   }
 
   static formatFocusBody(strategy) {

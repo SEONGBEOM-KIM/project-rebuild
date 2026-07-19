@@ -9,6 +9,7 @@ import Ep3PreviewViewManager from '../systems/Ep3PreviewViewManager.js';
 import Ep3PreviewRenderer from '../systems/Ep3PreviewRenderer.js';
 import EpisodePlacementLaunchManager from '../systems/EpisodePlacementLaunchManager.js';
 import { createLayoutText } from '../ui/LayoutText.js';
+import { REGISTRY_KEYS } from '../data/registryKeys.js';
 
 export default class Ep3PreviewScene extends Phaser.Scene {
   constructor() {
@@ -25,10 +26,12 @@ export default class Ep3PreviewScene extends Phaser.Scene {
     createLayoutText(this, layout.title, { origin: 0.5 });
     createLayoutText(this, layout.subtitle, { origin: 0.5 });
 
+    this.missionBriefing = briefing;
+    this.selectedStrategy = this.getInitialStrategy();
+    this.strategyObjects = new Map();
+
     Ep3PreviewRenderer.renderIntroPanel(this, briefing);
-    briefing.strategies.forEach((strategy, index) => {
-      Ep3PreviewRenderer.renderFocusCard(this, strategy, index);
-    });
+    this.renderStrategyCards();
     Ep3PreviewRenderer.renderTransitionNote(this, briefing, economyPolicies, economyBuildings);
 
     const controls = Ep3PreviewRenderer.renderControls(this, width / 2);
@@ -40,7 +43,44 @@ export default class Ep3PreviewScene extends Phaser.Scene {
     controls.restartButton.on('pointerdown', () => this.scene.start(controls.layout.restart.target));
   }
 
+  getInitialStrategy() {
+    const savedStrategyId = this.registry.get(REGISTRY_KEYS.selectedPlacementStrategy);
+    return Ep3PreviewViewManager.findStrategyById(this.missionBriefing, savedStrategyId)
+      ?? Ep3PreviewViewManager.getDefaultStrategy(this.missionBriefing);
+  }
+
+  renderStrategyCards() {
+    this.missionBriefing.strategies.forEach((strategy, index) => {
+      const cardObjects = Ep3PreviewRenderer.renderFocusCard(
+        this,
+        strategy,
+        index,
+        this.selectedStrategy?.id,
+        (selectedStrategy) => this.selectStrategy(selectedStrategy),
+      );
+      this.strategyObjects.set(strategy.id, cardObjects);
+    });
+  }
+
+  selectStrategy(strategy) {
+    this.selectedStrategy = strategy;
+    this.registry.set(REGISTRY_KEYS.selectedPlacementStrategy, strategy.id);
+    this.updateStrategyUi();
+  }
+
+  updateStrategyUi() {
+    for (const [strategyId, objects] of this.strategyObjects.entries()) {
+      const style = Ep3PreviewViewManager.getCardStyle(strategyId, this.selectedStrategy?.id, objects.strategy.color);
+      objects.background.setStrokeStyle(style.strokeWidth, style.strokeColor);
+      objects.background.setFillStyle(style.fillColor, style.fillAlpha);
+      objects.selectionLabel.setText(Ep3PreviewViewManager.formatSelectionLabel(strategyId, this.selectedStrategy?.id));
+      objects.selectionLabel.setColor(Ep3PreviewViewManager.getSelectionLabelStyle(style.selected).color);
+    }
+  }
+
   prepareEp3Placement() {
-    EpisodePlacementLaunchManager.prepareEp3EconomyPlacement(this.registry);
+    EpisodePlacementLaunchManager.prepareEp3EconomyPlacement(this.registry, {
+      selectedStrategy: this.selectedStrategy,
+    });
   }
 }

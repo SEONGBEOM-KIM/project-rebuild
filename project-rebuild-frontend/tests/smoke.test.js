@@ -1858,11 +1858,20 @@ function testEpisodePlacementLaunchManager() {
   assert.equal(isolatedContext.episodeId, EPISODE_IDS.EconomyGrowth);
   assert.equal(isolatedContext.placementConfigId, EP3_ECONOMY_PLACEMENT_CONFIG_ID);
   assert.equal(isolatedContext.selectedPolicy.id, economyPolicies[0].id);
-  assert.equal(isolatedContext.selectedStrategy, null);
+  assert.equal(isolatedContext.selectedStrategy, EP3_MISSION_BRIEFING.strategies[0].id);
   assert.deepEqual(isolatedContext.placedBuildings, [], 'current EP3 proof should stay isolated by default');
   assert.deepEqual(isolatedContext.gameState, GameState.createInitialState());
   assert.equal(isolatedContext.worldState.activeEpisodeId, EPISODE_IDS.EconomyGrowth);
   assert.equal(isolatedContext.progressPatch.placementConfigId, EP3_ECONOMY_PLACEMENT_CONFIG_ID);
+  assert.equal(isolatedContext.progressPatch.selectedStrategyId, EP3_MISSION_BRIEFING.strategies[0].id);
+
+  const selectedEp3Strategy = EP3_MISSION_BRIEFING.strategies[2];
+  const selectedContext = EpisodePlacementLaunchManager.buildEp3EconomyLaunchContext({
+    worldState: priorWorldState,
+    selectedStrategy: selectedEp3Strategy,
+  });
+  assert.equal(selectedContext.selectedStrategy, selectedEp3Strategy.id);
+  assert.equal(selectedContext.selectedPolicy.id, selectedEp3Strategy.policyId);
 
   const cumulativeContext = EpisodePlacementLaunchManager.buildEp3EconomyLaunchContext({
     worldState: priorWorldState,
@@ -1874,7 +1883,7 @@ function testEpisodePlacementLaunchManager() {
   EpisodePlacementLaunchManager.applyLaunchContext(registry, isolatedContext);
   assert.equal(registry.get(REGISTRY_KEYS.placementConfigId), EP3_ECONOMY_PLACEMENT_CONFIG_ID);
   assert.equal(registry.get(REGISTRY_KEYS.selectedPolicy).id, economyPolicies[0].id);
-  assert.equal(registry.get(REGISTRY_KEYS.selectedPlacementStrategy), null);
+  assert.equal(registry.get(REGISTRY_KEYS.selectedPlacementStrategy), EP3_MISSION_BRIEFING.strategies[0].id);
   assert.deepEqual(registry.get(REGISTRY_KEYS.placedBuildings), []);
   assert.deepEqual(registry.get(REGISTRY_KEYS.gameState), GameState.createInitialState());
   assert.equal(registry.get(REGISTRY_KEYS.worldState).activeEpisodeId, EPISODE_IDS.EconomyGrowth);
@@ -3137,9 +3146,20 @@ function testEp3PreviewRenderer() {
   assert.ok(introFixture.calls.some((call) => call[0] === 'text' && call[3].includes('EP3에서는')));
 
   const cardFixture = createRendererSceneSpy();
-  Ep3PreviewRenderer.renderFocusCard(cardFixture.scene, EP3_MISSION_BRIEFING.strategies[0], 0);
+  const selectedStrategyIds = [];
+  const card = Ep3PreviewRenderer.renderFocusCard(
+    cardFixture.scene,
+    EP3_MISSION_BRIEFING.strategies[0],
+    0,
+    EP3_MISSION_BRIEFING.strategies[0].id,
+    (strategy) => selectedStrategyIds.push(strategy.id),
+  );
   assert.ok(cardFixture.calls.some((call) => call[0] === 'text' && call[3] === EP3_MISSION_BRIEFING.strategies[0].title));
   assert.ok(cardFixture.calls.some((call) => call[0] === 'text' && call[3].includes('상태 초점: 경제↑ 인구↑')));
+  assert.ok(cardFixture.calls.some((call) => call[0] === 'text' && call[3] === '선택된 성장 전략'));
+  card.background.events.get('pointerdown')();
+  card.selectionLabel.events.get('pointerdown')();
+  assert.deepEqual(selectedStrategyIds, [EP3_MISSION_BRIEFING.strategies[0].id, EP3_MISSION_BRIEFING.strategies[0].id]);
 
   const noteFixture = createRendererSceneSpy();
   Ep3PreviewRenderer.renderTransitionNote(noteFixture.scene, EP3_MISSION_BRIEFING, economyPolicies, economyBuildings);
@@ -3168,6 +3188,8 @@ function testEp3PreviewViewManager() {
   assert.equal(Ep3PreviewViewManager.getScreenLayout(1920).progressStep, 'ending');
   assert.equal(Ep3PreviewViewManager.getPanelStyle().titleColor, '#fde68a');
   assert.equal(Ep3PreviewViewManager.getCardStyle().strokeColor, 0x93c5fd);
+  assert.equal(Ep3PreviewViewManager.getCardStyle('a', 'a', 0xfb923c).selected, true);
+  assert.equal(Ep3PreviewViewManager.formatSelectionLabel('a', 'a'), '선택된 성장 전략');
   assert.equal(Ep3PreviewViewManager.getNoteStyle().strokeColor, 0x86efac);
   assert.equal(Ep3PreviewViewManager.getIntroPanelLayout().title.text, '경제 성장 미션 브리핑');
   assert.deepEqual(Ep3PreviewViewManager.getFocusCardLayout(1).panel, { x: 960, y: 548, width: 440, height: 330 });
@@ -3200,6 +3222,7 @@ function testEp3PreviewViewManager() {
   assert.match(previewSceneSource, /Ep3PreviewRenderer\.renderFocusCard/, 'EP3 preview scene should render focus cards');
   assert.match(previewSceneSource, /economyPolicies/, 'EP3 preview scene should show economy policy candidates');
   assert.match(previewSceneSource, /economyBuildings/, 'EP3 preview scene should show economy building candidates');
+  assert.match(previewSceneSource, /selectStrategy/, 'EP3 preview scene should support selecting a growth strategy');
   assert.match(previewSceneSource, /prepareEp3Placement/, 'EP3 preview scene should prepare placement context before starting placement');
   assert.match(previewSceneSource, /EpisodePlacementLaunchManager/, 'EP3 preview scene should delegate placement launch setup');
 }

@@ -1,24 +1,28 @@
 import { EPISODE_IDS } from '../data/episodes.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
-import { EP3_ECONOMY_PLACEMENT_CONFIG_ID } from '../data/episodePlacementConfigs.js';
+import { getPlacementConfigIdForStrategy, EP3_ECONOMY_PLACEMENT_CONFIG_ID } from '../data/episodePlacementConfigs.js';
 import { economyPolicies } from '../data/economyPolicies.js';
+import { getEpisodeContent } from '../data/episodeContent.js';
 import LearningProgress from './LearningProgress.js';
 import WorldStateManager from './WorldStateManager.js';
 
 export default class EpisodePlacementLaunchManager {
-  static buildEp3EconomyLaunchContext({ worldState = null, cumulative = false } = {}) {
+  static buildEp3EconomyLaunchContext({ worldState = null, cumulative = false, selectedStrategy = null } = {}) {
     const baseWorldState = WorldStateManager.startEpisode(
       worldState ?? WorldStateManager.createInitialWorldState(),
       EPISODE_IDS.EconomyGrowth,
     );
     const placementSeed = WorldStateManager.buildPlacementSeed(baseWorldState, { cumulative });
-    const selectedPolicy = economyPolicies[0];
+    const missionBriefing = getEpisodeContent(EPISODE_IDS.EconomyGrowth).missionBriefing;
+    const resolvedStrategy = selectedStrategy ?? missionBriefing.strategies[0] ?? null;
+    const selectedPolicy = economyPolicies.find((policy) => policy.id === resolvedStrategy?.policyId) ?? economyPolicies[0];
+    const placementConfigId = getPlacementConfigIdForStrategy(resolvedStrategy) ?? EP3_ECONOMY_PLACEMENT_CONFIG_ID;
 
     return {
       episodeId: EPISODE_IDS.EconomyGrowth,
-      placementConfigId: EP3_ECONOMY_PLACEMENT_CONFIG_ID,
+      placementConfigId,
       selectedPolicy,
-      selectedStrategy: null,
+      selectedStrategy: resolvedStrategy?.id ?? null,
       gameState: placementSeed.gameState,
       placedBuildings: placementSeed.placedBuildings,
       lastPlacementResult: null,
@@ -26,8 +30,8 @@ export default class EpisodePlacementLaunchManager {
       progressPatch: {
         episode: 3,
         selectedPolicyId: selectedPolicy.id,
-        selectedStrategyId: null,
-        placementConfigId: EP3_ECONOMY_PLACEMENT_CONFIG_ID,
+        selectedStrategyId: resolvedStrategy?.id ?? null,
+        placementConfigId,
         placedBuildingIds: placementSeed.placedBuildings.map((record) => record.buildingId ?? record.building?.id).filter(Boolean),
       },
     };
@@ -49,6 +53,7 @@ export default class EpisodePlacementLaunchManager {
     const context = EpisodePlacementLaunchManager.buildEp3EconomyLaunchContext({
       worldState: options.worldState ?? registry.get(REGISTRY_KEYS.worldState),
       cumulative: options.cumulative ?? false,
+      selectedStrategy: options.selectedStrategy ?? null,
     });
     return EpisodePlacementLaunchManager.applyLaunchContext(registry, context);
   }
