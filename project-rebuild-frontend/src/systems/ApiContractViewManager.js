@@ -29,8 +29,8 @@ const API_CONTRACT_NOTE_STYLE = {
 };
 
 const API_CONTRACT_BUTTON_STYLE = {
-  fontSize: '29px',
-  padding: { x: 28, y: 16 },
+  fontSize: '23px',
+  padding: { x: 18, y: 13 },
 };
 
 export default class ApiContractViewManager {
@@ -98,11 +98,18 @@ export default class ApiContractViewManager {
     return '실제 연동 시 student/user, class_id, created_at은 서버에서 추가하는 편이 안전합니다. 프론트는 학습 결과 payload만 전송합니다.';
   }
 
+  static getExampleSelectorLayout() {
+    return {
+      ep2: { x: 360, y: 960, label: 'EP2 예시', exampleKey: 'ep2', backgroundColor: '#93c5fd', textColor: '#0f172a' },
+      ep3: { x: 535, y: 960, label: 'EP3 예시', exampleKey: 'ep3', backgroundColor: '#fdba74', textColor: '#0f172a' },
+    };
+  }
+
   static getControlLayout() {
     return {
-      payload: { x: 650, y: 960, label: 'Payload 미리보기', target: SCENE_KEYS.ApiPayload, backgroundColor: '#bbf7d0', textColor: '#123524' },
-      data: { x: 970, y: 960, label: '학습 데이터로', target: SCENE_KEYS.LearningData, backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
-      ending: { x: 1280, y: 960, label: '마무리로', target: SCENE_KEYS.Ending, backgroundColor: '#fde68a', textColor: '#0f172a' },
+      payload: { x: 760, y: 960, label: 'Payload 미리보기', target: SCENE_KEYS.ApiPayload, backgroundColor: '#bbf7d0', textColor: '#123524' },
+      data: { x: 1060, y: 960, label: '학습 데이터로', target: SCENE_KEYS.LearningData, backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
+      ending: { x: 1325, y: 960, label: '마무리로', target: SCENE_KEYS.Ending, backgroundColor: '#fde68a', textColor: '#0f172a' },
     };
   }
 }

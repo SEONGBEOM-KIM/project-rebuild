@@ -15,6 +15,7 @@ export default class ApiContractScene extends Phaser.Scene {
 
   create() {
     const { width } = this.scale;
+    this.selectedExampleKey = 'ep2';
     const screenLayout = ApiContractViewManager.getScreenLayout(width);
     createScreenBackground(this, screenLayout.backgroundColor);
     ProgressStepper.render(this, screenLayout.progressStep);
@@ -23,7 +24,7 @@ export default class ApiContractScene extends Phaser.Scene {
     createLayoutText(this, screenLayout.subtitle, { origin: 0.5 });
 
     const panels = ApiContractViewManager.getPanelLayout();
-    ApiContractRenderer.renderPanel(this, panels.request, formatContractRequest());
+    this.requestBodyText = ApiContractRenderer.renderPanel(this, panels.request, formatContractRequest(this.selectedExampleKey));
     ApiContractRenderer.renderPanel(this, panels.response, formatContractResponse());
     ApiContractRenderer.renderNotes(this);
     this.drawControls();
@@ -31,6 +32,12 @@ export default class ApiContractScene extends Phaser.Scene {
 
 
   drawControls() {
+    const selectorLayout = ApiContractViewManager.getExampleSelectorLayout();
+    for (const option of Object.values(selectorLayout)) {
+      const button = createTextButton(this, option, ApiContractViewManager.getButtonStyle());
+      button.on('pointerdown', () => this.selectExample(option.exampleKey));
+    }
+
     const layout = ApiContractViewManager.getControlLayout();
     const payloadButton = createTextButton(this, layout.payload, ApiContractViewManager.getButtonStyle());
     payloadButton.on('pointerdown', () => this.scene.start(layout.payload.target));
@@ -40,6 +47,11 @@ export default class ApiContractScene extends Phaser.Scene {
 
     const endingButton = createTextButton(this, layout.ending, ApiContractViewManager.getButtonStyle());
     endingButton.on('pointerdown', () => this.scene.start(layout.ending.target));
+  }
+
+  selectExample(exampleKey) {
+    this.selectedExampleKey = exampleKey;
+    this.requestBodyText?.setText(formatContractRequest(exampleKey));
   }
 
 }

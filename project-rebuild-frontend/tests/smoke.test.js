@@ -1237,7 +1237,7 @@ function testApiContractViewManager() {
   assert.equal(ApiContractViewManager.getScreenLayout(1920).title.fontSize, '60px');
   assert.equal(ApiContractViewManager.getPanelStyle().strokeWidth, 5);
   assert.equal(ApiContractViewManager.getNoteStyle().bodyFontSize, '22px');
-  assert.deepEqual(ApiContractViewManager.getButtonStyle().padding, { x: 28, y: 16 });
+  assert.deepEqual(ApiContractViewManager.getButtonStyle().padding, { x: 18, y: 13 });
   const panels = ApiContractViewManager.getPanelLayout();
   assert.equal(panels.request.title, '요청 Body 초안');
   assert.equal(panels.response.width, 620);
@@ -1247,8 +1247,16 @@ function testApiContractViewManager() {
   assert.equal(ApiContractViewManager.getNotesLayout().body.width, 1200);
   assert.equal(ApiContractViewManager.getNotesLayout().title.text, '백엔드 구현 메모');
   assert.match(ApiContractViewManager.formatBackendNote(), /서버에서 추가/);
+  assert.deepEqual(ApiContractViewManager.getExampleSelectorLayout().ep3, {
+    x: 535,
+    y: 960,
+    label: 'EP3 예시',
+    exampleKey: 'ep3',
+    backgroundColor: '#fdba74',
+    textColor: '#0f172a',
+  });
   assert.deepEqual(ApiContractViewManager.getControlLayout().payload, {
-    x: 650,
+    x: 760,
     y: 960,
     label: 'Payload 미리보기',
     target: 'ApiPayloadScene',
@@ -1256,7 +1264,7 @@ function testApiContractViewManager() {
     textColor: '#123524',
   });
   assert.deepEqual(ApiContractViewManager.getControlLayout().ending, {
-    x: 1280,
+    x: 1325,
     y: 960,
     label: '마무리로',
     target: 'EndingScene',
@@ -2798,6 +2806,10 @@ function testPlacementViewManager() {
   assert.match(reflectionSceneSource, /PlacementContextManager/, 'reflection scene should resolve active placement context');
   assert.match(reflectionSceneSource, /IssueDetector\.detect\(gameState, evaluationProfile\)/, 'reflection scene should detect issues with active evaluation profile');
   assert.match(reflectionSceneSource, /formatContextSummary\(placementConfig, evaluationProfile\)/, 'reflection scene should display active placement context summary');
+  const apiContractSceneSource = readProjectFile('src', 'scenes', 'ApiContractScene.js');
+  assert.match(apiContractSceneSource, /getExampleSelectorLayout/, 'api contract scene should render example selector controls');
+  assert.match(apiContractSceneSource, /selectExample\(option\.exampleKey\)/, 'api contract scene should bind selector buttons to example keys');
+  assert.match(apiContractSceneSource, /formatContractRequest\(exampleKey\)/, 'api contract scene should refresh the request example by selected key');
   const placementBootstrapSource = readProjectFile('src', 'systems', 'PlacementSceneBootstrap.js');
   assert.match(placementBootstrapSource, /PlacementUiCamera/, 'placement bootstrap should render fixed UI through a separate UI camera');
   assert.match(placementBootstrapSource, /objectRegistry\.ignoreUiObjectsOnMainCamera\(\)/, 'world camera should ignore fixed UI objects through registry');
