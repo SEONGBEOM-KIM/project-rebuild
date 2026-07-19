@@ -2950,8 +2950,12 @@ function testEp2BriefingViewManager() {
   });
   assert.match(Ep2BriefingViewManager.formatIntroText(EP2_MISSION_BRIEFING), /EP2에서는/);
   assert.match(Ep2BriefingViewManager.formatStrategyBody(EP2_MISSION_BRIEFING.strategies[0]), /상태 변화:/);
+  assert.match(Ep2BriefingViewManager.formatStrategyBody(EP2_MISSION_BRIEFING.strategies[0]), /배치 목표: 3개/);
+  assert.match(Ep2BriefingViewManager.formatStrategyBody(EP2_MISSION_BRIEFING.strategies[2]), /배치 목표: 2개/);
   assert.match(Ep2BriefingViewManager.formatStrategyCheck(EP2_MISSION_BRIEFING.strategies[0]), /생각할 점:/);
   assert.match(Ep2BriefingViewManager.formatSelectedStrategySummary(EP2_MISSION_BRIEFING.strategies[0]), /배치 목표:/);
+  assert.match(Ep2BriefingViewManager.formatSelectedStrategySummary(EP2_MISSION_BRIEFING.strategies[2]), /푸른군 환경 균형 배치 실험 \/ 필요 배치: 2개/);
+  assert.equal(Ep2BriefingViewManager.getStrategyPlacementContext(EP2_MISSION_BRIEFING.strategies[2]).placementConfig.id, ENVIRONMENT_PLACEMENT_CONFIG_ID);
   assert.match(Ep2BriefingViewManager.formatSelectedStrategySummary(EP2_MISSION_BRIEFING.strategies[0]), /관찰 포인트:/);
   assert.match(Ep2BriefingViewManager.formatSelectedStrategySummary(null), /전략 카드를 선택/);
   assert.equal(Ep2BriefingViewManager.formatSelectionLabel('jobs_services', 'jobs_services'), '선택된 전략');

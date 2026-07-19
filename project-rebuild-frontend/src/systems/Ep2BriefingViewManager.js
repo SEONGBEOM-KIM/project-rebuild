@@ -1,4 +1,5 @@
 import SCENE_KEYS from '../data/sceneKeys.js';
+import { getPlacementConfig, getPlacementConfigIdForStrategy } from '../data/episodePlacementConfigs.js';
 
 export const EP2_BRIEFING_LAYOUT = {
   backgroundColor: 0x10253f,
@@ -31,9 +32,9 @@ const EP2_BRIEFING_CARD_STYLE = {
   titleFontSize: '29px',
   titleColor: '#172554',
   titleFontStyle: 'bold',
-  bodyFontSize: '22px',
+  bodyFontSize: '19px',
   bodyColor: '#1e293b',
-  bodyLineSpacing: 8,
+  bodyLineSpacing: 3,
 };
 
 const EP2_BRIEFING_SELECTION_PANEL_STYLE = {
@@ -108,7 +109,7 @@ export default class Ep2BriefingViewManager {
       icon: { x: position.x, y: position.y - 135 },
       title: { x: position.x, y: position.y - 78, wordWrapWidth: 360 },
       body: { x: position.x - 180, y: position.y - 25, wordWrapWidth: 360 },
-      check: { x: position.x - 180, y: position.y + 112, wordWrapWidth: 360 },
+      check: { x: position.x - 180, y: position.y + 124, wordWrapWidth: 360 },
       selection: { x: position.x, y: position.y + 162 },
     };
   }
@@ -161,25 +162,37 @@ export default class Ep2BriefingViewManager {
     return briefing.intro.join('\n');
   }
 
+  static getStrategyPlacementContext(strategy) {
+    const placementConfig = getPlacementConfig(getPlacementConfigIdForStrategy(strategy));
+    return {
+      placementConfig,
+      requiredPlacements: placementConfig.requiredPlacements,
+      evaluationProfileId: placementConfig.evaluationProfileId,
+    };
+  }
+
   static formatStrategyBody(strategy) {
+    const context = Ep2BriefingViewManager.getStrategyPlacementContext(strategy);
     return [
       strategy.description,
-      '',
       `상태 변화: ${strategy.stateFocus}`,
+      `배치 목표: ${context.requiredPlacements}개`,
     ].join('\n');
   }
 
-  static formatStrategyCheck(strategy) {
-    return `생각할 점: ${strategy.checkQuestion}`;
+  static formatStrategyCheck(_strategy) {
+    return '생각할 점: 아래 선택 패널에서 확인';
   }
 
   static formatSelectedStrategySummary(strategy) {
     if (!strategy) {
       return '전략 카드를 선택하면 배치 목표와 관찰 포인트가 표시됩니다.';
     }
+    const context = Ep2BriefingViewManager.getStrategyPlacementContext(strategy);
 
     return [
       `${strategy.icon} ${strategy.title} — ${strategy.stateFocus}`,
+      `배치 설정: ${context.placementConfig.title} / 필요 배치: ${context.requiredPlacements}개 / 평가 기준: ${context.evaluationProfileId}`,
       `배치 목표: ${strategy.placementGoal}`,
       `관찰 포인트: ${strategy.observationPoint}`,
     ].join('\n');

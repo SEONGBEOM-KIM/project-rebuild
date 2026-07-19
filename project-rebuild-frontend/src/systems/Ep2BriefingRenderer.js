@@ -45,7 +45,7 @@ export default class Ep2BriefingRenderer {
     const check = createLayoutText(scene, layout.check, {
       text: Ep2BriefingViewManager.formatStrategyCheck(strategy),
       style: {
-        fontSize: '20px',
+        fontSize: '18px',
         color: '#334155',
         fontStyle: 'bold',
         wordWrap: { width: layout.check.wordWrapWidth },
