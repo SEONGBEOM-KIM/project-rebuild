@@ -10,6 +10,7 @@ const SCENE_KEYS = Object.freeze({
   CauseQuiz: 'CauseQuizScene',
   ProblemSummary: 'ProblemSummaryScene',
   Ep2Briefing: 'Ep2BriefingScene',
+  Ep3Preview: 'Ep3PreviewScene',
   Selection: 'SelectionScene',
   Placement: 'PlacementScene',
   Result: 'ResultScene',

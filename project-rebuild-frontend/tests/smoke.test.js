@@ -15,6 +15,8 @@ import EndingSummaryViewManager from '../src/systems/EndingSummaryViewManager.js
 import EndingSummaryRenderer from '../src/systems/EndingSummaryRenderer.js';
 import Ep2BriefingViewManager from '../src/systems/Ep2BriefingViewManager.js';
 import Ep2BriefingRenderer from '../src/systems/Ep2BriefingRenderer.js';
+import Ep3PreviewViewManager from '../src/systems/Ep3PreviewViewManager.js';
+import Ep3PreviewRenderer from '../src/systems/Ep3PreviewRenderer.js';
 import LearningProgress from '../src/systems/LearningProgress.js';
 import CauseQuizManager from '../src/systems/CauseQuizManager.js';
 import CauseQuizViewManager from '../src/systems/CauseQuizViewManager.js';
@@ -2918,22 +2920,85 @@ function testEndingSummaryViewManager() {
   });
   assert.deepEqual(EndingSummaryViewManager.getLearningRecordLayout(960).title, { x: 170, y: 737, text: '학습 기록' });
   assert.deepEqual(EndingSummaryViewManager.getControlLayout(960).restart, {
-    x: 1640,
+    x: 1740,
     y: 955,
     label: '처음부터 다시',
     target: 'BootScene',
-    backgroundColor: '#fde68a',
-    textColor: '#0f172a',
+    backgroundColor: '#fca5a5',
+    textColor: '#450a0a',
   });
   assert.deepEqual(EndingSummaryViewManager.getControlLayout(960).ep2, {
-    x: 1300,
+    x: 1130,
     y: 955,
     label: 'EP2 미션 보기',
     target: 'Ep2BriefingScene',
     backgroundColor: '#a7f3d0',
     textColor: '#064e3b',
   });
+  assert.deepEqual(EndingSummaryViewManager.getControlLayout(960).ep3, {
+    x: 1440,
+    y: 955,
+    label: 'EP3 예고 보기',
+    target: 'Ep3PreviewScene',
+    backgroundColor: '#fde68a',
+    textColor: '#422006',
+  });
   assert.equal(EndingSummaryViewManager.getControlLayout(960).report.target, 'TeacherReportScene');
+}
+
+
+function testEp3PreviewRenderer() {
+  const introFixture = createRendererSceneSpy();
+  Ep3PreviewRenderer.renderIntroPanel(introFixture.scene, EP3_MISSION_PREVIEW);
+  assert.ok(introFixture.calls.some((call) => call[0] === 'text' && call[3] === '다음 에피소드 미리보기'));
+  assert.ok(introFixture.calls.some((call) => call[0] === 'text' && call[3].includes('EP3에서는')));
+
+  const cardFixture = createRendererSceneSpy();
+  Ep3PreviewRenderer.renderFocusCard(cardFixture.scene, EP3_MISSION_PREVIEW.focusAreas[0], 0);
+  assert.ok(cardFixture.calls.some((call) => call[0] === 'text' && call[3] === EP3_MISSION_PREVIEW.focusAreas[0].title));
+  assert.ok(cardFixture.calls.some((call) => call[0] === 'text' && call[3].includes('상태 초점: 경제↑ 인구↑')));
+
+  const noteFixture = createRendererSceneSpy();
+  Ep3PreviewRenderer.renderTransitionNote(noteFixture.scene, EP3_MISSION_PREVIEW);
+  assert.ok(noteFixture.calls.some((call) => call[0] === 'text' && call[3] === 'EP4로 이어지는 복선'));
+  assert.ok(noteFixture.calls.some((call) => call[0] === 'text' && call[3].includes('EP4 부작용 단계')));
+
+  const controlsFixture = createRendererSceneSpy();
+  const controls = Ep3PreviewRenderer.renderControls(controlsFixture.scene, 960);
+  assert.equal(controls.layout.ending.target, 'EndingScene');
+  assert.equal(controls.layout.restart.target, 'BootScene');
+}
+
+function testEp3PreviewViewManager() {
+  assert.deepEqual(Ep3PreviewViewManager.getScreenLayout(1920).title, {
+    x: 960,
+    y: 76,
+    text: 'EP3. 경제 성장',
+    fontSize: '62px',
+    color: '#ffffff',
+    fontStyle: 'bold',
+  });
+  assert.equal(Ep3PreviewViewManager.getScreenLayout(1920).progressStep, 'ending');
+  assert.equal(Ep3PreviewViewManager.getPanelStyle().titleColor, '#fde68a');
+  assert.equal(Ep3PreviewViewManager.getCardStyle().strokeColor, 0x93c5fd);
+  assert.equal(Ep3PreviewViewManager.getNoteStyle().strokeColor, 0x86efac);
+  assert.equal(Ep3PreviewViewManager.getIntroPanelLayout().title.text, '다음 에피소드 미리보기');
+  assert.deepEqual(Ep3PreviewViewManager.getFocusCardLayout(1).panel, { x: 960, y: 548, width: 440, height: 330 });
+  assert.equal(Ep3PreviewViewManager.getTransitionNoteLayout().title.text, 'EP4로 이어지는 복선');
+  assert.deepEqual(Ep3PreviewViewManager.getControlLayout(960).ending, {
+    x: 710,
+    y: 955,
+    label: '마무리로 돌아가기',
+    target: 'EndingScene',
+    backgroundColor: '#c4b5fd',
+    textColor: '#1e1b4b',
+  });
+  assert.match(Ep3PreviewViewManager.formatIntroText(EP3_MISSION_PREVIEW), /일자리와 산업 성장/);
+  assert.match(Ep3PreviewViewManager.formatFocusBody(EP3_MISSION_PREVIEW.focusAreas[2]), /교통 부담↑ 오염 신호↑/);
+  assert.match(Ep3PreviewViewManager.formatTransitionNote(EP3_MISSION_PREVIEW), /아직 실제 산업 시설 배치/);
+  const previewSceneSource = readProjectFile('src', 'scenes', 'Ep3PreviewScene.js');
+  assert.match(previewSceneSource, /getNextEpisodeContent/, 'EP3 preview scene should use next episode content data');
+  assert.match(previewSceneSource, /Ep3PreviewRenderer\.renderFocusCard/, 'EP3 preview scene should render focus cards');
 }
 
 
@@ -4705,6 +4770,8 @@ async function run() {
   testPlacementRules();
   testEndingSummaryRenderer();
   testEndingSummaryViewManager();
+  testEp3PreviewRenderer();
+  testEp3PreviewViewManager();
   testEp2BriefingRenderer();
   testEp2BriefingViewManager();
   testEndingSummaryManager();

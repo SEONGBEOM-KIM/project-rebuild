@@ -1,0 +1,137 @@
+import SCENE_KEYS from '../data/sceneKeys.js';
+
+const EP3_PREVIEW_LAYOUT = {
+  backgroundColor: 0x0f172a,
+  progressStep: 'ending',
+  title: { y: 76, text: 'EP3. 경제 성장', fontSize: '62px', color: '#ffffff', fontStyle: 'bold' },
+  subtitle: { y: 142, text: '생활 기반 회복 다음에는 일자리와 산업 성장을 실험합니다.', fontSize: '26px', color: '#bfdbfe' },
+};
+
+const EP3_PREVIEW_PANEL_STYLE = {
+  fillColor: 0x111827,
+  fillAlpha: 0.98,
+  strokeWidth: 4,
+  strokeColor: 0xfde68a,
+  titleFontSize: '32px',
+  titleColor: '#fde68a',
+  titleFontStyle: 'bold',
+  bodyFontSize: '24px',
+  bodyColor: '#e0f2fe',
+  bodyLineSpacing: 10,
+};
+
+const EP3_PREVIEW_CARD_STYLE = {
+  fillColor: 0xffffff,
+  fillAlpha: 0.96,
+  strokeWidth: 4,
+  strokeColor: 0x93c5fd,
+  titleFontSize: '30px',
+  titleColor: '#172554',
+  titleFontStyle: 'bold',
+  bodyFontSize: '21px',
+  bodyColor: '#1e293b',
+  bodyLineSpacing: 5,
+};
+
+const EP3_PREVIEW_NOTE_STYLE = {
+  fillColor: 0x1e293b,
+  fillAlpha: 0.98,
+  strokeWidth: 4,
+  strokeColor: 0x86efac,
+  titleFontSize: '28px',
+  titleColor: '#bbf7d0',
+  titleFontStyle: 'bold',
+  bodyFontSize: '22px',
+  bodyColor: '#dbeafe',
+  bodyLineSpacing: 8,
+};
+
+const EP3_PREVIEW_BUTTON_STYLE = {
+  fontSize: '28px',
+  padding: { x: 34, y: 18 },
+};
+
+export default class Ep3PreviewViewManager {
+  static getScreenLayout(width) {
+    return {
+      backgroundColor: EP3_PREVIEW_LAYOUT.backgroundColor,
+      progressStep: EP3_PREVIEW_LAYOUT.progressStep,
+      title: { ...EP3_PREVIEW_LAYOUT.title, x: width / 2 },
+      subtitle: { ...EP3_PREVIEW_LAYOUT.subtitle, x: width / 2 },
+    };
+  }
+
+  static getPanelStyle() {
+    return { ...EP3_PREVIEW_PANEL_STYLE };
+  }
+
+  static getCardStyle() {
+    return { ...EP3_PREVIEW_CARD_STYLE };
+  }
+
+  static getNoteStyle() {
+    return { ...EP3_PREVIEW_NOTE_STYLE };
+  }
+
+  static getButtonStyle() {
+    return { ...EP3_PREVIEW_BUTTON_STYLE, padding: { ...EP3_PREVIEW_BUTTON_STYLE.padding } };
+  }
+
+  static getIntroPanelLayout() {
+    return {
+      panel: { x: 960, y: 260, width: 1510, height: 150 },
+      title: { x: 250, y: 202, text: '다음 에피소드 미리보기' },
+      body: { x: 250, y: 246, wordWrapWidth: 1380 },
+    };
+  }
+
+  static getFocusCardLayout(index) {
+    const positions = [
+      { x: 440, y: 548 },
+      { x: 960, y: 548 },
+      { x: 1480, y: 548 },
+    ];
+    const position = positions[index];
+    return {
+      panel: { x: position.x, y: position.y, width: 440, height: 330 },
+      icon: { x: position.x, y: position.y - 112 },
+      title: { x: position.x, y: position.y - 56, wordWrapWidth: 360 },
+      body: { x: position.x - 180, y: position.y, wordWrapWidth: 360 },
+    };
+  }
+
+  static getTransitionNoteLayout() {
+    return {
+      panel: { x: 960, y: 805, width: 1510, height: 170 },
+      title: { x: 250, y: 740, text: 'EP4로 이어지는 복선' },
+      body: { x: 250, y: 782, wordWrapWidth: 1380 },
+    };
+  }
+
+  static getControlLayout(centerX) {
+    return {
+      ending: { x: centerX - 250, y: 955, label: '마무리로 돌아가기', target: SCENE_KEYS.Ending, backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
+      restart: { x: centerX + 250, y: 955, label: '처음부터 다시', target: SCENE_KEYS.Boot, backgroundColor: '#fde68a', textColor: '#0f172a' },
+    };
+  }
+
+  static formatIntroText(preview) {
+    return preview.intro.join('\n');
+  }
+
+  static formatFocusBody(focusArea) {
+    return [
+      `상태 초점: ${focusArea.stateFocus}`,
+      focusArea.note,
+    ].join('\n');
+  }
+
+  static formatTransitionNote(preview) {
+    const signal = preview.focusAreas.find((focusArea) => focusArea.id === 'traffic_signal');
+    return [
+      'EP3에서는 경제 성장의 긍정적 효과를 먼저 체감합니다.',
+      signal ? `동시에 ${signal.title}(${signal.stateFocus})를 기록해 EP4 부작용 단계로 연결합니다.` : '동시에 작은 불편 신호를 기록해 EP4 부작용 단계로 연결합니다.',
+      '아직 실제 산업 시설 배치와 밸런싱은 다음 개발 단위에서 확정합니다.',
+    ].join('\n');
+  }
+}
