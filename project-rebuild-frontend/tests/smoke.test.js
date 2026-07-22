@@ -379,6 +379,7 @@ function testBootFlowManager() {
     'quizResult',
     'reflectionChoice',
     'learningProgress',
+    REGISTRY_KEYS.worldState,
   ]);
   const values = new Map(entries);
   assert.deepEqual(values.get('gameState'), GameState.createInitialState());
@@ -390,6 +391,7 @@ function testBootFlowManager() {
   assert.equal(values.get('quizResult'), null);
   assert.equal(values.get('reflectionChoice'), null);
   assert.equal(values.get('learningProgress').episode, 1);
+  assert.deepEqual(values.get(REGISTRY_KEYS.worldState), WorldStateManager.createInitialWorldState());
   assert.equal(BootFlowManager.getTargetScene(), 'TitleScene');
 }
 
@@ -3837,6 +3839,7 @@ function testLearningDataManager() {
   assert.equal(data.evaluationProfile.id, DEFAULT_EVALUATION_PROFILE_ID);
   assert.equal(data.summary.placementCount, 3);
   assert.equal(data.summary.nextAction.title, '예산 균형 보완');
+  assert.deepEqual(data.worldState.completedEpisodeIds, []);
 
   registry.set('placementConfigId', ENVIRONMENT_PLACEMENT_CONFIG_ID);
   const alternateData = LearningDataManager.build(registry);
@@ -4300,6 +4303,8 @@ function testLearningDataRestoreManager() {
   assert.equal(registry.get('learningProgress').placementConfigId, ENVIRONMENT_PLACEMENT_CONFIG_ID);
   assert.equal(registry.get('placementConfigId'), ENVIRONMENT_PLACEMENT_CONFIG_ID);
   assert.deepEqual(registry.get('learningProgress').placedBuildingIds, ['small_park']);
+  assert.deepEqual(registry.get(REGISTRY_KEYS.worldState).completedEpisodeIds, [EPISODE_IDS.PopulationRecovery]);
+  assert.equal(registry.get(REGISTRY_KEYS.worldState).placements[0].episodeId, EPISODE_IDS.PopulationRecovery);
 
   const alternateProgress = LearningDataRestoreManager.buildProgress(
     {
@@ -4357,6 +4362,8 @@ function testLearningDataRestoreManager() {
   assert.equal(derivedRegistry.get('gameState').satisfaction, 82);
   assert.equal(derivedRegistry.get('gameState').budget, 700);
   assert.equal(derivedRegistry.get('gameState').traffic, 7);
+  assert.deepEqual(derivedRegistry.get(REGISTRY_KEYS.worldState).completedEpisodeIds, []);
+  assert.equal(derivedRegistry.get(REGISTRY_KEYS.worldState).gameState.population, 1120);
 
 
   const ep3Registry = createMemoryRegistry();
@@ -4382,6 +4389,30 @@ function testLearningDataRestoreManager() {
   assert.equal(ep3Restored.selectedStrategy.id, 'industry_jobs_growth');
   assert.equal(ep3Registry.get(REGISTRY_KEYS.placementConfigId), EP3_ECONOMY_PLACEMENT_CONFIG_ID);
   assert.deepEqual(ep3Registry.get(REGISTRY_KEYS.learningProgress).placedBuildingIds, ['food_factory', 'logistics_center']);
+
+  const persistedWorldRegistry = createMemoryRegistry();
+  const persistedWorldState = WorldStateManager.completeEpisode(
+    WorldStateManager.appendPlacements(
+      WorldStateManager.startEpisode(WorldStateManager.createInitialWorldState(), EPISODE_IDS.PopulationRecovery),
+      restored.placedBuildings,
+      EPISODE_IDS.PopulationRecovery,
+    ),
+    EPISODE_IDS.PopulationRecovery,
+    { gameState: registry.get(REGISTRY_KEYS.gameState) },
+  );
+  const restoredWithWorldState = LearningDataRestoreManager.restore(persistedWorldRegistry, {
+    ...data,
+    worldState: persistedWorldState,
+  });
+  assert.equal(restoredWithWorldState.placedBuildings.length, 1);
+  assert.deepEqual(
+    persistedWorldRegistry.get(REGISTRY_KEYS.worldState).completedEpisodeIds,
+    [EPISODE_IDS.PopulationRecovery],
+  );
+  assert.equal(
+    persistedWorldRegistry.get(REGISTRY_KEYS.worldState).placements[0].id,
+    persistedWorldState.placements[0].id,
+  );
 }
 
 
@@ -4690,6 +4721,18 @@ function testSaveImport() {
   assert.equal(saved.version, 1);
   assert.equal(SaveManager.hasSave(), true);
   assert.deepEqual(SaveManager.load().data.exploredPlaces, learningData.exploredPlaces);
+
+  const worldState = WorldStateManager.completeEpisode(
+    WorldStateManager.startEpisode(WorldStateManager.createInitialWorldState(), EPISODE_IDS.PopulationRecovery),
+    EPISODE_IDS.PopulationRecovery,
+    { gameState: { ...GameState.createInitialState(), population: 1080 } },
+  );
+  SaveManager.importJsonText(JSON.stringify({ ...learningData, worldState }));
+  assert.deepEqual(
+    SaveManager.load().data.worldState.completedEpisodeIds,
+    [EPISODE_IDS.PopulationRecovery],
+    'local saves should retain optional shared world progress',
+  );
 
   SaveManager.importJsonText(JSON.stringify({ data: learningData }));
 

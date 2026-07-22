@@ -5,6 +5,7 @@ import LearningProgress from './LearningProgress.js';
 import EndingSummaryManager from './EndingSummaryManager.js';
 import EpisodeFlowManager from './EpisodeFlowManager.js';
 import PlacementContextManager from './PlacementContextManager.js';
+import WorldStateManager from './WorldStateManager.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
 
 export default class LearningDataManager {
@@ -82,6 +83,10 @@ export default class LearningDataManager {
         effect: record.delta,
       })),
       gameState,
+      // The learning-record API intentionally stays focused on the current episode.
+      // Local saves also carry this optional snapshot so later episodes can resume
+      // the shared Blue County state after a refresh or import.
+      worldState: WorldStateManager.get(registry),
       reflectionChoice,
       completed: progress.completed,
     };
