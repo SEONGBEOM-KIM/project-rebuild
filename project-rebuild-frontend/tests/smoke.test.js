@@ -104,7 +104,7 @@ import { API_CONTRACT, formatContractRequest, formatContractResponse } from '../
 import { CURRENT_EPISODE, CURRENT_PLACEMENT_EPISODE, EPISODE_IDS, EPISODES, EPISODE_STEPS, getEpisode, getEpisodeStep } from '../src/data/episodes.js';
 import SCENE_KEYS from '../src/data/sceneKeys.js';
 import { REGISTRY_KEYS } from '../src/data/registryKeys.js';
-import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES, EP2_MISSION_BRIEFING, EP2_NEXT_DEVELOPMENT_GOALS, EP3_MISSION_PREVIEW, EP3_MISSION_BRIEFING, EP3_NEXT_DEVELOPMENT_GOALS, EP3_REFLECTION_CHOICES, EP4_MISSION_BRIEFING, EP4_NEXT_DEVELOPMENT_GOALS, EP5_MISSION_PREVIEW, EPISODE_CONTENT, getCurrentEpisodeContent, getCurrentPlacementEpisodeContent, getCurrentPlacementMissionBriefing, getCurrentPlacementNextDevelopmentGoals, getEpisodeContent, getNextDevelopmentGoals, getNextEpisodeContent, getReflectionChoices } from '../src/data/episodeContent.js';
+import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES, EP2_MISSION_BRIEFING, EP2_NEXT_DEVELOPMENT_GOALS, EP2_REFLECTION_CHOICES, EP3_MISSION_PREVIEW, EP3_MISSION_BRIEFING, EP3_NEXT_DEVELOPMENT_GOALS, EP3_REFLECTION_CHOICES, EP4_MISSION_BRIEFING, EP4_NEXT_DEVELOPMENT_GOALS, EP5_MISSION_PREVIEW, EPISODE_CONTENT, getCurrentEpisodeContent, getCurrentPlacementEpisodeContent, getCurrentPlacementMissionBriefing, getCurrentPlacementNextDevelopmentGoals, getEpisodeContent, getNextDevelopmentGoals, getNextEpisodeContent, getReflectionChoices } from '../src/data/episodeContent.js';
 import ProgressStepper from '../src/ui/ProgressStepper.js';
 import { getTextButtonColor } from '../src/ui/TextButton.js';
 import { DEFAULT_STATE_KEYS, STATE_ICONS } from '../src/data/stateLabels.js';
@@ -685,8 +685,8 @@ function testProblemSummaryViewManager() {
   assert.deepEqual(ProblemSummaryViewManager.getControlLayout().next, {
     x: 1180,
     y: 955,
-    label: '회복 방향 선택',
-    target: 'SelectionScene',
+    label: 'EP2 전략 선택',
+    target: 'Ep2BriefingScene',
     backgroundColor: '#bbf7d0',
     textColor: '#123524',
   });
@@ -1007,7 +1007,7 @@ function testReflectionViewManager() {
   assert.deepEqual(ReflectionViewManager.getScreenLayout(1920).title, {
     x: 960,
     y: 82,
-    text: '생각 정리',
+    text: '배운 점 정리',
     fontSize: '60px',
     color: '#ffffff',
     fontStyle: 'bold',
@@ -1052,7 +1052,7 @@ function testReflectionViewManager() {
     textColor: '#123524',
   });
   assert.equal(ReflectionViewManager.getControlLayout().back.target, 'SideEffectScene');
-  assert.equal(ReflectionViewManager.formatInitialFeedback(), '하나를 선택하면 학습 기록에 저장됩니다.');
+  assert.equal(ReflectionViewManager.formatInitialFeedback(), '하나를 선택하면 이번 배치에서 배운 점으로 학습 기록에 저장됩니다.');
   const runSummary = ReflectionViewManager.formatRunSummary({
     gameState: { ...GameState.createInitialState(), population: 1240, economy: 80, satisfaction: 96, budget: 460 },
     issues: IssueDetector.detect({ ...GameState.createInitialState(), budget: 460, satisfaction: 96 }),
@@ -1075,10 +1075,10 @@ function testReflectionViewManager() {
   assert.match(strategyRunSummary, /배치 전략: 일자리와 생활 기반/);
   assert.match(strategyRunSummary, /목표: 인구·경제 동시 개선/);
   assert.doesNotMatch(strategyRunSummary, /선택 방향: 청년 생활 지원/);
-  assert.match(ReflectionViewManager.formatSelectedFeedback(selectedChoice), new RegExp(`선택됨: ${selectedChoice.title}`));
+  assert.match(ReflectionViewManager.formatSelectedFeedback(selectedChoice), new RegExp(`기록됨: ${selectedChoice.title}`));
   assert.match(ReflectionViewManager.formatSelectedFeedback(selectedChoice), new RegExp(selectedChoice.description));
   assert.match(ReflectionViewManager.formatSelectedFeedback(selectedChoice), new RegExp(selectedChoice.nextAction));
-  assert.equal(ReflectionViewManager.formatMissingChoiceFeedback(), '학습 기록에 남길 보완 방향을 하나 선택하세요.');
+  assert.equal(ReflectionViewManager.formatMissingChoiceFeedback(), '학습 기록에 남길 배운 점을 하나 선택하세요.');
   assert.deepEqual(ReflectionViewManager.getFeedbackStyle('initial'), { color: '#e0f2fe' });
   assert.deepEqual(ReflectionViewManager.getFeedbackStyle('selected'), { color: '#bbf7d0' });
   assert.deepEqual(ReflectionViewManager.getFeedbackStyle('missing'), { color: '#fecaca' });
@@ -1348,9 +1348,12 @@ function testEpisodeContent() {
   assert.equal(EP1_REFLECTION_CHOICES.length, 4, 'EP1 should expose four reflection choices');
   assert.equal(new Set(EP1_REFLECTION_CHOICES.map((choice) => choice.id)).size, EP1_REFLECTION_CHOICES.length, 'reflection choice ids should be unique');
   assert.ok(EP1_REFLECTION_CHOICES.every((choice) => choice.title && choice.icon && choice.description && Number.isFinite(choice.color)), 'reflection choices should have title/icon/description/color');
+  assert.equal(EP2_REFLECTION_CHOICES.length, 4, 'EP2 should expose four reflection record choices');
+  assert.ok(EP2_REFLECTION_CHOICES.every((choice) => choice.nextActionLabel === 'EP3 성장 관점'), 'EP2 reflection should prepare the fixed EP3 growth mission rather than choose its route');
 
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.Crisis].dataCards, EP1_DATA_CARDS, 'EP1 data cards should be addressable through episode content registry');
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.PopulationRecovery].missionBriefing, EP2_MISSION_BRIEFING, 'EP2 mission briefing should be addressable through episode content registry');
+  assert.equal(EPISODE_CONTENT[EPISODE_IDS.PopulationRecovery].reflectionChoices, EP2_REFLECTION_CHOICES, 'EP2 reflection choices should be addressable through episode content registry');
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.PopulationRecovery].nextDevelopmentGoals, EP2_NEXT_DEVELOPMENT_GOALS, 'EP2 next development goals should be addressable through episode content registry');
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.PopulationRecovery].nextEpisodeId, EPISODE_IDS.EconomyGrowth, 'EP2 should point to EP3 as the next episode');
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.EconomyGrowth].missionPreview, EP3_MISSION_PREVIEW, 'EP3 mission preview should be addressable through episode content registry');
@@ -2014,6 +2017,7 @@ function testEpisodeFlowManager() {
 
   const placementConfig = getPlacementConfig(ENVIRONMENT_PLACEMENT_CONFIG_ID);
   assert.equal(EpisodeFlowManager.resolveActivePlacementEpisodeId({ placementConfig }), EPISODE_IDS.PopulationRecovery);
+  assert.equal(EpisodeFlowManager.getReflectionChoices({ placementConfig }), EP2_REFLECTION_CHOICES);
   assert.equal(EpisodeFlowManager.getMissionBriefing({ registry }), EP3_MISSION_BRIEFING);
   assert.equal(EpisodeFlowManager.findStrategyByPolicyId(EP3_MISSION_BRIEFING, 'distribution_growth').id, 'logistics_growth_hub');
 
@@ -3279,6 +3283,15 @@ function testEndingSummaryViewManager() {
     backgroundColor: '#fde68a',
     textColor: '#422006',
   });
+  assert.deepEqual(EndingSummaryViewManager.getControlLayout(960, EPISODE_IDS.PopulationRecovery).ep2, {
+    x: 1130,
+    y: 955,
+    label: 'EP3 예고 보기',
+    target: 'Ep3PreviewScene',
+    backgroundColor: '#fde68a',
+    textColor: '#422006',
+  });
+  assert.equal(EndingSummaryViewManager.getControlLayout(960, EPISODE_IDS.PopulationRecovery).ep3.label, 'EP2 전략 다시 보기');
   assert.deepEqual(EndingSummaryViewManager.getControlLayout(960, EPISODE_IDS.EconomyGrowth).ep2, {
     x: 1130,
     y: 955,
@@ -3526,8 +3539,8 @@ function testEp2BriefingRenderer() {
   const controls = Ep2BriefingRenderer.renderControls(controlsFixture.scene, 960);
   assert.equal(controls.endingButton.type, 'text');
   assert.equal(controls.startButton.type, 'text');
-  assert.equal(controls.layout.start.target, 'SelectionScene');
-  assert.ok(controlsFixture.calls.some((call) => call[0] === 'text' && call[3] === '전략 선택으로'));
+  assert.equal(controls.layout.start.target, 'PlacementScene');
+  assert.ok(controlsFixture.calls.some((call) => call[0] === 'text' && call[3] === '배치 실험 시작'));
 }
 
 function testEp2BriefingViewManager() {
@@ -3553,8 +3566,8 @@ function testEp2BriefingViewManager() {
   assert.deepEqual(Ep2BriefingViewManager.getControlLayout(960).start, {
     x: 1210,
     y: 950,
-    label: '전략 선택으로',
-    target: 'SelectionScene',
+    label: '배치 실험 시작',
+    target: 'PlacementScene',
     backgroundColor: '#bbf7d0',
     textColor: '#123524',
   });
@@ -3616,10 +3629,10 @@ function testEndingSummaryManager() {
   });
   assert.match(strategyTakeaway, /배치 전략: 일자리와 생활 기반/);
   assert.match(strategyTakeaway, /목표: 인구·경제 동시 개선/);
-  assert.match(strategyTakeaway, /다음 액션: 예산 안의 우선순위 정하기/);
+  assert.match(strategyTakeaway, /다음 학습 관점: 예산 안의 우선순위 정하기/);
   assert.match(EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice), /선택 방향: 청년 생활 지원/);
   assert.match(EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice), /배치한 시설: 3개/);
-  assert.match(EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice), /다음 보완 방향:/);
+  assert.match(EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice), /기록한 관점:/);
   assert.match(EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice), new RegExp(reflectionChoice.nextAction));
   const focusedStateSummary = EndingSummaryManager.formatStateSummary(finalState, ending, ['budget'], getEvaluationProfile());
   assert.match(focusedStateSummary, /최종 상태:\n• 예산: 560/);
@@ -3630,7 +3643,7 @@ function testEndingSummaryManager() {
   assert.match(strategyChoiceSummary, /전략 초점: 인구↑ 경제↑ 예산↓/);
   assert.match(EndingSummaryManager.formatStateSummary(finalState, ending), /최종 상태:/);
   assert.match(EndingSummaryManager.formatStateSummary(finalState, ending), /큰 부작용 신호 없음/);
-  assert.match(EndingSummaryManager.formatReflectionNextAction(null), /아직 선택하지 않음/);
+  assert.match(EndingSummaryManager.formatReflectionNextAction(null), /아직 기록하지 않음/);
 
   const progress = {
     ...LearningProgress.createInitialProgress(),
@@ -3657,7 +3670,7 @@ function testEndingSummaryManager() {
   assert.match(rows[3], /원인 질문: 정답/);
   assert.match(rows[4], /배치 전략: 일자리와 생활 기반/);
   assert.match(rows[4], /초점: 인구↑ 경제↑ 예산↓/);
-  assert.match(rows[5], /생각 정리: 예산 균형 보완/);
+  assert.match(rows[5], /배운 점: 예산 균형 보완/);
   assert.match(rows[5], new RegExp(reflectionChoice.nextActionLabel));
 }
 

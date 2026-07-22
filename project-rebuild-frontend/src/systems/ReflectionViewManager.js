@@ -3,8 +3,8 @@ import SCENE_KEYS from '../data/sceneKeys.js';
 const REFLECTION_SCREEN_LAYOUT = {
   backgroundColor: 0x172554,
   progressStep: 'ending',
-  title: { y: 82, text: '생각 정리', fontSize: '60px', color: '#ffffff', fontStyle: 'bold' },
-  subtitle: { y: 142, text: '이번 선택을 돌아보고, 다음 개발에서 가장 먼저 보완할 부분을 고르세요.', fontSize: '27px', color: '#bfdbfe' },
+  title: { y: 82, text: '배운 점 정리', fontSize: '60px', color: '#ffffff', fontStyle: 'bold' },
+  subtitle: { y: 142, text: '이번 배치에서 확인한 관점을 하나 골라 학습 기록에 남기세요. 다음 미션은 EP3 경제 성장으로 이어집니다.', fontSize: '27px', color: '#bfdbfe' },
   contextSummary: { y: 184, wordWrapWidth: 1320 },
   summaryPanel: { x: 960, y: 260, width: 1510, height: 96, strokeColor: 0x93c5fd },
   summaryTitle: { x: 265, y: 227, text: '이번 결과 요약' },
@@ -179,20 +179,20 @@ export default class ReflectionViewManager {
   }
 
   static formatInitialFeedback() {
-    return '하나를 선택하면 학습 기록에 저장됩니다.';
+    return '하나를 선택하면 이번 배치에서 배운 점으로 학습 기록에 저장됩니다.';
   }
 
   static formatSelectedFeedback(choice) {
     return [
-      `선택됨: ${choice.title}`,
+      `기록됨: ${choice.title}`,
       choice.description,
       '',
-      `다음 액션: ${choice.nextAction}`,
+      `EP3 연결: ${choice.nextAction}`,
     ].join('\n');
   }
 
   static formatMissingChoiceFeedback() {
-    return '학습 기록에 남길 보완 방향을 하나 선택하세요.';
+    return '학습 기록에 남길 배운 점을 하나 선택하세요.';
   }
 
   static getFeedbackStyle(state) {

@@ -155,13 +155,18 @@ export default class EndingSummaryViewManager {
   static getControlLayout(centerX, placementEpisodeId = null) {
     const nextEpisodeControl = placementEpisodeId === EPISODE_IDS.EconomyGrowth
       ? { label: 'EP4 부작용 보기', target: SCENE_KEYS.Ep4Briefing, backgroundColor: '#fda4af', textColor: '#4c0519' }
-      : { label: 'EP2 미션 보기', target: SCENE_KEYS.Ep2Briefing, backgroundColor: '#a7f3d0', textColor: '#064e3b' };
+      : placementEpisodeId === EPISODE_IDS.PopulationRecovery
+        ? { label: 'EP3 예고 보기', target: SCENE_KEYS.Ep3Preview, backgroundColor: '#fde68a', textColor: '#422006' }
+        : { label: 'EP2 미션 보기', target: SCENE_KEYS.Ep2Briefing, backgroundColor: '#a7f3d0', textColor: '#064e3b' };
+    const extraControl = placementEpisodeId === EPISODE_IDS.PopulationRecovery
+      ? { label: 'EP2 전략 다시 보기', target: SCENE_KEYS.Ep2Briefing, backgroundColor: '#93c5fd', textColor: '#0f172a' }
+      : { label: 'EP3 예고 보기', target: SCENE_KEYS.Ep3Preview, backgroundColor: '#fde68a', textColor: '#422006' };
     return {
       retry: { x: centerX - 760, y: 955, label: '배치 다시 조정', target: SCENE_KEYS.Placement, backgroundColor: '#c4b5fd', textColor: '#0f172a' },
       report: { x: centerX - 455, y: 955, label: '교사용 요약', target: SCENE_KEYS.TeacherReport, backgroundColor: '#93c5fd', textColor: '#0f172a' },
       data: { x: centerX - 150, y: 955, label: '학습 데이터 보기', target: SCENE_KEYS.LearningData, backgroundColor: '#bbf7d0', textColor: '#0f172a' },
       ep2: { x: centerX + 170, y: 955, ...nextEpisodeControl },
-      ep3: { x: centerX + 480, y: 955, label: 'EP3 예고 보기', target: SCENE_KEYS.Ep3Preview, backgroundColor: '#fde68a', textColor: '#422006' },
+      ep3: { x: centerX + 480, y: 955, ...extraControl },
       restart: { x: centerX + 780, y: 955, label: '처음부터 다시', target: SCENE_KEYS.Boot, backgroundColor: '#fca5a5', textColor: '#450a0a' },
     };
   }

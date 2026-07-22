@@ -52,7 +52,7 @@ export default class EndingSummaryManager {
   static formatFinalTakeaway({ gameState, ending, reflectionChoice, selectedStrategy = null, evaluationProfile = getEvaluationProfile(), placedBuildings = [], placementEpisodeId = null }) {
     const issue = EndingSummaryManager.getPriorityIssue(gameState, evaluationProfile, placedBuildings, placementEpisodeId);
     const issueText = issue ? issue.title : '큰 부작용 신호 없음';
-    const actionText = reflectionChoice?.nextActionLabel ?? '다음 보완 방향 선택 필요';
+    const actionText = reflectionChoice?.nextActionLabel ?? '다음 학습 관점 기록 필요';
     const strategyText = selectedStrategy
       ? `배치 전략: ${selectedStrategy.title} / 목표: ${selectedStrategy.placementGoalShort ?? selectedStrategy.stateFocus}`
       : null;
@@ -60,8 +60,8 @@ export default class EndingSummaryManager {
     return [
       `${ending.title}: ${ending.message}`,
       strategyText
-        ? `${strategyText} / 우선 보완: ${issueText} / 다음 액션: ${actionText}`
-        : `우선 보완: ${issueText} / 다음 액션: ${actionText}`,
+        ? `${strategyText} / 우선 보완: ${issueText} / 다음 학습 관점: ${actionText}`
+        : `우선 보완: ${issueText} / 다음 학습 관점: ${actionText}`,
     ].join('\n');
   }
 
@@ -87,14 +87,14 @@ export default class EndingSummaryManager {
       '복기 질문:',
       '내 선택은 인구·경제·환경·만족도 중 어떤 값을 가장 크게 바꾸었나요?',
       '',
-      '다음 보완 방향:',
+      '기록한 관점:',
       EndingSummaryManager.formatReflectionNextAction(reflectionChoice),
     ].filter((row) => row !== null).join('\n');
   }
 
   static formatReflectionNextAction(reflectionChoice) {
     if (!reflectionChoice) {
-      return '• 아직 선택하지 않음: 다음에는 결과를 보고 보완 방향을 하나 정합니다.';
+      return '• 아직 기록하지 않음: 이번 결과에서 배운 점을 하나 정리합니다.';
     }
 
     return [
@@ -140,7 +140,7 @@ export default class EndingSummaryManager {
       `자료 확인: ${learningProgress.dataViewed ? '완료' : '미완료'} / 인구 감소 · 지역 불균형 · 고령화 자료 카드 확인`,
       `원인 질문: ${quizStatus} / 문제 정리: ${learningProgress.problemSummaryCompleted ? '완료' : '미완료'} / EP1 완료: ${learningProgress.completed ? '예' : '아니오'}`,
       `배치 전략: ${selectedStrategy?.title ?? '미선택'}${selectedStrategy?.stateFocus ? ` / 초점: ${selectedStrategy.stateFocus}` : ''}`,
-      `배치 기록: ${learningProgress.placedBuildingIds.length}개 시설 배치 / 생각 정리: ${reflectionChoice?.title ?? '미선택'} / 다음 액션: ${reflectionChoice?.nextActionLabel ?? '미정'}`,
+      `배치 기록: ${learningProgress.placedBuildingIds.length}개 시설 배치 / 배운 점: ${reflectionChoice?.title ?? '미선택'} / 성장 준비 관점: ${reflectionChoice?.nextActionLabel ?? '미정'}`,
     ];
   }
 }

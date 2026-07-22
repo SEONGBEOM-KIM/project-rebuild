@@ -154,7 +154,7 @@ export default class Ep2BriefingViewManager {
   static getControlLayout(centerX) {
     return {
       ending: { x: centerX - 250, y: 950, label: 'EP1 마무리로', target: SCENE_KEYS.Ending, backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
-      start: { x: centerX + 250, y: 950, label: '전략 선택으로', target: SCENE_KEYS.Selection, backgroundColor: '#bbf7d0', textColor: '#123524' },
+      start: { x: centerX + 250, y: 950, label: '배치 실험 시작', target: SCENE_KEYS.Placement, backgroundColor: '#bbf7d0', textColor: '#123524' },
     };
   }
 
