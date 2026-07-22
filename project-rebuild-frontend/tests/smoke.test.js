@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import GameState from '../src/systems/GameState.js';
 import BootFlowManager from '../src/systems/BootFlowManager.js';
 import IssueDetector from '../src/systems/IssueDetector.js';
+import IndustrializationRiskManager from '../src/systems/IndustrializationRiskManager.js';
 import SideEffectViewManager from '../src/systems/SideEffectViewManager.js';
 import SideEffectRenderer from '../src/systems/SideEffectRenderer.js';
 import EvaluationManager from '../src/systems/EvaluationManager.js';
@@ -1805,6 +1806,27 @@ function testGameStateAndIssues() {
   assert.deepEqual(issues, ['budget', 'satisfaction']);
 }
 
+function testIndustrializationRiskManager() {
+  const industrialPlacements = [
+    { building: economyBuildings[0] },
+    { building: economyBuildings[2] },
+  ];
+  const risks = IndustrializationRiskManager.detect({
+    gameState: { ...GameState.createInitialState(), economy: 112, satisfaction: 61, traffic: 20, pollution: 15 },
+    placedBuildings: industrialPlacements,
+    placementEpisodeId: EPISODE_IDS.EconomyGrowth,
+  });
+  assert.deepEqual(risks.map((risk) => risk.id), ['traffic', 'environment', 'inequality']);
+  assert.equal(risks.filter((risk) => risk.primary).length, 1);
+  assert.equal(risks.find((risk) => risk.id === 'traffic').severity.label, '집중 대응');
+  assert.equal(risks.find((risk) => risk.id === 'inequality').severity.label, '집중 대응');
+  assert.equal(IndustrializationRiskManager.getPrimaryRisk(risks).id, 'inequality');
+  assert.deepEqual(
+    IndustrializationRiskManager.detect({ gameState: GameState.createInitialState(), placementEpisodeId: EPISODE_IDS.PopulationRecovery }).map((risk) => risk.id),
+    IssueDetector.detect(GameState.createInitialState()).map((risk) => risk.id),
+  );
+}
+
 function testLearningProgress() {
   const registry = createMemoryRegistry();
 
@@ -2835,7 +2857,7 @@ function testPlacementViewManager() {
   assert.match(resultSceneSource, /WorldStateManager\.completeEpisode/, 'result scene should commit completed placements into world state');
   const sideEffectSceneSource = readProjectFile('src', 'scenes', 'SideEffectScene.js');
   assert.match(sideEffectSceneSource, /PlacementContextManager/, 'side effect scene should resolve active placement context');
-  assert.match(sideEffectSceneSource, /IssueDetector\.detect\(gameState, evaluationProfile\)/, 'side effect scene should detect issues with active evaluation profile');
+  assert.match(sideEffectSceneSource, /IndustrializationRiskManager\.detect\(\{ gameState, placedBuildings, placementEpisodeId, evaluationProfile \}\)/, 'side effect scene should classify EP3 industrialization risks from active placements');
   assert.match(sideEffectSceneSource, /formatContextSummary\(placementConfig, evaluationProfile\)/, 'side effect scene should display active placement context summary');
   const endingSceneSource = readProjectFile('src', 'scenes', 'EndingScene.js');
   assert.match(endingSceneSource, /EpisodeFlowManager\.resolveSelectedStrategy/, 'ending scene should recover the active episode strategy through episode flow manager');
@@ -2846,7 +2868,7 @@ function testPlacementViewManager() {
   const reflectionSceneSource = readProjectFile('src', 'scenes', 'ReflectionScene.js');
   assert.match(reflectionSceneSource, /EpisodeFlowManager\.resolveSelectedStrategy/, 'reflection scene should recover the active episode strategy through episode flow manager');
   assert.match(reflectionSceneSource, /PlacementContextManager/, 'reflection scene should resolve active placement context');
-  assert.match(reflectionSceneSource, /IssueDetector\.detect\(gameState, evaluationProfile\)/, 'reflection scene should detect issues with active evaluation profile');
+  assert.match(reflectionSceneSource, /IndustrializationRiskManager\.detect\(\{ gameState, placedBuildings, placementEpisodeId, evaluationProfile \}\)/, 'reflection scene should carry industrialization risks into reflection');
   assert.match(reflectionSceneSource, /formatContextSummary\(placementConfig, evaluationProfile\)/, 'reflection scene should display active placement context summary');
   const apiContractSceneSource = readProjectFile('src', 'scenes', 'ApiContractScene.js');
   assert.match(apiContractSceneSource, /getExampleSelectorLayout/, 'api contract scene should render example selector controls');
@@ -5238,6 +5260,7 @@ async function run() {
   testSideEffectViewManager();
   testSideEffectIssueRenderer();
   testGameStateAndIssues();
+  testIndustrializationRiskManager();
   testLearningProgress();
   testWorldStateManager();
   testEpisodePlacementLaunchManager();

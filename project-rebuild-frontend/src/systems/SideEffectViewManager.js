@@ -45,13 +45,14 @@ const SIDE_EFFECT_TEXT_STYLES = {
   hintBody: { fontSize: '22px', color: '#dbeafe', lineSpacing: 10 },
 };
 
-const SIDE_EFFECT_PRIORITY_ORDER = ['budget', 'environment', 'traffic', 'satisfaction'];
+const SIDE_EFFECT_PRIORITY_ORDER = ['traffic', 'environment', 'inequality', 'budget', 'satisfaction'];
 
 const SIDE_EFFECT_PRIORITY_LABELS = {
-  budget: '1순위 · 비용 균형',
-  environment: '2순위 · 환경 안전',
-  traffic: '3순위 · 이동 편의',
-  satisfaction: '4순위 · 체감 만족',
+  traffic: '교통 · 이동 편의',
+  environment: '환경 · 안전',
+  inequality: '격차 · 성장 혜택',
+  budget: '예산 · 비용 균형',
+  satisfaction: '만족 · 생활 편의',
 };
 
 const SIDE_EFFECT_BUTTON_STYLE = {
@@ -151,7 +152,9 @@ export default class SideEffectViewManager {
   }
 
   static getIssuePriorityLabel(issue) {
-    return SIDE_EFFECT_PRIORITY_LABELS[issue.id] ?? '확인 필요';
+    const emphasis = issue.primary ? '최우선 · ' : '';
+    const severity = issue.severity?.label ? ` · ${issue.severity.label}` : '';
+    return `${emphasis}${SIDE_EFFECT_PRIORITY_LABELS[issue.id] ?? '확인 필요'}${severity}`;
   }
 
   static sortIssuesByPriority(issues) {

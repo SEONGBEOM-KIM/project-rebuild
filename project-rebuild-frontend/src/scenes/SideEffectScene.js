@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
-import IssueDetector from '../systems/IssueDetector.js';
+import IndustrializationRiskManager from '../systems/IndustrializationRiskManager.js';
 import SideEffectViewManager from '../systems/SideEffectViewManager.js';
 import SideEffectRenderer from '../systems/SideEffectRenderer.js';
 import { createTextButton } from '../ui/TextButton.js';
@@ -20,6 +20,7 @@ export default class SideEffectScene extends Phaser.Scene {
     const { width } = this.scale;
     const gameState = this.registry.get(REGISTRY_KEYS.gameState);
     const selectedPolicy = this.registry.get(REGISTRY_KEYS.selectedPolicy);
+    const placedBuildings = this.registry.get(REGISTRY_KEYS.placedBuildings) ?? [];
     const learningProgress = LearningProgress.get(this.registry);
     const selectedStrategy = EpisodeFlowManager.resolveSelectedStrategy({ registry: this.registry, learningProgress, selectedPolicy });
     const { placementConfig, evaluationProfile } = PlacementContextManager.resolve({
@@ -27,7 +28,8 @@ export default class SideEffectScene extends Phaser.Scene {
       progress: learningProgress,
       selectedStrategy,
     });
-    const issues = IssueDetector.detect(gameState, evaluationProfile);
+    const placementEpisodeId = EpisodeFlowManager.resolveActivePlacementEpisodeId({ registry: this.registry, learningProgress, placementConfig });
+    const issues = IndustrializationRiskManager.detect({ gameState, placedBuildings, placementEpisodeId, evaluationProfile });
 
     const layout = SideEffectViewManager.getScreenLayout(width);
 

@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import PlacementContextManager from '../systems/PlacementContextManager.js';
-import IssueDetector from '../systems/IssueDetector.js';
+import IndustrializationRiskManager from '../systems/IndustrializationRiskManager.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import ReflectionViewManager from '../systems/ReflectionViewManager.js';
 import ReflectionRenderer from '../systems/ReflectionRenderer.js';
@@ -28,7 +28,8 @@ export default class ReflectionScene extends Phaser.Scene {
       progress: learningProgress,
       selectedStrategy,
     });
-    const issues = IssueDetector.detect(gameState, evaluationProfile);
+    const placementEpisodeId = EpisodeFlowManager.resolveActivePlacementEpisodeId({ registry: this.registry, learningProgress, placementConfig });
+    const issues = IndustrializationRiskManager.detect({ gameState, placedBuildings, placementEpisodeId, evaluationProfile });
     this.selectedChoice = this.registry.get(REGISTRY_KEYS.reflectionChoice);
     this.choiceObjects = new Map();
 
