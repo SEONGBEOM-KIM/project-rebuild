@@ -2,6 +2,7 @@ import GameState from './GameState.js';
 import LearningProgress from './LearningProgress.js';
 import { policies } from '../data/policies.js';
 import { economyPolicies } from '../data/economyPolicies.js';
+import { ep5Policies } from '../data/ep5Policies.js';
 import EpisodeFlowManager from './EpisodeFlowManager.js';
 import PlacementContextManager from './PlacementContextManager.js';
 import WorldStateManager from './WorldStateManager.js';
@@ -10,7 +11,7 @@ import { getEp5SolutionPlan } from '../data/ep5SolutionPlans.js';
 
 export default class LearningDataRestoreManager {
   static findPolicyById(policyId) {
-    return [...policies, ...economyPolicies].find((policy) => policy.id === policyId) ?? null;
+    return [...policies, ...economyPolicies, ...ep5Policies].find((policy) => policy.id === policyId) ?? null;
   }
 
   static restore(registry, data) {

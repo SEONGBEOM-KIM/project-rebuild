@@ -1,7 +1,8 @@
 import { EPISODE_IDS } from '../data/episodes.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
-import { getPlacementConfigIdForStrategy, EP3_ECONOMY_PLACEMENT_CONFIG_ID } from '../data/episodePlacementConfigs.js';
+import { getPlacementConfigIdForStrategy, EP3_ECONOMY_PLACEMENT_CONFIG_ID, EP5_BALANCED_SOLUTIONS_CONFIG_ID } from '../data/episodePlacementConfigs.js';
 import { economyPolicies } from '../data/economyPolicies.js';
+import { getEp5Policy } from '../data/ep5Policies.js';
 import { getEpisodeContent } from '../data/episodeContent.js';
 import LearningProgress from './LearningProgress.js';
 import WorldStateManager from './WorldStateManager.js';
@@ -56,5 +57,29 @@ export default class EpisodePlacementLaunchManager {
       selectedStrategy: options.selectedStrategy ?? null,
     });
     return EpisodePlacementLaunchManager.applyLaunchContext(registry, context);
+  }
+
+  static prepareEp5BalancedPlacement(registry, selectedSolutionPlan) {
+    const selectedPolicy = getEp5Policy(selectedSolutionPlan?.id) ?? getEp5Policy('mobility_green_network');
+    const baseWorldState = WorldStateManager.startEpisode(WorldStateManager.get(registry), EPISODE_IDS.BalancedSolutions);
+    const placementSeed = WorldStateManager.buildPlacementSeed(baseWorldState, { cumulative: true });
+    return EpisodePlacementLaunchManager.applyLaunchContext(registry, {
+      episodeId: EPISODE_IDS.BalancedSolutions,
+      placementConfigId: EP5_BALANCED_SOLUTIONS_CONFIG_ID,
+      selectedPolicy,
+      selectedStrategy: null,
+      gameState: placementSeed.gameState,
+      placedBuildings: placementSeed.placedBuildings,
+      lastPlacementResult: null,
+      worldState: baseWorldState,
+      progressPatch: {
+        episode: 5,
+        selectedPolicyId: selectedPolicy.id,
+        selectedStrategyId: null,
+        placementConfigId: EP5_BALANCED_SOLUTIONS_CONFIG_ID,
+        selectedSolutionPlanId: selectedSolutionPlan?.id ?? selectedPolicy.id,
+        placedBuildingIds: placementSeed.placedBuildings.map((record) => record.buildingId ?? record.building?.id).filter(Boolean),
+      },
+    });
   }
 }

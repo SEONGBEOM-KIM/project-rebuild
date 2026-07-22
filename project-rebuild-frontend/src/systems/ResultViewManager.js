@@ -1,4 +1,5 @@
 import SCENE_KEYS from '../data/sceneKeys.js';
+import { EPISODE_IDS } from '../data/episodes.js';
 
 const RESULT_SCREEN_LAYOUT = {
   backgroundColor: 0x1e1b4b,
@@ -133,10 +134,13 @@ export default class ResultViewManager {
     };
   }
 
-  static getControlLayout(centerX) {
+  static getControlLayout(centerX, placementEpisodeId = null) {
+    const nextControl = placementEpisodeId === EPISODE_IDS.BalancedSolutions
+      ? { label: 'EP5 해결 결과 정리', target: SCENE_KEYS.Ending, backgroundColor: '#bbf7d0', textColor: '#1e1b4b' }
+      : { label: '부작용 검토', target: SCENE_KEYS.SideEffect, backgroundColor: '#bbf7d0', textColor: '#1e1b4b' };
     return {
       retry: { x: centerX - 310, y: 940, label: '배치 더 하기', target: SCENE_KEYS.Placement, backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
-      sideEffect: { x: centerX, y: 940, label: '부작용 검토', target: SCENE_KEYS.SideEffect, backgroundColor: '#bbf7d0', textColor: '#1e1b4b' },
+      sideEffect: { x: centerX, y: 940, ...nextControl },
       restart: { x: centerX + 310, y: 940, label: '처음부터 다시', target: SCENE_KEYS.Boot, backgroundColor: '#fde68a', textColor: '#1e1b4b' },
     };
   }

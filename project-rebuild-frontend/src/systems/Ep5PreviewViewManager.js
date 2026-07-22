@@ -22,7 +22,7 @@ export default class Ep5PreviewViewManager {
   static getControlLayout(centerX) {
     return {
       back: { x: centerX - 240, y: 1000, label: 'EP4 정리로', target: SCENE_KEYS.Ep4Conclusion, backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
-      next: { x: centerX + 240, y: 1000, label: '해결안 저장 후 마무리', target: SCENE_KEYS.Ending, backgroundColor: '#64748b', textColor: '#e2e8f0' },
+      next: { x: centerX + 240, y: 1000, label: '균형 배치 시작', target: SCENE_KEYS.Placement, backgroundColor: '#64748b', textColor: '#e2e8f0' },
     };
   }
 

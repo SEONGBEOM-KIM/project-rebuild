@@ -10,6 +10,7 @@ import LearningProgress from '../systems/LearningProgress.js';
 import Ep5SolutionPlanManager from '../systems/Ep5SolutionPlanManager.js';
 import Ep5PreviewViewManager from '../systems/Ep5PreviewViewManager.js';
 import Ep5PreviewRenderer from '../systems/Ep5PreviewRenderer.js';
+import EpisodePlacementLaunchManager from '../systems/EpisodePlacementLaunchManager.js';
 
 export default class Ep5PreviewScene extends Phaser.Scene {
   constructor() {
@@ -34,7 +35,10 @@ export default class Ep5PreviewScene extends Phaser.Scene {
     const controls = Ep5PreviewRenderer.renderControls(this, width / 2);
     controls.backButton.on('pointerdown', () => this.scene.start(controls.layout.back.target));
     this.nextButton = controls.nextButton;
-    this.nextButton.on('pointerdown', () => this.scene.start(controls.layout.next.target));
+    this.nextButton.on('pointerdown', () => {
+      EpisodePlacementLaunchManager.prepareEp5BalancedPlacement(this.registry, this.selectedPlan);
+      this.scene.start(controls.layout.next.target);
+    });
     this.persistSelection();
     this.updateUi();
   }

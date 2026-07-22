@@ -92,11 +92,13 @@ import SideEffectIssueRenderer from '../src/systems/SideEffectIssueRenderer.js';
 import { buildings } from '../src/data/buildings.js';
 import { economyBuildings } from '../src/data/economyBuildings.js';
 import { ep5SolutionPlans } from '../src/data/ep5SolutionPlans.js';
+import { ep5Buildings } from '../src/data/ep5Buildings.js';
+import { ep5Policies } from '../src/data/ep5Policies.js';
 import { policies } from '../src/data/policies.js';
 import { economyPolicies } from '../src/data/economyPolicies.js';
 import { explorationPlaces } from '../src/data/explorationPlaces.js';
 import { mapData } from '../src/data/mapData.js';
-import { DEFAULT_PLACEMENT_CONFIG_ID, ENVIRONMENT_PLACEMENT_CONFIG_ID, EP3_ECONOMY_PLACEMENT_CONFIG_ID, episodePlacementConfigs, getDefaultPlacementConfig, getDefaultPlacementConfigIdForEpisode, getPlacementConfig, getPlacementConfigIdForStrategy, getPlacementConfigsForEpisode } from '../src/data/episodePlacementConfigs.js';
+import { DEFAULT_PLACEMENT_CONFIG_ID, ENVIRONMENT_PLACEMENT_CONFIG_ID, EP3_ECONOMY_PLACEMENT_CONFIG_ID, EP5_BALANCED_SOLUTIONS_CONFIG_ID, episodePlacementConfigs, getDefaultPlacementConfig, getDefaultPlacementConfigIdForEpisode, getPlacementConfig, getPlacementConfigIdForStrategy, getPlacementConfigsForEpisode } from '../src/data/episodePlacementConfigs.js';
 import { DEFAULT_EVALUATION_PROFILE_ID, ENVIRONMENT_EVALUATION_PROFILE_ID, ISSUE_THRESHOLDS, REACTION_THRESHOLDS, RESULT_THRESHOLDS, SCORE_RULES, evaluationProfiles, getEvaluationProfile } from '../src/data/evaluationRules.js';
 import { API_CONTRACT, formatContractRequest, formatContractResponse } from '../src/data/apiContract.js';
 import { CURRENT_EPISODE, CURRENT_PLACEMENT_EPISODE, EPISODE_IDS, EPISODES, EPISODE_STEPS, getEpisode, getEpisodeStep } from '../src/data/episodes.js';
@@ -3453,6 +3455,24 @@ function testEp4Briefing() {
   assert.ok(ep5Fixture.calls.some((call) => call[0] === 'text' && call[3] === ep5SolutionPlans[2].title));
 }
 
+function testEp5PlacementSetup() {
+  assert.equal(ep5Buildings.length, 4);
+  assert.equal(ep5Policies.length, 3);
+  assert.equal(getPlacementConfig(EP5_BALANCED_SOLUTIONS_CONFIG_ID).episodeId, EPISODE_IDS.BalancedSolutions);
+  assert.deepEqual(getPlacementConfig(EP5_BALANCED_SOLUTIONS_CONFIG_ID).stateKeys, ['traffic', 'environment', 'pollution', 'satisfaction', 'economy', 'budget']);
+  assert.equal(getDefaultPlacementConfigIdForEpisode(EPISODE_IDS.BalancedSolutions), EP5_BALANCED_SOLUTIONS_CONFIG_ID);
+  assert.deepEqual(getPlacementConfigsForEpisode(EPISODE_IDS.BalancedSolutions).map((config) => config.id), [EP5_BALANCED_SOLUTIONS_CONFIG_ID]);
+
+  const registry = createMemoryRegistry();
+  registry.set(REGISTRY_KEYS.worldState, WorldStateManager.createInitialWorldState());
+  EpisodePlacementLaunchManager.prepareEp5BalancedPlacement(registry, ep5SolutionPlans[1]);
+  assert.equal(registry.get(REGISTRY_KEYS.placementConfigId), EP5_BALANCED_SOLUTIONS_CONFIG_ID);
+  assert.equal(registry.get(REGISTRY_KEYS.selectedPolicy).id, 'clean_growth_guardrails');
+  assert.equal(registry.get(REGISTRY_KEYS.worldState).activeEpisodeId, EPISODE_IDS.BalancedSolutions);
+  assert.equal(LearningProgress.get(registry).episode, 5);
+  assert.equal(LearningProgress.get(registry).selectedSolutionPlanId, 'clean_growth_guardrails');
+}
+
 function testEp2BriefingRenderer() {
   const introFixture = createRendererSceneSpy();
   const intro = Ep2BriefingRenderer.renderIntroPanel(introFixture.scene, EP2_MISSION_BRIEFING);
@@ -5413,6 +5433,7 @@ async function run() {
   testEp3PreviewRenderer();
   testEp3PreviewViewManager();
   testEp4Briefing();
+  testEp5PlacementSetup();
   testEp2BriefingRenderer();
   testEp2BriefingViewManager();
   testEndingSummaryManager();

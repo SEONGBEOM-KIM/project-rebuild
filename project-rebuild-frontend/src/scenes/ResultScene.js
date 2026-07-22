@@ -71,12 +71,12 @@ export default class ResultScene extends Phaser.Scene {
     ResultRenderer.renderStatePanel(this, panels.evaluation, EvaluationManager.formatEvaluationRows(evaluation, gameState, placedBuildings, selectedPolicy, selectedStrategy, evaluationProfile));
     ResultRenderer.renderStatePanel(this, panels.trend, EvaluationManager.formatChoiceTrendRows(placedBuildings, selectedPolicy, selectedStrategy, placementConfig.stateKeys));
     ResultRenderer.renderResidentReactionStrip(this, width / 2, EvaluationManager.formatResidentReactions(gameState, placedBuildings, evaluationProfile));
-    this.drawControls(width / 2);
+    this.drawControls(width / 2, placementEpisodeId);
   }
 
 
-  drawControls(centerX) {
-    const controls = ResultViewManager.getControlLayout(centerX);
+  drawControls(centerX, placementEpisodeId) {
+    const controls = ResultViewManager.getControlLayout(centerX, placementEpisodeId);
     Object.values(controls).forEach((control) => {
       const button = createTextButton(this, control, ResultViewManager.getButtonStyle());
       button.on('pointerdown', () => this.scene.start(control.target));
