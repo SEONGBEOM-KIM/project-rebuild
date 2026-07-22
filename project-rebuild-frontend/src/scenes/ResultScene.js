@@ -7,6 +7,7 @@ import ResultViewManager from '../systems/ResultViewManager.js';
 import ResultRenderer from '../systems/ResultRenderer.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import EpisodeFlowManager from '../systems/EpisodeFlowManager.js';
+import WorldStateManager from '../systems/WorldStateManager.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
@@ -29,6 +30,19 @@ export default class ResultScene extends Phaser.Scene {
       progress: learningProgress,
       selectedStrategy,
     });
+    const placementEpisodeId = EpisodeFlowManager.resolveActivePlacementEpisodeId({
+      registry: this.registry,
+      learningProgress,
+      placementConfig,
+    });
+    WorldStateManager.set(
+      this.registry,
+      WorldStateManager.completeEpisode(
+        WorldStateManager.get(this.registry),
+        placementEpisodeId,
+        { gameState, placements: placedBuildings },
+      ),
+    );
     const evaluation = EvaluationManager.evaluateState(gameState, placedBuildings, evaluationProfile);
 
     const layout = ResultViewManager.getScreenLayout(width);

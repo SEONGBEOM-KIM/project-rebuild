@@ -91,10 +91,15 @@ export default class WorldStateManager {
   static appendPlacements(worldState, placements, episodeId = null) {
     const normalized = normalizeWorldState(worldState);
     const resolvedEpisodeId = episodeId ?? normalized.activeEpisodeId;
-    const taggedPlacements = placements.map((record) => ({
-      ...clonePlacement(record),
-      episodeId: record.episodeId ?? resolvedEpisodeId,
-    }));
+    const existingPlacementIds = new Set(
+      normalized.placements.map((record) => record.id).filter(Boolean),
+    );
+    const taggedPlacements = placements
+      .filter((record) => !record.id || !existingPlacementIds.has(record.id))
+      .map((record) => ({
+        ...clonePlacement(record),
+        episodeId: record.episodeId ?? resolvedEpisodeId,
+      }));
     const placementIds = taggedPlacements.map((record) => record.id).filter(Boolean);
 
     return normalizeWorldState({

@@ -1831,6 +1831,10 @@ function testWorldStateManager() {
   assert.deepEqual(completed.completedEpisodeIds, [EPISODE_IDS.PopulationRecovery]);
   assert.equal(completed.episodeRuns[EPISODE_IDS.PopulationRecovery].completed, true);
   assert.equal(completed.gameState.population, 1080);
+  const repeatedCompletion = WorldStateManager.completeEpisode(completed, EPISODE_IDS.PopulationRecovery, {
+    placements: [placement],
+  });
+  assert.equal(repeatedCompletion.placements.length, 1, 'revisiting a result must not duplicate completed world placements');
 
   const isolatedSeed = WorldStateManager.buildPlacementSeed(completed);
   assert.deepEqual(isolatedSeed.gameState, GameState.createInitialState(), 'isolated episode proof should start from default state');
@@ -2791,6 +2795,7 @@ function testPlacementViewManager() {
   assert.match(resultSceneSource, /formatResidentReactions\(gameState, placedBuildings, evaluationProfile\)/, 'result scene should pass evaluation profile into resident reactions');
   assert.match(resultSceneSource, /stateKeys/, 'result scene should apply state display keys from active placement config');
   assert.match(resultSceneSource, /formatContextSummary\(placementConfig, evaluationProfile\)/, 'result scene should display active placement context summary');
+  assert.match(resultSceneSource, /WorldStateManager\.completeEpisode/, 'result scene should commit completed placements into world state');
   const sideEffectSceneSource = readProjectFile('src', 'scenes', 'SideEffectScene.js');
   assert.match(sideEffectSceneSource, /PlacementContextManager/, 'side effect scene should resolve active placement context');
   assert.match(sideEffectSceneSource, /IssueDetector\.detect\(gameState, evaluationProfile\)/, 'side effect scene should detect issues with active evaluation profile');
