@@ -1,5 +1,5 @@
 import { explorationPlaces } from '../data/explorationPlaces.js';
-import { CURRENT_EPISODE, CURRENT_PLACEMENT_EPISODE } from '../data/episodes.js';
+import { CURRENT_EPISODE } from '../data/episodes.js';
 import IssueDetector from './IssueDetector.js';
 import LearningProgress from './LearningProgress.js';
 import EndingSummaryManager from './EndingSummaryManager.js';
@@ -18,6 +18,11 @@ export default class LearningDataManager {
       progress,
       selectedStrategy,
     });
+    const placementEpisode = EpisodeFlowManager.resolveActivePlacementEpisode({
+      registry,
+      learningProgress: progress,
+      placementConfig,
+    });
     const placedBuildings = registry.get(REGISTRY_KEYS.placedBuildings) ?? [];
     const gameState = registry.get(REGISTRY_KEYS.gameState);
     const reflectionChoice = registry.get(REGISTRY_KEYS.reflectionChoice);
@@ -31,7 +36,7 @@ export default class LearningDataManager {
       episode: progress.episode,
       episodeContext: {
         current: LearningDataManager.serializeEpisode(CURRENT_EPISODE),
-        placement: LearningDataManager.serializeEpisode(CURRENT_PLACEMENT_EPISODE),
+        placement: LearningDataManager.serializeEpisode(placementEpisode),
       },
       summary: LearningDataManager.buildSummary({
         ending,
@@ -136,6 +141,9 @@ export default class LearningDataManager {
 
   static validate(data) {
     const requiredPlacements = LearningDataManager.getRequiredPlacements(data);
+    const expectedPlacementEpisode = EpisodeFlowManager.resolveActivePlacementEpisode({
+      placementConfig: data.placementConfig,
+    });
     return [
       {
         ok: data.episode === 1,
@@ -148,9 +156,9 @@ export default class LearningDataManager {
         message: 'episodeContext.current 값이 현재 에피소드와 다릅니다.',
       },
       {
-        ok: data.episodeContext == null || data.episodeContext.placement?.code === CURRENT_PLACEMENT_EPISODE.code,
+        ok: data.episodeContext == null || data.episodeContext.placement?.code === expectedPlacementEpisode.code,
         label: '배치 에피소드 메타 확인',
-        message: 'episodeContext.placement 값이 현재 배치 에피소드와 다릅니다.',
+        message: 'episodeContext.placement 값이 배치 설정의 에피소드와 다릅니다.',
       },
       {
         ok: Boolean(data.summary?.outcomeType),

@@ -1,4 +1,4 @@
-import { CURRENT_PLACEMENT_EPISODE } from '../data/episodes.js';
+import { CURRENT_PLACEMENT_EPISODE, getEpisode } from '../data/episodes.js';
 import { getEpisodeContent, getNextDevelopmentGoals, getReflectionChoices } from '../data/episodeContent.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
 import LearningProgress from './LearningProgress.js';
@@ -12,6 +12,9 @@ export default class EpisodeFlowManager {
     return resolvedPlacementConfig?.episodeId ?? CURRENT_PLACEMENT_EPISODE.code;
   }
 
+  static resolveActivePlacementEpisode(context = {}) {
+    return getEpisode(EpisodeFlowManager.resolveActivePlacementEpisodeId(context));
+  }
 
   static getMissionBriefing(context = {}) {
     return getEpisodeContent(EpisodeFlowManager.resolveActivePlacementEpisodeId(context)).missionBriefing ?? null;

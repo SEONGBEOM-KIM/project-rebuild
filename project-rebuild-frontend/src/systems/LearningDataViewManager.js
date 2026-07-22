@@ -224,7 +224,9 @@ export default class LearningDataViewManager {
   }
 
   static formatEpisodeFileSlug({ episodeContext = null, episode = null } = {}) {
-    return episodeContext?.current?.code ?? (episode ? `ep${episode}` : 'episode');
+    return episodeContext?.placement?.code
+      ?? episodeContext?.current?.code
+      ?? (episode ? `ep${episode}` : 'episode');
   }
 
   static formatDownloadFileName(learningData) {

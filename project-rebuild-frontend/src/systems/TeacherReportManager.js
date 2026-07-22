@@ -1,5 +1,5 @@
 import { explorationPlaces } from '../data/explorationPlaces.js';
-import { CURRENT_EPISODE, CURRENT_PLACEMENT_EPISODE } from '../data/episodes.js';
+import { CURRENT_EPISODE } from '../data/episodes.js';
 import { DEFAULT_STATE_KEYS, STATE_LABELS } from '../data/stateLabels.js';
 import IssueDetector from './IssueDetector.js';
 import LearningProgress from './LearningProgress.js';
@@ -34,7 +34,9 @@ export default class TeacherReportManager {
   }
 
   static formatEpisodeFileSlug(report = null) {
-    return report?.episodeContext?.current?.code ?? CURRENT_EPISODE.code;
+    return report?.episodeContext?.placement?.code
+      ?? report?.episodeContext?.current?.code
+      ?? CURRENT_EPISODE.code;
   }
 
   static formatDownloadFileName(report = null) {
@@ -50,6 +52,11 @@ export default class TeacherReportManager {
       progress,
       selectedStrategy,
     });
+    const placementEpisode = EpisodeFlowManager.resolveActivePlacementEpisode({
+      registry,
+      learningProgress: progress,
+      placementConfig,
+    });
     const placedBuildings = registry.get(REGISTRY_KEYS.placedBuildings) ?? [];
     const gameState = registry.get(REGISTRY_KEYS.gameState);
     const reflectionChoice = registry.get(REGISTRY_KEYS.reflectionChoice);
@@ -64,7 +71,7 @@ export default class TeacherReportManager {
       progress,
       episodeContext: {
         current: TeacherReportManager.serializeEpisode(CURRENT_EPISODE),
-        placement: TeacherReportManager.serializeEpisode(CURRENT_PLACEMENT_EPISODE),
+        placement: TeacherReportManager.serializeEpisode(placementEpisode),
       },
       selectedPolicy,
       selectedStrategy,

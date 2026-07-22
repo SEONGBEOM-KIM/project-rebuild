@@ -3572,7 +3572,7 @@ function testTeacherReportManager() {
   assert.match(TeacherReportManager.formatChoiceReport({ ...report, placementConfig: { ...report.placementConfig, stateKeys: ['budget'] } }), /최종 상태:\n예산: 560/);
   assert.doesNotMatch(TeacherReportManager.formatChoiceReport({ ...report, placementConfig: { ...report.placementConfig, stateKeys: ['budget'] } }), /인구:/);
   assert.match(TeacherReportManager.formatTeachingPointReport(report), /큰 부작용 신호 없음/);
-  assert.equal(TeacherReportManager.formatDownloadFileName(report), 'project-rebuild-ep1-teacher-report.txt');
+  assert.equal(TeacherReportManager.formatDownloadFileName(report), 'project-rebuild-ep2-teacher-report.txt');
   assert.equal(TeacherReportManager.formatReportTitle(report), '[프로젝트 리빌드 EP1. 지역 위기 탐색 교사용 요약]');
   assert.match(TeacherReportManager.buildReportText(report), /\[프로젝트 리빌드 EP1\. 지역 위기 탐색 교사용 요약\]/);
   assert.match(TeacherReportManager.buildReportText(report), /0\. 에피소드\/설정/);
@@ -3608,6 +3608,8 @@ function testTeacherReportManager() {
   assert.equal(ep3Report.selectedPolicy.id, 'visitor_economy');
   assert.equal(ep3Report.selectedStrategy.id, 'visitor_commerce_growth');
   assert.equal(ep3Report.placementConfig.id, EP3_ECONOMY_PLACEMENT_CONFIG_ID);
+  assert.equal(ep3Report.episodeContext.placement.code, 'ep3');
+  assert.equal(TeacherReportManager.formatDownloadFileName(ep3Report), 'project-rebuild-ep3-teacher-report.txt');
   assert.match(TeacherReportManager.formatClassSummaryReport(ep3Report), /배치 전략: 방문 경제 활성화/);
   assert.match(TeacherReportManager.formatChoiceReport(ep3Report), /배치 전략: 방문 경제 활성화/);
 }
@@ -3700,7 +3702,11 @@ function testLearningDataViewManager() {
   assert.match(LearningDataViewManager.formatCopyFailure(), /권한/);
   assert.match(LearningDataViewManager.formatDownloadSuccess(), /다운로드/);
   assert.equal(LearningDataViewManager.formatDownloadFileName({ episode: 1 }), 'project-rebuild-ep1-learning-data.json');
-  assert.equal(LearningDataViewManager.formatDownloadFileName(createCompleteLearningData()), 'project-rebuild-ep1-learning-data.json');
+  assert.equal(LearningDataViewManager.formatDownloadFileName(createCompleteLearningData()), 'project-rebuild-ep2-learning-data.json');
+  assert.equal(LearningDataViewManager.formatDownloadFileName({
+    episode: 1,
+    episodeContext: { current: { code: 'ep1' }, placement: { code: 'ep3' } },
+  }), 'project-rebuild-ep3-learning-data.json');
 
   const completeData = createCompleteLearningData({
     placements: [
@@ -3833,6 +3839,7 @@ function testLearningDataManager() {
   assert.equal(ep3Data.selectedStrategy.id, 'logistics_growth_hub');
   assert.equal(ep3Data.selectedStrategy.placementConfigId, EP3_ECONOMY_PLACEMENT_CONFIG_ID);
   assert.equal(ep3Data.placementConfig.id, EP3_ECONOMY_PLACEMENT_CONFIG_ID);
+  assert.equal(ep3Data.episodeContext.placement.code, 'ep3');
   assert.equal(ep3Data.summary.selectedStrategyTitle, '유통 성장 거점');
   assert.equal(LearningDataManager.validate({ ...ep3Data, selectedStrategy: null }).every((row) => row.ok), true, 'EP3 saved data should be accepted when policy maps to an EP3 strategy');
 
@@ -3938,8 +3945,9 @@ function testApiPayloadViewManager() {
   assert.equal(ApiPayloadViewManager.formatCopySuccess(), 'API payload를 클립보드에 복사했습니다.');
   assert.match(ApiPayloadViewManager.formatCopyFailure(), /클립보드/);
   assert.equal(ApiPayloadViewManager.formatDownloadSuccess(), 'API payload 다운로드를 시작했습니다.');
-  assert.equal(ApiPayloadViewManager.formatDownloadFileName(payload), 'project-rebuild-ep1-api-payload.json');
+  assert.equal(ApiPayloadViewManager.formatDownloadFileName(payload), 'project-rebuild-ep2-api-payload.json');
   assert.equal(ApiPayloadViewManager.formatDownloadFileName({ episode_id: 7 }), 'project-rebuild-ep7-api-payload.json');
+  assert.equal(ApiPayloadViewManager.formatDownloadFileName(API_CONTRACT.requestExamples.ep3), 'project-rebuild-ep3-api-payload.json');
 
   const summary = ApiPayloadViewManager.getValidationSummary(payload);
   assert.equal(summary.ok, true);

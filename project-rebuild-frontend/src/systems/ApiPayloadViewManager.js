@@ -174,7 +174,9 @@ export default class ApiPayloadViewManager {
   }
 
   static formatEpisodeFileSlug(payload = {}) {
-    return payload.episode_context?.current?.code ?? (payload.episode_id ? `ep${payload.episode_id}` : 'episode');
+    return payload.episode_context?.placement?.code
+      ?? payload.episode_context?.current?.code
+      ?? (payload.episode_id ? `ep${payload.episode_id}` : 'episode');
   }
 
   static formatDownloadFileName(payload) {
