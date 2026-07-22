@@ -31,7 +31,7 @@ export default class Ep3PreviewScene extends Phaser.Scene {
     this.selectedStrategy = this.getInitialStrategy();
     this.strategyObjects = new Map();
     this.worldState = WorldStateManager.get(this.registry);
-    this.cumulativeMode = false;
+    this.cumulativeMode = Ep3PreviewViewManager.canUseCumulativeMode(this.worldState);
 
     Ep3PreviewRenderer.renderIntroPanel(this, briefing);
     this.worldProgressObjects = Ep3PreviewRenderer.renderWorldProgress(

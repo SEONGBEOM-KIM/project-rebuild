@@ -4,22 +4,27 @@ import { createLayoutText } from '../ui/LayoutText.js';
 import { createTextButton } from '../ui/TextButton.js';
 
 export default class TitleRenderer {
-  static renderScreen(scene, width, hasSave) {
+  static renderScreen(scene, width, saved, continueButtonState = null) {
+    const hasSave = Boolean(saved);
     const screenText = TitleViewManager.getScreenText();
     createScreenBackground(scene, screenText.backgroundColor);
     createLayoutText(scene, screenText.title, { x: width / 2, origin: 0.5 });
     createLayoutText(scene, screenText.subtitle, { x: width / 2, origin: 0.5 });
 
     const layout = TitleViewManager.getLayout(hasSave);
-    const controls = TitleRenderer.renderControls(scene, width, layout, hasSave);
+    const controls = TitleRenderer.renderControls(scene, width, layout, hasSave, continueButtonState);
     return { layout, ...controls };
   }
 
-  static renderControls(scene, width, layout, hasSave) {
+  static renderControls(scene, width, layout, hasSave, continueButtonState = null) {
     const startButtonConfig = TitleViewManager.getStartButton();
     const importButtonConfig = TitleViewManager.getImportButton();
     const storageButtonConfig = TitleViewManager.getStorageButton();
-    const loadButtonConfig = TitleViewManager.getLoadButton();
+    const loadButtonConfig = {
+      ...TitleViewManager.getLoadButton(),
+      label: continueButtonState?.label ?? TitleViewManager.getLoadButton().label,
+      targetScene: continueButtonState?.targetScene ?? TitleViewManager.getLoadButton().targetScene,
+    };
 
     return {
       startButton: TitleRenderer.renderTitleButton(scene, width / 2, layout.startButtonY, startButtonConfig, TitleViewManager.getPrimaryButtonStyle()),

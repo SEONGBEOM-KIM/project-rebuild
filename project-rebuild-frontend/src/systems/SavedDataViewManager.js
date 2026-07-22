@@ -1,4 +1,5 @@
 import SCENE_KEYS from '../data/sceneKeys.js';
+import { EPISODE_IDS } from '../data/episodes.js';
 
 export const SAVED_DATA_LAYOUT = {
   backgroundColor: 0x10253f,
@@ -108,12 +109,13 @@ export default class SavedDataViewManager {
     const context = SavedDataViewManager.getPlacementContext(data);
     const configText = context.placementConfigId ?? 'config 없음';
     const profileText = context.evaluationProfileId ?? 'profile 없음';
+    const resumeHint = SavedDataViewManager.formatResumeHint(data);
 
     return [
       `저장 시각: ${savedAt} / ${currentEpisodeText} → ${placementEpisodeText}`,
       `탐색 ${exploredCount}곳 / ${placementBreakdownText} / 완료: ${data.completed ? '예' : '아니오'}`,
       `회복 방향: ${policyName} / 배치 전략: ${strategyTitle}`,
-      `배치 설정: ${configText} / 평가 기준: ${profileText}`,
+      `배치 설정: ${configText} / 평가 기준: ${profileText}${resumeHint ? ` / ${resumeHint}` : ''}`,
     ].join('\n');
   }
 
@@ -174,10 +176,25 @@ export default class SavedDataViewManager {
     return Boolean(saved?.data);
   }
 
+  static canResumeEp3(data) {
+    const completedEpisodeIds = data?.worldState?.completedEpisodeIds ?? [];
+    return completedEpisodeIds.includes(EPISODE_IDS.PopulationRecovery)
+      && !completedEpisodeIds.includes(EPISODE_IDS.EconomyGrowth);
+  }
+
+  static formatResumeHint(data) {
+    return SavedDataViewManager.canResumeEp3(data)
+      ? '다음: EP3 누적 미션'
+      : null;
+  }
+
   static getContinueTargetScene(saved) {
     const data = saved?.data;
     if (!data) {
       return null;
+    }
+    if (SavedDataViewManager.canResumeEp3(data)) {
+      return SCENE_KEYS.Ep3Preview;
     }
     if (data.completed) {
       return SCENE_KEYS.Ending;
@@ -213,6 +230,7 @@ export default class SavedDataViewManager {
       [SCENE_KEYS.Placement]: '배치 이어보기',
       [SCENE_KEYS.Result]: '결과 이어보기',
       [SCENE_KEYS.Ending]: '마무리 이어보기',
+      [SCENE_KEYS.Ep3Preview]: 'EP3 미션 이어보기',
     }[targetScene] ?? '이어보기';
   }
 

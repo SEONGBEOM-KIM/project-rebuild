@@ -1074,7 +1074,7 @@ function testReflectionViewManager() {
 function testTitleRenderer() {
   const emptyFixture = createRendererSceneSpy();
   emptyFixture.scene.scale = { width: 1920, height: 1080 };
-  const emptyControls = TitleRenderer.renderScreen(emptyFixture.scene, 1920, false);
+  const emptyControls = TitleRenderer.renderScreen(emptyFixture.scene, 1920, null);
   assert.equal(emptyControls.startButton.type, 'text');
   assert.equal(emptyControls.importButton.type, 'text');
   assert.equal(emptyControls.storageButton.type, 'text');
@@ -1089,10 +1089,17 @@ function testTitleRenderer() {
 
   const savedFixture = createRendererSceneSpy();
   savedFixture.scene.scale = { width: 1920, height: 1080 };
-  const savedControls = TitleRenderer.renderScreen(savedFixture.scene, 1920, true);
+  const savedControls = TitleRenderer.renderScreen(savedFixture.scene, 1920, { data: {} });
   assert.equal(savedControls.loadButton.type, 'text');
   assert.ok(savedFixture.calls.some((call) => call[0] === 'text' && call[3] === '저장 데이터 확인'));
   assert.deepEqual(savedControls.layout, TitleViewManager.getLayout(true));
+  const resumeFixture = createRendererSceneSpy();
+  resumeFixture.scene.scale = { width: 1920, height: 1080 };
+  TitleRenderer.renderScreen(resumeFixture.scene, 1920, { data: {} }, {
+    label: 'EP3 미션 이어보기',
+    targetScene: 'Ep3PreviewScene',
+  });
+  assert.ok(resumeFixture.calls.some((call) => call[0] === 'text' && call[3] === 'EP3 미션 이어보기'));
 }
 
 function testTitleViewManager() {
@@ -3305,9 +3312,13 @@ function testEp3PreviewViewManager() {
   assert.match(previewSceneSource, /economyBuildings/, 'EP3 preview scene should show economy building candidates');
   assert.match(previewSceneSource, /selectStrategy/, 'EP3 preview scene should support selecting a growth strategy');
   assert.match(previewSceneSource, /selectCumulativeMode/, 'EP3 preview scene should support selecting an independent or cumulative placement mode');
+  assert.match(previewSceneSource, /cumulativeMode = Ep3PreviewViewManager\.canUseCumulativeMode\(this\.worldState\)/, 'EP3 preview should default to cumulative mode when a completed EP2 world exists');
   assert.match(previewSceneSource, /cumulative: this\.cumulativeMode/, 'EP3 preview scene should pass the selected world mode into placement launch');
   assert.match(previewSceneSource, /prepareEp3Placement/, 'EP3 preview scene should prepare placement context before starting placement');
   assert.match(previewSceneSource, /EpisodePlacementLaunchManager/, 'EP3 preview scene should delegate placement launch setup');
+  const titleSceneSource = readProjectFile('src', 'scenes', 'TitleScene.js');
+  assert.match(titleSceneSource, /LearningDataRestoreManager\.restore\(this\.registry, saved\.data\)/, 'title scene should restore the saved world before continuing');
+  assert.match(titleSceneSource, /continueButtonState\.targetScene/, 'title scene should continue directly to the saved progress target');
 }
 
 
@@ -4538,6 +4549,15 @@ function testSavedDataViewManager() {
   assert.equal(SavedDataViewManager.getContinueTargetScene({ data: { problemSummaryCompleted: true } }), 'Ep2BriefingScene');
   assert.equal(SavedDataViewManager.getContinueTargetScene({ data: { selectedPolicy: { id: 'youth_living_support' } } }), 'PlacementScene');
   assert.equal(SavedDataViewManager.getContinueTargetScene({ data: { placements: [{}, {}], summary: { placementContext: { requiredPlacements: 2 } } } }), 'ResultScene');
+  const ep2WorldState = WorldStateManager.completeEpisode(
+    WorldStateManager.startEpisode(WorldStateManager.createInitialWorldState(), EPISODE_IDS.PopulationRecovery),
+    EPISODE_IDS.PopulationRecovery,
+  );
+  const ep3ResumeSaved = { data: { completed: true, worldState: ep2WorldState } };
+  assert.equal(SavedDataViewManager.canResumeEp3(ep3ResumeSaved.data), true);
+  assert.equal(SavedDataViewManager.getContinueTargetScene(ep3ResumeSaved), 'Ep3PreviewScene');
+  assert.equal(SavedDataViewManager.getContinueButtonState(ep3ResumeSaved).label, 'EP3 미션 이어보기');
+  assert.equal(SavedDataViewManager.formatResumeHint(ep3ResumeSaved.data), '다음: EP3 누적 미션');
   assert.equal(SavedDataViewManager.getContinueTargetScene({ data: { placements: [{}, {}, {}] } }), 'ResultScene');
   assert.equal(SavedDataViewManager.getContinueTargetScene({ data: { completed: true } }), 'EndingScene');
   assert.equal(SavedDataViewManager.formatContinueLabel('PlacementScene'), '배치 이어보기');
