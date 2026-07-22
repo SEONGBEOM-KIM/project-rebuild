@@ -14,6 +14,7 @@ export const EPISODE_IDS = Object.freeze({
   PopulationRecovery: 'ep2',
   EconomyGrowth: 'ep3',
   SideEffects: 'ep4',
+  BalancedSolutions: 'ep5',
 });
 
 export const EPISODES = Object.freeze({
@@ -70,6 +71,19 @@ export const EPISODES = Object.freeze({
     intro: [
       '산업과 관광 개발로 푸른군은 활기를 되찾았습니다.',
       '하지만 성장의 효과와 함께 주민 생활에 새로운 부담도 나타나기 시작했습니다.',
+    ],
+  },
+  [EPISODE_IDS.BalancedSolutions]: {
+    id: 5,
+    code: EPISODE_IDS.BalancedSolutions,
+    title: '푸른군 균형 해결 프로젝트',
+    shortTitle: 'EP5. 문제 해결',
+    regionName: '푸른군',
+    theme: '성장과 삶의 질을 함께 지키는 해결',
+    requiredExploredCount: 0,
+    intro: [
+      '푸른군의 성장을 멈추는 대신, 성장의 혜택과 부담을 더 공정하고 안전하게 조정할 차례입니다.',
+      '한 문제를 먼저 해결하되, 다른 문제를 키우지 않는 균형안을 설계합니다.',
     ],
   },
 });

@@ -1,5 +1,6 @@
 import { DEFAULT_PLACEMENT_CONFIG_ID, ENVIRONMENT_PLACEMENT_CONFIG_ID, EP3_ECONOMY_PLACEMENT_CONFIG_ID } from './episodePlacementConfigs.js';
 import { CURRENT_EPISODE, CURRENT_PLACEMENT_EPISODE, EPISODE_IDS } from './episodes.js';
+import { ep5SolutionPlans } from './ep5SolutionPlans.js';
 export const EP1_DATA_CARDS = [
   {
     id: 'population_change',
@@ -342,6 +343,16 @@ export const EP4_NEXT_DEVELOPMENT_GOALS = [
   '다음 단계에서는 한 가지 문제만 줄이는 것이 아니라 푸른군 전체의 균형을 회복합니다.',
 ];
 
+export const EP5_MISSION_PREVIEW = {
+  title: '문제 해결',
+  intro: [
+    'EP4에서 성장의 부작용이 함께 나타나는 것을 확인했습니다.',
+    'EP5에서는 가장 두드러진 문제를 우선 보완하면서도 교통·환경·생활 격차를 함께 관리합니다.',
+    '선택한 해결안은 이후 정책·시설 배치와 실제 균형 평가로 확장됩니다.',
+  ],
+  solutionPlans: ep5SolutionPlans,
+};
+
 export const EP1_REFLECTION_CHOICES = [
   {
     id: 'population_economy',
@@ -409,6 +420,10 @@ export const EPISODE_CONTENT = Object.freeze({
   [EPISODE_IDS.SideEffects]: Object.freeze({
     missionBriefing: EP4_MISSION_BRIEFING,
     nextDevelopmentGoals: EP4_NEXT_DEVELOPMENT_GOALS,
+    nextEpisodeId: EPISODE_IDS.BalancedSolutions,
+  }),
+  [EPISODE_IDS.BalancedSolutions]: Object.freeze({
+    missionPreview: EP5_MISSION_PREVIEW,
   }),
 });
 

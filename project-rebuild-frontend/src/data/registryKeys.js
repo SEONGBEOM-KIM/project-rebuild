@@ -8,6 +8,7 @@ export const REGISTRY_KEYS = Object.freeze({
   exploredPlaces: 'exploredPlaces',
   quizResult: 'quizResult',
   reflectionChoice: 'reflectionChoice',
+  selectedSolutionPlan: 'selectedSolutionPlan',
   learningProgress: 'learningProgress',
   worldState: 'worldState',
 });

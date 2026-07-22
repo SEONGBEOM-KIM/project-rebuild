@@ -20,6 +20,7 @@ import Ep3PreviewScene from './scenes/Ep3PreviewScene.js';
 import Ep4BriefingScene from './scenes/Ep4BriefingScene.js';
 import Ep4InvestigationScene from './scenes/Ep4InvestigationScene.js';
 import Ep4ConclusionScene from './scenes/Ep4ConclusionScene.js';
+import Ep5PreviewScene from './scenes/Ep5PreviewScene.js';
 import LearningDataScene from './scenes/LearningDataScene.js';
 import ApiPayloadScene from './scenes/ApiPayloadScene.js';
 import ApiContractScene from './scenes/ApiContractScene.js';
@@ -60,6 +61,7 @@ const config = {
     Ep4BriefingScene,
     Ep4InvestigationScene,
     Ep4ConclusionScene,
+    Ep5PreviewScene,
     LearningDataScene,
     ApiPayloadScene,
     ApiContractScene,

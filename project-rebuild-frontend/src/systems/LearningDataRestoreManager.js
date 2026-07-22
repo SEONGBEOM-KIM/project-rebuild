@@ -6,6 +6,7 @@ import EpisodeFlowManager from './EpisodeFlowManager.js';
 import PlacementContextManager from './PlacementContextManager.js';
 import WorldStateManager from './WorldStateManager.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
+import { getEp5SolutionPlan } from '../data/ep5SolutionPlans.js';
 
 export default class LearningDataRestoreManager {
   static findPolicyById(policyId) {
@@ -40,6 +41,7 @@ export default class LearningDataRestoreManager {
     registry.set(REGISTRY_KEYS.exploredPlaces, progress.exploredPlaces);
     registry.set(REGISTRY_KEYS.quizResult, progress.quizResult);
     registry.set(REGISTRY_KEYS.reflectionChoice, progress.reflectionChoice);
+    registry.set(REGISTRY_KEYS.selectedSolutionPlan, getEp5SolutionPlan(data.selectedSolutionPlan?.id));
     registry.set(REGISTRY_KEYS.learningProgress, progress);
     WorldStateManager.set(registry, worldState);
 
@@ -123,6 +125,7 @@ export default class LearningDataRestoreManager {
       placedBuildingIds: restoredPlacements.map((record) => record.building.id),
       reviewedRiskIds: data.reviewedRiskIds ?? [],
       ep4InvestigationCompleted: Boolean(data.ep4InvestigationCompleted),
+      selectedSolutionPlanId: data.selectedSolutionPlan?.id ?? null,
       reflectionChoice: data.reflectionChoice ?? null,
       completed: Boolean(data.completed),
     };

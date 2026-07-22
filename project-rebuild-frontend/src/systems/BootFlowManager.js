@@ -21,6 +21,7 @@ export default class BootFlowManager {
       [REGISTRY_KEYS.exploredPlaces, []],
       [REGISTRY_KEYS.quizResult, null],
       [REGISTRY_KEYS.reflectionChoice, null],
+      [REGISTRY_KEYS.selectedSolutionPlan, null],
       [REGISTRY_KEYS.learningProgress, LearningProgress.createInitialProgress()],
       [REGISTRY_KEYS.worldState, WorldStateManager.createInitialWorldState()],
     ];

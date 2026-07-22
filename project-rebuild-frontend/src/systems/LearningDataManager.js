@@ -34,6 +34,7 @@ export default class LearningDataManager {
     }));
     const gameState = registry.get(REGISTRY_KEYS.gameState);
     const reflectionChoice = registry.get(REGISTRY_KEYS.reflectionChoice);
+    const selectedSolutionPlan = registry.get(REGISTRY_KEYS.selectedSolutionPlan);
     const issues = IndustrializationRiskManager.detect({
       gameState,
       placedBuildings,
@@ -98,6 +99,7 @@ export default class LearningDataManager {
       // the shared Blue County state after a refresh or import.
       worldState: WorldStateManager.get(registry),
       reflectionChoice,
+      selectedSolutionPlan: selectedSolutionPlan ? { id: selectedSolutionPlan.id, title: selectedSolutionPlan.title } : null,
       completed: progress.completed,
     };
   }

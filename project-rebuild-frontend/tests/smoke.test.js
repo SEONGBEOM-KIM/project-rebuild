@@ -24,6 +24,9 @@ import Ep4InvestigationViewManager from '../src/systems/Ep4InvestigationViewMana
 import Ep4InvestigationRenderer from '../src/systems/Ep4InvestigationRenderer.js';
 import Ep4ConclusionViewManager from '../src/systems/Ep4ConclusionViewManager.js';
 import Ep4ConclusionRenderer from '../src/systems/Ep4ConclusionRenderer.js';
+import Ep5SolutionPlanManager from '../src/systems/Ep5SolutionPlanManager.js';
+import Ep5PreviewViewManager from '../src/systems/Ep5PreviewViewManager.js';
+import Ep5PreviewRenderer from '../src/systems/Ep5PreviewRenderer.js';
 import LearningProgress from '../src/systems/LearningProgress.js';
 import WorldStateManager from '../src/systems/WorldStateManager.js';
 import EpisodePlacementLaunchManager from '../src/systems/EpisodePlacementLaunchManager.js';
@@ -88,6 +91,7 @@ import StorageManagerRenderer from '../src/systems/StorageManagerRenderer.js';
 import SideEffectIssueRenderer from '../src/systems/SideEffectIssueRenderer.js';
 import { buildings } from '../src/data/buildings.js';
 import { economyBuildings } from '../src/data/economyBuildings.js';
+import { ep5SolutionPlans } from '../src/data/ep5SolutionPlans.js';
 import { policies } from '../src/data/policies.js';
 import { economyPolicies } from '../src/data/economyPolicies.js';
 import { explorationPlaces } from '../src/data/explorationPlaces.js';
@@ -98,7 +102,7 @@ import { API_CONTRACT, formatContractRequest, formatContractResponse } from '../
 import { CURRENT_EPISODE, CURRENT_PLACEMENT_EPISODE, EPISODE_IDS, EPISODES, EPISODE_STEPS, getEpisode, getEpisodeStep } from '../src/data/episodes.js';
 import SCENE_KEYS from '../src/data/sceneKeys.js';
 import { REGISTRY_KEYS } from '../src/data/registryKeys.js';
-import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES, EP2_MISSION_BRIEFING, EP2_NEXT_DEVELOPMENT_GOALS, EP3_MISSION_PREVIEW, EP3_MISSION_BRIEFING, EP3_NEXT_DEVELOPMENT_GOALS, EP3_REFLECTION_CHOICES, EP4_MISSION_BRIEFING, EP4_NEXT_DEVELOPMENT_GOALS, EPISODE_CONTENT, getCurrentEpisodeContent, getCurrentPlacementEpisodeContent, getCurrentPlacementMissionBriefing, getCurrentPlacementNextDevelopmentGoals, getEpisodeContent, getNextDevelopmentGoals, getNextEpisodeContent, getReflectionChoices } from '../src/data/episodeContent.js';
+import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES, EP2_MISSION_BRIEFING, EP2_NEXT_DEVELOPMENT_GOALS, EP3_MISSION_PREVIEW, EP3_MISSION_BRIEFING, EP3_NEXT_DEVELOPMENT_GOALS, EP3_REFLECTION_CHOICES, EP4_MISSION_BRIEFING, EP4_NEXT_DEVELOPMENT_GOALS, EP5_MISSION_PREVIEW, EPISODE_CONTENT, getCurrentEpisodeContent, getCurrentPlacementEpisodeContent, getCurrentPlacementMissionBriefing, getCurrentPlacementNextDevelopmentGoals, getEpisodeContent, getNextDevelopmentGoals, getNextEpisodeContent, getReflectionChoices } from '../src/data/episodeContent.js';
 import ProgressStepper from '../src/ui/ProgressStepper.js';
 import { getTextButtonColor } from '../src/ui/TextButton.js';
 import { DEFAULT_STATE_KEYS, STATE_ICONS } from '../src/data/stateLabels.js';
@@ -387,6 +391,7 @@ function testBootFlowManager() {
     'exploredPlaces',
     'quizResult',
     'reflectionChoice',
+    REGISTRY_KEYS.selectedSolutionPlan,
     'learningProgress',
     REGISTRY_KEYS.worldState,
   ]);
@@ -399,6 +404,7 @@ function testBootFlowManager() {
   assert.equal(values.get(REGISTRY_KEYS.selectedPlacementStrategy), null);
   assert.equal(values.get('quizResult'), null);
   assert.equal(values.get('reflectionChoice'), null);
+  assert.equal(values.get(REGISTRY_KEYS.selectedSolutionPlan), null);
   assert.equal(values.get('learningProgress').episode, 1);
   assert.deepEqual(values.get(REGISTRY_KEYS.worldState), WorldStateManager.createInitialWorldState());
   const resetRegistry = createMemoryRegistry();
@@ -426,12 +432,15 @@ function testEpisodeMetadata() {
   assert.match(EPISODES[EPISODE_IDS.EconomyGrowth].theme, /산업과 일자리/);
   assert.equal(EPISODES[EPISODE_IDS.SideEffects].id, 4);
   assert.match(EPISODES[EPISODE_IDS.SideEffects].shortTitle, /EP4/);
+  assert.equal(EPISODES[EPISODE_IDS.BalancedSolutions].id, 5);
+  assert.match(EPISODES[EPISODE_IDS.BalancedSolutions].shortTitle, /EP5/);
   assert.equal(getEpisode('ep1'), CURRENT_EPISODE);
   assert.equal(getEpisode(1), CURRENT_EPISODE);
   assert.equal(getEpisode('ep2'), CURRENT_PLACEMENT_EPISODE);
   assert.equal(getEpisode(2), CURRENT_PLACEMENT_EPISODE);
   assert.equal(getEpisode('ep3'), EPISODES[EPISODE_IDS.EconomyGrowth]);
   assert.equal(getEpisode(3), EPISODES[EPISODE_IDS.EconomyGrowth]);
+  assert.equal(getEpisode('ep5'), EPISODES[EPISODE_IDS.BalancedSolutions]);
   assert.equal(getEpisode('missing'), CURRENT_EPISODE);
   assert.deepEqual(EPISODE_STEPS.map((step) => step.key), [
     'exploration',
@@ -1346,6 +1355,8 @@ function testEpisodeContent() {
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.EconomyGrowth].missionBriefing, EP3_MISSION_BRIEFING, 'EP3 mission briefing should be addressable through episode content registry');
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.SideEffects].missionBriefing, EP4_MISSION_BRIEFING, 'EP4 mission briefing should be addressable through episode content registry');
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.SideEffects].nextDevelopmentGoals, EP4_NEXT_DEVELOPMENT_GOALS, 'EP4 goals should be addressable through episode content registry');
+  assert.equal(EPISODE_CONTENT[EPISODE_IDS.BalancedSolutions].missionPreview, EP5_MISSION_PREVIEW, 'EP5 mission preview should be addressable through episode content registry');
+  assert.equal(EP5_MISSION_PREVIEW.solutionPlans, ep5SolutionPlans);
   assert.equal(getEpisodeContent(EPISODE_IDS.Crisis).causeQuestion, EP1_CAUSE_QUESTION);
   assert.equal(getEpisodeContent('unknown_episode').coreConcept, EP1_CORE_CONCEPT, 'unknown content ids should fall back to current episode content');
   assert.equal(getCurrentEpisodeContent().problemItems, EP1_PROBLEM_ITEMS);
@@ -1354,6 +1365,7 @@ function testEpisodeContent() {
   assert.equal(getCurrentPlacementNextDevelopmentGoals(), EP2_NEXT_DEVELOPMENT_GOALS);
   assert.equal(getNextEpisodeContent(EPISODE_IDS.PopulationRecovery).missionPreview, EP3_MISSION_PREVIEW);
   assert.equal(getNextEpisodeContent(EPISODE_IDS.EconomyGrowth).missionBriefing, EP4_MISSION_BRIEFING);
+  assert.equal(getNextEpisodeContent(EPISODE_IDS.SideEffects).missionPreview, EP5_MISSION_PREVIEW);
 }
 
 
@@ -3421,12 +3433,24 @@ function testEp4Briefing() {
   assert.match(Ep4ConclusionViewManager.formatMainBody(sortedRisks), /소득 격차/);
   assert.match(Ep4ConclusionViewManager.formatMainBody(sortedRisks), /우선 해결 관점:/);
   assert.match(Ep4ConclusionViewManager.formatNextBody(), /지역 전체의 균형/);
-  assert.equal(Ep4ConclusionViewManager.getControlLayout(960).next.target, 'EndingScene');
+  assert.equal(Ep4ConclusionViewManager.getControlLayout(960).next.target, 'Ep5PreviewScene');
 
   const conclusionFixture = createRendererSceneSpy();
   Ep4ConclusionRenderer.renderMainPanel(conclusionFixture.scene, sortedRisks);
   assert.ok(conclusionFixture.calls.some((call) => call[0] === 'text' && call[3] === '이번 성장에서 배운 점'));
   assert.ok(conclusionFixture.calls.some((call) => call[0] === 'text' && call[3].includes('우선 해결 관점:')));
+
+  assert.equal(Ep5SolutionPlanManager.getRecommendedPlanId(sortedRisks), 'inequality');
+  assert.equal(Ep5SolutionPlanManager.isRecommended(ep5SolutionPlans[2], sortedRisks), true);
+  assert.match(Ep5SolutionPlanManager.formatIntroText(EP5_MISSION_PREVIEW, sortedRisks[0]), /소득 격차/);
+  assert.match(Ep5SolutionPlanManager.formatPlanBody(ep5SolutionPlans[2]), /함께 관리할 기준/);
+  assert.equal(Ep5PreviewViewManager.getScreenLayout(1920).title.text, 'EP5. 문제 해결 준비');
+  assert.equal(Ep5PreviewViewManager.getControlLayout(960).back.target, 'Ep4ConclusionScene');
+
+  const ep5Fixture = createRendererSceneSpy();
+  Ep5PreviewRenderer.renderPlanCard(ep5Fixture.scene, ep5SolutionPlans[2], 2, ep5SolutionPlans[2].id, sortedRisks, () => {});
+  assert.ok(ep5Fixture.calls.some((call) => call[0] === 'text' && call[3] === '선택한 해결안'));
+  assert.ok(ep5Fixture.calls.some((call) => call[0] === 'text' && call[3] === ep5SolutionPlans[2].title));
 }
 
 function testEp2BriefingRenderer() {
@@ -4035,6 +4059,9 @@ function testLearningDataManager() {
   assert.equal(ep3Data.summary.sideEffectRisks.primaryRisk.id, 'inequality');
   assert.deepEqual(ep3Data.reviewedRiskIds, []);
   assert.equal(ep3Data.ep4InvestigationCompleted, false);
+  registry.set(REGISTRY_KEYS.selectedSolutionPlan, ep5SolutionPlans[0]);
+  const solutionPlanData = LearningDataManager.build(registry);
+  assert.equal(solutionPlanData.selectedSolutionPlan.id, 'mobility_green_network');
   assert.equal(LearningDataManager.validate({ ...ep3Data, selectedStrategy: null }).every((row) => row.ok), true, 'EP3 saved data should be accepted when policy maps to an EP3 strategy');
 
   registry.set(REGISTRY_KEYS.selectedPolicy, { id: 'youth_living_support', name: '청년 생활 지원' });
@@ -4440,6 +4467,7 @@ function testLearningDataRestoreManager() {
     ],
     gameState: { ...GameState.createInitialState(), environment: 92, budget: 860 },
     reflectionChoice: { id: 'environment', title: '환경 보완' },
+    selectedSolutionPlan: { id: 'clean_growth_guardrails', title: '친환경 성장 기준' },
     completed: true,
   };
 
@@ -4464,6 +4492,7 @@ function testLearningDataRestoreManager() {
   assert.deepEqual(registry.get('learningProgress').placedBuildingIds, ['small_park']);
   assert.deepEqual(registry.get('learningProgress').reviewedRiskIds, ['traffic', 'environment']);
   assert.equal(registry.get('learningProgress').ep4InvestigationCompleted, true);
+  assert.equal(registry.get(REGISTRY_KEYS.selectedSolutionPlan).id, 'clean_growth_guardrails');
   assert.deepEqual(registry.get(REGISTRY_KEYS.worldState).completedEpisodeIds, [EPISODE_IDS.PopulationRecovery]);
   assert.equal(registry.get(REGISTRY_KEYS.worldState).placements[0].episodeId, EPISODE_IDS.PopulationRecovery);
 
