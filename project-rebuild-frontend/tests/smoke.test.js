@@ -2810,6 +2810,7 @@ function testPlacementViewManager() {
   assert.match(apiContractSceneSource, /getExampleSelectorLayout/, 'api contract scene should render example selector controls');
   assert.match(apiContractSceneSource, /selectExample\(option\.exampleKey\)/, 'api contract scene should bind selector buttons to example keys');
   assert.match(apiContractSceneSource, /formatContractRequest\(exampleKey\)/, 'api contract scene should refresh the request example by selected key');
+  assert.match(apiContractSceneSource, /formatContractResponse\(exampleKey\)/, 'api contract scene should refresh the response example by selected key');
   const placementBootstrapSource = readProjectFile('src', 'systems', 'PlacementSceneBootstrap.js');
   assert.match(placementBootstrapSource, /PlacementUiCamera/, 'placement bootstrap should render fixed UI through a separate UI camera');
   assert.match(placementBootstrapSource, /objectRegistry\.ignoreUiObjectsOnMainCamera\(\)/, 'world camera should ignore fixed UI objects through registry');
@@ -4748,6 +4749,8 @@ function testApiContract() {
   assert.match(formatContractRequest('ep3'), /visitor_commerce_growth/);
   assert.match(formatContractRequest('ep3'), /ep3_economy_growth/);
   assert.match(formatContractResponse(), /201 Created/);
+  assert.match(formatContractResponse('ep3'), /"code": "ep3"/);
+  assert.match(formatContractResponse('ep3'), /EP3\. 경제 성장/);
 }
 
 

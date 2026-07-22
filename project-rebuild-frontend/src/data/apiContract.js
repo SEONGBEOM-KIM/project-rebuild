@@ -195,6 +195,8 @@ export function formatContractRequest(exampleKey = DEFAULT_EXAMPLE_KEY) {
   return `${API_CONTRACT.method} ${API_CONTRACT.endpoint}\nContent-Type: ${API_CONTRACT.contentType}\n\n${JSON.stringify(example, null, 2)}`;
 }
 
-export function formatContractResponse() {
-  return `201 Created\n${JSON.stringify(API_CONTRACT.successResponseExample, null, 2)}\n\n400 Bad Request\n${JSON.stringify(API_CONTRACT.errorResponseExample, null, 2)}`;
+export function formatContractResponse(exampleKey = DEFAULT_EXAMPLE_KEY) {
+  const requestExample = API_CONTRACT.requestExamples[exampleKey] ?? API_CONTRACT.requestExample;
+  const successResponseExample = buildSuccessResponseExample(requestExample);
+  return `201 Created\n${JSON.stringify(successResponseExample, null, 2)}\n\n400 Bad Request\n${JSON.stringify(API_CONTRACT.errorResponseExample, null, 2)}`;
 }

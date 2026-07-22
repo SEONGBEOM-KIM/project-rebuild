@@ -25,7 +25,7 @@ export default class ApiContractScene extends Phaser.Scene {
 
     const panels = ApiContractViewManager.getPanelLayout();
     this.requestBodyText = ApiContractRenderer.renderPanel(this, panels.request, formatContractRequest(this.selectedExampleKey));
-    ApiContractRenderer.renderPanel(this, panels.response, formatContractResponse());
+    this.responseBodyText = ApiContractRenderer.renderPanel(this, panels.response, formatContractResponse(this.selectedExampleKey));
     ApiContractRenderer.renderNotes(this);
     this.drawControls();
   }
@@ -52,6 +52,7 @@ export default class ApiContractScene extends Phaser.Scene {
   selectExample(exampleKey) {
     this.selectedExampleKey = exampleKey;
     this.requestBodyText?.setText(formatContractRequest(exampleKey));
+    this.responseBodyText?.setText(formatContractResponse(exampleKey));
   }
 
 }
