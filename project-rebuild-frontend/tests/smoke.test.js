@@ -18,6 +18,8 @@ import Ep2BriefingViewManager from '../src/systems/Ep2BriefingViewManager.js';
 import Ep2BriefingRenderer from '../src/systems/Ep2BriefingRenderer.js';
 import Ep3PreviewViewManager from '../src/systems/Ep3PreviewViewManager.js';
 import Ep3PreviewRenderer from '../src/systems/Ep3PreviewRenderer.js';
+import Ep4BriefingViewManager from '../src/systems/Ep4BriefingViewManager.js';
+import Ep4BriefingRenderer from '../src/systems/Ep4BriefingRenderer.js';
 import LearningProgress from '../src/systems/LearningProgress.js';
 import WorldStateManager from '../src/systems/WorldStateManager.js';
 import EpisodePlacementLaunchManager from '../src/systems/EpisodePlacementLaunchManager.js';
@@ -92,7 +94,7 @@ import { API_CONTRACT, formatContractRequest, formatContractResponse } from '../
 import { CURRENT_EPISODE, CURRENT_PLACEMENT_EPISODE, EPISODE_IDS, EPISODES, EPISODE_STEPS, getEpisode, getEpisodeStep } from '../src/data/episodes.js';
 import SCENE_KEYS from '../src/data/sceneKeys.js';
 import { REGISTRY_KEYS } from '../src/data/registryKeys.js';
-import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES, EP2_MISSION_BRIEFING, EP2_NEXT_DEVELOPMENT_GOALS, EP3_MISSION_PREVIEW, EP3_MISSION_BRIEFING, EP3_NEXT_DEVELOPMENT_GOALS, EP3_REFLECTION_CHOICES, EPISODE_CONTENT, getCurrentEpisodeContent, getCurrentPlacementEpisodeContent, getCurrentPlacementMissionBriefing, getCurrentPlacementNextDevelopmentGoals, getEpisodeContent, getNextDevelopmentGoals, getNextEpisodeContent, getReflectionChoices } from '../src/data/episodeContent.js';
+import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES, EP2_MISSION_BRIEFING, EP2_NEXT_DEVELOPMENT_GOALS, EP3_MISSION_PREVIEW, EP3_MISSION_BRIEFING, EP3_NEXT_DEVELOPMENT_GOALS, EP3_REFLECTION_CHOICES, EP4_MISSION_BRIEFING, EP4_NEXT_DEVELOPMENT_GOALS, EPISODE_CONTENT, getCurrentEpisodeContent, getCurrentPlacementEpisodeContent, getCurrentPlacementMissionBriefing, getCurrentPlacementNextDevelopmentGoals, getEpisodeContent, getNextDevelopmentGoals, getNextEpisodeContent, getReflectionChoices } from '../src/data/episodeContent.js';
 import ProgressStepper from '../src/ui/ProgressStepper.js';
 import { getTextButtonColor } from '../src/ui/TextButton.js';
 import { DEFAULT_STATE_KEYS, STATE_ICONS } from '../src/data/stateLabels.js';
@@ -416,6 +418,8 @@ function testEpisodeMetadata() {
   assert.equal(EPISODES[EPISODE_IDS.EconomyGrowth].id, 3);
   assert.match(EPISODES[EPISODE_IDS.EconomyGrowth].shortTitle, /EP3/);
   assert.match(EPISODES[EPISODE_IDS.EconomyGrowth].theme, /산업과 일자리/);
+  assert.equal(EPISODES[EPISODE_IDS.SideEffects].id, 4);
+  assert.match(EPISODES[EPISODE_IDS.SideEffects].shortTitle, /EP4/);
   assert.equal(getEpisode('ep1'), CURRENT_EPISODE);
   assert.equal(getEpisode(1), CURRENT_EPISODE);
   assert.equal(getEpisode('ep2'), CURRENT_PLACEMENT_EPISODE);
@@ -1334,6 +1338,8 @@ function testEpisodeContent() {
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.PopulationRecovery].nextEpisodeId, EPISODE_IDS.EconomyGrowth, 'EP2 should point to EP3 as the next episode');
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.EconomyGrowth].missionPreview, EP3_MISSION_PREVIEW, 'EP3 mission preview should be addressable through episode content registry');
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.EconomyGrowth].missionBriefing, EP3_MISSION_BRIEFING, 'EP3 mission briefing should be addressable through episode content registry');
+  assert.equal(EPISODE_CONTENT[EPISODE_IDS.SideEffects].missionBriefing, EP4_MISSION_BRIEFING, 'EP4 mission briefing should be addressable through episode content registry');
+  assert.equal(EPISODE_CONTENT[EPISODE_IDS.SideEffects].nextDevelopmentGoals, EP4_NEXT_DEVELOPMENT_GOALS, 'EP4 goals should be addressable through episode content registry');
   assert.equal(getEpisodeContent(EPISODE_IDS.Crisis).causeQuestion, EP1_CAUSE_QUESTION);
   assert.equal(getEpisodeContent('unknown_episode').coreConcept, EP1_CORE_CONCEPT, 'unknown content ids should fall back to current episode content');
   assert.equal(getCurrentEpisodeContent().problemItems, EP1_PROBLEM_ITEMS);
@@ -1341,7 +1347,7 @@ function testEpisodeContent() {
   assert.equal(getCurrentPlacementMissionBriefing(), EP2_MISSION_BRIEFING);
   assert.equal(getCurrentPlacementNextDevelopmentGoals(), EP2_NEXT_DEVELOPMENT_GOALS);
   assert.equal(getNextEpisodeContent(EPISODE_IDS.PopulationRecovery).missionPreview, EP3_MISSION_PREVIEW);
-  assert.equal(getNextEpisodeContent(EPISODE_IDS.EconomyGrowth), null);
+  assert.equal(getNextEpisodeContent(EPISODE_IDS.EconomyGrowth).missionBriefing, EP4_MISSION_BRIEFING);
 }
 
 
@@ -3238,6 +3244,14 @@ function testEndingSummaryViewManager() {
     backgroundColor: '#fde68a',
     textColor: '#422006',
   });
+  assert.deepEqual(EndingSummaryViewManager.getControlLayout(960, EPISODE_IDS.EconomyGrowth).ep2, {
+    x: 1130,
+    y: 955,
+    label: 'EP4 부작용 보기',
+    target: 'Ep4BriefingScene',
+    backgroundColor: '#fda4af',
+    textColor: '#4c0519',
+  });
   assert.equal(EndingSummaryViewManager.getControlLayout(960).report.target, 'TeacherReportScene');
 }
 
@@ -3354,6 +3368,31 @@ function testEp3PreviewViewManager() {
   assert.match(titleSceneSource, /BootFlowManager\.resetRegistry\(this\.registry\)/, 'title scene should reset runtime progress before beginning a new game');
 }
 
+
+function testEp4Briefing() {
+  const risks = IndustrializationRiskManager.detect({
+    gameState: { ...GameState.createInitialState(), economy: 112, satisfaction: 61, traffic: 20, pollution: 15 },
+    placedBuildings: [{ building: economyBuildings[0] }, { building: economyBuildings[2] }],
+    placementEpisodeId: EPISODE_IDS.EconomyGrowth,
+  });
+  const sortedRisks = Ep4BriefingViewManager.sortRisks(risks);
+  assert.equal(Ep4BriefingViewManager.getScreenLayout(1920).title.text, 'EP4. 부작용 발생');
+  assert.equal(sortedRisks[0].id, 'inequality');
+  assert.match(Ep4BriefingViewManager.formatRiskPriority(sortedRisks[0]), /가장 두드러진 문제/);
+  assert.match(Ep4BriefingViewManager.formatRiskBody(sortedRisks[0]), /다음 관찰:/);
+  assert.match(Ep4BriefingViewManager.formatLearningBody(EP4_MISSION_BRIEFING), /학습 목표:/);
+  assert.equal(Ep4BriefingViewManager.getControlLayout(960).next.target, 'EndingScene');
+
+  const introFixture = createRendererSceneSpy();
+  Ep4BriefingRenderer.renderIntroPanel(introFixture.scene, EP4_MISSION_BRIEFING);
+  assert.ok(introFixture.calls.some((call) => call[0] === 'text' && call[3] === '성장 이후의 푸른군'));
+  assert.ok(introFixture.calls.some((call) => call[0] === 'text' && call[3].includes('경제 성장으로')));
+
+  const riskFixture = createRendererSceneSpy();
+  Ep4BriefingRenderer.renderRiskCard(riskFixture.scene, sortedRisks[0], 0);
+  assert.ok(riskFixture.calls.some((call) => call[0] === 'text' && call[3] === sortedRisks[0].title));
+  assert.ok(riskFixture.calls.some((call) => call[0] === 'text' && call[3].includes('가장 두드러진 문제')));
+}
 
 function testEp2BriefingRenderer() {
   const introFixture = createRendererSceneSpy();
@@ -5303,6 +5342,7 @@ async function run() {
   testEndingSummaryViewManager();
   testEp3PreviewRenderer();
   testEp3PreviewViewManager();
+  testEp4Briefing();
   testEp2BriefingRenderer();
   testEp2BriefingViewManager();
   testEndingSummaryManager();

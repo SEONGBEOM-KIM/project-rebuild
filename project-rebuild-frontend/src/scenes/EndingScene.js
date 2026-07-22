@@ -56,12 +56,12 @@ export default class EndingScene extends Phaser.Scene {
       width / 2,
       EndingSummaryManager.formatLearningRecordRows(learningProgress, exploredPlaces, quizResult, reflectionChoice, selectedStrategy, placementConfig, evaluationProfile),
     );
-    this.drawControls(width / 2);
+    this.drawControls(width / 2, placementConfig.episodeId);
   }
 
 
-  drawControls(centerX) {
-    const controls = EndingSummaryViewManager.getControlLayout(centerX);
+  drawControls(centerX, placementEpisodeId) {
+    const controls = EndingSummaryViewManager.getControlLayout(centerX, placementEpisodeId);
     Object.values(controls).forEach((control) => {
       const button = createTextButton(this, control, EndingSummaryViewManager.getButtonStyle());
       button.on('pointerdown', () => this.scene.start(control.target));

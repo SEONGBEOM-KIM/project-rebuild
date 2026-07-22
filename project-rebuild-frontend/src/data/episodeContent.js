@@ -316,6 +316,32 @@ export const EP3_NEXT_DEVELOPMENT_GOALS = [
   '다음 개발은 성장 효과가 만든 새 문제를 균형 있게 조정하는 방향으로 확장합니다.',
 ];
 
+export const EP4_MISSION_BRIEFING = {
+  title: '부작용 발생',
+  intro: [
+    '경제 성장으로 일자리와 방문객은 늘었지만, 모든 변화가 긍정적인 것은 아닙니다.',
+    '교통 혼잡, 환경 오염, 소득 격차는 함께 나타날 수 있으며 이전 선택에 따라 한 문제가 더 크게 드러납니다.',
+    '이제 푸른군의 주민 생활에서 어떤 부담이 커졌는지 확인하고, 다음 해결 미션의 우선순위를 정합니다.',
+  ],
+  learningGoal: '성장의 긍정적 효과와 부작용이 함께 생길 수 있음을 이해하고, 균형 있는 해결이 필요한 이유를 설명합니다.',
+  activitySteps: [
+    '성장 이후 달라진 푸른군의 상태를 확인합니다.',
+    '교통·환경·격차 문제를 비교하고 가장 두드러진 위험을 찾습니다.',
+    '주민 생활과 지역 경제를 함께 지키기 위한 다음 해결 방향을 준비합니다.',
+  ],
+  nextEpisodeTitle: 'EP5. 문제 해결',
+};
+
+export const EP4_NEXT_DEVELOPMENT_GOALS = [
+  'EP5 문제 해결 예고',
+  '',
+  '• 교통 혼잡 완화',
+  '• 환경 오염 저감',
+  '• 성장 혜택의 지역 공유',
+  '',
+  '다음 단계에서는 한 가지 문제만 줄이는 것이 아니라 푸른군 전체의 균형을 회복합니다.',
+];
+
 export const EP1_REFLECTION_CHOICES = [
   {
     id: 'population_economy',
@@ -378,6 +404,11 @@ export const EPISODE_CONTENT = Object.freeze({
     missionBriefing: EP3_MISSION_BRIEFING,
     reflectionChoices: EP3_REFLECTION_CHOICES,
     nextDevelopmentGoals: EP3_NEXT_DEVELOPMENT_GOALS,
+    nextEpisodeId: EPISODE_IDS.SideEffects,
+  }),
+  [EPISODE_IDS.SideEffects]: Object.freeze({
+    missionBriefing: EP4_MISSION_BRIEFING,
+    nextDevelopmentGoals: EP4_NEXT_DEVELOPMENT_GOALS,
   }),
 });
 

@@ -11,6 +11,7 @@ const SCENE_KEYS = Object.freeze({
   ProblemSummary: 'ProblemSummaryScene',
   Ep2Briefing: 'Ep2BriefingScene',
   Ep3Preview: 'Ep3PreviewScene',
+  Ep4Briefing: 'Ep4BriefingScene',
   Selection: 'SelectionScene',
   Placement: 'PlacementScene',
   Result: 'ResultScene',

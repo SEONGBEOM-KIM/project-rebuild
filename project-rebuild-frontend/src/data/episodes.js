@@ -13,6 +13,7 @@ export const EPISODE_IDS = Object.freeze({
   Crisis: 'ep1',
   PopulationRecovery: 'ep2',
   EconomyGrowth: 'ep3',
+  SideEffects: 'ep4',
 });
 
 export const EPISODES = Object.freeze({
@@ -56,6 +57,19 @@ export const EPISODES = Object.freeze({
     intro: [
       '생활 기반이 조금씩 회복된 뒤에는 일자리와 경제 활력이 필요합니다.',
       '산업 시설과 성장 전략이 인구, 경제, 교통에 어떤 변화를 만드는지 살펴봅니다.',
+    ],
+  },
+  [EPISODE_IDS.SideEffects]: {
+    id: 4,
+    code: EPISODE_IDS.SideEffects,
+    title: '푸른군 성장의 부작용',
+    shortTitle: 'EP4. 부작용 발생',
+    regionName: '푸른군',
+    theme: '성장과 삶의 질 사이의 균형',
+    requiredExploredCount: 0,
+    intro: [
+      '산업과 관광 개발로 푸른군은 활기를 되찾았습니다.',
+      '하지만 성장의 효과와 함께 주민 생활에 새로운 부담도 나타나기 시작했습니다.',
     ],
   },
 });
