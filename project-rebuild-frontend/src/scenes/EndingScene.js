@@ -34,7 +34,7 @@ export default class EndingScene extends Phaser.Scene {
     });
     const ending = EndingSummaryManager.getEndingSummary(gameState, placedBuildings, evaluationProfile);
 
-    const layout = EndingSummaryViewManager.getScreenLayout(width);
+    const layout = EndingSummaryViewManager.getScreenLayout(width, placementConfig.episodeId);
 
     createScreenBackground(this, layout.background.color);
     ProgressStepper.render(this, layout.progressStep);
@@ -46,7 +46,7 @@ export default class EndingScene extends Phaser.Scene {
       gameState, ending, reflectionChoice, selectedStrategy, evaluationProfile, placedBuildings, placementEpisodeId: placementConfig.episodeId,
     }));
 
-    const panels = EndingSummaryViewManager.getPanelLayout();
+    const panels = EndingSummaryViewManager.getPanelLayout(placementConfig.episodeId);
     EndingSummaryRenderer.renderPanel(this, panels.choice, EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice, selectedStrategy));
     EndingSummaryRenderer.renderPanel(this, panels.state, EndingSummaryManager.formatStateSummary(
       gameState, ending, placementConfig.stateKeys, evaluationProfile, placedBuildings, placementConfig.episodeId,

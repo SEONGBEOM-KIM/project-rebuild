@@ -3264,6 +3264,8 @@ function testEndingSummaryViewManager() {
     fontStyle: 'bold',
   });
   assert.equal(EndingSummaryViewManager.getScreenLayout(1920).progressStep, 'ending');
+  assert.equal(EndingSummaryViewManager.getScreenLayout(1920, EPISODE_IDS.PopulationRecovery).title.text, 'EP2. 인구 유입 전략 마무리');
+  assert.match(EndingSummaryViewManager.getScreenLayout(1920, EPISODE_IDS.EconomyGrowth).subtitle.text, /성장 효과와 부작용/);
   assert.equal(EndingSummaryViewManager.getTakeawayStyle().title, '학습 결론');
   assert.equal(EndingSummaryViewManager.getPanelStyle().strokeColor, 0x60a5fa);
   assert.equal(EndingSummaryViewManager.getLearningRecordStyle().title, '학습 기록');
@@ -3271,6 +3273,8 @@ function testEndingSummaryViewManager() {
   const panels = EndingSummaryViewManager.getPanelLayout();
   assert.equal(panels.choice.title, '오늘의 선택 요약');
   assert.equal(panels.nextMission.width, 360);
+  assert.equal(EndingSummaryViewManager.getPanelLayout(EPISODE_IDS.PopulationRecovery).nextMission.title, '다음: EP3. 경제 성장');
+  assert.equal(EndingSummaryViewManager.getPanelLayout(EPISODE_IDS.BalancedSolutions).nextMission.title, '프로젝트 마무리');
   assert.deepEqual(EndingSummaryViewManager.getTakeawayLayout(960).title, { x: 170, y: 178, text: '학습 결론' });
   assert.deepEqual(EndingSummaryViewManager.getPanelTitlePosition(panels.choice), { x: 430, y: 265 });
   assert.deepEqual(EndingSummaryViewManager.getPanelBodyPosition(panels.choice), { x: 175, y: 325 });

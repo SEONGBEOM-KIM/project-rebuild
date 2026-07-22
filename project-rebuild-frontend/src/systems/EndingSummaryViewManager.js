@@ -1,5 +1,6 @@
 import SCENE_KEYS from '../data/sceneKeys.js';
-import { EPISODE_IDS } from '../data/episodes.js';
+import { EPISODE_IDS, getEpisode } from '../data/episodes.js';
+import EpisodeActivityFlowManager from './EpisodeActivityFlowManager.js';
 
 const ENDING_SCREEN_LAYOUT = {
   backgroundColor: 0x0f172a,
@@ -53,12 +54,16 @@ const ENDING_BUTTON_STYLE = {
 };
 
 export default class EndingSummaryViewManager {
-  static getScreenLayout(width) {
+  static getScreenLayout(width, episodeId = null) {
+    const flow = EpisodeActivityFlowManager.get(episodeId);
+    const episode = episodeId ? getEpisode(episodeId) : null;
+    const titleText = episode ? `${episode.shortTitle} 마무리` : ENDING_SCREEN_LAYOUT.title.text;
+    const subtitleText = flow?.completionFocus ?? ENDING_SCREEN_LAYOUT.subtitle.text;
     return {
       background: { color: ENDING_SCREEN_LAYOUT.backgroundColor },
       progressStep: ENDING_SCREEN_LAYOUT.progressStep,
-      title: { x: width / 2, ...ENDING_SCREEN_LAYOUT.title },
-      subtitle: { x: width / 2, ...ENDING_SCREEN_LAYOUT.subtitle },
+      title: { x: width / 2, ...ENDING_SCREEN_LAYOUT.title, text: titleText },
+      subtitle: { x: width / 2, ...ENDING_SCREEN_LAYOUT.subtitle, text: subtitleText },
     };
   }
 
@@ -104,11 +109,13 @@ export default class EndingSummaryViewManager {
     };
   }
 
-  static getPanelLayout() {
+  static getPanelLayout(episodeId = null) {
+    const flow = EpisodeActivityFlowManager.get(episodeId);
+    const nextEpisode = flow?.nextEpisodeId ? getEpisode(flow.nextEpisodeId) : null;
     return {
       choice: { x: 430, y: 470, width: 600, height: 500, title: '오늘의 선택 요약' },
       state: { x: 1110, y: 470, width: 600, height: 500, title: '지역 상태 요약' },
-      nextMission: { x: 1585, y: 470, width: 360, height: 500, title: '다음 개발 목표' },
+      nextMission: { x: 1585, y: 470, width: 360, height: 500, title: nextEpisode ? `다음: ${nextEpisode.shortTitle}` : '프로젝트 마무리' },
     };
   }
 
