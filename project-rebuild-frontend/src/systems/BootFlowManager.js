@@ -25,4 +25,10 @@ export default class BootFlowManager {
       [REGISTRY_KEYS.worldState, WorldStateManager.createInitialWorldState()],
     ];
   }
+
+  static resetRegistry(registry) {
+    for (const [key, value] of BootFlowManager.createInitialRegistryEntries()) {
+      registry.set(key, value);
+    }
+  }
 }

@@ -392,6 +392,12 @@ function testBootFlowManager() {
   assert.equal(values.get('reflectionChoice'), null);
   assert.equal(values.get('learningProgress').episode, 1);
   assert.deepEqual(values.get(REGISTRY_KEYS.worldState), WorldStateManager.createInitialWorldState());
+  const resetRegistry = createMemoryRegistry();
+  resetRegistry.set(REGISTRY_KEYS.gameState, { population: 9999 });
+  resetRegistry.set(REGISTRY_KEYS.worldState, { completedEpisodeIds: [EPISODE_IDS.PopulationRecovery] });
+  BootFlowManager.resetRegistry(resetRegistry);
+  assert.deepEqual(resetRegistry.get(REGISTRY_KEYS.gameState), GameState.createInitialState());
+  assert.deepEqual(resetRegistry.get(REGISTRY_KEYS.worldState), WorldStateManager.createInitialWorldState());
   assert.equal(BootFlowManager.getTargetScene(), 'TitleScene');
 }
 
@@ -3319,6 +3325,7 @@ function testEp3PreviewViewManager() {
   const titleSceneSource = readProjectFile('src', 'scenes', 'TitleScene.js');
   assert.match(titleSceneSource, /LearningDataRestoreManager\.restore\(this\.registry, saved\.data\)/, 'title scene should restore the saved world before continuing');
   assert.match(titleSceneSource, /continueButtonState\.targetScene/, 'title scene should continue directly to the saved progress target');
+  assert.match(titleSceneSource, /BootFlowManager\.resetRegistry\(this\.registry\)/, 'title scene should reset runtime progress before beginning a new game');
 }
 
 

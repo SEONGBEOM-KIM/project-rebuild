@@ -7,9 +7,7 @@ export default class BootScene extends Phaser.Scene {
   }
 
   create() {
-    for (const [key, value] of BootFlowManager.createInitialRegistryEntries()) {
-      this.registry.set(key, value);
-    }
+    BootFlowManager.resetRegistry(this.registry);
     this.scene.start(BootFlowManager.getTargetScene());
   }
 }

@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import SaveManager from '../systems/SaveManager.js';
 import LearningDataRestoreManager from '../systems/LearningDataRestoreManager.js';
 import SavedDataViewManager from '../systems/SavedDataViewManager.js';
+import BootFlowManager from '../systems/BootFlowManager.js';
 import TitleViewManager from '../systems/TitleViewManager.js';
 import TitleRenderer from '../systems/TitleRenderer.js';
 
@@ -17,7 +18,10 @@ export default class TitleScene extends Phaser.Scene {
     const controls = TitleRenderer.renderScreen(this, width, saved, continueButtonState);
     this.importStatusText = controls.importStatusText;
 
-    controls.startButton.on('pointerdown', () => this.scene.start(controls.startButtonConfig.targetScene));
+    controls.startButton.on('pointerdown', () => {
+      BootFlowManager.resetRegistry(this.registry);
+      this.scene.start(controls.startButtonConfig.targetScene);
+    });
     controls.importButton.on('pointerdown', () => this.openImportPicker());
     controls.storageButton.on('pointerdown', () => this.scene.start(controls.storageButtonConfig.targetScene));
 
