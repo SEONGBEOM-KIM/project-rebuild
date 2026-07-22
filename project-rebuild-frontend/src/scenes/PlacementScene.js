@@ -74,7 +74,7 @@ export default class PlacementScene extends Phaser.Scene {
     this.uiUpdater.updatePlacementHistoryPanel(this.placedBuildings, this.placementConfig.stateKeys);
     this.updateSelectedBuildingUi();
     this.uiUpdater.updateContinueButton(
-      this.placedBuildings.length,
+      this.getCurrentEpisodePlacedCount(),
       this.selectedPolicy,
       this.selectedStrategy,
       this.placementConfig.requiredPlacements,
@@ -90,7 +90,7 @@ export default class PlacementScene extends Phaser.Scene {
       currentState: this.registry.get(REGISTRY_KEYS.gameState),
       stateKeys: this.placementConfig.stateKeys,
       selectedPolicy: this.selectedPolicy,
-      getPlacedCount: () => this.placedBuildings.length,
+      getPlacedCount: () => this.getCurrentEpisodePlacedCount(),
       onSelectBuilding: (building) => this.selectBuilding(building),
       onContinue: (target) => this.scene.start(target),
       onContinueBlocked: (placedCount) => {
@@ -113,6 +113,12 @@ export default class PlacementScene extends Phaser.Scene {
 
   updateSelectedBuildingUi() {
     this.uiRenderer.updateSelectedBuildingCards(this.cardObjects, this.selectedBuilding);
+  }
+
+  getCurrentEpisodePlacedCount() {
+    return this.placedBuildings.filter((record) => (
+      record.episodeId == null || record.episodeId === this.placementConfig.episodeId
+    )).length;
   }
 
   registerPlacementInput() {
@@ -150,6 +156,7 @@ export default class PlacementScene extends Phaser.Scene {
       placementSystem: this.placementSystem,
       building: this.selectedBuilding,
       placedBuildings: this.placedBuildings,
+      episodeId: this.placementConfig.episodeId,
     });
 
     if (action.status === PLACEMENT_ACTION_STATUS.MISSING_TILE) {
@@ -171,7 +178,7 @@ export default class PlacementScene extends Phaser.Scene {
     this.uiUpdater.updateLastChangePanel(this.registry.get(REGISTRY_KEYS.lastPlacementResult), this.placementConfig.stateKeys);
     this.uiUpdater.updatePlacementHistoryPanel(this.placedBuildings, this.placementConfig.stateKeys);
     this.uiUpdater.updateContinueButton(
-      this.placedBuildings.length,
+      this.getCurrentEpisodePlacedCount(),
       this.selectedPolicy,
       this.selectedStrategy,
       this.placementConfig.requiredPlacements,
@@ -179,7 +186,7 @@ export default class PlacementScene extends Phaser.Scene {
     );
     this.uiUpdater.showMessage(PlacementUiStateManager.formatPlacementSuccessMessage(
       this.selectedBuilding,
-      this.placedBuildings.length,
+      this.getCurrentEpisodePlacedCount(),
       this.placementConfig.requiredPlacements,
     ), '#bbf7d0');
     this.updatePreview(pointer);

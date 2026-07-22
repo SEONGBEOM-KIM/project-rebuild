@@ -16,17 +16,18 @@ export default class PlacementResultManager {
     };
   }
 
-  static createPlacementRecord({ building, tile, occupiedTiles, placedCount, now = Date.now() }) {
+  static createPlacementRecord({ building, tile, occupiedTiles, placedCount, episodeId = null, now = Date.now() }) {
     return {
       id: `${building.id}-${now}-${placedCount}`,
       building,
       position: { x: tile.x, y: tile.y },
       occupiedTiles,
       delta: building.effect,
+      episodeId,
     };
   }
 
-  static commitPlacement({ registry, building, tile, occupiedTiles, placedBuildings, now = Date.now() }) {
+  static commitPlacement({ registry, building, tile, occupiedTiles, placedBuildings, episodeId = null, now = Date.now() }) {
     const before = registry.get(REGISTRY_KEYS.gameState);
     const result = PlacementResultManager.createPlacementResult({ building, tile, occupiedTiles, before });
     const record = PlacementResultManager.createPlacementRecord({
@@ -34,6 +35,7 @@ export default class PlacementResultManager {
       tile,
       occupiedTiles,
       placedCount: placedBuildings.length,
+      episodeId,
       now,
     });
     const nextPlacedBuildings = [...placedBuildings, record];

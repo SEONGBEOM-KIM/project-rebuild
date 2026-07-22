@@ -26,7 +26,7 @@ export default class PlacementActionManager {
     };
   }
 
-  static place({ registry, tile, placementSystem, building, placedBuildings }) {
+  static place({ registry, tile, placementSystem, building, placedBuildings, episodeId = null }) {
     const preview = PlacementActionManager.previewPlacement({ tile, placementSystem, building });
 
     if (preview.status === PLACEMENT_ACTION_STATUS.MISSING_TILE || preview.status === PLACEMENT_ACTION_STATUS.INVALID) {
@@ -40,6 +40,7 @@ export default class PlacementActionManager {
       tile,
       occupiedTiles,
       placedBuildings,
+      episodeId,
     });
 
     return {

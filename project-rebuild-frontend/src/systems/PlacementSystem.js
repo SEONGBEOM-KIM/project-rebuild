@@ -122,6 +122,27 @@ export default class PlacementSystem {
     return occupiedTiles;
   }
 
+  restorePlacedBuildings(placedBuildings = []) {
+    for (const record of placedBuildings) {
+      if (!record?.position || !record?.building) {
+        continue;
+      }
+      const occupiedTiles = record.occupiedTiles?.length
+        ? record.occupiedTiles
+        : this.getFootprintTiles(record.position.x, record.position.y, record.building.footprint);
+      for (const tile of occupiedTiles) {
+        if (tile.x < 0 || tile.y < 0 || tile.x >= this.mapData.width || tile.y >= this.mapData.height) {
+          continue;
+        }
+        this.occupied.add(this.getKey(tile.x, tile.y));
+        const mapTile = this.mapData.tiles[tile.y]?.[tile.x];
+        if (mapTile) {
+          mapTile.occupied = true;
+        }
+      }
+    }
+  }
+
   getTile(tileX, tileY) {
     return this.mapData.tiles[tileY]?.[tileX] ?? null;
   }

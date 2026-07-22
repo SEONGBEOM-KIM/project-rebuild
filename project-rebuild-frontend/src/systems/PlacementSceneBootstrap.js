@@ -71,6 +71,7 @@ export default class PlacementSceneBootstrap {
   }
 
   drawInitialWorld({ mapRenderer, mapGraphics, placementSystem, worldRenderer, placedBuildings }) {
+    placementSystem.restorePlacedBuildings(placedBuildings);
     mapRenderer.drawMap(mapGraphics, placementSystem.mapData);
     worldRenderer.restorePlacedBuildings(placedBuildings);
   }

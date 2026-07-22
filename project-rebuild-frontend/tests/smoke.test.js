@@ -3086,6 +3086,13 @@ function testPlacementRules() {
 
   placementSystem.place(1, 1, youthCenter);
   assert.equal(placementSystem.validatePlacement(1, 1, youthCenter).valid, false, 'occupied footprint should block later placement');
+  const restoredPlacementSystem = new PlacementSystem(PlacementSceneBootstrap.cloneMapData(mapData));
+  restoredPlacementSystem.restorePlacedBuildings([{
+    building: youthCenter,
+    position: { x: 1, y: 1 },
+    occupiedTiles: [],
+  }]);
+  assert.equal(restoredPlacementSystem.validatePlacement(1, 1, youthCenter).valid, false, 'restored facilities should block their occupied tiles');
 }
 
 
