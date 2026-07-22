@@ -81,7 +81,7 @@ export default class Ep4BriefingViewManager {
   static getControlLayout(centerX) {
     return {
       back: { x: centerX - 220, y: 1000, label: 'EP3 결과로 돌아가기', target: SCENE_KEYS.Ending, backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
-      next: { x: centerX + 220, y: 1000, label: 'EP5 해결 단계 예고', target: SCENE_KEYS.Ending, backgroundColor: '#bbf7d0', textColor: '#123524' },
+      next: { x: centerX + 220, y: 1000, label: '부작용 현황 확인', target: SCENE_KEYS.Ep4Investigation, backgroundColor: '#bbf7d0', textColor: '#123524' },
     };
   }
 

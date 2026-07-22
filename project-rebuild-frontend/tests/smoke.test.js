@@ -20,6 +20,8 @@ import Ep3PreviewViewManager from '../src/systems/Ep3PreviewViewManager.js';
 import Ep3PreviewRenderer from '../src/systems/Ep3PreviewRenderer.js';
 import Ep4BriefingViewManager from '../src/systems/Ep4BriefingViewManager.js';
 import Ep4BriefingRenderer from '../src/systems/Ep4BriefingRenderer.js';
+import Ep4InvestigationViewManager from '../src/systems/Ep4InvestigationViewManager.js';
+import Ep4InvestigationRenderer from '../src/systems/Ep4InvestigationRenderer.js';
 import LearningProgress from '../src/systems/LearningProgress.js';
 import WorldStateManager from '../src/systems/WorldStateManager.js';
 import EpisodePlacementLaunchManager from '../src/systems/EpisodePlacementLaunchManager.js';
@@ -3381,7 +3383,7 @@ function testEp4Briefing() {
   assert.match(Ep4BriefingViewManager.formatRiskPriority(sortedRisks[0]), /가장 두드러진 문제/);
   assert.match(Ep4BriefingViewManager.formatRiskBody(sortedRisks[0]), /다음 관찰:/);
   assert.match(Ep4BriefingViewManager.formatLearningBody(EP4_MISSION_BRIEFING), /학습 목표:/);
-  assert.equal(Ep4BriefingViewManager.getControlLayout(960).next.target, 'EndingScene');
+  assert.equal(Ep4BriefingViewManager.getControlLayout(960).next.target, 'Ep4InvestigationScene');
 
   const introFixture = createRendererSceneSpy();
   Ep4BriefingRenderer.renderIntroPanel(introFixture.scene, EP4_MISSION_BRIEFING);
@@ -3392,6 +3394,20 @@ function testEp4Briefing() {
   Ep4BriefingRenderer.renderRiskCard(riskFixture.scene, sortedRisks[0], 0);
   assert.ok(riskFixture.calls.some((call) => call[0] === 'text' && call[3] === sortedRisks[0].title));
   assert.ok(riskFixture.calls.some((call) => call[0] === 'text' && call[3].includes('가장 두드러진 문제')));
+
+  assert.match(Ep4InvestigationViewManager.formatProgress(0, 3), /0\/3/);
+  assert.match(Ep4InvestigationViewManager.formatProgress(3, 3), /모두 확인/);
+  assert.equal(Ep4InvestigationViewManager.formatCardStatus(sortedRisks[0], true), '✓ 관찰 완료');
+  assert.match(Ep4InvestigationViewManager.formatDetail(sortedRisks[0]), /다음 관찰/);
+  assert.equal(Ep4InvestigationViewManager.getNextButtonStyle(false).backgroundColor, '#64748b');
+  assert.equal(Ep4InvestigationViewManager.getNextButtonStyle(true).backgroundColor, '#bbf7d0');
+
+  const investigationFixture = createRendererSceneSpy();
+  const investigationCard = Ep4InvestigationRenderer.renderRiskCard(
+    investigationFixture.scene, sortedRisks[0], 0, true, true, () => {},
+  );
+  assert.equal(investigationCard.background.type, 'rectangle');
+  assert.ok(investigationFixture.calls.some((call) => call[0] === 'text' && call[3] === '✓ 관찰 완료'));
 }
 
 function testEp2BriefingRenderer() {
