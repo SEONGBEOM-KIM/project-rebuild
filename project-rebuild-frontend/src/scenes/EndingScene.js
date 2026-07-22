@@ -8,6 +8,8 @@ import EndingSummaryViewManager from '../systems/EndingSummaryViewManager.js';
 import EndingSummaryRenderer from '../systems/EndingSummaryRenderer.js';
 import EpisodeFlowManager from '../systems/EpisodeFlowManager.js';
 import EpisodeActivityFlowManager from '../systems/EpisodeActivityFlowManager.js';
+import WorldStateManager from '../systems/WorldStateManager.js';
+import { EPISODE_IDS } from '../data/episodes.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
@@ -25,6 +27,7 @@ export default class EndingScene extends Phaser.Scene {
     const exploredPlaces = this.registry.get(REGISTRY_KEYS.exploredPlaces) ?? [];
     const quizResult = this.registry.get(REGISTRY_KEYS.quizResult);
     const reflectionChoice = this.registry.get(REGISTRY_KEYS.reflectionChoice);
+    const worldState = WorldStateManager.get(this.registry);
     const learningProgress = LearningProgress.update(this.registry, { completed: true });
     const selectedStrategy = EpisodeFlowManager.resolveSelectedStrategy({ registry: this.registry, learningProgress, selectedPolicy });
     const { placementConfig, evaluationProfile } = PlacementContextManager.resolve({
@@ -51,7 +54,11 @@ export default class EndingScene extends Phaser.Scene {
     EndingSummaryRenderer.renderPanel(this, panels.state, EndingSummaryManager.formatStateSummary(
       gameState, ending, placementConfig.stateKeys, evaluationProfile, placedBuildings, placementConfig.episodeId,
     ));
-    EndingSummaryRenderer.renderNextMissionPanel(this, panels.nextMission, EpisodeFlowManager.getNextDevelopmentGoals({ registry: this.registry, learningProgress, placementConfig }));
+    if (placementConfig.episodeId === EPISODE_IDS.BalancedSolutions) {
+      EndingSummaryRenderer.renderEpisodeJourneyPanel(this, panels.journey, EndingSummaryManager.formatEpisodeJourney(worldState));
+    } else {
+      EndingSummaryRenderer.renderNextMissionPanel(this, panels.nextMission, EpisodeFlowManager.getNextDevelopmentGoals({ registry: this.registry, learningProgress, placementConfig }));
+    }
     EndingSummaryRenderer.renderLearningRecordStrip(
       this,
       width / 2,

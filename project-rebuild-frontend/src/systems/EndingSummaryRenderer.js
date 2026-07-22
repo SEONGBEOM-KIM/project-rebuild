@@ -53,4 +53,18 @@ export default class EndingSummaryRenderer {
       style: EndingSummaryViewManager.getNextMissionBodyStyle(panel),
     });
   }
+
+  static renderEpisodeJourneyPanel(scene, panel, journeyRows) {
+    const panelStyle = EndingSummaryViewManager.getNextMissionStyle();
+    const textStyles = EndingSummaryViewManager.getTextStyles();
+    createPanelBackground(scene, panel, panelStyle);
+    const titlePosition = EndingSummaryViewManager.getPanelTitlePosition(panel);
+    createPanelTitle(scene, titlePosition, textStyles.nextMissionTitle, { text: panel.title, origin: 0.5 });
+
+    const bodyPosition = EndingSummaryViewManager.getPanelBodyPosition(panel, 32, 108);
+    return createLayoutText(scene, bodyPosition, {
+      text: journeyRows.join('\n\n'),
+      style: EndingSummaryViewManager.getNextMissionBodyStyle(panel),
+    });
+  }
 }

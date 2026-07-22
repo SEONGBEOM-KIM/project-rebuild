@@ -116,6 +116,7 @@ export default class EndingSummaryViewManager {
       choice: { x: 430, y: 470, width: 600, height: 500, title: '오늘의 선택 요약' },
       state: { x: 1110, y: 470, width: 600, height: 500, title: '지역 상태 요약' },
       nextMission: { x: 1585, y: 470, width: 360, height: 500, title: nextEpisode ? `다음: ${nextEpisode.shortTitle}` : '프로젝트 마무리' },
+      journey: { x: 1585, y: 470, width: 360, height: 500, title: '푸른군 여정' },
     };
   }
 

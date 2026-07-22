@@ -3282,6 +3282,11 @@ function testEndingSummaryRenderer() {
   assert.ok(missionFixture.calls.some((call) => call[0] === 'text' && call[3] === panels.nextMission.title));
   assert.ok(missionFixture.calls.some((call) => call[0] === 'text' && call[3] === EP1_NEXT_DEVELOPMENT_GOALS.join('\n')));
 
+  const journeyFixture = createRendererSceneSpy();
+  EndingSummaryRenderer.renderEpisodeJourneyPanel(journeyFixture.scene, panels.journey, ['EP2 회복', 'EP3 성장']);
+  assert.ok(journeyFixture.calls.some((call) => call[0] === 'text' && call[3] === '푸른군 여정'));
+  assert.ok(journeyFixture.calls.some((call) => call[0] === 'text' && call[3] === 'EP2 회복\n\nEP3 성장'));
+
   const recordFixture = createRendererSceneSpy();
   EndingSummaryRenderer.renderLearningRecordStrip(recordFixture.scene, 960, ['탐색: 3/5곳 확인']);
   assert.ok(recordFixture.calls.some((call) => call[0] === 'text' && call[3] === '학습 기록'));
@@ -3307,6 +3312,7 @@ function testEndingSummaryViewManager() {
   const panels = EndingSummaryViewManager.getPanelLayout();
   assert.equal(panels.choice.title, '오늘의 선택 요약');
   assert.equal(panels.nextMission.width, 360);
+  assert.equal(panels.journey.title, '푸른군 여정');
   assert.equal(EndingSummaryViewManager.getPanelLayout(EPISODE_IDS.PopulationRecovery).nextMission.title, '다음: EP3. 경제 성장');
   assert.equal(EndingSummaryViewManager.getPanelLayout(EPISODE_IDS.BalancedSolutions).nextMission.title, '프로젝트 마무리');
   assert.deepEqual(EndingSummaryViewManager.getTakeawayLayout(960).title, { x: 170, y: 178, text: '학습 결론' });
@@ -3704,6 +3710,30 @@ function testEndingSummaryManager() {
   assert.match(EndingSummaryManager.formatStateSummary(finalState, ending), /최종 상태:/);
   assert.match(EndingSummaryManager.formatStateSummary(finalState, ending), /큰 부작용 신호 없음/);
   assert.match(EndingSummaryManager.formatReflectionNextAction(null), /아직 기록하지 않음/);
+  const journeyRows = EndingSummaryManager.formatEpisodeJourney({
+    placements: [{ episodeId: EPISODE_IDS.PopulationRecovery }],
+    episodeRuns: {
+      [EPISODE_IDS.EconomyGrowth]: {
+        metadata: { selectedStrategyId: 'logistics_growth_hub' },
+        startGameState: GameState.createInitialState(),
+        endGameState: { ...GameState.createInitialState(), economy: 75, traffic: 16, pollution: 14, inequality: 38 },
+      },
+      [EPISODE_IDS.SideEffects]: {
+        metadata: { riskSummary: { primaryRisk: { title: '소득 격차' } } },
+      },
+      [EPISODE_IDS.BalancedSolutions]: {
+        metadata: { selectedSolutionPlanId: 'inclusive_local_benefits' },
+      },
+    },
+  });
+  assert.equal(journeyRows.length, 4);
+  assert.match(journeyRows[0], /EP2 회복: 생활 기반 시설 1개/);
+  assert.match(journeyRows[1], /유통 성장 거점/);
+  assert.match(journeyRows[2], /소득 격차/);
+  assert.match(journeyRows[3], /생활 혜택 공유 계획/);
+  const endingSceneSource = readProjectFile('src', 'scenes', 'EndingScene.js');
+  assert.match(endingSceneSource, /renderEpisodeJourneyPanel/, 'EP5 ending should render the connected episode journey');
+  assert.match(endingSceneSource, /formatEpisodeJourney/, 'EP5 ending should summarize persisted episode records');
 
   const progress = {
     ...LearningProgress.createInitialProgress(),
