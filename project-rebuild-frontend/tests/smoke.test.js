@@ -31,6 +31,7 @@ import LearningProgress from '../src/systems/LearningProgress.js';
 import WorldStateManager from '../src/systems/WorldStateManager.js';
 import EpisodePlacementLaunchManager from '../src/systems/EpisodePlacementLaunchManager.js';
 import EpisodeFlowManager from '../src/systems/EpisodeFlowManager.js';
+import EpisodeActivityFlowManager from '../src/systems/EpisodeActivityFlowManager.js';
 import CauseQuizManager from '../src/systems/CauseQuizManager.js';
 import CauseQuizViewManager from '../src/systems/CauseQuizViewManager.js';
 import CauseQuizPanelRenderer from '../src/systems/CauseQuizPanelRenderer.js';
@@ -102,6 +103,7 @@ import { DEFAULT_PLACEMENT_CONFIG_ID, ENVIRONMENT_PLACEMENT_CONFIG_ID, EP3_ECONO
 import { DEFAULT_EVALUATION_PROFILE_ID, ENVIRONMENT_EVALUATION_PROFILE_ID, ISSUE_THRESHOLDS, REACTION_THRESHOLDS, RESULT_THRESHOLDS, SCORE_RULES, evaluationProfiles, getEvaluationProfile } from '../src/data/evaluationRules.js';
 import { API_CONTRACT, formatContractRequest, formatContractResponse } from '../src/data/apiContract.js';
 import { CURRENT_EPISODE, CURRENT_PLACEMENT_EPISODE, EPISODE_IDS, EPISODES, EPISODE_STEPS, getEpisode, getEpisodeStep } from '../src/data/episodes.js';
+import { EPISODE_ACTIVITY_FLOWS, getEpisodeActivityFlow } from '../src/data/episodeActivityFlows.js';
 import { EPISODE_TRANSITIONS, getEpisodeTransition } from '../src/data/episodeTransitions.js';
 import SCENE_KEYS from '../src/data/sceneKeys.js';
 import { REGISTRY_KEYS } from '../src/data/registryKeys.js';
@@ -1368,6 +1370,11 @@ function testEpisodeContent() {
   assert.equal(getEpisodeTransition(EPISODE_IDS.EconomyGrowth).nextScene, SCENE_KEYS.Ep3Preview);
   assert.equal(getEpisodeTransition(EPISODE_IDS.SideEffects).nextScene, SCENE_KEYS.Ep4Briefing);
   assert.equal(getEpisodeTransition('missing_episode'), null);
+  assert.equal(getEpisodeActivityFlow(EPISODE_IDS.PopulationRecovery), EPISODE_ACTIVITY_FLOWS[EPISODE_IDS.PopulationRecovery]);
+  assert.equal(EpisodeActivityFlowManager.getNextEpisodeId(EPISODE_IDS.PopulationRecovery), EPISODE_IDS.EconomyGrowth);
+  assert.equal(EpisodeActivityFlowManager.getNextEpisodeId(EPISODE_IDS.BalancedSolutions), null);
+  assert.equal(EpisodeActivityFlowManager.formatActivityRows(EPISODE_IDS.EconomyGrowth).length, 3);
+  assert.match(EpisodeActivityFlowManager.formatActivityRows(EPISODE_IDS.SideEffects)[1], /문제 비교/);
 
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.Crisis].dataCards, EP1_DATA_CARDS, 'EP1 data cards should be addressable through episode content registry');
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.PopulationRecovery].missionBriefing, EP2_MISSION_BRIEFING, 'EP2 mission briefing should be addressable through episode content registry');

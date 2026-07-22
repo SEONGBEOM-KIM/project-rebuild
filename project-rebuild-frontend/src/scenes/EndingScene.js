@@ -7,7 +7,7 @@ import EndingSummaryManager from '../systems/EndingSummaryManager.js';
 import EndingSummaryViewManager from '../systems/EndingSummaryViewManager.js';
 import EndingSummaryRenderer from '../systems/EndingSummaryRenderer.js';
 import EpisodeFlowManager from '../systems/EpisodeFlowManager.js';
-import { getEpisodeContent } from '../data/episodeContent.js';
+import EpisodeActivityFlowManager from '../systems/EpisodeActivityFlowManager.js';
 import { createTextButton } from '../ui/TextButton.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
@@ -66,7 +66,7 @@ export default class EndingScene extends Phaser.Scene {
     Object.entries(controls).forEach(([key, control]) => {
       const button = createTextButton(this, control, EndingSummaryViewManager.getButtonStyle());
       button.on('pointerdown', () => {
-        const nextEpisodeId = getEpisodeContent(placementEpisodeId).nextEpisodeId;
+        const nextEpisodeId = EpisodeActivityFlowManager.getNextEpisodeId(placementEpisodeId);
         if (key === 'next' && nextEpisodeId) {
           this.scene.start(control.target, { episodeId: nextEpisodeId });
           return;
