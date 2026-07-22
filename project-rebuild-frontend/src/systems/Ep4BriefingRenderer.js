@@ -4,14 +4,14 @@ import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js'
 import { createTextButton } from '../ui/TextButton.js';
 
 export default class Ep4BriefingRenderer {
-  static renderIntroPanel(scene, briefing) {
+  static renderIntroPanel(scene, briefing, growthRecord = null) {
     const layout = Ep4BriefingViewManager.getIntroPanelLayout();
     const style = Ep4BriefingViewManager.getPanelStyle();
     createPanelBackground(scene, layout.panel, style);
     createPanelTitle(scene, layout.title, style);
     return createLayoutText(scene, layout.body, {
-      text: Ep4BriefingViewManager.formatIntroText(briefing),
-      style: { fontSize: style.bodyFontSize, color: style.bodyColor, lineSpacing: style.bodyLineSpacing, wordWrap: { width: layout.body.wordWrapWidth } },
+      text: [Ep4BriefingViewManager.formatIntroText(briefing), growthRecord].filter(Boolean).join('\n\n'),
+      style: { fontSize: '18px', color: style.bodyColor, lineSpacing: style.bodyLineSpacing, wordWrap: { width: layout.body.wordWrapWidth } },
     });
   }
 

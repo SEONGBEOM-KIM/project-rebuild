@@ -1939,6 +1939,7 @@ function testWorldStateManager() {
   const ep2Started = WorldStateManager.startEpisode(worldState, EPISODE_IDS.PopulationRecovery);
   assert.equal(ep2Started.activeEpisodeId, EPISODE_IDS.PopulationRecovery);
   assert.deepEqual(ep2Started.episodeRuns[EPISODE_IDS.PopulationRecovery].placementIds, []);
+  assert.deepEqual(ep2Started.episodeRuns[EPISODE_IDS.PopulationRecovery].startGameState, GameState.createInitialState());
 
   const placement = {
     id: 'youth_center-1-0',
@@ -1968,6 +1969,7 @@ function testWorldStateManager() {
   });
   assert.deepEqual(completed.completedEpisodeIds, [EPISODE_IDS.PopulationRecovery]);
   assert.equal(completed.episodeRuns[EPISODE_IDS.PopulationRecovery].completed, true);
+  assert.equal(completed.episodeRuns[EPISODE_IDS.PopulationRecovery].endGameState.population, 1080);
   assert.equal(completed.gameState.population, 1080);
   const repeatedCompletion = WorldStateManager.completeEpisode(completed, EPISODE_IDS.PopulationRecovery, {
     placements: [placement],
@@ -1981,6 +1983,21 @@ function testWorldStateManager() {
   const cumulativeSeed = WorldStateManager.buildPlacementSeed(completed, { cumulative: true });
   assert.equal(cumulativeSeed.gameState.population, 1080);
   assert.equal(cumulativeSeed.placedBuildings[0].id, 'youth_center-1-0');
+
+  const ep3Started = WorldStateManager.setEpisodeRunMetadata(
+    WorldStateManager.startEpisode(completed, EPISODE_IDS.EconomyGrowth),
+    EPISODE_IDS.EconomyGrowth,
+    { selectedStrategyId: 'logistics_growth_hub' },
+  );
+  const ep3Completed = WorldStateManager.completeEpisode(ep3Started, EPISODE_IDS.EconomyGrowth, {
+    gameState: { ...completed.gameState, economy: 76, traffic: 17, pollution: 14, inequality: 39 },
+    placements: [{ id: 'logistics_center-2-0', buildingId: 'logistics_center' }],
+  });
+  const ep3Summary = WorldStateManager.getEpisodeRunSummary(ep3Completed, EPISODE_IDS.EconomyGrowth, ['economy', 'traffic', 'pollution', 'inequality']);
+  assert.equal(ep3Summary.metadata.selectedStrategyId, 'logistics_growth_hub');
+  assert.equal(ep3Summary.changes.economy, 26);
+  assert.equal(ep3Summary.changes.traffic, 7);
+  assert.deepEqual(ep3Summary.placements.map((record) => record.buildingId), ['logistics_center']);
 
   WorldStateManager.set(registry, completed);
   assert.equal(registry.get(REGISTRY_KEYS.worldState).regionName, '푸른군');
@@ -2014,6 +2031,7 @@ function testEpisodePlacementLaunchManager() {
   assert.equal(carriedContext.worldState.activeEpisodeId, EPISODE_IDS.EconomyGrowth);
   assert.equal(carriedContext.progressPatch.placementConfigId, EP3_ECONOMY_PLACEMENT_CONFIG_ID);
   assert.equal(carriedContext.progressPatch.selectedStrategyId, EP3_MISSION_BRIEFING.strategies[0].id);
+  assert.equal(carriedContext.worldState.episodeRuns[EPISODE_IDS.EconomyGrowth].metadata.selectedStrategyId, EP3_MISSION_BRIEFING.strategies[0].id);
 
   const selectedEp3Strategy = EP3_MISSION_BRIEFING.strategies[2];
   const selectedContext = EpisodePlacementLaunchManager.buildEp3EconomyLaunchContext({
@@ -3447,11 +3465,23 @@ function testEp4Briefing() {
   assert.match(Ep4BriefingViewManager.formatRiskBody(sortedRisks[0]), /다음 관찰:/);
   assert.match(Ep4BriefingViewManager.formatLearningBody(EP4_MISSION_BRIEFING), /학습 목표:/);
   assert.equal(Ep4BriefingViewManager.getControlLayout(960).next.target, 'Ep4InvestigationScene');
+  assert.match(Ep4BriefingViewManager.formatGrowthRecord({
+    strategy: EP3_MISSION_BRIEFING.strategies[2],
+    summary: {
+      completed: true,
+      placements: [{ buildingName: '물류 센터' }],
+      startGameState: GameState.createInitialState(),
+      endGameState: { ...GameState.createInitialState(), economy: 75, traffic: 16, pollution: 14, inequality: 38 },
+    },
+  }), /EP3 선택: 유통 성장 거점/);
 
   const introFixture = createRendererSceneSpy();
   Ep4BriefingRenderer.renderIntroPanel(introFixture.scene, EP4_MISSION_BRIEFING);
   assert.ok(introFixture.calls.some((call) => call[0] === 'text' && call[3] === '성장 이후의 푸른군'));
   assert.ok(introFixture.calls.some((call) => call[0] === 'text' && call[3].includes('경제 성장으로')));
+  const ep4SceneSource = readProjectFile('src', 'scenes', 'Ep4BriefingScene.js');
+  assert.match(ep4SceneSource, /getEpisodeRunSummary/, 'EP4 should read the completed EP3 growth record');
+  assert.match(ep4SceneSource, /formatGrowthRecord/, 'EP4 should render a visible growth record before analysing risks');
 
   const riskFixture = createRendererSceneSpy();
   Ep4BriefingRenderer.renderRiskCard(riskFixture.scene, sortedRisks[0], 0);

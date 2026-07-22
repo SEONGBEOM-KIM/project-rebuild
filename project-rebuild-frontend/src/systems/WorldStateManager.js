@@ -34,6 +34,9 @@ function cloneEpisodeRuns(episodeRuns = {}) {
       {
         ...run,
         placementIds: [...(run.placementIds ?? [])],
+        startGameState: run.startGameState ? cloneGameState(run.startGameState) : null,
+        endGameState: run.endGameState ? cloneGameState(run.endGameState) : null,
+        metadata: run.metadata ? { ...run.metadata } : {},
       },
     ]),
   );
@@ -83,6 +86,24 @@ export default class WorldStateManager {
           ...(normalized.episodeRuns[episodeId] ?? {}),
           started: true,
           placementIds: normalized.episodeRuns[episodeId]?.placementIds ?? [],
+          startGameState: normalized.episodeRuns[episodeId]?.startGameState ?? cloneGameState(normalized.gameState),
+        },
+      },
+    });
+  }
+
+  static setEpisodeRunMetadata(worldState, episodeId, metadata = {}) {
+    const normalized = normalizeWorldState(worldState);
+    return normalizeWorldState({
+      ...normalized,
+      episodeRuns: {
+        ...normalized.episodeRuns,
+        [episodeId]: {
+          ...(normalized.episodeRuns[episodeId] ?? {}),
+          metadata: {
+            ...(normalized.episodeRuns[episodeId]?.metadata ?? {}),
+            ...metadata,
+          },
         },
       },
     });
@@ -137,9 +158,39 @@ export default class WorldStateManager {
           ...(withPlacements.episodeRuns[episodeId] ?? {}),
           started: true,
           completed: true,
+          endGameState: gameState ? cloneGameState(gameState) : withPlacements.episodeRuns[episodeId]?.endGameState ?? null,
         },
       },
     });
+  }
+
+  static getEpisodeRunSummary(worldState, episodeId, stateKeys = []) {
+    const normalized = normalizeWorldState(worldState);
+    const run = normalized.episodeRuns[episodeId] ?? null;
+    if (!run) {
+      return null;
+    }
+
+    const startGameState = run.startGameState ? cloneGameState(run.startGameState) : null;
+    const endGameState = run.endGameState ? cloneGameState(run.endGameState) : null;
+    const changes = startGameState && endGameState
+      ? Object.fromEntries(stateKeys.map((key) => [key, (endGameState[key] ?? 0) - (startGameState[key] ?? 0)]))
+      : {};
+    const placementIds = new Set(run.placementIds ?? []);
+    const placements = normalized.placements.filter((record) => (
+      record.episodeId === episodeId || (record.id && placementIds.has(record.id))
+    ));
+
+    return {
+      episodeId,
+      started: Boolean(run.started),
+      completed: Boolean(run.completed),
+      metadata: { ...(run.metadata ?? {}) },
+      startGameState,
+      endGameState,
+      changes,
+      placements,
+    };
   }
 
   static getPlacementBreakdown(placements = [], currentEpisodeId = null) {

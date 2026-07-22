@@ -1,4 +1,7 @@
 import SCENE_KEYS from '../data/sceneKeys.js';
+import StateHudManager from './StateHudManager.js';
+
+const GROWTH_RECORD_STATE_KEYS = ['economy', 'traffic', 'pollution', 'inequality'];
 
 const SCREEN_LAYOUT = {
   backgroundColor: 0x172554,
@@ -52,9 +55,9 @@ export default class Ep4BriefingViewManager {
 
   static getIntroPanelLayout() {
     return {
-      panel: { x: 960, y: 245, width: 1510, height: 150 },
-      title: { x: 250, y: 185, text: '성장 이후의 푸른군' },
-      body: { x: 250, y: 222, wordWrapWidth: 1380 },
+      panel: { x: 960, y: 260, width: 1510, height: 190 },
+      title: { x: 250, y: 180, text: '성장 이후의 푸른군' },
+      body: { x: 250, y: 215, wordWrapWidth: 1380 },
     };
   }
 
@@ -87,6 +90,30 @@ export default class Ep4BriefingViewManager {
 
   static formatIntroText(briefing) {
     return briefing.intro.join('\n');
+  }
+
+  static formatGrowthRecord({ strategy = null, summary = null } = {}) {
+    if (!summary?.completed) {
+      return 'EP3 성장 기록을 불러오는 중입니다. 경제 성장 선택과 시설 배치 결과를 확인합니다.';
+    }
+
+    const facilityNames = [...new Set(
+      (summary.placements ?? []).map((record) => record.building?.name ?? record.buildingName ?? record.buildingId).filter(Boolean),
+    )];
+    const facilityText = facilityNames.length
+      ? `새로 배치한 시설: ${facilityNames.slice(0, 3).join(' · ')}`
+      : '새로 배치한 시설 기록 없음';
+    const stateText = summary.startGameState && summary.endGameState
+      ? StateHudManager.buildItems(summary.endGameState, {
+        previousState: summary.startGameState,
+        stateKeys: GROWTH_RECORD_STATE_KEYS,
+      }).map((item) => `${item.icon} ${item.label} ${item.deltaText}`).join('  ')
+      : '상태 변화 기록 없음';
+
+    return [
+      `EP3 선택: ${strategy?.title ?? '성장 전략'} · ${strategy?.stateFocus ?? '지역 변화 관찰'}`,
+      `${facilityText}  |  성장 후 변화: ${stateText}`,
+    ].join('\n');
   }
 
   static sortRisks(risks = []) {

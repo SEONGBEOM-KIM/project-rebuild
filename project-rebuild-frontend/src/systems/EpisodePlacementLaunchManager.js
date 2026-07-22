@@ -9,15 +9,20 @@ import WorldStateManager from './WorldStateManager.js';
 
 export default class EpisodePlacementLaunchManager {
   static buildEp3EconomyLaunchContext({ worldState = null, cumulative = true, selectedStrategy = null } = {}) {
-    const baseWorldState = WorldStateManager.startEpisode(
-      worldState ?? WorldStateManager.createInitialWorldState(),
-      EPISODE_IDS.EconomyGrowth,
-    );
-    const placementSeed = WorldStateManager.buildPlacementSeed(baseWorldState, { cumulative });
     const missionBriefing = getEpisodeContent(EPISODE_IDS.EconomyGrowth).missionBriefing;
     const resolvedStrategy = selectedStrategy ?? missionBriefing.strategies[0] ?? null;
     const selectedPolicy = economyPolicies.find((policy) => policy.id === resolvedStrategy?.policyId) ?? economyPolicies[0];
     const placementConfigId = getPlacementConfigIdForStrategy(resolvedStrategy) ?? EP3_ECONOMY_PLACEMENT_CONFIG_ID;
+    const startedWorldState = WorldStateManager.startEpisode(
+      worldState ?? WorldStateManager.createInitialWorldState(),
+      EPISODE_IDS.EconomyGrowth,
+    );
+    const baseWorldState = WorldStateManager.setEpisodeRunMetadata(startedWorldState, EPISODE_IDS.EconomyGrowth, {
+      selectedStrategyId: resolvedStrategy?.id ?? null,
+      selectedPolicyId: selectedPolicy.id,
+      placementConfigId,
+    });
+    const placementSeed = WorldStateManager.buildPlacementSeed(baseWorldState, { cumulative });
 
     return {
       episodeId: EPISODE_IDS.EconomyGrowth,

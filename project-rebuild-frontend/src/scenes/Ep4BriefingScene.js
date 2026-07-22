@@ -8,6 +8,7 @@ import ProgressStepper from '../ui/ProgressStepper.js';
 import IndustrializationRiskManager from '../systems/IndustrializationRiskManager.js';
 import Ep4BriefingViewManager from '../systems/Ep4BriefingViewManager.js';
 import Ep4BriefingRenderer from '../systems/Ep4BriefingRenderer.js';
+import WorldStateManager from '../systems/WorldStateManager.js';
 
 export default class Ep4BriefingScene extends Phaser.Scene {
   constructor() {
@@ -17,6 +18,14 @@ export default class Ep4BriefingScene extends Phaser.Scene {
   create() {
     const { width } = this.scale;
     const briefing = getEpisodeContent(EPISODE_IDS.SideEffects).missionBriefing;
+    const economyBriefing = getEpisodeContent(EPISODE_IDS.EconomyGrowth).missionBriefing;
+    const worldState = WorldStateManager.get(this.registry);
+    const growthSummary = WorldStateManager.getEpisodeRunSummary(worldState, EPISODE_IDS.EconomyGrowth, [
+      'economy', 'traffic', 'pollution', 'inequality',
+    ]);
+    const selectedGrowthStrategy = economyBriefing.strategies.find(
+      (strategy) => strategy.id === growthSummary?.metadata?.selectedStrategyId,
+    ) ?? null;
     const risks = IndustrializationRiskManager.detect({
       gameState: this.registry.get(REGISTRY_KEYS.gameState),
       placedBuildings: this.registry.get(REGISTRY_KEYS.placedBuildings) ?? [],
@@ -28,7 +37,10 @@ export default class Ep4BriefingScene extends Phaser.Scene {
     ProgressStepper.render(this, layout.progressStep);
     createLayoutText(this, layout.title, { origin: 0.5 });
     createLayoutText(this, layout.subtitle, { origin: 0.5 });
-    Ep4BriefingRenderer.renderIntroPanel(this, briefing);
+    Ep4BriefingRenderer.renderIntroPanel(this, briefing, Ep4BriefingViewManager.formatGrowthRecord({
+      strategy: selectedGrowthStrategy,
+      summary: growthSummary,
+    }));
     Ep4BriefingViewManager.sortRisks(risks).forEach((risk, index) => Ep4BriefingRenderer.renderRiskCard(this, risk, index));
     Ep4BriefingRenderer.renderLearningPanel(this, briefing);
 
