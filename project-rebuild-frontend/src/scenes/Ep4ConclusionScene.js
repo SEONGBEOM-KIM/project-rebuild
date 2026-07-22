@@ -29,6 +29,6 @@ export default class Ep4ConclusionScene extends Phaser.Scene {
     Ep4ConclusionRenderer.renderNextPanel(this);
     const controls = Ep4ConclusionRenderer.renderControls(this, width / 2);
     controls.backButton.on('pointerdown', () => this.scene.start(controls.layout.back.target));
-    controls.nextButton.on('pointerdown', () => this.scene.start(controls.layout.next.target));
+    controls.nextButton.on('pointerdown', () => this.scene.start(controls.layout.next.target, { episodeId: EPISODE_IDS.BalancedSolutions }));
   }
 }

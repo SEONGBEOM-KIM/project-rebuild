@@ -9,6 +9,7 @@ import ExplorationScene from './scenes/ExplorationScene.js';
 import DataBriefingScene from './scenes/DataBriefingScene.js';
 import CauseQuizScene from './scenes/CauseQuizScene.js';
 import ProblemSummaryScene from './scenes/ProblemSummaryScene.js';
+import EpisodeTransitionScene from './scenes/EpisodeTransitionScene.js';
 import SelectionScene from './scenes/SelectionScene.js';
 import PlacementScene from './scenes/PlacementScene.js';
 import ResultScene from './scenes/ResultScene.js';
@@ -50,6 +51,7 @@ const config = {
     DataBriefingScene,
     CauseQuizScene,
     ProblemSummaryScene,
+    EpisodeTransitionScene,
     SelectionScene,
     PlacementScene,
     ResultScene,

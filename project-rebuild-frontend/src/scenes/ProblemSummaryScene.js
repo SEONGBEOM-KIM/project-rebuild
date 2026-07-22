@@ -6,6 +6,7 @@ import LearningProgress from '../systems/LearningProgress.js';
 import ProblemSummaryViewManager from '../systems/ProblemSummaryViewManager.js';
 import ProblemSummaryRenderer from '../systems/ProblemSummaryRenderer.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
+import { EPISODE_IDS } from '../data/episodes.js';
 
 import { getCurrentEpisodeContent } from '../data/episodeContent.js';
 import { createTextButton } from '../ui/TextButton.js';
@@ -63,7 +64,7 @@ export default class ProblemSummaryScene extends Phaser.Scene {
     const nextButton = createTextButton(this, layout.next, ProblemSummaryViewManager.getButtonStyle());
     nextButton.on('pointerdown', () => {
       LearningProgress.update(this.registry, { problemSummaryCompleted: true });
-      this.scene.start(layout.next.target);
+      this.scene.start(layout.next.target, { episodeId: EPISODE_IDS.PopulationRecovery });
     });
   }
 

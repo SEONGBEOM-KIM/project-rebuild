@@ -9,6 +9,7 @@ const SCENE_KEYS = Object.freeze({
   DataBriefing: 'DataBriefingScene',
   CauseQuiz: 'CauseQuizScene',
   ProblemSummary: 'ProblemSummaryScene',
+  EpisodeTransition: 'EpisodeTransitionScene',
   Ep2Briefing: 'Ep2BriefingScene',
   Ep3Preview: 'Ep3PreviewScene',
   Ep4Briefing: 'Ep4BriefingScene',

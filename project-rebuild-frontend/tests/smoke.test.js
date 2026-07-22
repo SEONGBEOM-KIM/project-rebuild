@@ -102,6 +102,7 @@ import { DEFAULT_PLACEMENT_CONFIG_ID, ENVIRONMENT_PLACEMENT_CONFIG_ID, EP3_ECONO
 import { DEFAULT_EVALUATION_PROFILE_ID, ENVIRONMENT_EVALUATION_PROFILE_ID, ISSUE_THRESHOLDS, REACTION_THRESHOLDS, RESULT_THRESHOLDS, SCORE_RULES, evaluationProfiles, getEvaluationProfile } from '../src/data/evaluationRules.js';
 import { API_CONTRACT, formatContractRequest, formatContractResponse } from '../src/data/apiContract.js';
 import { CURRENT_EPISODE, CURRENT_PLACEMENT_EPISODE, EPISODE_IDS, EPISODES, EPISODE_STEPS, getEpisode, getEpisodeStep } from '../src/data/episodes.js';
+import { EPISODE_TRANSITIONS, getEpisodeTransition } from '../src/data/episodeTransitions.js';
 import SCENE_KEYS from '../src/data/sceneKeys.js';
 import { REGISTRY_KEYS } from '../src/data/registryKeys.js';
 import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES, EP2_MISSION_BRIEFING, EP2_NEXT_DEVELOPMENT_GOALS, EP2_REFLECTION_CHOICES, EP3_MISSION_PREVIEW, EP3_MISSION_BRIEFING, EP3_NEXT_DEVELOPMENT_GOALS, EP3_REFLECTION_CHOICES, EP4_MISSION_BRIEFING, EP4_NEXT_DEVELOPMENT_GOALS, EP5_MISSION_PREVIEW, EPISODE_CONTENT, getCurrentEpisodeContent, getCurrentPlacementEpisodeContent, getCurrentPlacementMissionBriefing, getCurrentPlacementNextDevelopmentGoals, getEpisodeContent, getNextDevelopmentGoals, getNextEpisodeContent, getReflectionChoices } from '../src/data/episodeContent.js';
@@ -685,8 +686,8 @@ function testProblemSummaryViewManager() {
   assert.deepEqual(ProblemSummaryViewManager.getControlLayout().next, {
     x: 1180,
     y: 955,
-    label: 'EP2 전략 선택',
-    target: 'Ep2BriefingScene',
+    label: 'EP2 시작하기',
+    target: 'EpisodeTransitionScene',
     backgroundColor: '#bbf7d0',
     textColor: '#123524',
   });
@@ -1350,6 +1351,10 @@ function testEpisodeContent() {
   assert.ok(EP1_REFLECTION_CHOICES.every((choice) => choice.title && choice.icon && choice.description && Number.isFinite(choice.color)), 'reflection choices should have title/icon/description/color');
   assert.equal(EP2_REFLECTION_CHOICES.length, 4, 'EP2 should expose four reflection record choices');
   assert.ok(EP2_REFLECTION_CHOICES.every((choice) => choice.nextActionLabel === 'EP3 성장 관점'), 'EP2 reflection should prepare the fixed EP3 growth mission rather than choose its route');
+  assert.equal(getEpisodeTransition(EPISODE_IDS.PopulationRecovery), EPISODE_TRANSITIONS[EPISODE_IDS.PopulationRecovery]);
+  assert.equal(getEpisodeTransition(EPISODE_IDS.EconomyGrowth).nextScene, SCENE_KEYS.Ep3Preview);
+  assert.equal(getEpisodeTransition(EPISODE_IDS.SideEffects).nextScene, SCENE_KEYS.Ep4Briefing);
+  assert.equal(getEpisodeTransition('missing_episode'), null);
 
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.Crisis].dataCards, EP1_DATA_CARDS, 'EP1 data cards should be addressable through episode content registry');
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.PopulationRecovery].missionBriefing, EP2_MISSION_BRIEFING, 'EP2 mission briefing should be addressable through episode content registry');
@@ -3260,47 +3265,22 @@ function testEndingSummaryViewManager() {
   });
   assert.deepEqual(EndingSummaryViewManager.getLearningRecordLayout(960).title, { x: 170, y: 737, text: '학습 기록' });
   assert.deepEqual(EndingSummaryViewManager.getControlLayout(960).restart, {
-    x: 1740,
+    x: 1320,
     y: 955,
     label: '처음부터 다시',
     target: 'BootScene',
     backgroundColor: '#fca5a5',
     textColor: '#450a0a',
   });
-  assert.deepEqual(EndingSummaryViewManager.getControlLayout(960).ep2, {
-    x: 1130,
+  assert.deepEqual(EndingSummaryViewManager.getControlLayout(960, EPISODE_IDS.PopulationRecovery).next, {
+    x: 960,
     y: 955,
-    label: 'EP2 미션 보기',
-    target: 'Ep2BriefingScene',
-    backgroundColor: '#a7f3d0',
-    textColor: '#064e3b',
+    label: '다음 에피소드',
+    target: 'EpisodeTransitionScene',
+    backgroundColor: '#bbf7d0',
+    textColor: '#123524',
   });
-  assert.deepEqual(EndingSummaryViewManager.getControlLayout(960).ep3, {
-    x: 1440,
-    y: 955,
-    label: 'EP3 예고 보기',
-    target: 'Ep3PreviewScene',
-    backgroundColor: '#fde68a',
-    textColor: '#422006',
-  });
-  assert.deepEqual(EndingSummaryViewManager.getControlLayout(960, EPISODE_IDS.PopulationRecovery).ep2, {
-    x: 1130,
-    y: 955,
-    label: 'EP3 예고 보기',
-    target: 'Ep3PreviewScene',
-    backgroundColor: '#fde68a',
-    textColor: '#422006',
-  });
-  assert.equal(EndingSummaryViewManager.getControlLayout(960, EPISODE_IDS.PopulationRecovery).ep3.label, 'EP2 전략 다시 보기');
-  assert.deepEqual(EndingSummaryViewManager.getControlLayout(960, EPISODE_IDS.EconomyGrowth).ep2, {
-    x: 1130,
-    y: 955,
-    label: 'EP4 부작용 보기',
-    target: 'Ep4BriefingScene',
-    backgroundColor: '#fda4af',
-    textColor: '#4c0519',
-  });
-  assert.equal(EndingSummaryViewManager.getControlLayout(960).report.target, 'TeacherReportScene');
+  assert.equal(EndingSummaryViewManager.getControlLayout(960, EPISODE_IDS.BalancedSolutions).next.label, '학습 마무리');
 }
 
 
@@ -3459,7 +3439,7 @@ function testEp4Briefing() {
   assert.match(Ep4ConclusionViewManager.formatMainBody(sortedRisks), /소득 격차/);
   assert.match(Ep4ConclusionViewManager.formatMainBody(sortedRisks), /우선 해결 관점:/);
   assert.match(Ep4ConclusionViewManager.formatNextBody(), /지역 전체의 균형/);
-  assert.equal(Ep4ConclusionViewManager.getControlLayout(960).next.target, 'Ep5PreviewScene');
+  assert.equal(Ep4ConclusionViewManager.getControlLayout(960).next.target, 'EpisodeTransitionScene');
 
   const conclusionFixture = createRendererSceneSpy();
   Ep4ConclusionRenderer.renderMainPanel(conclusionFixture.scene, sortedRisks);
@@ -5242,6 +5222,7 @@ function testSharedUiComponentStyles() {
     fontSize: '20px',
     fontStyle: 'bold',
   });
+  assert.equal(ProgressStepper.render(), null, 'the provisional global progress bar should not render');
   assert.equal(getTextButtonColor(0xbbf7d0), '#bbf7d0');
   assert.equal(getTextButtonColor('#0f172a'), '#0f172a');
   assert.deepEqual(getLayoutTextStyle({

@@ -98,7 +98,7 @@ export default class ProblemSummaryViewManager {
   static getControlLayout() {
     return {
       back: { x: 750, y: 955, label: '원인 질문 다시 보기', target: SCENE_KEYS.CauseQuiz, backgroundColor: '#93c5fd', textColor: '#0f172a' },
-      next: { x: 1180, y: 955, label: 'EP2 전략 선택', target: SCENE_KEYS.Ep2Briefing, backgroundColor: '#bbf7d0', textColor: '#123524' },
+      next: { x: 1180, y: 955, label: 'EP2 시작하기', target: SCENE_KEYS.EpisodeTransition, backgroundColor: '#bbf7d0', textColor: '#123524' },
     };
   }
 

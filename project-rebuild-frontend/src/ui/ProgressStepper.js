@@ -63,39 +63,9 @@ export default class ProgressStepper {
     };
   }
 
-  static render(scene, activeKey, options = {}) {
-    const style = ProgressStepper.getStyle();
-    const activeIndex = EPISODE_STEPS.findIndex((step) => step.key === activeKey);
-    const x = options.x ?? scene.scale.width / 2;
-    const y = options.y ?? style.position.y;
-    const spacing = options.spacing ?? style.spacing;
-    const container = scene.add.container(x, y).setDepth(options.depth ?? style.depth).setScrollFactor(0);
-    const startX = -((EPISODE_STEPS.length - 1) * spacing) / 2;
-
-    EPISODE_STEPS.forEach((step, index) => {
-      const stepX = startX + index * spacing;
-      const visualState = ProgressStepper.getStepVisualState(index, activeIndex);
-
-      if (index > 0) {
-        container.add(scene.add.rectangle(
-          stepX - spacing / 2,
-          0,
-          spacing - style.line.widthOffset,
-          style.line.height,
-          visualState.lineColor,
-          style.line.alpha,
-        ));
-      }
-
-      container.add(scene.add.circle(stepX, 0, visualState.radius, visualState.circleColor, 1)
-        .setStrokeStyle(style.circle.strokeWidth, style.circle.strokeColor, visualState.strokeAlpha));
-      container.add(scene.add.text(stepX, style.label.y, step.label, {
-        fontSize: visualState.fontSize,
-        color: visualState.textColor,
-        fontStyle: visualState.fontStyle,
-      }).setOrigin(0.5));
-    });
-
-    return container;
+  static render(_scene, _activeKey, _options = {}) {
+    // Episode-specific step lists will replace this shared progress bar in a later UI pass.
+    // Keep callers stable while intentionally hiding the provisional global sequence.
+    return null;
   }
 }
