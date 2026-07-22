@@ -29,6 +29,18 @@ export default class IssueDetector {
       });
     }
 
+    if (gameState.inequality >= issueThresholds.inequalityMax) {
+      issues.push({
+        id: 'inequality',
+        title: '소득 격차 주의',
+        shortMessage: '성장 혜택의 지역 공유 필요',
+        message: '성장 효과가 주민 생활에 고르게 이어지도록 보완해야 합니다.',
+        cause: '일자리·상권·서비스 혜택이 일부 지역에 집중되면 생활 격차가 커질 수 있습니다.',
+        nextAction: '지역 일자리, 생활 서비스, 이동 접근성을 함께 높이는 선택을 검토합니다.',
+        color: 0xa78bfa,
+      });
+    }
+
     if (gameState.budget < issueThresholds.budgetMin) {
       issues.push({
         id: 'budget',

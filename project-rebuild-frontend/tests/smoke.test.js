@@ -1374,14 +1374,14 @@ function testEpisodeContent() {
 function testStateHudManager() {
   assert.equal(STATE_ICONS.population, '👥');
   const initial = GameState.createInitialState();
-  const updated = { ...initial, population: 1120, budget: 780, pollution: 6 };
-  const items = StateHudManager.buildItems(updated, { previousState: initial, stateKeys: ['population', 'budget', 'pollution'] });
+  const updated = { ...initial, population: 1120, budget: 780, pollution: 6, inequality: 25 };
+  const items = StateHudManager.buildItems(updated, { previousState: initial, stateKeys: ['population', 'budget', 'pollution', 'inequality'] });
 
-  assert.deepEqual(items.map((item) => item.key), ['population', 'budget', 'pollution']);
-  assert.deepEqual(items.map((item) => item.icon), ['👥', '💰', '☁️']);
-  assert.deepEqual(items.map((item) => item.deltaText), ['+120', '-220', '-4']);
-  assert.deepEqual(items.map((item) => item.trend), ['up', 'down', 'down']);
-  assert.deepEqual(items.map((item) => item.tone), ['positive', 'negative', 'positive']);
+  assert.deepEqual(items.map((item) => item.key), ['population', 'budget', 'pollution', 'inequality']);
+  assert.deepEqual(items.map((item) => item.icon), ['👥', '💰', '☁️', '⚖️']);
+  assert.deepEqual(items.map((item) => item.deltaText), ['+120', '-220', '-4', '-5']);
+  assert.deepEqual(items.map((item) => item.trend), ['up', 'down', 'down', 'down']);
+  assert.deepEqual(items.map((item) => item.tone), ['positive', 'negative', 'positive', 'positive']);
   assert.equal(StateHudManager.formatCompactText(updated, { stateKeys: ['population', 'budget'] }), '👥 인구 1120  💰 예산 780');
   assert.equal(StateHudManager.formatStackedText(updated, { stateKeys: ['population'] }), '현재 상태\n👥 인구: 1120');
 }
@@ -1392,6 +1392,7 @@ function testEvaluationRuleConstants() {
   assert.equal(ISSUE_THRESHOLDS.trafficMax, 12);
   assert.equal(ISSUE_THRESHOLDS.budgetMin, 500);
   assert.equal(ISSUE_THRESHOLDS.satisfactionMin, 70);
+  assert.equal(ISSUE_THRESHOLDS.inequalityMax, 45);
 
   assert.equal(RESULT_THRESHOLDS.populationImproved, 1100);
   assert.equal(RESULT_THRESHOLDS.economyImproved, 60);
@@ -1399,6 +1400,7 @@ function testEvaluationRuleConstants() {
   assert.equal(RESULT_THRESHOLDS.satisfactionBalanced, 70);
   assert.equal(RESULT_THRESHOLDS.satisfactionHigh, 75);
   assert.equal(RESULT_THRESHOLDS.budgetSafe, 500);
+  assert.equal(RESULT_THRESHOLDS.inequalityBalanced, 35);
   assert.equal(RESULT_THRESHOLDS.balancedScore, 75);
   assert.equal(RESULT_THRESHOLDS.recoveryScore, 60);
   assert.equal(RESULT_THRESHOLDS.balancedMinimumBuildingTypes, 2);
@@ -1421,6 +1423,7 @@ function testEvaluationRuleConstants() {
   const environmentProfile = getEvaluationProfile(ENVIRONMENT_EVALUATION_PROFILE_ID);
   assert.equal(environmentProfile.id, ENVIRONMENT_EVALUATION_PROFILE_ID);
   assert.equal(environmentProfile.issueThresholds.environmentMin, 75);
+  assert.equal(environmentProfile.issueThresholds.inequalityMax, 40);
   assert.equal(environmentProfile.resultThresholds.budgetSafe, 650);
   assert.equal(getEvaluationProfile('missing_profile').id, DEFAULT_EVALUATION_PROFILE_ID);
 }
@@ -1612,6 +1615,7 @@ function testEvaluationManager() {
     '• 환경 상태: 양호',
     '• 주민 만족도: 높아짐',
     '• 예산: 여유 있음',
+    '• 소득 격차: 안정적',
   ]);
   const strictJudgementProfile = {
     ...getEvaluationProfile(),
@@ -1622,6 +1626,7 @@ function testEvaluationManager() {
       environmentGood: 95,
       satisfactionHigh: 100,
       budgetSafe: 900,
+      inequalityBalanced: 20,
     },
   };
   assert.deepEqual(EvaluationManager.formatJudgementRows(finalState, strictJudgementProfile), [
@@ -1630,6 +1635,7 @@ function testEvaluationManager() {
     '• 환경 상태: 주의 필요',
     '• 주민 만족도: 추가 개선 필요',
     '• 예산: 주의 필요',
+    '• 소득 격차: 완화 필요',
   ]);
   const evaluationRows = EvaluationManager.formatEvaluationRows(evaluation, finalState, placedBuildings, youthPolicy);
   assert.match(evaluationRows, /선택 방향: 청년 생활 지원/);
@@ -1691,15 +1697,17 @@ function testSideEffectRenderer() {
       environmentMin: 90,
       trafficMax: 8,
       satisfactionMin: 90,
+      inequalityMax: 20,
     },
   };
   assert.deepEqual(
     IssueDetector.detect(GameState.createInitialState(), strictIssueProfile).map((issue) => issue.id),
-    ['environment', 'traffic', 'budget', 'satisfaction'],
+    ['environment', 'traffic', 'inequality', 'budget', 'satisfaction'],
   );
   assert.deepEqual(IssueDetector.formatRows(GameState.createInitialState(), '없음', strictIssueProfile), [
     '• 환경 주의: 환경 보전 대책 필요',
     '• 교통 불편: 이동 편의 개선 필요',
+    '• 소득 격차 주의: 성장 혜택의 지역 공유 필요',
     '• 예산 부족: 비용 균형 검토 필요',
     '• 만족도 보완: 생활 편의 개선 필요',
   ]);
@@ -1827,9 +1835,11 @@ function testGameStateAndIssues() {
   assert.equal(initial.population, 1000, 'initial state must stay immutable after applyEffect');
   assert.equal(next.population, 1080);
   assert.equal(next.budget, 400);
+  assert.equal(initial.inequality, 30);
 
   const issues = IssueDetector.detect(next).map((issue) => issue.id);
   assert.deepEqual(issues, ['budget', 'satisfaction']);
+  assert.deepEqual(IssueDetector.detect({ ...initial, satisfaction: 70, inequality: 46 }).map((issue) => issue.id), ['inequality']);
 }
 
 function testIndustrializationRiskManager() {
@@ -2061,6 +2071,7 @@ function testEconomyBuildingData() {
     assert.ok(building.balanceNote && building.balanceSummary, `${building.id} should explain its EP3 balancing tradeoff`);
     assert.equal(building.effect.budget, -building.cost, `${building.id} budget effect should match negative cost`);
     assert.ok((building.effect.economy ?? 0) > 0, `${building.id} should increase economy in EP3`);
+    assert.ok((building.effect.inequality ?? 0) > 0, `${building.id} should expose its growth-gap tradeoff in EP3`);
     assert.ok(Object.values(building.effect).every(Number.isFinite), `${building.id} effects should be numeric`);
   }
 
@@ -2095,7 +2106,7 @@ function testEpisodePlacementConfigs() {
   assert.equal(economyConfig.episodeId, EPISODE_IDS.EconomyGrowth);
   assert.equal(economyConfig.buildings, economyBuildings);
   assert.equal(economyConfig.requiredPlacements, 3);
-  assert.deepEqual(economyConfig.stateKeys, ['economy', 'population', 'budget', 'traffic', 'pollution', 'satisfaction']);
+  assert.deepEqual(economyConfig.stateKeys, ['economy', 'population', 'budget', 'traffic', 'pollution', 'satisfaction', 'inequality']);
   assert.equal(getDefaultPlacementConfigIdForEpisode(EPISODE_IDS.EconomyGrowth), EP3_ECONOMY_PLACEMENT_CONFIG_ID);
   const environmentConfig = getPlacementConfig(ENVIRONMENT_PLACEMENT_CONFIG_ID);
   assert.equal(environmentConfig.id, ENVIRONMENT_PLACEMENT_CONFIG_ID);
@@ -3459,7 +3470,8 @@ function testEp5PlacementSetup() {
   assert.equal(ep5Buildings.length, 4);
   assert.equal(ep5Policies.length, 3);
   assert.equal(getPlacementConfig(EP5_BALANCED_SOLUTIONS_CONFIG_ID).episodeId, EPISODE_IDS.BalancedSolutions);
-  assert.deepEqual(getPlacementConfig(EP5_BALANCED_SOLUTIONS_CONFIG_ID).stateKeys, ['traffic', 'environment', 'pollution', 'satisfaction', 'economy', 'budget']);
+  assert.deepEqual(getPlacementConfig(EP5_BALANCED_SOLUTIONS_CONFIG_ID).stateKeys, ['traffic', 'environment', 'pollution', 'inequality', 'satisfaction', 'economy', 'budget']);
+  assert.equal(ep5Buildings.find((building) => building.id === 'community_benefit_center').effect.inequality, -8);
   assert.equal(getDefaultPlacementConfigIdForEpisode(EPISODE_IDS.BalancedSolutions), EP5_BALANCED_SOLUTIONS_CONFIG_ID);
   assert.deepEqual(getPlacementConfigsForEpisode(EPISODE_IDS.BalancedSolutions).map((config) => config.id), [EP5_BALANCED_SOLUTIONS_CONFIG_ID]);
 

@@ -4,6 +4,7 @@ export const ISSUE_THRESHOLDS = Object.freeze({
   trafficMax: 12,
   budgetMin: 500,
   satisfactionMin: 70,
+  inequalityMax: 45,
 });
 
 export const RESULT_THRESHOLDS = Object.freeze({
@@ -13,6 +14,7 @@ export const RESULT_THRESHOLDS = Object.freeze({
   satisfactionBalanced: 70,
   satisfactionHigh: 75,
   budgetSafe: 500,
+  inequalityBalanced: 35,
   balancedScore: 75,
   recoveryScore: 60,
   balancedMinimumBuildingTypes: 2,
@@ -54,12 +56,14 @@ export const evaluationProfiles = Object.freeze({
       environmentMin: 75,
       pollutionMax: 10,
       budgetMin: 650,
+      inequalityMax: 40,
     }),
     resultThresholds: Object.freeze({
       ...RESULT_THRESHOLDS,
       environmentGood: 85,
       satisfactionBalanced: 75,
       budgetSafe: 650,
+      inequalityBalanced: 30,
     }),
     scoreRules: Object.freeze({
       ...SCORE_RULES,

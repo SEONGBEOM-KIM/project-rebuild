@@ -37,7 +37,7 @@ export default class StateHudManager {
       return 'neutral';
     }
 
-    const lowerIsBetter = key === 'pollution' || key === 'traffic';
+    const lowerIsBetter = key === 'pollution' || key === 'traffic' || key === 'inequality';
     const higherIsCost = key === 'budget' ? false : lowerIsBetter;
     if (higherIsCost) {
       return delta < 0 ? 'positive' : 'negative';

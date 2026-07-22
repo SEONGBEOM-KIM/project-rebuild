@@ -23,14 +23,15 @@ export default class EvaluationManager {
     const uniqueBuildingTypes = new Set(placedBuildings.map((record) => record.building.id)).size;
     const hasBalancedChoices = uniqueBuildingTypes >= resultThresholds.balancedMinimumBuildingTypes
       && gameState.environment >= resultThresholds.environmentGood
-      && gameState.satisfaction >= resultThresholds.satisfactionBalanced;
+      && gameState.satisfaction >= resultThresholds.satisfactionBalanced
+      && gameState.inequality <= resultThresholds.inequalityBalanced;
 
     if (hasBalancedChoices && score >= resultThresholds.balancedScore) {
       return {
         score,
         title: '균형 있는 회복 가능성이 보입니다',
         color: '#bbf7d0',
-        message: '여러 시설을 조합해 인구·생활 만족·환경을 함께 살펴보는 방향이 좋습니다.',
+        message: '여러 시설을 조합해 인구·생활 만족·환경·소득 격차를 함께 살펴보는 방향이 좋습니다.',
       };
     }
 
@@ -47,7 +48,7 @@ export default class EvaluationManager {
       score,
       title: '추가 조정이 필요한 계획입니다',
       color: '#fecaca',
-      message: '한두 지표만 높이는 선택보다 인구·경제·환경·만족도를 함께 고려해야 합니다.',
+      message: '한두 지표만 높이는 선택보다 인구·경제·환경·만족도·소득 격차를 함께 고려해야 합니다.',
     };
   }
 
@@ -73,6 +74,7 @@ export default class EvaluationManager {
       `• 환경 상태: ${gameState.environment >= resultThresholds.environmentGood ? '양호' : '주의 필요'}`,
       `• 주민 만족도: ${gameState.satisfaction >= resultThresholds.satisfactionHigh ? '높아짐' : '추가 개선 필요'}`,
       `• 예산: ${gameState.budget >= resultThresholds.budgetSafe ? '여유 있음' : '주의 필요'}`,
+      `• 소득 격차: ${gameState.inequality <= resultThresholds.inequalityBalanced ? '안정적' : '완화 필요'}`,
     ];
   }
 

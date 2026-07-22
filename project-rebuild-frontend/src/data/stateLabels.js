@@ -6,6 +6,7 @@ export const DEFAULT_STATE_KEYS = [
   'budget',
   'traffic',
   'pollution',
+  'inequality',
 ];
 
 export const STATE_LABELS = {
@@ -16,6 +17,7 @@ export const STATE_LABELS = {
   budget: '예산',
   traffic: '교통',
   pollution: '오염',
+  inequality: '소득 격차',
 };
 
 export const STATE_ICONS = {
@@ -26,6 +28,7 @@ export const STATE_ICONS = {
   budget: '💰',
   traffic: '🚌',
   pollution: '☁️',
+  inequality: '⚖️',
 };
 
 export function formatSignedValue(value) {

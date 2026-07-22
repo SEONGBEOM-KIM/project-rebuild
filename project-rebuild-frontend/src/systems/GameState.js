@@ -6,6 +6,7 @@ const INITIAL_STATE = Object.freeze({
   budget: 1000,
   traffic: 10,
   pollution: 10,
+  inequality: 30,
 });
 
 export default class GameState {

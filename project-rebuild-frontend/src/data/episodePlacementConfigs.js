@@ -27,6 +27,7 @@ export const episodePlacementConfigs = {
       'budget',
       'traffic',
       'pollution',
+      'inequality',
     ],
   },
   [ENVIRONMENT_PLACEMENT_CONFIG_ID]: {
@@ -59,6 +60,7 @@ export const episodePlacementConfigs = {
       'traffic',
       'pollution',
       'satisfaction',
+      'inequality',
     ],
   },
   [EP5_BALANCED_SOLUTIONS_CONFIG_ID]: {
@@ -69,7 +71,7 @@ export const episodePlacementConfigs = {
     buildings: ep5Buildings,
     requiredPlacements: 3,
     evaluationProfileId: ENVIRONMENT_EVALUATION_PROFILE_ID,
-    stateKeys: ['traffic', 'environment', 'pollution', 'satisfaction', 'economy', 'budget'],
+    stateKeys: ['traffic', 'environment', 'pollution', 'inequality', 'satisfaction', 'economy', 'budget'],
   },
 };
 

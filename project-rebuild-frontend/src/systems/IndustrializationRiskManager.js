@@ -77,13 +77,14 @@ export default class IndustrializationRiskManager {
   static createInequalityRisk(gameState, industrialCount) {
     const economyGain = gameState.economy - 50;
     const satisfactionGain = gameState.satisfaction - 60;
-    const level = industrialCount >= 2 && economyGain >= 50 && satisfactionGain <= 5
+    const inequality = gameState.inequality ?? 30;
+    const level = inequality >= 50 || (industrialCount >= 2 && economyGain >= 50 && satisfactionGain <= 5)
       ? 'high'
-      : industrialCount >= 1 && economyGain >= 25
+      : inequality >= 40 || (industrialCount >= 1 && economyGain >= 25)
         ? 'medium'
         : 'low';
     return IndustrializationRiskManager.createRisk({
-      id: 'inequality', level, color: 0xa78bfa, impact: Math.max(0, economyGain - Math.max(0, satisfactionGain)) + industrialCount * 2,
+      id: 'inequality', level, color: 0xa78bfa, impact: Math.max(0, economyGain - Math.max(0, satisfactionGain)) + industrialCount * 2 + Math.max(0, inequality - 25) * 2,
       title: '소득 격차',
       shortMessage: '성장 혜택이 주민에게 고르게 닿는지 점검',
       message: level === 'high' ? '경제 수치는 크게 올랐지만 생활 만족도 개선이 따라가지 못해 성장 혜택의 격차가 가장 두드러집니다.' : '산업화의 경제 효과가 모든 주민의 생활 개선으로 이어지는지 확인해야 합니다.',
