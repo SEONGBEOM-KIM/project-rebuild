@@ -1439,6 +1439,14 @@ function testResultViewManager() {
     ResultViewManager.formatContextSummary(getPlacementConfig(ENVIRONMENT_PLACEMENT_CONFIG_ID), getEvaluationProfile(ENVIRONMENT_EVALUATION_PROFILE_ID)),
     '푸른군 환경 균형 배치 실험  |  필요 배치: 2개  |  평가 기준: ep2_environment_focus',
   );
+  assert.match(
+    ResultViewManager.formatContextSummary(
+      getPlacementConfig(ENVIRONMENT_PLACEMENT_CONFIG_ID),
+      getEvaluationProfile(ENVIRONMENT_EVALUATION_PROFILE_ID),
+      { currentPlacementCount: 2, inheritedPlacementCount: 3, totalPlacementCount: 5 },
+    ),
+    /이번 배치: 2개 \| 이전 시설: 3개 \| 누적: 5개/,
+  );
   assert.deepEqual(ResultViewManager.getContextSummaryTextStyle(), {
     fontSize: '22px',
     color: '#c7d2fe',
@@ -1826,6 +1834,18 @@ function testWorldStateManager() {
   const withPlacements = WorldStateManager.appendPlacements(ep2Started, [placement]);
   assert.equal(withPlacements.placements[0].episodeId, EPISODE_IDS.PopulationRecovery);
   assert.deepEqual(withPlacements.episodeRuns[EPISODE_IDS.PopulationRecovery].placementIds, ['youth_center-1-0']);
+  assert.deepEqual(
+    WorldStateManager.getPlacementBreakdown([
+      ...withPlacements.placements,
+      { id: 'food_factory-2-0', episodeId: EPISODE_IDS.EconomyGrowth },
+    ], EPISODE_IDS.EconomyGrowth),
+    {
+      currentEpisodeId: EPISODE_IDS.EconomyGrowth,
+      currentPlacementCount: 1,
+      inheritedPlacementCount: 1,
+      totalPlacementCount: 2,
+    },
+  );
 
   const completed = WorldStateManager.completeEpisode(withPlacements, EPISODE_IDS.PopulationRecovery, {
     gameState: { ...GameState.createInitialState(), population: 1080, budget: 820 },
@@ -2798,7 +2818,7 @@ function testPlacementViewManager() {
   assert.match(resultSceneSource, /formatEvaluationRows\(evaluation, gameState, placedBuildings, selectedPolicy, selectedStrategy, evaluationProfile\)/, 'result scene should pass evaluation profile into result copy');
   assert.match(resultSceneSource, /formatResidentReactions\(gameState, placedBuildings, evaluationProfile\)/, 'result scene should pass evaluation profile into resident reactions');
   assert.match(resultSceneSource, /stateKeys/, 'result scene should apply state display keys from active placement config');
-  assert.match(resultSceneSource, /formatContextSummary\(placementConfig, evaluationProfile\)/, 'result scene should display active placement context summary');
+  assert.match(resultSceneSource, /formatContextSummary\([\s\S]*placementConfig,[\s\S]*evaluationProfile,[\s\S]*getPlacementBreakdown/, 'result scene should display active placement context and cumulative facility summary');
   assert.match(resultSceneSource, /WorldStateManager\.completeEpisode/, 'result scene should commit completed placements into world state');
   const sideEffectSceneSource = readProjectFile('src', 'scenes', 'SideEffectScene.js');
   assert.match(sideEffectSceneSource, /PlacementContextManager/, 'side effect scene should resolve active placement context');
@@ -3758,6 +3778,7 @@ function testLearningDataViewManager() {
   assert.match(LearningDataViewManager.formatSummaryText(completeData), /배치 전략: 균형 성장/);
   assert.match(LearningDataViewManager.formatSummaryText(completeData), /회복 방향: 녹색 회복 계획/);
   assert.match(LearningDataViewManager.formatSummaryText(completeData), /우선 보완/);
+  assert.match(LearningDataViewManager.formatPlacementBreakdown(completeData), /이번 3개 \/ 이전 0개 \/ 누적 3개/);
   const completeSummary = LearningDataViewManager.getValidationSummary(completeData);
   assert.equal(completeSummary.ok, true);
   assert.equal(completeSummary.title, '저장 준비 상태');
@@ -3838,6 +3859,13 @@ function testLearningDataManager() {
   assert.deepEqual(data.placementConfig.stateKeys, DEFAULT_STATE_KEYS);
   assert.equal(data.evaluationProfile.id, DEFAULT_EVALUATION_PROFILE_ID);
   assert.equal(data.summary.placementCount, 3);
+  assert.deepEqual(data.summary.placementBreakdown, {
+    currentEpisodeId: EPISODE_IDS.PopulationRecovery,
+    currentPlacementCount: 3,
+    inheritedPlacementCount: 0,
+    totalPlacementCount: 3,
+  });
+  assert.equal(data.placements[0].episodeId, EPISODE_IDS.PopulationRecovery);
   assert.equal(data.summary.nextAction.title, '예산 균형 보완');
   assert.deepEqual(data.worldState.completedEpisodeIds, []);
 
@@ -4636,7 +4664,7 @@ function testStorageSummaryManager() {
   assert.ok(savedRows.includes('배치 설정: config 없음'));
   assert.ok(savedRows.includes('평가 기준: profile 없음'));
   assert.ok(savedRows.includes('탐색 장소: 3곳'));
-  assert.ok(savedRows.includes('배치 기록: 1개'));
+  assert.ok(savedRows.includes('시설 현황: 배치 1개'));
   assert.ok(savedRows.includes('완료 여부: 완료'));
 
   const fullSavedRows = StorageSummaryManager.formatSavedDataRows({
@@ -4648,6 +4676,7 @@ function testStorageSummaryManager() {
   assert.ok(fullSavedRows.includes('배치 실험: EP2. 인구 유입 전략'));
   assert.ok(fullSavedRows.includes(`배치 설정: ${ENVIRONMENT_PLACEMENT_CONFIG_ID}`));
   assert.ok(fullSavedRows.includes(`평가 기준: ${ENVIRONMENT_EVALUATION_PROFILE_ID}`));
+  assert.ok(fullSavedRows.some((row) => row.startsWith('시설 현황:')));
   assert.deepEqual(StorageSummaryManager.getLearningDataPlacementContext({
     summary: { placementContext: { placementConfigId: ENVIRONMENT_PLACEMENT_CONFIG_ID, evaluationProfileId: ENVIRONMENT_EVALUATION_PROFILE_ID } },
     placementConfig: { id: DEFAULT_PLACEMENT_CONFIG_ID },

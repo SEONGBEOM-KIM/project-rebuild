@@ -35,7 +35,7 @@ export default class ResultScene extends Phaser.Scene {
       learningProgress,
       placementConfig,
     });
-    WorldStateManager.set(
+    const worldState = WorldStateManager.set(
       this.registry,
       WorldStateManager.completeEpisode(
         WorldStateManager.get(this.registry),
@@ -57,7 +57,11 @@ export default class ResultScene extends Phaser.Scene {
       origin: 0.5,
     });
     createLayoutText(this, layout.contextSummary, {
-      text: ResultViewManager.formatContextSummary(placementConfig, evaluationProfile),
+      text: ResultViewManager.formatContextSummary(
+        placementConfig,
+        evaluationProfile,
+        WorldStateManager.getPlacementBreakdown(worldState.placements, placementEpisodeId),
+      ),
       style: ResultViewManager.getContextSummaryTextStyle(),
       origin: 0.5,
     });

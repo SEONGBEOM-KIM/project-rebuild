@@ -25,6 +25,13 @@ export default class LearningDataManager {
       placementConfig,
     });
     const placedBuildings = registry.get(REGISTRY_KEYS.placedBuildings) ?? [];
+    const placements = placedBuildings.map((record) => ({
+      buildingId: record.building.id,
+      buildingName: record.building.name,
+      episodeId: record.episodeId ?? placementConfig.episodeId,
+      position: record.position,
+      effect: record.delta,
+    }));
     const gameState = registry.get(REGISTRY_KEYS.gameState);
     const reflectionChoice = registry.get(REGISTRY_KEYS.reflectionChoice);
     const issues = IssueDetector.detect(gameState, evaluationProfile);
@@ -44,7 +51,8 @@ export default class LearningDataManager {
         issues,
         selectedPolicy,
         selectedStrategy,
-        placedBuildings,
+        placementCount: placements.length,
+        placementBreakdown: WorldStateManager.getPlacementBreakdown(placements, placementConfig.episodeId),
         reflectionChoice,
         placementConfig,
         evaluationProfile,
@@ -76,12 +84,7 @@ export default class LearningDataManager {
       evaluationProfile: {
         id: evaluationProfile.id,
       },
-      placements: placedBuildings.map((record) => ({
-        buildingId: record.building.id,
-        buildingName: record.building.name,
-        position: record.position,
-        effect: record.delta,
-      })),
+      placements,
       gameState,
       // The learning-record API intentionally stays focused on the current episode.
       // Local saves also carry this optional snapshot so later episodes can resume
@@ -112,7 +115,7 @@ export default class LearningDataManager {
     };
   }
 
-  static buildSummary({ ending, issues, selectedPolicy, selectedStrategy, placedBuildings, reflectionChoice, placementConfig = null, evaluationProfile = null }) {
+  static buildSummary({ ending, issues, selectedPolicy, selectedStrategy, placementCount, placementBreakdown, reflectionChoice, placementConfig = null, evaluationProfile = null }) {
     const priorityIssue = issues[0] ?? null;
     return {
       outcomeType: ending.title,
@@ -124,7 +127,8 @@ export default class LearningDataManager {
       selectedPolicyName: selectedPolicy?.name ?? null,
       selectedStrategyTitle: selectedStrategy?.title ?? null,
       placementContext: LearningDataManager.buildPlacementContextSummary(placementConfig, evaluationProfile),
-      placementCount: placedBuildings.length,
+      placementCount,
+      placementBreakdown,
       nextAction: reflectionChoice ? {
         id: reflectionChoice.id,
         title: reflectionChoice.title,

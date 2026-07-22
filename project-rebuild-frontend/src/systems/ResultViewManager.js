@@ -63,12 +63,16 @@ export default class ResultViewManager {
     };
   }
 
-  static formatContextSummary(placementConfig, evaluationProfile) {
+  static formatContextSummary(placementConfig, evaluationProfile, placementBreakdown = null) {
+    const placementSummary = placementBreakdown
+      ? `이번 배치: ${placementBreakdown.currentPlacementCount}개 | 이전 시설: ${placementBreakdown.inheritedPlacementCount}개 | 누적: ${placementBreakdown.totalPlacementCount}개`
+      : null;
     return [
       placementConfig?.title ?? '배치 실험',
       `필요 배치: ${placementConfig?.requiredPlacements ?? '-'}개`,
       `평가 기준: ${evaluationProfile?.id ?? '기본'}`,
-    ].join('  |  ');
+      placementSummary,
+    ].filter(Boolean).join('  |  ');
   }
 
   static getContextSummaryTextStyle() {

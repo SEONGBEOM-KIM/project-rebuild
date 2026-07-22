@@ -199,12 +199,36 @@ export default class LearningDataViewManager {
     const placementContext = summary.placementContext;
     const configText = placementContext?.placementConfigId ?? learningData.placementConfig?.id ?? 'config 없음';
     const profileText = placementContext?.evaluationProfileId ?? learningData.evaluationProfile?.id ?? 'profile 없음';
+    const placementBreakdownText = LearningDataViewManager.formatPlacementBreakdown(learningData);
     return [
       `${summary.outcomeType}: ${summary.outcomeMessage}`,
       `${currentEpisodeText} → ${placementEpisodeText} / ${configText} / ${profileText}`,
       `배치 전략: ${strategyText} / 회복 방향: ${policyText}`,
-      `우선 보완: ${issueText} / 다음 액션: ${actionText} / 배치 ${summary.placementCount}개`,
+      `우선 보완: ${issueText} / 다음 액션: ${actionText} / ${placementBreakdownText}`,
     ].join('\n');
+  }
+
+  static getPlacementBreakdown(learningData) {
+    const breakdown = learningData?.summary?.placementBreakdown;
+    if (breakdown) {
+      return breakdown;
+    }
+
+    const placements = learningData?.placements ?? [];
+    const currentEpisodeId = learningData?.placementConfig?.episodeId ?? null;
+    const currentPlacementCount = placements.filter((placement) => (
+      placement.episodeId == null || placement.episodeId === currentEpisodeId
+    )).length;
+    return {
+      currentPlacementCount,
+      inheritedPlacementCount: placements.length - currentPlacementCount,
+      totalPlacementCount: placements.length,
+    };
+  }
+
+  static formatPlacementBreakdown(learningData) {
+    const breakdown = LearningDataViewManager.getPlacementBreakdown(learningData);
+    return `이번 ${breakdown.currentPlacementCount}개 / 이전 ${breakdown.inheritedPlacementCount}개 / 누적 ${breakdown.totalPlacementCount}개`;
   }
 
   static formatSaveCleared() {

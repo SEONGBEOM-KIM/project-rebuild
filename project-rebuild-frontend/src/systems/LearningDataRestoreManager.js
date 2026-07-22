@@ -75,7 +75,7 @@ export default class LearningDataRestoreManager {
           position: placement.position,
           occupiedTiles: [],
           delta: placement.effect ?? building.effect,
-          episodeId,
+          episodeId: placement.episodeId ?? episodeId,
         };
       })
       .filter(Boolean);

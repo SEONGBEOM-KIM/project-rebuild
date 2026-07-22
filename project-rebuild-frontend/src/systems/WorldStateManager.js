@@ -142,6 +142,20 @@ export default class WorldStateManager {
     });
   }
 
+  static getPlacementBreakdown(placements = [], currentEpisodeId = null) {
+    const totalPlacementCount = placements.length;
+    const currentPlacementCount = placements.filter((record) => (
+      record.episodeId == null || record.episodeId === currentEpisodeId
+    )).length;
+
+    return {
+      currentEpisodeId,
+      currentPlacementCount,
+      inheritedPlacementCount: totalPlacementCount - currentPlacementCount,
+      totalPlacementCount,
+    };
+  }
+
   static buildPlacementSeed(worldState, { cumulative = false } = {}) {
     const normalized = normalizeWorldState(worldState);
     return {

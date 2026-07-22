@@ -102,7 +102,7 @@ export default class SavedDataViewManager {
     const policyName = data.selectedPolicy?.name ?? data.summary?.selectedPolicyName ?? '미선택';
     const strategyTitle = data.selectedStrategy?.title ?? data.summary?.selectedStrategyTitle ?? '미선택';
     const exploredCount = data.exploredPlaces?.length ?? 0;
-    const placementCount = data.placements?.length ?? data.summary?.placementCount ?? 0;
+    const placementBreakdownText = SavedDataViewManager.formatPlacementBreakdown(data);
     const currentEpisodeText = data.episodeContext?.current?.shortTitle ?? `Episode ${data.episode ?? '-'}`;
     const placementEpisodeText = data.episodeContext?.placement?.shortTitle ?? '배치 실험 미지정';
     const context = SavedDataViewManager.getPlacementContext(data);
@@ -111,7 +111,7 @@ export default class SavedDataViewManager {
 
     return [
       `저장 시각: ${savedAt} / ${currentEpisodeText} → ${placementEpisodeText}`,
-      `탐색 ${exploredCount}곳 / 배치 ${placementCount}개 / 완료: ${data.completed ? '예' : '아니오'}`,
+      `탐색 ${exploredCount}곳 / ${placementBreakdownText} / 완료: ${data.completed ? '예' : '아니오'}`,
       `회복 방향: ${policyName} / 배치 전략: ${strategyTitle}`,
       `배치 설정: ${configText} / 평가 기준: ${profileText}`,
     ].join('\n');
@@ -124,6 +124,16 @@ export default class SavedDataViewManager {
       evaluationProfileId: summaryContext?.evaluationProfileId ?? data?.evaluationProfile?.id ?? null,
       requiredPlacements: summaryContext?.requiredPlacements ?? data?.placementConfig?.requiredPlacements ?? null,
     };
+  }
+
+  static formatPlacementBreakdown(data) {
+    const breakdown = data?.summary?.placementBreakdown;
+    if (breakdown) {
+      return `이번 ${breakdown.currentPlacementCount}개 / 이전 ${breakdown.inheritedPlacementCount}개 / 누적 ${breakdown.totalPlacementCount}개`;
+    }
+
+    const placementCount = data?.placements?.length ?? data?.summary?.placementCount ?? 0;
+    return `배치 ${placementCount}개`;
   }
 
   static hasCompletedRequiredPlacements(data) {

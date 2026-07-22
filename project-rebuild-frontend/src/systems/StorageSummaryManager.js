@@ -36,7 +36,7 @@ export default class StorageSummaryManager {
       `배치 설정: ${configText}`,
       `평가 기준: ${profileText}`,
       `탐색 장소: ${data?.exploredPlaces?.length ?? 0}곳`,
-      `배치 기록: ${data?.placements?.length ?? 0}개`,
+      `시설 현황: ${StorageSummaryManager.formatPlacementBreakdown(data)}`,
       `완료 여부: ${data?.completed ? '완료' : '미완료'}`,
     ];
   }
@@ -78,6 +78,14 @@ export default class StorageSummaryManager {
       placementConfigId: summaryContext?.placementConfigId ?? data?.placementConfig?.id ?? null,
       evaluationProfileId: summaryContext?.evaluationProfileId ?? data?.evaluationProfile?.id ?? null,
     };
+  }
+
+  static formatPlacementBreakdown(data) {
+    const breakdown = data?.summary?.placementBreakdown;
+    if (breakdown) {
+      return `이번 ${breakdown.currentPlacementCount}개 / 이전 ${breakdown.inheritedPlacementCount}개 / 누적 ${breakdown.totalPlacementCount}개`;
+    }
+    return `배치 ${data?.placements?.length ?? 0}개`;
   }
 
   static getApiPayloadPlacementContext(payload) {
