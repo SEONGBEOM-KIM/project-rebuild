@@ -18,6 +18,16 @@ export default class Ep5SolutionPlanManager {
     return [...preview.intro, '', recommendation].join('\n');
   }
 
+  static formatMissionHandoff(primaryRisk = null, selectedPlan = null) {
+    const priorityText = primaryRisk
+      ? `EP4에서 확인한 우선 문제: ${primaryRisk.title}`
+      : 'EP4에서 확인한 우선 문제: 지역 상태를 다시 확인합니다.';
+    const planText = selectedPlan
+      ? `현재 선택한 해결안: ${selectedPlan.title}`
+      : '해결안을 선택하면 균형 배치 목표가 정해집니다.';
+    return `${priorityText} · ${planText}`;
+  }
+
   static formatPlanBody(plan) {
     return [plan.description, '', '함께 관리할 기준', ...plan.balanceChecks.map((check) => `• ${check}`), '', `균형 장치: ${plan.safeguards}`].join('\n');
   }

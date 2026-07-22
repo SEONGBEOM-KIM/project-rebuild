@@ -3516,11 +3516,16 @@ function testEp4Briefing() {
   assert.equal(Ep5SolutionPlanManager.getRecommendedPlanId(sortedRisks), 'inequality');
   assert.equal(Ep5SolutionPlanManager.isRecommended(ep5SolutionPlans[2], sortedRisks), true);
   assert.match(Ep5SolutionPlanManager.formatIntroText(EP5_MISSION_PREVIEW, sortedRisks[0]), /소득 격차/);
+  assert.match(Ep5SolutionPlanManager.formatMissionHandoff(sortedRisks[0], ep5SolutionPlans[2]), /EP4에서 확인한 우선 문제: 소득 격차/);
+  assert.match(Ep5SolutionPlanManager.formatMissionHandoff(sortedRisks[0], ep5SolutionPlans[2]), /생활 혜택 공유 계획/);
   assert.match(Ep5SolutionPlanManager.formatPlanBody(ep5SolutionPlans[2]), /함께 관리할 기준/);
   assert.equal(Ep5PreviewViewManager.getScreenLayout(1920).title.text, 'EP5. 문제 해결 준비');
   assert.equal(Ep5PreviewViewManager.getControlLayout(960).back.target, 'Ep4ConclusionScene');
 
   const ep5Fixture = createRendererSceneSpy();
+  const ep5Intro = Ep5PreviewRenderer.renderIntroPanel(ep5Fixture.scene, EP5_MISSION_PREVIEW, sortedRisks[0], ep5SolutionPlans[2]);
+  assert.equal(ep5Intro.body.type, 'text');
+  assert.ok(ep5Fixture.calls.some((call) => call[0] === 'text' && call[3].includes('EP4에서 확인한 우선 문제')));
   Ep5PreviewRenderer.renderPlanCard(ep5Fixture.scene, ep5SolutionPlans[2], 2, ep5SolutionPlans[2].id, sortedRisks, () => {});
   assert.ok(ep5Fixture.calls.some((call) => call[0] === 'text' && call[3] === '선택한 해결안'));
   assert.ok(ep5Fixture.calls.some((call) => call[0] === 'text' && call[3] === ep5SolutionPlans[2].title));
@@ -3541,8 +3546,16 @@ function testEp5PlacementSetup() {
   assert.equal(registry.get(REGISTRY_KEYS.placementConfigId), EP5_BALANCED_SOLUTIONS_CONFIG_ID);
   assert.equal(registry.get(REGISTRY_KEYS.selectedPolicy).id, 'clean_growth_guardrails');
   assert.equal(registry.get(REGISTRY_KEYS.worldState).activeEpisodeId, EPISODE_IDS.BalancedSolutions);
+  assert.equal(registry.get(REGISTRY_KEYS.worldState).episodeRuns[EPISODE_IDS.BalancedSolutions].metadata.selectedSolutionPlanId, 'clean_growth_guardrails');
+  assert.equal(registry.get(REGISTRY_KEYS.worldState).episodeRuns[EPISODE_IDS.BalancedSolutions].metadata.targetPrimaryRiskId, 'environment');
   assert.equal(LearningProgress.get(registry).episode, 5);
   assert.equal(LearningProgress.get(registry).selectedSolutionPlanId, 'clean_growth_guardrails');
+  const ep4ConclusionSceneSource = readProjectFile('src', 'scenes', 'Ep4ConclusionScene.js');
+  assert.match(ep4ConclusionSceneSource, /riskSummary/, 'EP4 conclusion should persist the analysed risk summary for EP5');
+  assert.match(ep4ConclusionSceneSource, /completeEpisode/, 'EP4 conclusion should complete its episode before transitioning');
+  const ep5PreviewSceneSource = readProjectFile('src', 'scenes', 'Ep5PreviewScene.js');
+  assert.match(ep5PreviewSceneSource, /sideEffectSummary/, 'EP5 should use the recorded EP4 risk summary when it exists');
+  assert.match(ep5PreviewSceneSource, /formatMissionHandoff/, 'EP5 should show the selected plan against the EP4 priority');
 }
 
 function testEp2BriefingRenderer() {

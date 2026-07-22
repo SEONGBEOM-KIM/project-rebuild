@@ -11,6 +11,7 @@ import Ep5SolutionPlanManager from '../systems/Ep5SolutionPlanManager.js';
 import Ep5PreviewViewManager from '../systems/Ep5PreviewViewManager.js';
 import Ep5PreviewRenderer from '../systems/Ep5PreviewRenderer.js';
 import EpisodePlacementLaunchManager from '../systems/EpisodePlacementLaunchManager.js';
+import WorldStateManager from '../systems/WorldStateManager.js';
 
 export default class Ep5PreviewScene extends Phaser.Scene {
   constructor() {
@@ -20,7 +21,13 @@ export default class Ep5PreviewScene extends Phaser.Scene {
   create() {
     const { width } = this.scale;
     this.preview = getEpisodeContent(EPISODE_IDS.BalancedSolutions).missionPreview;
-    this.risks = IndustrializationRiskManager.detect({ gameState: this.registry.get(REGISTRY_KEYS.gameState), placedBuildings: this.registry.get(REGISTRY_KEYS.placedBuildings) ?? [], placementEpisodeId: EPISODE_IDS.EconomyGrowth });
+    this.worldState = WorldStateManager.get(this.registry);
+    this.sideEffectSummary = WorldStateManager.getEpisodeRunSummary(this.worldState, EPISODE_IDS.SideEffects)?.metadata?.riskSummary ?? null;
+    this.risks = this.sideEffectSummary?.risks ?? IndustrializationRiskManager.detect({
+      gameState: this.registry.get(REGISTRY_KEYS.gameState),
+      placedBuildings: this.registry.get(REGISTRY_KEYS.placedBuildings) ?? [],
+      placementEpisodeId: EPISODE_IDS.EconomyGrowth,
+    });
     this.selectedPlan = this.registry.get(REGISTRY_KEYS.selectedSolutionPlan)
       ?? this.preview.solutionPlans.find((plan) => plan.primaryRiskId === Ep5SolutionPlanManager.getRecommendedPlanId(this.risks))
       ?? this.preview.solutionPlans[0];
@@ -30,7 +37,8 @@ export default class Ep5PreviewScene extends Phaser.Scene {
     ProgressStepper.render(this, layout.progressStep);
     createLayoutText(this, layout.title, { origin: 0.5 });
     createLayoutText(this, layout.subtitle, { origin: 0.5 });
-    Ep5PreviewRenderer.renderIntroPanel(this, this.preview, Ep5SolutionPlanManager.getPrimaryRisk(this.risks));
+    this.primaryRisk = Ep5SolutionPlanManager.getPrimaryRisk(this.risks);
+    this.introObjects = Ep5PreviewRenderer.renderIntroPanel(this, this.preview, this.primaryRisk, this.selectedPlan);
     this.preview.solutionPlans.forEach((plan, index) => this.cardObjects.set(plan.id, Ep5PreviewRenderer.renderPlanCard(this, plan, index, this.selectedPlan?.id, this.risks, (selectedPlan) => this.selectPlan(selectedPlan))));
     const controls = Ep5PreviewRenderer.renderControls(this, width / 2);
     controls.backButton.on('pointerdown', () => this.scene.start(controls.layout.back.target));
@@ -55,6 +63,10 @@ export default class Ep5PreviewScene extends Phaser.Scene {
   }
 
   updateUi() {
+    this.introObjects.body.setText([
+      Ep5SolutionPlanManager.formatIntroText(this.preview, this.primaryRisk),
+      Ep5SolutionPlanManager.formatMissionHandoff(this.primaryRisk, this.selectedPlan),
+    ].join('\n\n'));
     this.nextButton.setStyle(Ep5PreviewViewManager.getNextButtonStyle(Boolean(this.selectedPlan)));
     for (const [planId, objects] of this.cardObjects.entries()) {
       const selected = planId === this.selectedPlan?.id;

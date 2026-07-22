@@ -5,12 +5,19 @@ import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js'
 import { createTextButton } from '../ui/TextButton.js';
 
 export default class Ep5PreviewRenderer {
-  static renderIntroPanel(scene, preview, primaryRisk) {
+  static renderIntroPanel(scene, preview, primaryRisk, selectedPlan = null) {
     const layout = Ep5PreviewViewManager.getIntroPanelLayout();
     const style = { fillColor: 0x172554, fillAlpha: 0.98, strokeWidth: 4, strokeColor: 0xfde68a, titleFontSize: '30px', titleColor: '#fde68a', titleFontStyle: 'bold' };
     createPanelBackground(scene, layout.panel, style);
     createPanelTitle(scene, layout.title, style);
-    return createLayoutText(scene, layout.body, { text: Ep5SolutionPlanManager.formatIntroText(preview, primaryRisk), style: { fontSize: '20px', color: '#e0f2fe', lineSpacing: 4, wordWrap: { width: layout.body.wordWrapWidth } } });
+    const body = createLayoutText(scene, layout.body, {
+      text: [
+        Ep5SolutionPlanManager.formatIntroText(preview, primaryRisk),
+        Ep5SolutionPlanManager.formatMissionHandoff(primaryRisk, selectedPlan),
+      ].join('\n\n'),
+      style: { fontSize: '18px', color: '#e0f2fe', lineSpacing: 4, wordWrap: { width: layout.body.wordWrapWidth } },
+    });
+    return { body, layout };
   }
 
   static renderPlanCard(scene, plan, index, selectedPlanId, risks, onSelect) {

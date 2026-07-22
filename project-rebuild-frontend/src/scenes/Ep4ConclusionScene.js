@@ -7,6 +7,7 @@ import ProgressStepper from '../ui/ProgressStepper.js';
 import IndustrializationRiskManager from '../systems/IndustrializationRiskManager.js';
 import Ep4ConclusionViewManager from '../systems/Ep4ConclusionViewManager.js';
 import Ep4ConclusionRenderer from '../systems/Ep4ConclusionRenderer.js';
+import WorldStateManager from '../systems/WorldStateManager.js';
 
 export default class Ep4ConclusionScene extends Phaser.Scene {
   constructor() {
@@ -20,6 +21,10 @@ export default class Ep4ConclusionScene extends Phaser.Scene {
       placedBuildings: this.registry.get(REGISTRY_KEYS.placedBuildings) ?? [],
       placementEpisodeId: EPISODE_IDS.EconomyGrowth,
     });
+    const startedWorldState = WorldStateManager.startEpisode(WorldStateManager.get(this.registry), EPISODE_IDS.SideEffects);
+    this.worldState = WorldStateManager.set(this.registry, WorldStateManager.setEpisodeRunMetadata(startedWorldState, EPISODE_IDS.SideEffects, {
+      riskSummary: IndustrializationRiskManager.summarize(risks),
+    }));
     const layout = Ep4ConclusionViewManager.getScreenLayout(width);
     createScreenBackground(this, layout.background.color);
     ProgressStepper.render(this, layout.progressStep);
@@ -29,6 +34,11 @@ export default class Ep4ConclusionScene extends Phaser.Scene {
     Ep4ConclusionRenderer.renderNextPanel(this);
     const controls = Ep4ConclusionRenderer.renderControls(this, width / 2);
     controls.backButton.on('pointerdown', () => this.scene.start(controls.layout.back.target));
-    controls.nextButton.on('pointerdown', () => this.scene.start(controls.layout.next.target, { episodeId: EPISODE_IDS.BalancedSolutions }));
+    controls.nextButton.on('pointerdown', () => {
+      WorldStateManager.set(this.registry, WorldStateManager.completeEpisode(this.worldState, EPISODE_IDS.SideEffects, {
+        gameState: this.registry.get(REGISTRY_KEYS.gameState),
+      }));
+      this.scene.start(controls.layout.next.target, { episodeId: EPISODE_IDS.BalancedSolutions });
+    });
   }
 }

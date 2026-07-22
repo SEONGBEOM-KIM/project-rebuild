@@ -66,7 +66,13 @@ export default class EpisodePlacementLaunchManager {
 
   static prepareEp5BalancedPlacement(registry, selectedSolutionPlan) {
     const selectedPolicy = getEp5Policy(selectedSolutionPlan?.id) ?? getEp5Policy('mobility_green_network');
-    const baseWorldState = WorldStateManager.startEpisode(WorldStateManager.get(registry), EPISODE_IDS.BalancedSolutions);
+    const startedWorldState = WorldStateManager.startEpisode(WorldStateManager.get(registry), EPISODE_IDS.BalancedSolutions);
+    const baseWorldState = WorldStateManager.setEpisodeRunMetadata(startedWorldState, EPISODE_IDS.BalancedSolutions, {
+      selectedSolutionPlanId: selectedSolutionPlan?.id ?? selectedPolicy.id,
+      targetPrimaryRiskId: selectedSolutionPlan?.primaryRiskId ?? null,
+      selectedPolicyId: selectedPolicy.id,
+      placementConfigId: EP5_BALANCED_SOLUTIONS_CONFIG_ID,
+    });
     const placementSeed = WorldStateManager.buildPlacementSeed(baseWorldState, { cumulative: true });
     return EpisodePlacementLaunchManager.applyLaunchContext(registry, {
       episodeId: EPISODE_IDS.BalancedSolutions,
