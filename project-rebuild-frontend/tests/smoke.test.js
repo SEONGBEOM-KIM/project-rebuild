@@ -1019,7 +1019,7 @@ function testReflectionViewManager() {
   assert.deepEqual(ReflectionViewManager.getScreenLayout(1920).contextSummary, { x: 960, y: 184, wordWrapWidth: 1320 });
   assert.deepEqual(ReflectionViewManager.getScreenLayout(1920).summaryPanel, { x: 960, y: 260, width: 1510, height: 96, strokeColor: 0x93c5fd });
   assert.equal(ReflectionViewManager.getScreenLayout(1920).summaryTitle.text, '이번 결과 요약');
-  assert.deepEqual(ReflectionViewManager.getScreenLayout(1920).feedback, { x: 960, y: 825, wordWrapWidth: 1150 });
+  assert.deepEqual(ReflectionViewManager.getScreenLayout(1920).feedback, { x: 960, y: 840, wordWrapWidth: 1150 });
   assert.equal(
     ReflectionViewManager.formatContextSummary(getPlacementConfig(ENVIRONMENT_PLACEMENT_CONFIG_ID), getEvaluationProfile(ENVIRONMENT_EVALUATION_PROFILE_ID)),
     '푸른군 환경 균형 배치 실험  |  필요 배치: 2개  |  평가 기준: ep2_environment_focus',
@@ -1055,7 +1055,7 @@ function testReflectionViewManager() {
     textColor: '#123524',
   });
   assert.equal(ReflectionViewManager.getControlLayout().back.target, 'SideEffectScene');
-  assert.equal(ReflectionViewManager.formatInitialFeedback(), '하나를 선택하면 이번 배치에서 배운 점으로 학습 기록에 저장됩니다.');
+  assert.equal(ReflectionViewManager.formatInitialFeedback(), '선택한 전략의 영향은 자동으로 학습 기록에 저장됩니다.');
   const runSummary = ReflectionViewManager.formatRunSummary({
     gameState: { ...GameState.createInitialState(), population: 1240, economy: 80, satisfaction: 96, budget: 460 },
     issues: IssueDetector.detect({ ...GameState.createInitialState(), budget: 460, satisfaction: 96 }),
@@ -1068,6 +1068,17 @@ function testReflectionViewManager() {
   assert.equal(ReflectionViewManager.formatRunContext(policies[0], null), '선택 방향: 청년 생활 지원');
   assert.match(ReflectionViewManager.formatRunContext(policies[0], EP2_MISSION_BRIEFING.strategies[0]), /배치 전략: 일자리와 생활 기반/);
   assert.match(ReflectionViewManager.formatRunContext(policies[0], EP2_MISSION_BRIEFING.strategies[0]), /목표: 인구·경제 동시 개선/);
+  const selectedInsight = ReflectionViewManager.buildSelectedInsight({
+    selectedStrategy: EP2_MISSION_BRIEFING.strategies[0],
+    selectedPolicy: policies[0],
+    gameState: GameState.createInitialState(),
+    issues: [],
+  });
+  assert.match(selectedInsight.title, /내가 선택한 전략: 일자리와 생활 기반/);
+  assert.match(selectedInsight.body, /큰 부작용 신호는 없습니다/);
+  assert.equal(ReflectionViewManager.buildAlternativeInsights(EP2_MISSION_BRIEFING.strategies, EP2_MISSION_BRIEFING.strategies[0]).length, 2);
+  assert.match(ReflectionViewManager.buildAlternativeInsights(EP2_MISSION_BRIEFING.strategies, EP2_MISSION_BRIEFING.strategies[0])[0].title, /다른 선택:/);
+  assert.equal(ReflectionViewManager.buildStrategyReflectionRecord(selectedInsight).title, '일자리와 생활 기반');
   const strategyRunSummary = ReflectionViewManager.formatRunSummary({
     gameState: { ...GameState.createInitialState(), population: 1240, economy: 80, satisfaction: 96, budget: 460 },
     issues: IssueDetector.detect({ ...GameState.createInitialState(), budget: 460, satisfaction: 96 }),

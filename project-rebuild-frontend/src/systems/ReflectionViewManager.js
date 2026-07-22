@@ -4,12 +4,14 @@ const REFLECTION_SCREEN_LAYOUT = {
   backgroundColor: 0x172554,
   progressStep: 'ending',
   title: { y: 82, text: '배운 점 정리', fontSize: '60px', color: '#ffffff', fontStyle: 'bold' },
-  subtitle: { y: 142, text: '이번 배치에서 확인한 관점을 하나 골라 학습 기록에 남기세요. 다음 미션은 EP3 경제 성장으로 이어집니다.', fontSize: '27px', color: '#bfdbfe' },
+  subtitle: { y: 142, text: '내가 선택한 전략의 영향과, 다른 전략이 만들 수 있었던 차이를 비교합니다.', fontSize: '27px', color: '#bfdbfe' },
   contextSummary: { y: 184, wordWrapWidth: 1320 },
   summaryPanel: { x: 960, y: 260, width: 1510, height: 96, strokeColor: 0x93c5fd },
   summaryTitle: { x: 265, y: 227, text: '이번 결과 요약' },
   summaryBody: { x: 470, y: 226, wordWrapWidth: 1240 },
-  feedback: { y: 825, wordWrapWidth: 1150 },
+  selectedInsight: { x: 960, y: 440, width: 1510, height: 170 },
+  alternativesTitle: { x: 250, y: 565, text: '다른 전략과 비교해 보기' },
+  feedback: { y: 840, wordWrapWidth: 1150 },
 };
 
 const REFLECTION_SUMMARY_PANEL_STYLE = {
@@ -24,6 +26,22 @@ const REFLECTION_CHOICE_CARD_LAYOUT = {
   iconOffset: { x: -250, y: -35 },
   titleOffset: { x: -200, y: -62 },
   descriptionOffset: { x: -200, y: -12, wordWrapWidth: 470 },
+};
+
+const REFLECTION_SELECTED_INSIGHT_STYLE = {
+  fillColor: 0x0f3b52,
+  fillAlpha: 0.98,
+  strokeWidth: 5,
+  strokeColor: 0xfde68a,
+};
+
+const REFLECTION_ALTERNATIVE_CARD_LAYOUT = {
+  width: 700,
+  height: 190,
+  positions: [
+    { x: 590, y: 690 },
+    { x: 1330, y: 690 },
+  ],
 };
 
 const REFLECTION_CONTEXT_TEXT_STYLE = {
@@ -66,6 +84,8 @@ export default class ReflectionViewManager {
       summaryPanel: { ...REFLECTION_SCREEN_LAYOUT.summaryPanel, x: width / 2 },
       summaryTitle: { ...REFLECTION_SCREEN_LAYOUT.summaryTitle },
       summaryBody: { ...REFLECTION_SCREEN_LAYOUT.summaryBody },
+      selectedInsight: { ...REFLECTION_SCREEN_LAYOUT.selectedInsight, x: width / 2 },
+      alternativesTitle: { ...REFLECTION_SCREEN_LAYOUT.alternativesTitle },
       feedback: { x: width / 2, ...REFLECTION_SCREEN_LAYOUT.feedback },
     };
   }
@@ -103,6 +123,24 @@ export default class ReflectionViewManager {
     return {
       title: { ...REFLECTION_SUMMARY_TEXT_STYLES.title },
       body: { ...REFLECTION_SUMMARY_TEXT_STYLES.body },
+    };
+  }
+
+  static getSelectedInsightStyle() {
+    return { ...REFLECTION_SELECTED_INSIGHT_STYLE };
+  }
+
+  static getSelectedInsightLayout() {
+    return { ...REFLECTION_SCREEN_LAYOUT.selectedInsight };
+  }
+
+  static getAlternativeCardLayout(index) {
+    const position = REFLECTION_ALTERNATIVE_CARD_LAYOUT.positions[index];
+    return {
+      background: { ...position, width: REFLECTION_ALTERNATIVE_CARD_LAYOUT.width, height: REFLECTION_ALTERNATIVE_CARD_LAYOUT.height },
+      icon: { x: position.x - 290, y: position.y - 50 },
+      title: { x: position.x - 230, y: position.y - 70 },
+      body: { x: position.x - 290, y: position.y - 20, wordWrapWidth: 580 },
     };
   }
 
@@ -178,8 +216,45 @@ export default class ReflectionViewManager {
     ].join('\n');
   }
 
+  static buildSelectedInsight({ selectedStrategy = null, selectedPolicy = null, gameState, issues = [] }) {
+    const title = selectedStrategy?.title ?? selectedPolicy?.name ?? '이번 배치 전략';
+    const icon = selectedStrategy?.icon ?? '📌';
+    const focus = selectedStrategy?.stateFocus ?? selectedPolicy?.focus?.join(' · ') ?? '상태 변화 확인';
+    const priorityIssue = ReflectionViewManager.getPriorityIssue(issues);
+    const issueText = priorityIssue ? `함께 확인할 점은 ${priorityIssue.title}입니다.` : '현재 큰 부작용 신호는 없습니다.';
+    return {
+      id: selectedStrategy?.id ?? selectedPolicy?.id ?? 'default',
+      icon,
+      title: `내가 선택한 전략: ${title}`,
+      body: `이 전략은 ${focus}에 가장 큰 영향을 주도록 설계되었습니다. 이번 결과에서 인구 ${gameState.population}, 경제 ${gameState.economy}, 만족도 ${gameState.satisfaction}로 변화했습니다. ${issueText}`,
+    };
+  }
+
+  static buildAlternativeInsights(strategies = [], selectedStrategy = null) {
+    return strategies
+      .filter((strategy) => strategy.id !== selectedStrategy?.id)
+      .slice(0, 2)
+      .map((strategy) => ({
+        id: strategy.id,
+        icon: strategy.icon,
+        title: `다른 선택: ${strategy.title}`,
+        body: `선택하지는 않았지만 ${strategy.stateFocus}에 더 집중하는 방향입니다. ${strategy.observationPointShort ?? strategy.observationPoint}`,
+      }));
+  }
+
+  static buildStrategyReflectionRecord(selectedInsight) {
+    return {
+      id: `strategy_${selectedInsight.id}`,
+      title: selectedInsight.title.replace('내가 선택한 전략: ', ''),
+      icon: selectedInsight.icon,
+      description: selectedInsight.body,
+      nextActionLabel: '선택 전략의 영향 확인',
+      nextAction: '선택한 전략의 효과와 다른 전략의 차이를 비교해 보았습니다.',
+    };
+  }
+
   static formatInitialFeedback() {
-    return '하나를 선택하면 이번 배치에서 배운 점으로 학습 기록에 저장됩니다.';
+    return '선택한 전략의 영향은 자동으로 학습 기록에 저장됩니다.';
   }
 
   static formatSelectedFeedback(choice) {

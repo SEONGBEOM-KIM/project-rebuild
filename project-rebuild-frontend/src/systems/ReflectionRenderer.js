@@ -47,4 +47,27 @@ export default class ReflectionRenderer {
       origin: 0.5,
     });
   }
+
+  static renderSelectedInsight(scene, insight, layout) {
+    const style = ReflectionViewManager.getSelectedInsightStyle();
+    createPanelBackground(scene, layout.selectedInsight, style);
+    createLayoutText(scene, { x: layout.selectedInsight.x - 700, y: layout.selectedInsight.y - 58, text: insight.icon }, {
+      style: { fontSize: '48px' },
+      origin: 0.5,
+    });
+    createPanelTitle(scene, { x: layout.selectedInsight.x - 635, y: layout.selectedInsight.y - 67, text: insight.title }, {
+      fontSize: '32px', color: '#fde68a', fontStyle: 'bold',
+    });
+    return createLayoutText(scene, { x: layout.selectedInsight.x - 700, y: layout.selectedInsight.y - 12, text: insight.body, wordWrapWidth: 1360 }, {
+      style: { fontSize: '23px', color: '#e0f2fe', lineSpacing: 7 },
+    });
+  }
+
+  static renderAlternativeInsight(scene, insight, index) {
+    const layout = ReflectionViewManager.getAlternativeCardLayout(index);
+    createPanelBackground(scene, layout.background, { fillColor: 0x0f172a, fillAlpha: 0.96, strokeWidth: 3, strokeColor: 0x64748b });
+    createLayoutText(scene, layout.icon, { text: insight.icon, style: { fontSize: '38px' }, origin: 0.5 });
+    createPanelTitle(scene, layout.title, { fontSize: '25px', color: '#ffffff', fontStyle: 'bold' }, { text: insight.title });
+    return createLayoutText(scene, layout.body, { text: insight.body, style: { fontSize: '20px', color: '#cbd5e1', lineSpacing: 6 } });
+  }
 }

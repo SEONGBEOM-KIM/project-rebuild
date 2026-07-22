@@ -30,8 +30,11 @@ export default class ReflectionScene extends Phaser.Scene {
     });
     const placementEpisodeId = EpisodeFlowManager.resolveActivePlacementEpisodeId({ registry: this.registry, learningProgress, placementConfig });
     const issues = IndustrializationRiskManager.detect({ gameState, placedBuildings, placementEpisodeId, evaluationProfile });
-    this.selectedChoice = this.registry.get(REGISTRY_KEYS.reflectionChoice);
-    this.choiceObjects = new Map();
+    const strategies = EpisodeFlowManager.getMissionBriefing({ registry: this.registry, learningProgress, placementConfig })?.strategies ?? [];
+    const selectedInsight = ReflectionViewManager.buildSelectedInsight({ selectedStrategy, selectedPolicy, gameState, issues });
+    const reflectionRecord = ReflectionViewManager.buildStrategyReflectionRecord(selectedInsight);
+    this.registry.set(REGISTRY_KEYS.reflectionChoice, reflectionRecord);
+    LearningProgress.update(this.registry, { reflectionChoice: reflectionRecord });
 
     const layout = ReflectionViewManager.getScreenLayout(width);
 
@@ -48,42 +51,14 @@ export default class ReflectionScene extends Phaser.Scene {
     });
 
     ReflectionRenderer.renderRunSummary(this, { gameState, issues, selectedPolicy, selectedStrategy, placedBuildings }, layout);
-
-    EpisodeFlowManager.getReflectionChoices({ registry: this.registry, learningProgress, placementConfig }).forEach((choice, index) => {
-      const { x, y } = ReflectionViewManager.getChoiceCardPosition(index);
-      const cardObjects = ReflectionRenderer.renderChoiceCard(
-        this,
-        choice,
-        this.selectedChoice,
-        x,
-        y,
-        (selected) => this.selectChoice(selected),
-      );
-      this.choiceObjects.set(choice.id, cardObjects);
-    });
+    ReflectionRenderer.renderSelectedInsight(this, selectedInsight, layout);
+    createLayoutText(this, layout.alternativesTitle, { style: { fontSize: '25px', color: '#bfdbfe', fontStyle: 'bold' } });
+    ReflectionViewManager.buildAlternativeInsights(strategies, selectedStrategy)
+      .forEach((insight, index) => ReflectionRenderer.renderAlternativeInsight(this, insight, index));
 
     this.feedbackText = ReflectionRenderer.renderFeedback(this, layout);
 
     this.drawControls();
-    this.updateSelectionUi();
-  }
-
-
-  selectChoice(choice) {
-    this.selectedChoice = choice;
-    this.registry.set(REGISTRY_KEYS.reflectionChoice, choice);
-    LearningProgress.update(this.registry, { reflectionChoice: choice });
-    this.feedbackText.setText(ReflectionViewManager.formatSelectedFeedback(choice));
-    this.feedbackText.setColor(ReflectionViewManager.getFeedbackStyle('selected').color);
-    this.updateSelectionUi();
-  }
-
-  updateSelectionUi() {
-    for (const [choiceId, objects] of this.choiceObjects.entries()) {
-      const style = ReflectionViewManager.getChoiceCardStyle(choiceId, this.selectedChoice);
-      objects.background.setStrokeStyle(style.strokeWidth, style.strokeColor);
-      objects.background.setFillStyle(style.fillColor, style.fillAlpha);
-    }
   }
 
   drawControls() {
@@ -92,14 +67,7 @@ export default class ReflectionScene extends Phaser.Scene {
     backButton.on('pointerdown', () => this.scene.start(layout.back.target));
 
     const nextButton = createTextButton(this, layout.next, ReflectionViewManager.getButtonStyle());
-    nextButton.on('pointerdown', () => {
-      if (!this.selectedChoice) {
-        this.feedbackText.setText(ReflectionViewManager.formatMissingChoiceFeedback());
-        this.feedbackText.setColor(ReflectionViewManager.getFeedbackStyle('missing').color);
-        return;
-      }
-      this.scene.start(layout.next.target);
-    });
+    nextButton.on('pointerdown', () => this.scene.start(layout.next.target));
   }
 
 }
