@@ -1,7 +1,7 @@
 import { explorationPlaces } from '../data/explorationPlaces.js';
 import { DEFAULT_STATE_KEYS, STATE_LABELS } from '../data/stateLabels.js';
 import { getEvaluationProfile } from '../data/evaluationRules.js';
-import IssueDetector from './IssueDetector.js';
+import IndustrializationRiskManager from './IndustrializationRiskManager.js';
 
 export default class EndingSummaryManager {
   static getEndingSummary(gameState, placedBuildings, evaluationProfile = getEvaluationProfile()) {
@@ -39,13 +39,18 @@ export default class EndingSummaryManager {
     };
   }
 
-  static getPriorityIssue(gameState, evaluationProfile = getEvaluationProfile()) {
-    const issues = IssueDetector.detect(gameState, evaluationProfile);
-    return issues[0] ?? null;
+  static getPriorityIssue(gameState, evaluationProfile = getEvaluationProfile(), placedBuildings = [], placementEpisodeId = null) {
+    const issues = IndustrializationRiskManager.detect({
+      gameState,
+      placedBuildings,
+      placementEpisodeId,
+      evaluationProfile,
+    });
+    return issues.find((issue) => issue.primary) ?? issues[0] ?? null;
   }
 
-  static formatFinalTakeaway({ gameState, ending, reflectionChoice, selectedStrategy = null, evaluationProfile = getEvaluationProfile() }) {
-    const issue = EndingSummaryManager.getPriorityIssue(gameState, evaluationProfile);
+  static formatFinalTakeaway({ gameState, ending, reflectionChoice, selectedStrategy = null, evaluationProfile = getEvaluationProfile(), placedBuildings = [], placementEpisodeId = null }) {
+    const issue = EndingSummaryManager.getPriorityIssue(gameState, evaluationProfile, placedBuildings, placementEpisodeId);
     const issueText = issue ? issue.title : '큰 부작용 신호 없음';
     const actionText = reflectionChoice?.nextActionLabel ?? '다음 보완 방향 선택 필요';
     const strategyText = selectedStrategy
@@ -98,11 +103,14 @@ export default class EndingSummaryManager {
     ].join('\n');
   }
 
-  static formatStateSummary(gameState, ending, stateKeys = DEFAULT_STATE_KEYS, evaluationProfile = getEvaluationProfile()) {
+  static formatStateSummary(gameState, ending, stateKeys = DEFAULT_STATE_KEYS, evaluationProfile = getEvaluationProfile(), placedBuildings = [], placementEpisodeId = null) {
     const stateRows = stateKeys
       .map((key) => `• ${STATE_LABELS[key] ?? key}: ${gameState[key] ?? 0}`)
       .join('\n');
-    const issueRows = IssueDetector.formatRows(gameState, '큰 부작용 신호 없음', evaluationProfile).join('\n');
+    const issues = IndustrializationRiskManager.detect({ gameState, placedBuildings, placementEpisodeId, evaluationProfile });
+    const issueRows = issues.length
+      ? issues.map((issue) => `• ${issue.primary ? '최우선 · ' : ''}${issue.title}: ${issue.shortMessage}${issue.severity ? ` (${issue.severity.label})` : ''}`).join('\n')
+      : '• 큰 부작용 신호 없음';
 
     return [
       ending.title,

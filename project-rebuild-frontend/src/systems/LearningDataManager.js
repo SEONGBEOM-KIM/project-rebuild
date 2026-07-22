@@ -1,6 +1,6 @@
 import { explorationPlaces } from '../data/explorationPlaces.js';
 import { CURRENT_EPISODE } from '../data/episodes.js';
-import IssueDetector from './IssueDetector.js';
+import IndustrializationRiskManager from './IndustrializationRiskManager.js';
 import LearningProgress from './LearningProgress.js';
 import EndingSummaryManager from './EndingSummaryManager.js';
 import EpisodeFlowManager from './EpisodeFlowManager.js';
@@ -34,7 +34,12 @@ export default class LearningDataManager {
     }));
     const gameState = registry.get(REGISTRY_KEYS.gameState);
     const reflectionChoice = registry.get(REGISTRY_KEYS.reflectionChoice);
-    const issues = IssueDetector.detect(gameState, evaluationProfile);
+    const issues = IndustrializationRiskManager.detect({
+      gameState,
+      placedBuildings,
+      placementEpisodeId: placementEpisode.code,
+      evaluationProfile,
+    });
     const ending = EndingSummaryManager.getEndingSummary(gameState, placedBuildings, evaluationProfile);
     const exploredPlaceNames = explorationPlaces
       .filter((place) => progress.exploredPlaces.includes(place.id))
@@ -116,7 +121,7 @@ export default class LearningDataManager {
   }
 
   static buildSummary({ ending, issues, selectedPolicy, selectedStrategy, placementCount, placementBreakdown, reflectionChoice, placementConfig = null, evaluationProfile = null }) {
-    const priorityIssue = issues[0] ?? null;
+    const priorityIssue = issues.find((issue) => issue.primary) ?? issues[0] ?? null;
     return {
       outcomeType: ending.title,
       outcomeMessage: ending.message,
@@ -124,6 +129,7 @@ export default class LearningDataManager {
         id: priorityIssue.id,
         title: priorityIssue.title,
       } : null,
+      sideEffectRisks: IndustrializationRiskManager.summarize(issues),
       selectedPolicyName: selectedPolicy?.name ?? null,
       selectedStrategyTitle: selectedStrategy?.title ?? null,
       placementContext: LearningDataManager.buildPlacementContextSummary(placementConfig, evaluationProfile),

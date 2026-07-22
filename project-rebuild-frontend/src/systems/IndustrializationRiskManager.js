@@ -33,6 +33,23 @@ export default class IndustrializationRiskManager {
     return [...risks].sort((a, b) => b.impact - a.impact || b.severity.rank - a.severity.rank)[0];
   }
 
+  static summarize(risks = []) {
+    const primaryRisk = risks.find((risk) => risk.primary) ?? risks[0] ?? null;
+    const serializeRisk = (risk) => ({
+      id: risk.id,
+      title: risk.title,
+      shortMessage: risk.shortMessage,
+      primary: Boolean(risk.primary),
+      impact: risk.impact ?? 0,
+      severity: risk.severity ? { ...risk.severity } : null,
+    });
+
+    return {
+      primaryRisk: primaryRisk ? serializeRisk(primaryRisk) : null,
+      risks: risks.map(serializeRisk),
+    };
+  }
+
   static createTrafficRisk(gameState) {
     const level = gameState.traffic >= 20 ? 'high' : gameState.traffic >= 15 ? 'medium' : 'low';
     return IndustrializationRiskManager.createRisk({

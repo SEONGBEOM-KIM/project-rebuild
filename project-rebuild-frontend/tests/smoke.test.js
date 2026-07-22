@@ -1821,6 +1821,10 @@ function testIndustrializationRiskManager() {
   assert.equal(risks.find((risk) => risk.id === 'traffic').severity.label, '집중 대응');
   assert.equal(risks.find((risk) => risk.id === 'inequality').severity.label, '집중 대응');
   assert.equal(IndustrializationRiskManager.getPrimaryRisk(risks).id, 'inequality');
+  const summary = IndustrializationRiskManager.summarize(risks);
+  assert.equal(summary.primaryRisk.id, 'inequality');
+  assert.deepEqual(summary.risks.map((risk) => risk.id), ['traffic', 'environment', 'inequality']);
+  assert.equal(summary.risks.find((risk) => risk.id === 'inequality').severity.label, '집중 대응');
   assert.deepEqual(
     IndustrializationRiskManager.detect({ gameState: GameState.createInitialState(), placementEpisodeId: EPISODE_IDS.PopulationRecovery }).map((risk) => risk.id),
     IssueDetector.detect(GameState.createInitialState()).map((risk) => risk.id),
@@ -2863,7 +2867,7 @@ function testPlacementViewManager() {
   assert.match(endingSceneSource, /EpisodeFlowManager\.resolveSelectedStrategy/, 'ending scene should recover the active episode strategy through episode flow manager');
   assert.match(endingSceneSource, /PlacementContextManager/, 'ending scene should resolve active placement context');
   assert.match(endingSceneSource, /EpisodeFlowManager\.getNextDevelopmentGoals/, 'ending scene should show next goals from active placement episode');
-  assert.match(endingSceneSource, /formatStateSummary\(gameState, ending, placementConfig\.stateKeys, evaluationProfile\)/, 'ending scene should summarize state with active placement config');
+  assert.match(endingSceneSource, /formatStateSummary\([\s\S]*placementConfig\.stateKeys, evaluationProfile, placedBuildings, placementConfig\.episodeId/, 'ending scene should summarize state with active placement config and industrialization risks');
   assert.match(endingSceneSource, /formatLearningRecordRows\(learningProgress, exploredPlaces, quizResult, reflectionChoice, selectedStrategy, placementConfig, evaluationProfile\)/, 'ending scene should record active placement context');
   const reflectionSceneSource = readProjectFile('src', 'scenes', 'ReflectionScene.js');
   assert.match(reflectionSceneSource, /EpisodeFlowManager\.resolveSelectedStrategy/, 'reflection scene should recover the active episode strategy through episode flow manager');
@@ -3707,6 +3711,9 @@ function testTeacherReportManager() {
   assert.equal(ep3Report.episodeContext.placement.code, 'ep3');
   assert.equal(TeacherReportManager.formatDownloadFileName(ep3Report), 'project-rebuild-ep3-teacher-report.txt');
   assert.match(TeacherReportManager.formatClassSummaryReport(ep3Report), /배치 전략: 방문 경제 활성화/);
+  assert.match(TeacherReportManager.formatClassSummaryReport(ep3Report), /부작용 수준:/);
+  assert.match(TeacherReportManager.formatTeachingPointReport(ep3Report), /최우선 ·/);
+  assert.deepEqual(ep3Report.sideEffectRisks.risks.map((risk) => risk.id), ['traffic', 'environment', 'inequality']);
   assert.match(TeacherReportManager.formatChoiceReport(ep3Report), /배치 전략: 방문 경제 활성화/);
 }
 
@@ -3939,6 +3946,9 @@ function testLearningDataManager() {
     { building: economyBuildings[1], position: { x: 3, y: 2 }, delta: economyBuildings[1].effect },
     { building: economyBuildings[2], position: { x: 6, y: 1 }, delta: economyBuildings[2].effect },
   ]);
+  registry.set(REGISTRY_KEYS.gameState, {
+    ...GameState.createInitialState(), economy: 112, satisfaction: 61, traffic: 20, pollution: 15,
+  });
   const ep3Data = LearningDataManager.build(registry);
   assert.equal(ep3Data.selectedPolicy.id, 'distribution_growth');
   assert.equal(ep3Data.selectedStrategy.id, 'logistics_growth_hub');
@@ -3946,6 +3956,9 @@ function testLearningDataManager() {
   assert.equal(ep3Data.placementConfig.id, EP3_ECONOMY_PLACEMENT_CONFIG_ID);
   assert.equal(ep3Data.episodeContext.placement.code, 'ep3');
   assert.equal(ep3Data.summary.selectedStrategyTitle, '유통 성장 거점');
+  assert.equal(ep3Data.summary.priorityIssue.id, 'inequality');
+  assert.deepEqual(ep3Data.summary.sideEffectRisks.risks.map((risk) => risk.id), ['traffic', 'environment', 'inequality']);
+  assert.equal(ep3Data.summary.sideEffectRisks.primaryRisk.id, 'inequality');
   assert.equal(LearningDataManager.validate({ ...ep3Data, selectedStrategy: null }).every((row) => row.ok), true, 'EP3 saved data should be accepted when policy maps to an EP3 strategy');
 
   registry.set(REGISTRY_KEYS.selectedPolicy, { id: 'youth_living_support', name: '청년 생활 지원' });

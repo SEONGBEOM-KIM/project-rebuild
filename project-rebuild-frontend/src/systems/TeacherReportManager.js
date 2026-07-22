@@ -1,7 +1,7 @@
 import { explorationPlaces } from '../data/explorationPlaces.js';
 import { CURRENT_EPISODE } from '../data/episodes.js';
 import { DEFAULT_STATE_KEYS, STATE_LABELS } from '../data/stateLabels.js';
-import IssueDetector from './IssueDetector.js';
+import IndustrializationRiskManager from './IndustrializationRiskManager.js';
 import LearningProgress from './LearningProgress.js';
 import EndingSummaryManager from './EndingSummaryManager.js';
 import EpisodeFlowManager from './EpisodeFlowManager.js';
@@ -61,7 +61,12 @@ export default class TeacherReportManager {
     const gameState = registry.get(REGISTRY_KEYS.gameState);
     const reflectionChoice = registry.get(REGISTRY_KEYS.reflectionChoice);
     const quizResult = registry.get(REGISTRY_KEYS.quizResult) ?? progress.quizResult;
-    const issues = IssueDetector.detect(gameState, evaluationProfile);
+    const issues = IndustrializationRiskManager.detect({
+      gameState,
+      placedBuildings,
+      placementEpisodeId: placementEpisode.code,
+      evaluationProfile,
+    });
     const ending = EndingSummaryManager.getEndingSummary(gameState, placedBuildings, evaluationProfile);
     const exploredNames = explorationPlaces
       .filter((place) => progress.exploredPlaces.includes(place.id))
@@ -83,6 +88,7 @@ export default class TeacherReportManager {
       reflectionChoice,
       quizResult,
       issues,
+      sideEffectRisks: IndustrializationRiskManager.summarize(issues),
       ending,
       exploredNames,
     };
@@ -123,7 +129,7 @@ export default class TeacherReportManager {
   }
 
   static formatClassSummaryReport(report) {
-    const priorityIssue = report.issues[0];
+    const priorityIssue = report.issues.find((issue) => issue.primary) ?? report.issues[0];
     const issueText = priorityIssue ? priorityIssue.title : '큰 부작용 신호 없음';
     const actionText = report.reflectionChoice?.nextActionLabel
       ?? report.reflectionChoice?.title
@@ -132,10 +138,11 @@ export default class TeacherReportManager {
     return [
       `${report.ending.title}: ${report.ending.message}`,
       `우선 보완: ${issueText}`,
+      priorityIssue?.severity ? `부작용 수준: ${priorityIssue.severity.label}` : null,
       `학생 다음 액션: ${actionText}`,
       `배치 전략: ${report.selectedStrategy?.title ?? '미선택'}`,
       `회복 방향: ${report.selectedPolicy?.name ?? '미선택'} / 배치 ${report.placedBuildings.length}개`,
-    ].join('\n');
+    ].filter((row) => row !== null).join('\n');
   }
 
   static formatProgressReport(report) {
@@ -180,7 +187,7 @@ export default class TeacherReportManager {
 
   static formatTeachingPointReport(report) {
     const issueRows = report.issues.length
-      ? report.issues.map((issue) => `• ${issue.title}`).join('\n')
+      ? report.issues.map((issue) => `• ${issue.primary ? '최우선 · ' : ''}${issue.title}${issue.severity ? ` (${issue.severity.label})` : ''}`).join('\n')
       : '• 큰 부작용 신호 없음';
 
     return [

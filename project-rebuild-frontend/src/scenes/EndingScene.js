@@ -41,11 +41,15 @@ export default class EndingScene extends Phaser.Scene {
 
     createLayoutText(this, layout.subtitle, { origin: 0.5 });
 
-    EndingSummaryRenderer.renderTakeawayStrip(this, width / 2, EndingSummaryManager.formatFinalTakeaway({ gameState, ending, reflectionChoice, selectedStrategy, evaluationProfile }));
+    EndingSummaryRenderer.renderTakeawayStrip(this, width / 2, EndingSummaryManager.formatFinalTakeaway({
+      gameState, ending, reflectionChoice, selectedStrategy, evaluationProfile, placedBuildings, placementEpisodeId: placementConfig.episodeId,
+    }));
 
     const panels = EndingSummaryViewManager.getPanelLayout();
     EndingSummaryRenderer.renderPanel(this, panels.choice, EndingSummaryManager.formatChoiceSummary(selectedPolicy, placedBuildings, reflectionChoice, selectedStrategy));
-    EndingSummaryRenderer.renderPanel(this, panels.state, EndingSummaryManager.formatStateSummary(gameState, ending, placementConfig.stateKeys, evaluationProfile));
+    EndingSummaryRenderer.renderPanel(this, panels.state, EndingSummaryManager.formatStateSummary(
+      gameState, ending, placementConfig.stateKeys, evaluationProfile, placedBuildings, placementConfig.episodeId,
+    ));
     EndingSummaryRenderer.renderNextMissionPanel(this, panels.nextMission, EpisodeFlowManager.getNextDevelopmentGoals({ registry: this.registry, learningProgress, placementConfig }));
     EndingSummaryRenderer.renderLearningRecordStrip(
       this,
