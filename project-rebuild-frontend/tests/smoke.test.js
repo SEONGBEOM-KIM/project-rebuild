@@ -2284,7 +2284,9 @@ function testPlacementWorldRenderer() {
   assert.equal(placed.graphics.type, 'graphics');
   assert.equal(placed.label.type, 'text');
   assert.equal(placed.label.args[2], '청년센터');
-  assert.equal(fixture.mapDrawCalls.length, 1);
+  const inherited = fixture.renderer.drawPlacedBuilding(youthCenter, 2, 7, { inherited: true });
+  assert.equal(inherited.label.args[2], '이전 청년센터');
+  assert.equal(fixture.mapDrawCalls.length, 2);
   assert.deepEqual(fixture.mapDrawCalls[0][1], [{ x: 2, y: 7 }, { x: 3, y: 8 }]);
   assert.equal(fixture.labelAdds[0], placed.label);
   assert.ok(placed.graphics.calls.some((call) => call[0] === 'fillRoundedRect'), 'building label background should be drawn');
@@ -2853,6 +2855,7 @@ function testPlacementViewManager() {
     strokeWidth: 2,
     depth: 17,
   });
+  assert.equal(PlacementViewManager.getInheritedBuildingVisual(buildings.find((building) => building.id === 'small_park'), 6, 1).strokeColor, 0xfde68a);
   assert.deepEqual(PlacementViewManager.getBuildingLabelLayout({ x: 500, y: 300 }, 2, 3).text, {
     x: 500,
     y: 265,

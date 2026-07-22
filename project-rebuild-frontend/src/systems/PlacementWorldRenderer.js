@@ -14,13 +14,15 @@ export default class PlacementWorldRenderer {
   restorePlacedBuildings(placedBuildings) {
     for (const record of placedBuildings) {
       this.placementSystem.place(record.position.x, record.position.y, record.building);
-      this.drawPlacedBuilding(record.building, record.position.x, record.position.y);
+      this.drawPlacedBuilding(record.building, record.position.x, record.position.y, { inherited: true });
       this.drawImpactMarkers(record.building, record.position.x, record.position.y, false);
     }
   }
 
-  drawPlacedBuilding(building, tileX, tileY) {
-    const buildingVisual = this.viewManager.getPlacedBuildingVisual(building, tileX, tileY);
+  drawPlacedBuilding(building, tileX, tileY, { inherited = false } = {}) {
+    const buildingVisual = inherited
+      ? this.viewManager.getInheritedBuildingVisual(building, tileX, tileY)
+      : this.viewManager.getPlacedBuildingVisual(building, tileX, tileY);
     const graphics = this.objectRegistry.registerWorldObject(this.scene.add.graphics().setDepth(buildingVisual.depth));
     this.mapRenderer.drawTiles(
       graphics,
@@ -41,7 +43,7 @@ export default class PlacementWorldRenderer {
     const label = this.objectRegistry.registerWorldObject(this.scene.add.text(
       labelLayout.text.x,
       labelLayout.text.y,
-      building.name,
+      inherited ? `이전 ${building.name}` : building.name,
       this.viewManager.getTextStyles().buildingLabel,
     ).setOrigin(0.5).setDepth(labelLayout.text.depth));
 

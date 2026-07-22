@@ -310,6 +310,15 @@ export default class PlacementViewManager {
     };
   }
 
+  static getInheritedBuildingVisual(building, tileX, tileY) {
+    return {
+      ...PlacementViewManager.getPlacedBuildingVisual(building, tileX, tileY),
+      alpha: 0.46,
+      strokeColor: 0xfde68a,
+      strokeWidth: 5,
+    };
+  }
+
   static getBuildingLabelLayout(labelPosition, tileX, tileY) {
     const label = PLACEMENT_MAP_VISUALS.buildingLabel;
     return {
