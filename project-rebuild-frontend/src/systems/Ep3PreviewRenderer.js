@@ -20,12 +20,12 @@ export default class Ep3PreviewRenderer {
     });
   }
 
-  static renderWorldProgress(scene, worldState) {
+  static renderWorldProgress(scene, worldState, cumulativeMode = false, onSelectMode = null) {
     const layout = Ep3PreviewViewManager.getWorldProgressLayout();
     const style = Ep3PreviewViewManager.getPanelStyle();
     createPanelBackground(scene, layout.panel, style);
     createPanelTitle(scene, layout.title, style);
-    return createLayoutText(scene, layout.body, {
+    const progressText = createLayoutText(scene, layout.body, {
       text: Ep3PreviewViewManager.formatWorldProgress(worldState),
       style: {
         fontSize: '18px',
@@ -34,6 +34,24 @@ export default class Ep3PreviewRenderer {
         wordWrap: { width: layout.body.wordWrapWidth },
       },
     });
+    const modeStatus = createLayoutText(scene, layout.modeStatus, {
+      text: Ep3PreviewViewManager.formatWorldModeStatus(worldState, cumulativeMode),
+      style: {
+        fontSize: '18px',
+        color: style.bodyColor,
+        wordWrap: { width: layout.modeStatus.wordWrapWidth },
+      },
+    });
+    const canUseCumulativeMode = Ep3PreviewViewManager.canUseCumulativeMode(worldState);
+    const modeButtons = canUseCumulativeMode
+      ? Ep3PreviewViewManager.getWorldModeOptions(cumulativeMode).map((option) => {
+        const button = createTextButton(scene, option, option);
+        button.on('pointerdown', () => onSelectMode?.(option.mode));
+        return { ...option, button };
+      })
+      : [];
+
+    return { progressText, modeStatus, modeButtons };
   }
 
   static renderFocusCard(scene, focusArea, index, selectedStrategyId = null, onSelect = null) {

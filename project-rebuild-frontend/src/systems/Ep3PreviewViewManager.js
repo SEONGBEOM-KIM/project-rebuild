@@ -56,6 +56,11 @@ const EP3_PREVIEW_BUTTON_STYLE = {
   padding: { x: 34, y: 18 },
 };
 
+const EP3_PREVIEW_WORLD_MODE_BUTTON_STYLE = {
+  fontSize: '18px',
+  padding: { x: 16, y: 10 },
+};
+
 export default class Ep3PreviewViewManager {
   static getScreenLayout(width) {
     return {
@@ -100,17 +105,38 @@ export default class Ep3PreviewViewManager {
 
   static getWorldProgressLayout() {
     return {
-      panel: { x: 960, y: 370, width: 1510, height: 85 },
-      title: { x: 250, y: 340, text: '푸른군 현재 현황' },
-      body: { x: 505, y: 338, wordWrapWidth: 1195 },
+      panel: { x: 960, y: 385, width: 1510, height: 110 },
+      title: { x: 250, y: 345, text: '푸른군 현재 현황' },
+      body: { x: 505, y: 342, wordWrapWidth: 780 },
+      modeStatus: { x: 505, y: 404, wordWrapWidth: 780 },
     };
+  }
+
+  static getWorldModeOptions(cumulativeMode = false) {
+    return [
+      {
+        mode: false,
+        x: 1410,
+        y: 410,
+        label: '독립 실험',
+      },
+      {
+        mode: true,
+        x: 1660,
+        y: 410,
+        label: 'EP2 결과 이어받기',
+      },
+    ].map((option) => ({
+      ...option,
+      ...Ep3PreviewViewManager.getWorldModeButtonStyle(option.mode === cumulativeMode),
+    }));
   }
 
   static getFocusCardLayout(index) {
     const positions = [
-      { x: 440, y: 590 },
-      { x: 960, y: 590 },
-      { x: 1480, y: 590 },
+      { x: 440, y: 620 },
+      { x: 960, y: 620 },
+      { x: 1480, y: 620 },
     ];
     const position = positions[index];
     return {
@@ -124,23 +150,35 @@ export default class Ep3PreviewViewManager {
 
   static getTransitionNoteLayout() {
     return {
-      panel: { x: 960, y: 830, width: 1510, height: 150 },
-      title: { x: 250, y: 775, text: 'EP3 배치 준비' },
-      policyBody: { x: 250, y: 810, wordWrapWidth: 650 },
-      buildingBody: { x: 975, y: 810, wordWrapWidth: 650 },
+      panel: { x: 960, y: 855, width: 1510, height: 150 },
+      title: { x: 250, y: 800, text: 'EP3 배치 준비' },
+      policyBody: { x: 250, y: 835, wordWrapWidth: 650 },
+      buildingBody: { x: 975, y: 835, wordWrapWidth: 650 },
     };
   }
 
   static getControlLayout(centerX) {
     return {
-      ending: { x: centerX - 420, y: 980, label: '마무리로 돌아가기', target: SCENE_KEYS.Ending, backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
-      start: { x: centerX, y: 980, label: 'EP3 배치 연습 시작', target: SCENE_KEYS.Placement, backgroundColor: '#bbf7d0', textColor: '#123524' },
-      restart: { x: centerX + 420, y: 980, label: '처음부터 다시', target: SCENE_KEYS.Boot, backgroundColor: '#fde68a', textColor: '#0f172a' },
+      ending: { x: centerX - 420, y: 1000, label: '마무리로 돌아가기', target: SCENE_KEYS.Ending, backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
+      start: { x: centerX, y: 1000, label: 'EP3 배치 연습 시작', target: SCENE_KEYS.Placement, backgroundColor: '#bbf7d0', textColor: '#123524' },
+      restart: { x: centerX + 420, y: 1000, label: '처음부터 다시', target: SCENE_KEYS.Boot, backgroundColor: '#fde68a', textColor: '#0f172a' },
     };
   }
 
   static formatIntroText(preview) {
     return preview.intro.join('\n');
+  }
+
+  static canUseCumulativeMode(worldState = {}) {
+    return (worldState.completedEpisodeIds ?? []).includes(EPISODE_IDS.PopulationRecovery);
+  }
+
+  static getWorldModeButtonStyle(selected) {
+    return {
+      ...EP3_PREVIEW_WORLD_MODE_BUTTON_STYLE,
+      backgroundColor: selected ? '#bbf7d0' : '#334155',
+      textColor: selected ? '#123524' : '#e2e8f0',
+    };
   }
 
   static formatWorldProgress(worldState = {}) {
@@ -160,8 +198,16 @@ export default class Ep3PreviewViewManager {
     return [
       completedEp2 ? 'EP2 배치 완료 · 경제 성장 단계로 진입합니다.' : 'EP2 배치 결과를 완료하면 푸른군 기록에 반영됩니다.',
       `${facilityText}  |  ${stateText}`,
-      '이번 목표: 일자리·상권·물류 성장 방향 비교  |  현재는 독립 실험, 누적 지도 모드에서는 이 기록을 이어받습니다.',
     ].join('\n');
+  }
+
+  static formatWorldModeStatus(worldState = {}, cumulativeMode = false) {
+    if (!Ep3PreviewViewManager.canUseCumulativeMode(worldState)) {
+      return '배치 방식: 독립 실험 · EP2 완료 기록이 생기면 이전 시설과 상태를 이어받을 수 있습니다.';
+    }
+    return cumulativeMode
+      ? '배치 방식: EP2 결과 이어받기 · 기존 시설과 지역 상태를 지도에 복원합니다.'
+      : '배치 방식: 독립 실험 · EP3 성장 전략만 별도 조건에서 비교합니다.';
   }
 
   static getSelectionLabelStyle(selected) {

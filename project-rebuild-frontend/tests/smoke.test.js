@@ -3235,13 +3235,13 @@ function testEp3PreviewViewManager() {
   assert.equal(Ep3PreviewViewManager.getNoteStyle().strokeColor, 0x86efac);
   assert.equal(Ep3PreviewViewManager.getIntroPanelLayout().title.text, '경제 성장 미션 브리핑');
   assert.equal(Ep3PreviewViewManager.getWorldProgressLayout().title.text, '푸른군 현재 현황');
-  assert.deepEqual(Ep3PreviewViewManager.getFocusCardLayout(1).panel, { x: 960, y: 590, width: 440, height: 300 });
+  assert.deepEqual(Ep3PreviewViewManager.getFocusCardLayout(1).panel, { x: 960, y: 620, width: 440, height: 300 });
   assert.equal(Ep3PreviewViewManager.getTransitionNoteLayout().title.text, 'EP3 배치 준비');
   assert.equal(Ep3PreviewViewManager.getTransitionNoteLayout().policyBody.wordWrapWidth, 650);
   assert.equal(Ep3PreviewViewManager.getTransitionNoteLayout().buildingBody.wordWrapWidth, 650);
   assert.deepEqual(Ep3PreviewViewManager.getControlLayout(960).ending, {
     x: 540,
-    y: 980,
+    y: 1000,
     label: '마무리로 돌아가기',
     target: 'EndingScene',
     backgroundColor: '#c4b5fd',
@@ -3249,7 +3249,7 @@ function testEp3PreviewViewManager() {
   });
   assert.deepEqual(Ep3PreviewViewManager.getControlLayout(960).start, {
     x: 960,
-    y: 980,
+    y: 1000,
     label: 'EP3 배치 연습 시작',
     target: 'PlacementScene',
     backgroundColor: '#bbf7d0',
@@ -3258,7 +3258,10 @@ function testEp3PreviewViewManager() {
   assert.match(Ep3PreviewViewManager.formatIntroText(EP3_MISSION_BRIEFING), /일자리와 산업 성장/);
   assert.match(Ep3PreviewViewManager.formatFocusBody(EP3_MISSION_BRIEFING.strategies[2]), /교통 부담↑ 오염 신호↑/);
   assert.match(Ep3PreviewViewManager.formatWorldProgress({ completedEpisodeIds: [EPISODE_IDS.PopulationRecovery] }), /EP2 배치 완료/);
-  assert.match(Ep3PreviewViewManager.formatWorldProgress({}), /독립 실험/);
+  assert.match(Ep3PreviewViewManager.formatWorldModeStatus({}), /독립 실험/);
+  assert.equal(Ep3PreviewViewManager.canUseCumulativeMode({ completedEpisodeIds: [EPISODE_IDS.PopulationRecovery] }), true);
+  assert.equal(Ep3PreviewViewManager.canUseCumulativeMode({}), false);
+  assert.match(Ep3PreviewViewManager.formatWorldModeStatus({ completedEpisodeIds: [EPISODE_IDS.PopulationRecovery] }, true), /결과 이어받기/);
   assert.match(Ep3PreviewViewManager.formatTransitionNote(EP3_MISSION_BRIEFING), /경제 성장 미션 브리핑/);
   assert.match(Ep3PreviewViewManager.formatPolicyPreviewRows(economyPolicies), /방문 경제 활성화/);
   assert.match(Ep3PreviewViewManager.formatBuildingPreviewRows(economyBuildings), /물류 센터/);
@@ -3269,6 +3272,8 @@ function testEp3PreviewViewManager() {
   assert.match(previewSceneSource, /economyPolicies/, 'EP3 preview scene should show economy policy candidates');
   assert.match(previewSceneSource, /economyBuildings/, 'EP3 preview scene should show economy building candidates');
   assert.match(previewSceneSource, /selectStrategy/, 'EP3 preview scene should support selecting a growth strategy');
+  assert.match(previewSceneSource, /selectCumulativeMode/, 'EP3 preview scene should support selecting an independent or cumulative placement mode');
+  assert.match(previewSceneSource, /cumulative: this\.cumulativeMode/, 'EP3 preview scene should pass the selected world mode into placement launch');
   assert.match(previewSceneSource, /prepareEp3Placement/, 'EP3 preview scene should prepare placement context before starting placement');
   assert.match(previewSceneSource, /EpisodePlacementLaunchManager/, 'EP3 preview scene should delegate placement launch setup');
 }
