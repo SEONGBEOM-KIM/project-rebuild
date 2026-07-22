@@ -299,6 +299,8 @@ function testPlacementSceneObjectRegistry() {
   assert.equal(uiObject.scrollFactor, 0);
   assert.equal(uiObject.depth, 100);
   assert.deepEqual(fixture.ignoredByMain, [uiObject]);
+  assert.equal(registry.registerUiObject(null), null, 'hidden optional UI should not be passed to Phaser cameras');
+  assert.equal(registry.uiObjects.length, 1);
 
   registry.registerWorldObject(worldObject);
   registry.ignoreUiObjectsOnMainCamera();

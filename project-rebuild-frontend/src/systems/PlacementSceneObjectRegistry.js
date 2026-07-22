@@ -20,6 +20,10 @@ export default class PlacementSceneObjectRegistry {
   }
 
   registerUiObject(object) {
+    if (!object) {
+      return null;
+    }
+
     this.uiObjects.push(object);
 
     if (this.scene.cameras?.main) {

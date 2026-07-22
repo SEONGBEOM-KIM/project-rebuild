@@ -50,7 +50,10 @@ export default class PlacementSceneBootstrap {
     const { width, height } = this.scene.scale;
     const layout = this.viewManager.getScreenLayout();
     objectRegistry.registerWorldObject(this.scene.add.rectangle(width / 2, height / 2, width, height, layout.background.color).setScrollFactor(0).setDepth(-10));
-    objectRegistry.registerUiObject(this.progressStepper.render(this.scene, layout.progressStep));
+    const progressStepper = this.progressStepper.render(this.scene, layout.progressStep);
+    if (progressStepper) {
+      objectRegistry.registerUiObject(progressStepper);
+    }
     objectRegistry.registerUiObject(this.scene.add.text(layout.topHint.x, layout.topHint.y, layout.topHint.text, layout.topHint).setScrollFactor(0).setDepth(100));
   }
 
