@@ -20,6 +20,22 @@ export default class Ep3PreviewRenderer {
     });
   }
 
+  static renderWorldProgress(scene, worldState) {
+    const layout = Ep3PreviewViewManager.getWorldProgressLayout();
+    const style = Ep3PreviewViewManager.getPanelStyle();
+    createPanelBackground(scene, layout.panel, style);
+    createPanelTitle(scene, layout.title, style);
+    return createLayoutText(scene, layout.body, {
+      text: Ep3PreviewViewManager.formatWorldProgress(worldState),
+      style: {
+        fontSize: '18px',
+        color: style.bodyColor,
+        lineSpacing: 3,
+        wordWrap: { width: layout.body.wordWrapWidth },
+      },
+    });
+  }
+
   static renderFocusCard(scene, focusArea, index, selectedStrategyId = null, onSelect = null) {
     const layout = Ep3PreviewViewManager.getFocusCardLayout(index);
     const style = Ep3PreviewViewManager.getCardStyle(focusArea.id, selectedStrategyId, focusArea.color);

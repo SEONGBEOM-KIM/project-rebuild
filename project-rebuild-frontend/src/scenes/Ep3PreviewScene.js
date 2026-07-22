@@ -8,6 +8,7 @@ import { EPISODE_IDS } from '../data/episodes.js';
 import Ep3PreviewViewManager from '../systems/Ep3PreviewViewManager.js';
 import Ep3PreviewRenderer from '../systems/Ep3PreviewRenderer.js';
 import EpisodePlacementLaunchManager from '../systems/EpisodePlacementLaunchManager.js';
+import WorldStateManager from '../systems/WorldStateManager.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
 
@@ -31,6 +32,7 @@ export default class Ep3PreviewScene extends Phaser.Scene {
     this.strategyObjects = new Map();
 
     Ep3PreviewRenderer.renderIntroPanel(this, briefing);
+    Ep3PreviewRenderer.renderWorldProgress(this, WorldStateManager.get(this.registry));
     this.renderStrategyCards();
     Ep3PreviewRenderer.renderTransitionNote(this, briefing, economyPolicies, economyBuildings);
 

@@ -1,4 +1,6 @@
 import SCENE_KEYS from '../data/sceneKeys.js';
+import { EPISODE_IDS } from '../data/episodes.js';
+import StateHudManager from './StateHudManager.js';
 
 const EP3_PREVIEW_LAYOUT = {
   backgroundColor: 0x0f172a,
@@ -15,9 +17,9 @@ const EP3_PREVIEW_PANEL_STYLE = {
   titleFontSize: '32px',
   titleColor: '#fde68a',
   titleFontStyle: 'bold',
-  bodyFontSize: '24px',
+  bodyFontSize: '21px',
   bodyColor: '#e0f2fe',
-  bodyLineSpacing: 10,
+  bodyLineSpacing: 5,
 };
 
 const EP3_PREVIEW_CARD_STYLE = {
@@ -44,9 +46,9 @@ const EP3_PREVIEW_NOTE_STYLE = {
   titleFontSize: '28px',
   titleColor: '#bbf7d0',
   titleFontStyle: 'bold',
-  bodyFontSize: '22px',
+  bodyFontSize: '18px',
   bodyColor: '#dbeafe',
-  bodyLineSpacing: 8,
+  bodyLineSpacing: 4,
 };
 
 const EP3_PREVIEW_BUTTON_STYLE = {
@@ -90,21 +92,29 @@ export default class Ep3PreviewViewManager {
 
   static getIntroPanelLayout() {
     return {
-      panel: { x: 960, y: 260, width: 1510, height: 150 },
+      panel: { x: 960, y: 250, width: 1510, height: 130 },
       title: { x: 250, y: 202, text: '경제 성장 미션 브리핑' },
-      body: { x: 250, y: 246, wordWrapWidth: 1380 },
+      body: { x: 250, y: 240, wordWrapWidth: 1380 },
+    };
+  }
+
+  static getWorldProgressLayout() {
+    return {
+      panel: { x: 960, y: 370, width: 1510, height: 85 },
+      title: { x: 250, y: 340, text: '푸른군 현재 현황' },
+      body: { x: 505, y: 338, wordWrapWidth: 1195 },
     };
   }
 
   static getFocusCardLayout(index) {
     const positions = [
-      { x: 440, y: 548 },
-      { x: 960, y: 548 },
-      { x: 1480, y: 548 },
+      { x: 440, y: 590 },
+      { x: 960, y: 590 },
+      { x: 1480, y: 590 },
     ];
     const position = positions[index];
     return {
-      panel: { x: position.x, y: position.y, width: 440, height: 330 },
+      panel: { x: position.x, y: position.y, width: 440, height: 300 },
       icon: { x: position.x, y: position.y - 112 },
       title: { x: position.x, y: position.y - 56, wordWrapWidth: 360 },
       body: { x: position.x - 180, y: position.y - 16, wordWrapWidth: 360 },
@@ -114,23 +124,44 @@ export default class Ep3PreviewViewManager {
 
   static getTransitionNoteLayout() {
     return {
-      panel: { x: 960, y: 805, width: 1510, height: 170 },
-      title: { x: 250, y: 740, text: 'EP3 배치 준비' },
-      policyBody: { x: 250, y: 782, wordWrapWidth: 650 },
-      buildingBody: { x: 975, y: 782, wordWrapWidth: 650 },
+      panel: { x: 960, y: 830, width: 1510, height: 150 },
+      title: { x: 250, y: 775, text: 'EP3 배치 준비' },
+      policyBody: { x: 250, y: 810, wordWrapWidth: 650 },
+      buildingBody: { x: 975, y: 810, wordWrapWidth: 650 },
     };
   }
 
   static getControlLayout(centerX) {
     return {
-      ending: { x: centerX - 420, y: 955, label: '마무리로 돌아가기', target: SCENE_KEYS.Ending, backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
-      start: { x: centerX, y: 955, label: 'EP3 배치 연습 시작', target: SCENE_KEYS.Placement, backgroundColor: '#bbf7d0', textColor: '#123524' },
-      restart: { x: centerX + 420, y: 955, label: '처음부터 다시', target: SCENE_KEYS.Boot, backgroundColor: '#fde68a', textColor: '#0f172a' },
+      ending: { x: centerX - 420, y: 980, label: '마무리로 돌아가기', target: SCENE_KEYS.Ending, backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
+      start: { x: centerX, y: 980, label: 'EP3 배치 연습 시작', target: SCENE_KEYS.Placement, backgroundColor: '#bbf7d0', textColor: '#123524' },
+      restart: { x: centerX + 420, y: 980, label: '처음부터 다시', target: SCENE_KEYS.Boot, backgroundColor: '#fde68a', textColor: '#0f172a' },
     };
   }
 
   static formatIntroText(preview) {
     return preview.intro.join('\n');
+  }
+
+  static formatWorldProgress(worldState = {}) {
+    const completedEpisodeIds = worldState.completedEpisodeIds ?? [];
+    const completedEp2 = completedEpisodeIds.includes(EPISODE_IDS.PopulationRecovery);
+    const placements = worldState.placements ?? [];
+    const facilityNames = [...new Set(
+      placements.map((record) => record.building?.name ?? record.buildingName ?? record.buildingId).filter(Boolean),
+    )];
+    const facilityText = facilityNames.length
+      ? `완료 시설 ${placements.length}개: ${facilityNames.slice(0, 3).join(' · ')}`
+      : '완료 시설: 아직 없음';
+    const stateText = worldState.gameState
+      ? StateHudManager.formatCompactText(worldState.gameState, { stateKeys: ['population', 'economy', 'budget'] })
+      : '이전 지역 상태: 아직 저장된 결과 없음';
+
+    return [
+      completedEp2 ? 'EP2 배치 완료 · 경제 성장 단계로 진입합니다.' : 'EP2 배치 결과를 완료하면 푸른군 기록에 반영됩니다.',
+      `${facilityText}  |  ${stateText}`,
+      '이번 목표: 일자리·상권·물류 성장 방향 비교  |  현재는 독립 실험, 누적 지도 모드에서는 이 기록을 이어받습니다.',
+    ].join('\n');
   }
 
   static getSelectionLabelStyle(selected) {

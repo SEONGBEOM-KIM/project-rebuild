@@ -3177,6 +3177,16 @@ function testEp3PreviewRenderer() {
   assert.ok(introFixture.calls.some((call) => call[0] === 'text' && call[3] === '경제 성장 미션 브리핑'));
   assert.ok(introFixture.calls.some((call) => call[0] === 'text' && call[3].includes('EP3에서는')));
 
+  const worldFixture = createRendererSceneSpy();
+  Ep3PreviewRenderer.renderWorldProgress(worldFixture.scene, {
+    completedEpisodeIds: [EPISODE_IDS.PopulationRecovery],
+    placements: [{ building: { name: '청년센터' } }],
+    gameState: { ...GameState.createInitialState(), population: 1080, economy: 58, budget: 820 },
+  });
+  assert.ok(worldFixture.calls.some((call) => call[0] === 'text' && call[3] === '푸른군 현재 현황'));
+  assert.ok(worldFixture.calls.some((call) => call[0] === 'text' && call[3].includes('EP2 배치 완료')));
+  assert.ok(worldFixture.calls.some((call) => call[0] === 'text' && call[3].includes('청년센터')));
+
   const cardFixture = createRendererSceneSpy();
   const selectedStrategyIds = [];
   const card = Ep3PreviewRenderer.renderFocusCard(
@@ -3224,13 +3234,14 @@ function testEp3PreviewViewManager() {
   assert.equal(Ep3PreviewViewManager.formatSelectionLabel('a', 'a'), '선택된 성장 전략');
   assert.equal(Ep3PreviewViewManager.getNoteStyle().strokeColor, 0x86efac);
   assert.equal(Ep3PreviewViewManager.getIntroPanelLayout().title.text, '경제 성장 미션 브리핑');
-  assert.deepEqual(Ep3PreviewViewManager.getFocusCardLayout(1).panel, { x: 960, y: 548, width: 440, height: 330 });
+  assert.equal(Ep3PreviewViewManager.getWorldProgressLayout().title.text, '푸른군 현재 현황');
+  assert.deepEqual(Ep3PreviewViewManager.getFocusCardLayout(1).panel, { x: 960, y: 590, width: 440, height: 300 });
   assert.equal(Ep3PreviewViewManager.getTransitionNoteLayout().title.text, 'EP3 배치 준비');
   assert.equal(Ep3PreviewViewManager.getTransitionNoteLayout().policyBody.wordWrapWidth, 650);
   assert.equal(Ep3PreviewViewManager.getTransitionNoteLayout().buildingBody.wordWrapWidth, 650);
   assert.deepEqual(Ep3PreviewViewManager.getControlLayout(960).ending, {
     x: 540,
-    y: 955,
+    y: 980,
     label: '마무리로 돌아가기',
     target: 'EndingScene',
     backgroundColor: '#c4b5fd',
@@ -3238,7 +3249,7 @@ function testEp3PreviewViewManager() {
   });
   assert.deepEqual(Ep3PreviewViewManager.getControlLayout(960).start, {
     x: 960,
-    y: 955,
+    y: 980,
     label: 'EP3 배치 연습 시작',
     target: 'PlacementScene',
     backgroundColor: '#bbf7d0',
@@ -3246,12 +3257,15 @@ function testEp3PreviewViewManager() {
   });
   assert.match(Ep3PreviewViewManager.formatIntroText(EP3_MISSION_BRIEFING), /일자리와 산업 성장/);
   assert.match(Ep3PreviewViewManager.formatFocusBody(EP3_MISSION_BRIEFING.strategies[2]), /교통 부담↑ 오염 신호↑/);
+  assert.match(Ep3PreviewViewManager.formatWorldProgress({ completedEpisodeIds: [EPISODE_IDS.PopulationRecovery] }), /EP2 배치 완료/);
+  assert.match(Ep3PreviewViewManager.formatWorldProgress({}), /독립 실험/);
   assert.match(Ep3PreviewViewManager.formatTransitionNote(EP3_MISSION_BRIEFING), /경제 성장 미션 브리핑/);
   assert.match(Ep3PreviewViewManager.formatPolicyPreviewRows(economyPolicies), /방문 경제 활성화/);
   assert.match(Ep3PreviewViewManager.formatBuildingPreviewRows(economyBuildings), /물류 센터/);
   const previewSceneSource = readProjectFile('src', 'scenes', 'Ep3PreviewScene.js');
   assert.match(previewSceneSource, /getEpisodeContent/, 'EP3 preview scene should use episode content data');
   assert.match(previewSceneSource, /Ep3PreviewRenderer\.renderFocusCard/, 'EP3 preview scene should render focus cards');
+  assert.match(previewSceneSource, /Ep3PreviewRenderer\.renderWorldProgress/, 'EP3 preview scene should show shared world progress');
   assert.match(previewSceneSource, /economyPolicies/, 'EP3 preview scene should show economy policy candidates');
   assert.match(previewSceneSource, /economyBuildings/, 'EP3 preview scene should show economy building candidates');
   assert.match(previewSceneSource, /selectStrategy/, 'EP3 preview scene should support selecting a growth strategy');
