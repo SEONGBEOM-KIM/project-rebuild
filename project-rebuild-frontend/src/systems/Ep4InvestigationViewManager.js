@@ -35,7 +35,7 @@ export default class Ep4InvestigationViewManager {
   static getControlLayout(centerX) {
     return {
       back: { x: centerX - 250, y: 1000, label: 'EP4 안내로', target: SCENE_KEYS.Ep4Briefing, backgroundColor: '#c4b5fd', textColor: '#1e1b4b' },
-      next: { x: centerX + 250, y: 1000, label: 'EP5 해결 단계 예고', target: SCENE_KEYS.Ending, backgroundColor: '#64748b', textColor: '#e2e8f0' },
+      next: { x: centerX + 250, y: 1000, label: 'EP4 정리하기', target: SCENE_KEYS.Ep4Conclusion, backgroundColor: '#64748b', textColor: '#e2e8f0' },
     };
   }
 

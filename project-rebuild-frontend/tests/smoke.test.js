@@ -22,6 +22,8 @@ import Ep4BriefingViewManager from '../src/systems/Ep4BriefingViewManager.js';
 import Ep4BriefingRenderer from '../src/systems/Ep4BriefingRenderer.js';
 import Ep4InvestigationViewManager from '../src/systems/Ep4InvestigationViewManager.js';
 import Ep4InvestigationRenderer from '../src/systems/Ep4InvestigationRenderer.js';
+import Ep4ConclusionViewManager from '../src/systems/Ep4ConclusionViewManager.js';
+import Ep4ConclusionRenderer from '../src/systems/Ep4ConclusionRenderer.js';
 import LearningProgress from '../src/systems/LearningProgress.js';
 import WorldStateManager from '../src/systems/WorldStateManager.js';
 import EpisodePlacementLaunchManager from '../src/systems/EpisodePlacementLaunchManager.js';
@@ -165,6 +167,7 @@ function createCompleteLearningData(overrides = {}) {
     },
     exploredPlaces: ['school', 'market', 'bus_stop'],
     reviewedRiskIds: ['traffic', 'environment'],
+    ep4InvestigationCompleted: true,
     dataViewed: true,
     quizResult: { questionId: 'ep1_q1', selected: 'lack_jobs_services', correct: true },
     problemSummaryCompleted: true,
@@ -1856,6 +1859,7 @@ function testLearningProgress() {
   assert.deepEqual(progress.exploredPlaces, ['school', 'market'], 'explored places should be unique');
   assert.deepEqual(progress.placedBuildingIds, ['youth_center']);
   assert.deepEqual(progress.reviewedRiskIds, ['traffic']);
+  assert.equal(progress.ep4InvestigationCompleted, false);
   assert.equal(LearningProgress.createInitialProgress().selectedStrategyId, null);
   assert.equal(LearningProgress.createInitialProgress().placementConfigId, null);
 }
@@ -3412,6 +3416,17 @@ function testEp4Briefing() {
   );
   assert.equal(investigationCard.background.type, 'rectangle');
   assert.ok(investigationFixture.calls.some((call) => call[0] === 'text' && call[3] === '✓ 관찰 완료'));
+
+  assert.equal(Ep4ConclusionViewManager.getScreenLayout(1920).title.text, 'EP4. 성장의 부작용 정리');
+  assert.match(Ep4ConclusionViewManager.formatMainBody(sortedRisks), /소득 격차/);
+  assert.match(Ep4ConclusionViewManager.formatMainBody(sortedRisks), /우선 해결 관점:/);
+  assert.match(Ep4ConclusionViewManager.formatNextBody(), /지역 전체의 균형/);
+  assert.equal(Ep4ConclusionViewManager.getControlLayout(960).next.target, 'EndingScene');
+
+  const conclusionFixture = createRendererSceneSpy();
+  Ep4ConclusionRenderer.renderMainPanel(conclusionFixture.scene, sortedRisks);
+  assert.ok(conclusionFixture.calls.some((call) => call[0] === 'text' && call[3] === '이번 성장에서 배운 점'));
+  assert.ok(conclusionFixture.calls.some((call) => call[0] === 'text' && call[3].includes('우선 해결 관점:')));
 }
 
 function testEp2BriefingRenderer() {
@@ -4019,6 +4034,7 @@ function testLearningDataManager() {
   assert.deepEqual(ep3Data.summary.sideEffectRisks.risks.map((risk) => risk.id), ['traffic', 'environment', 'inequality']);
   assert.equal(ep3Data.summary.sideEffectRisks.primaryRisk.id, 'inequality');
   assert.deepEqual(ep3Data.reviewedRiskIds, []);
+  assert.equal(ep3Data.ep4InvestigationCompleted, false);
   assert.equal(LearningDataManager.validate({ ...ep3Data, selectedStrategy: null }).every((row) => row.ok), true, 'EP3 saved data should be accepted when policy maps to an EP3 strategy');
 
   registry.set(REGISTRY_KEYS.selectedPolicy, { id: 'youth_living_support', name: '청년 생활 지원' });
@@ -4403,6 +4419,7 @@ function testLearningDataRestoreManager() {
     },
     exploredPlaces: ['school', 'market', 'bus_stop'],
     reviewedRiskIds: ['traffic', 'environment'],
+    ep4InvestigationCompleted: true,
     dataViewed: true,
     quizResult: { questionId: 'ep1_q1', selected: 'lack_jobs_services', correct: true },
     problemSummaryCompleted: true,
@@ -4446,6 +4463,7 @@ function testLearningDataRestoreManager() {
   assert.equal(registry.get('placementConfigId'), ENVIRONMENT_PLACEMENT_CONFIG_ID);
   assert.deepEqual(registry.get('learningProgress').placedBuildingIds, ['small_park']);
   assert.deepEqual(registry.get('learningProgress').reviewedRiskIds, ['traffic', 'environment']);
+  assert.equal(registry.get('learningProgress').ep4InvestigationCompleted, true);
   assert.deepEqual(registry.get(REGISTRY_KEYS.worldState).completedEpisodeIds, [EPISODE_IDS.PopulationRecovery]);
   assert.equal(registry.get(REGISTRY_KEYS.worldState).placements[0].episodeId, EPISODE_IDS.PopulationRecovery);
 

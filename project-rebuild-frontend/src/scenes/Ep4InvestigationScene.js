@@ -38,6 +38,7 @@ export default class Ep4InvestigationScene extends Phaser.Scene {
     this.nextButton = controls.nextButton;
     this.nextButton.on('pointerdown', () => {
       if (this.reviewedRiskIds.size < this.risks.length) return;
+      LearningProgress.update(this.registry, { ep4InvestigationCompleted: true });
       this.scene.start(controls.layout.next.target);
     });
     this.updateUi();

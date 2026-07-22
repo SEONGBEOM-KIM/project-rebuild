@@ -122,6 +122,7 @@ export default class LearningDataRestoreManager {
       placementConfigId: placementContext?.placementConfig.id ?? PlacementContextManager.resolvePlacementConfigIdFromLearningData(data, selectedStrategy),
       placedBuildingIds: restoredPlacements.map((record) => record.building.id),
       reviewedRiskIds: data.reviewedRiskIds ?? [],
+      ep4InvestigationCompleted: Boolean(data.ep4InvestigationCompleted),
       reflectionChoice: data.reflectionChoice ?? null,
       completed: Boolean(data.completed),
     };

@@ -12,6 +12,7 @@ const INITIAL_PROGRESS = Object.freeze({
   placementConfigId: null,
   placedBuildingIds: [],
   reviewedRiskIds: [],
+  ep4InvestigationCompleted: false,
   reflectionChoice: null,
   completed: false,
 });
