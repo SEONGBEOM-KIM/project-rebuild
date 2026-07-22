@@ -8,7 +8,7 @@ import LearningProgress from './LearningProgress.js';
 import WorldStateManager from './WorldStateManager.js';
 
 export default class EpisodePlacementLaunchManager {
-  static buildEp3EconomyLaunchContext({ worldState = null, cumulative = false, selectedStrategy = null } = {}) {
+  static buildEp3EconomyLaunchContext({ worldState = null, cumulative = true, selectedStrategy = null } = {}) {
     const baseWorldState = WorldStateManager.startEpisode(
       worldState ?? WorldStateManager.createInitialWorldState(),
       EPISODE_IDS.EconomyGrowth,
@@ -53,7 +53,7 @@ export default class EpisodePlacementLaunchManager {
   static prepareEp3EconomyPlacement(registry, options = {}) {
     const context = EpisodePlacementLaunchManager.buildEp3EconomyLaunchContext({
       worldState: options.worldState ?? registry.get(REGISTRY_KEYS.worldState),
-      cumulative: options.cumulative ?? false,
+      cumulative: options.cumulative ?? true,
       selectedStrategy: options.selectedStrategy ?? null,
     });
     return EpisodePlacementLaunchManager.applyLaunchContext(registry, context);

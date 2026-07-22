@@ -1375,6 +1375,15 @@ function testEpisodeContent() {
   assert.equal(EpisodeActivityFlowManager.getNextEpisodeId(EPISODE_IDS.BalancedSolutions), null);
   assert.equal(EpisodeActivityFlowManager.formatActivityRows(EPISODE_IDS.EconomyGrowth).length, 3);
   assert.match(EpisodeActivityFlowManager.formatActivityRows(EPISODE_IDS.SideEffects)[1], /문제 비교/);
+  assert.match(EpisodeActivityFlowManager.formatCarryoverSummary({
+    completedEpisodeIds: [EPISODE_IDS.PopulationRecovery],
+    placements: [{ buildingId: 'youth_center', buildingName: '청년 센터' }],
+    gameState: { ...GameState.createInitialState(), population: 1080 },
+  }), /이전 선택 이어받기/);
+  assert.equal(EpisodeActivityFlowManager.formatCarryoverSummary({}), null);
+  const transitionSceneSource = readProjectFile('src', 'scenes', 'EpisodeTransitionScene.js');
+  assert.match(transitionSceneSource, /formatCarryoverSummary/, 'episode transitions should summarize prior choices');
+  assert.match(transitionSceneSource, /WorldStateManager\.get\(this\.registry\)/, 'episode transitions should read persisted world state');
 
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.Crisis].dataCards, EP1_DATA_CARDS, 'EP1 data cards should be addressable through episode content registry');
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.PopulationRecovery].missionBriefing, EP2_MISSION_BRIEFING, 'EP2 mission briefing should be addressable through episode content registry');
@@ -1995,16 +2004,16 @@ function testEpisodePlacementLaunchManager() {
     { gameState: { ...GameState.createInitialState(), population: 1080 } },
   );
 
-  const isolatedContext = EpisodePlacementLaunchManager.buildEp3EconomyLaunchContext({ worldState: priorWorldState });
-  assert.equal(isolatedContext.episodeId, EPISODE_IDS.EconomyGrowth);
-  assert.equal(isolatedContext.placementConfigId, EP3_ECONOMY_PLACEMENT_CONFIG_ID);
-  assert.equal(isolatedContext.selectedPolicy.id, economyPolicies[0].id);
-  assert.equal(isolatedContext.selectedStrategy, EP3_MISSION_BRIEFING.strategies[0].id);
-  assert.deepEqual(isolatedContext.placedBuildings, [], 'current EP3 proof should stay isolated by default');
-  assert.deepEqual(isolatedContext.gameState, GameState.createInitialState());
-  assert.equal(isolatedContext.worldState.activeEpisodeId, EPISODE_IDS.EconomyGrowth);
-  assert.equal(isolatedContext.progressPatch.placementConfigId, EP3_ECONOMY_PLACEMENT_CONFIG_ID);
-  assert.equal(isolatedContext.progressPatch.selectedStrategyId, EP3_MISSION_BRIEFING.strategies[0].id);
+  const carriedContext = EpisodePlacementLaunchManager.buildEp3EconomyLaunchContext({ worldState: priorWorldState });
+  assert.equal(carriedContext.episodeId, EPISODE_IDS.EconomyGrowth);
+  assert.equal(carriedContext.placementConfigId, EP3_ECONOMY_PLACEMENT_CONFIG_ID);
+  assert.equal(carriedContext.selectedPolicy.id, economyPolicies[0].id);
+  assert.equal(carriedContext.selectedStrategy, EP3_MISSION_BRIEFING.strategies[0].id);
+  assert.deepEqual(carriedContext.placedBuildings.map((record) => record.buildingId), ['youth_center'], 'EP3 should carry prior facilities by default');
+  assert.equal(carriedContext.gameState.population, 1080, 'EP3 should carry the prior regional state by default');
+  assert.equal(carriedContext.worldState.activeEpisodeId, EPISODE_IDS.EconomyGrowth);
+  assert.equal(carriedContext.progressPatch.placementConfigId, EP3_ECONOMY_PLACEMENT_CONFIG_ID);
+  assert.equal(carriedContext.progressPatch.selectedStrategyId, EP3_MISSION_BRIEFING.strategies[0].id);
 
   const selectedEp3Strategy = EP3_MISSION_BRIEFING.strategies[2];
   const selectedContext = EpisodePlacementLaunchManager.buildEp3EconomyLaunchContext({
@@ -2021,12 +2030,19 @@ function testEpisodePlacementLaunchManager() {
   assert.equal(cumulativeContext.gameState.population, 1080);
   assert.deepEqual(cumulativeContext.progressPatch.placedBuildingIds, ['youth_center']);
 
-  EpisodePlacementLaunchManager.applyLaunchContext(registry, isolatedContext);
+  const isolatedContext = EpisodePlacementLaunchManager.buildEp3EconomyLaunchContext({
+    worldState: priorWorldState,
+    cumulative: false,
+  });
+  assert.deepEqual(isolatedContext.placedBuildings, [], 'an explicit isolated proof remains available for tests');
+  assert.deepEqual(isolatedContext.gameState, GameState.createInitialState());
+
+  EpisodePlacementLaunchManager.applyLaunchContext(registry, carriedContext);
   assert.equal(registry.get(REGISTRY_KEYS.placementConfigId), EP3_ECONOMY_PLACEMENT_CONFIG_ID);
   assert.equal(registry.get(REGISTRY_KEYS.selectedPolicy).id, economyPolicies[0].id);
   assert.equal(registry.get(REGISTRY_KEYS.selectedPlacementStrategy), EP3_MISSION_BRIEFING.strategies[0].id);
-  assert.deepEqual(registry.get(REGISTRY_KEYS.placedBuildings), []);
-  assert.deepEqual(registry.get(REGISTRY_KEYS.gameState), GameState.createInitialState());
+  assert.deepEqual(registry.get(REGISTRY_KEYS.placedBuildings).map((record) => record.buildingId), ['youth_center']);
+  assert.equal(registry.get(REGISTRY_KEYS.gameState).population, 1080);
   assert.equal(registry.get(REGISTRY_KEYS.worldState).activeEpisodeId, EPISODE_IDS.EconomyGrowth);
   assert.equal(LearningProgress.get(registry).selectedPolicyId, economyPolicies[0].id);
 }
@@ -3395,10 +3411,8 @@ function testEp3PreviewViewManager() {
   assert.match(Ep3PreviewViewManager.formatIntroText(EP3_MISSION_BRIEFING), /일자리와 산업 성장/);
   assert.match(Ep3PreviewViewManager.formatFocusBody(EP3_MISSION_BRIEFING.strategies[2]), /교통 부담↑ 오염 신호↑/);
   assert.match(Ep3PreviewViewManager.formatWorldProgress({ completedEpisodeIds: [EPISODE_IDS.PopulationRecovery] }), /EP2 배치 완료/);
-  assert.match(Ep3PreviewViewManager.formatWorldModeStatus({}), /독립 실험/);
-  assert.equal(Ep3PreviewViewManager.canUseCumulativeMode({ completedEpisodeIds: [EPISODE_IDS.PopulationRecovery] }), true);
-  assert.equal(Ep3PreviewViewManager.canUseCumulativeMode({}), false);
-  assert.match(Ep3PreviewViewManager.formatWorldModeStatus({ completedEpisodeIds: [EPISODE_IDS.PopulationRecovery] }, true), /결과 이어받기/);
+  assert.match(Ep3PreviewViewManager.formatWorldModeStatus({}), /기본 푸른군 상태/);
+  assert.match(Ep3PreviewViewManager.formatWorldModeStatus({ completedEpisodeIds: [EPISODE_IDS.PopulationRecovery] }), /결과 이어받기/);
   assert.match(Ep3PreviewViewManager.formatTransitionNote(EP3_MISSION_BRIEFING), /경제 성장 미션 브리핑/);
   assert.match(Ep3PreviewViewManager.formatPolicyPreviewRows(economyPolicies), /방문 경제 활성화/);
   assert.match(Ep3PreviewViewManager.formatBuildingPreviewRows(economyBuildings), /물류 센터/);
@@ -3409,9 +3423,8 @@ function testEp3PreviewViewManager() {
   assert.match(previewSceneSource, /economyPolicies/, 'EP3 preview scene should show economy policy candidates');
   assert.match(previewSceneSource, /economyBuildings/, 'EP3 preview scene should show economy building candidates');
   assert.match(previewSceneSource, /selectStrategy/, 'EP3 preview scene should support selecting a growth strategy');
-  assert.match(previewSceneSource, /selectCumulativeMode/, 'EP3 preview scene should support selecting an independent or cumulative placement mode');
-  assert.match(previewSceneSource, /cumulativeMode = Ep3PreviewViewManager\.canUseCumulativeMode\(this\.worldState\)/, 'EP3 preview should default to cumulative mode when a completed EP2 world exists');
-  assert.match(previewSceneSource, /cumulative: this\.cumulativeMode/, 'EP3 preview scene should pass the selected world mode into placement launch');
+  assert.doesNotMatch(previewSceneSource, /selectCumulativeMode/, 'EP3 preview should not offer a separate world mode that breaks the linear narrative');
+  assert.match(previewSceneSource, /prepareEp3EconomyPlacement\(this\.registry/, 'EP3 preview should use the carry-forward placement launch by default');
   assert.match(previewSceneSource, /prepareEp3Placement/, 'EP3 preview scene should prepare placement context before starting placement');
   assert.match(previewSceneSource, /EpisodePlacementLaunchManager/, 'EP3 preview scene should delegate placement launch setup');
   const titleSceneSource = readProjectFile('src', 'scenes', 'TitleScene.js');

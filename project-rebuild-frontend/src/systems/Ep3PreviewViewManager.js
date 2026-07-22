@@ -56,11 +56,6 @@ const EP3_PREVIEW_BUTTON_STYLE = {
   padding: { x: 34, y: 18 },
 };
 
-const EP3_PREVIEW_WORLD_MODE_BUTTON_STYLE = {
-  fontSize: '18px',
-  padding: { x: 16, y: 10 },
-};
-
 export default class Ep3PreviewViewManager {
   static getScreenLayout(width) {
     return {
@@ -112,26 +107,6 @@ export default class Ep3PreviewViewManager {
     };
   }
 
-  static getWorldModeOptions(cumulativeMode = false) {
-    return [
-      {
-        mode: false,
-        x: 1410,
-        y: 410,
-        label: '독립 실험',
-      },
-      {
-        mode: true,
-        x: 1660,
-        y: 410,
-        label: 'EP2 결과 이어받기',
-      },
-    ].map((option) => ({
-      ...option,
-      ...Ep3PreviewViewManager.getWorldModeButtonStyle(option.mode === cumulativeMode),
-    }));
-  }
-
   static getFocusCardLayout(index) {
     const positions = [
       { x: 440, y: 620 },
@@ -169,18 +144,6 @@ export default class Ep3PreviewViewManager {
     return preview.intro.join('\n');
   }
 
-  static canUseCumulativeMode(worldState = {}) {
-    return (worldState.completedEpisodeIds ?? []).includes(EPISODE_IDS.PopulationRecovery);
-  }
-
-  static getWorldModeButtonStyle(selected) {
-    return {
-      ...EP3_PREVIEW_WORLD_MODE_BUTTON_STYLE,
-      backgroundColor: selected ? '#bbf7d0' : '#334155',
-      textColor: selected ? '#123524' : '#e2e8f0',
-    };
-  }
-
   static formatWorldProgress(worldState = {}) {
     const completedEpisodeIds = worldState.completedEpisodeIds ?? [];
     const completedEp2 = completedEpisodeIds.includes(EPISODE_IDS.PopulationRecovery);
@@ -201,13 +164,11 @@ export default class Ep3PreviewViewManager {
     ].join('\n');
   }
 
-  static formatWorldModeStatus(worldState = {}, cumulativeMode = false) {
-    if (!Ep3PreviewViewManager.canUseCumulativeMode(worldState)) {
-      return '배치 방식: 독립 실험 · EP2 완료 기록이 생기면 이전 시설과 상태를 이어받을 수 있습니다.';
-    }
-    return cumulativeMode
-      ? '배치 방식: EP2 결과 이어받기 · 기존 시설과 지역 상태를 지도에 복원합니다.'
-      : '배치 방식: 독립 실험 · EP3 성장 전략만 별도 조건에서 비교합니다.';
+  static formatWorldModeStatus(worldState = {}) {
+    const completedEp2 = (worldState.completedEpisodeIds ?? []).includes(EPISODE_IDS.PopulationRecovery);
+    return completedEp2
+      ? 'EP2 결과 이어받기 · 기존 시설과 지역 상태를 지도에 복원한 뒤 경제 성장 효과를 더합니다.'
+      : '이전 기록이 없어 기본 푸른군 상태에서 경제 성장 미션을 시작합니다.';
   }
 
   static getSelectionLabelStyle(selected) {

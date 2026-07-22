@@ -31,15 +31,9 @@ export default class Ep3PreviewScene extends Phaser.Scene {
     this.selectedStrategy = this.getInitialStrategy();
     this.strategyObjects = new Map();
     this.worldState = WorldStateManager.get(this.registry);
-    this.cumulativeMode = Ep3PreviewViewManager.canUseCumulativeMode(this.worldState);
 
     Ep3PreviewRenderer.renderIntroPanel(this, briefing);
-    this.worldProgressObjects = Ep3PreviewRenderer.renderWorldProgress(
-      this,
-      this.worldState,
-      this.cumulativeMode,
-      (cumulativeMode) => this.selectCumulativeMode(cumulativeMode),
-    );
+    this.worldProgressObjects = Ep3PreviewRenderer.renderWorldProgress(this, this.worldState);
     this.renderStrategyCards();
     Ep3PreviewRenderer.renderTransitionNote(this, briefing, economyPolicies, economyBuildings);
 
@@ -87,20 +81,9 @@ export default class Ep3PreviewScene extends Phaser.Scene {
     }
   }
 
-  selectCumulativeMode(cumulativeMode) {
-    this.cumulativeMode = cumulativeMode;
-    this.worldProgressObjects.modeStatus.setText(
-      Ep3PreviewViewManager.formatWorldModeStatus(this.worldState, cumulativeMode),
-    );
-    for (const option of this.worldProgressObjects.modeButtons) {
-      option.button.setStyle(Ep3PreviewViewManager.getWorldModeButtonStyle(option.mode === cumulativeMode));
-    }
-  }
-
   prepareEp3Placement() {
     EpisodePlacementLaunchManager.prepareEp3EconomyPlacement(this.registry, {
       selectedStrategy: this.selectedStrategy,
-      cumulative: this.cumulativeMode,
     });
   }
 }

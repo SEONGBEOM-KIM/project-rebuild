@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { getEpisodeTransition } from '../data/episodeTransitions.js';
 import EpisodeActivityFlowManager from '../systems/EpisodeActivityFlowManager.js';
+import WorldStateManager from '../systems/WorldStateManager.js';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
@@ -24,6 +25,9 @@ export default class EpisodeTransitionScene extends Phaser.Scene {
 
     const { width } = this.scale;
     const activityFlow = EpisodeActivityFlowManager.get(this.episodeId);
+    const carryoverSummary = EpisodeActivityFlowManager.formatCarryoverSummary(
+      WorldStateManager.get(this.registry),
+    );
     createScreenBackground(this, 0x0f172a);
     createLayoutText(this, { x: width / 2, y: 185, text: transition.title }, {
       style: { fontSize: '68px', color: '#fde68a', fontStyle: 'bold' },
@@ -37,6 +41,12 @@ export default class EpisodeTransitionScene extends Phaser.Scene {
       style: { fontSize: '22px', color: '#bbf7d0', align: 'center', wordWrap: { width: 1360 } },
       origin: 0.5,
     });
+    if (carryoverSummary) {
+      createLayoutText(this, { x: width / 2, y: 360, text: carryoverSummary }, {
+        style: { fontSize: '18px', color: '#bfdbfe', align: 'center', wordWrap: { width: 1360 } },
+        origin: 0.5,
+      });
+    }
 
     createPanelBackground(this, { x: width / 2, y: 575, width: 1420, height: 360 }, {
       fillColor: 0x172554,
