@@ -64,6 +64,7 @@ export default class LearningDataManager {
       }),
       exploredPlaces: progress.exploredPlaces,
       exploredPlaceNames,
+      reviewedRiskIds: progress.reviewedRiskIds ?? [],
       dataViewed: progress.dataViewed,
       quizResult: quizResult ?? progress.quizResult,
       problemSummaryCompleted: progress.problemSummaryCompleted,

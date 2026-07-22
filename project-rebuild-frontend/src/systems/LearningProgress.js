@@ -11,6 +11,7 @@ const INITIAL_PROGRESS = Object.freeze({
   selectedStrategyId: null,
   placementConfigId: null,
   placedBuildingIds: [],
+  reviewedRiskIds: [],
   reflectionChoice: null,
   completed: false,
 });
@@ -21,6 +22,7 @@ export default class LearningProgress {
       ...INITIAL_PROGRESS,
       exploredPlaces: [],
       placedBuildingIds: [],
+      reviewedRiskIds: [],
     };
   }
 
@@ -48,5 +50,11 @@ export default class LearningProgress {
     return LearningProgress.update(registry, {
       placedBuildingIds: [...progress.placedBuildingIds, buildingId],
     });
+  }
+
+  static addReviewedRisk(registry, riskId) {
+    const progress = LearningProgress.get(registry);
+    const reviewedRiskIds = Array.from(new Set([...(progress.reviewedRiskIds ?? []), riskId]));
+    return LearningProgress.update(registry, { reviewedRiskIds });
   }
 }

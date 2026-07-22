@@ -164,6 +164,7 @@ function createCompleteLearningData(overrides = {}) {
       nextAction: { id: 'environment', title: '환경 보완', label: '개발 효과와 환경 부담 비교' },
     },
     exploredPlaces: ['school', 'market', 'bus_stop'],
+    reviewedRiskIds: ['traffic', 'environment'],
     dataViewed: true,
     quizResult: { questionId: 'ep1_q1', selected: 'lack_jobs_services', correct: true },
     problemSummaryCompleted: true,
@@ -1847,11 +1848,14 @@ function testLearningProgress() {
   LearningProgress.addExploredPlace(registry, 'school');
   LearningProgress.addExploredPlace(registry, 'market');
   LearningProgress.addPlacedBuilding(registry, 'youth_center');
+  LearningProgress.addReviewedRisk(registry, 'traffic');
+  LearningProgress.addReviewedRisk(registry, 'traffic');
 
   const progress = LearningProgress.get(registry);
   assert.equal(progress.dataViewed, true);
   assert.deepEqual(progress.exploredPlaces, ['school', 'market'], 'explored places should be unique');
   assert.deepEqual(progress.placedBuildingIds, ['youth_center']);
+  assert.deepEqual(progress.reviewedRiskIds, ['traffic']);
   assert.equal(LearningProgress.createInitialProgress().selectedStrategyId, null);
   assert.equal(LearningProgress.createInitialProgress().placementConfigId, null);
 }
@@ -4014,6 +4018,7 @@ function testLearningDataManager() {
   assert.equal(ep3Data.summary.priorityIssue.id, 'inequality');
   assert.deepEqual(ep3Data.summary.sideEffectRisks.risks.map((risk) => risk.id), ['traffic', 'environment', 'inequality']);
   assert.equal(ep3Data.summary.sideEffectRisks.primaryRisk.id, 'inequality');
+  assert.deepEqual(ep3Data.reviewedRiskIds, []);
   assert.equal(LearningDataManager.validate({ ...ep3Data, selectedStrategy: null }).every((row) => row.ok), true, 'EP3 saved data should be accepted when policy maps to an EP3 strategy');
 
   registry.set(REGISTRY_KEYS.selectedPolicy, { id: 'youth_living_support', name: '청년 생활 지원' });
@@ -4397,6 +4402,7 @@ function testLearningDataRestoreManager() {
       nextAction: { id: 'environment', title: '환경 보완', label: '개발 효과와 환경 부담 비교' },
     },
     exploredPlaces: ['school', 'market', 'bus_stop'],
+    reviewedRiskIds: ['traffic', 'environment'],
     dataViewed: true,
     quizResult: { questionId: 'ep1_q1', selected: 'lack_jobs_services', correct: true },
     problemSummaryCompleted: true,
@@ -4439,6 +4445,7 @@ function testLearningDataRestoreManager() {
   assert.equal(registry.get('learningProgress').placementConfigId, ENVIRONMENT_PLACEMENT_CONFIG_ID);
   assert.equal(registry.get('placementConfigId'), ENVIRONMENT_PLACEMENT_CONFIG_ID);
   assert.deepEqual(registry.get('learningProgress').placedBuildingIds, ['small_park']);
+  assert.deepEqual(registry.get('learningProgress').reviewedRiskIds, ['traffic', 'environment']);
   assert.deepEqual(registry.get(REGISTRY_KEYS.worldState).completedEpisodeIds, [EPISODE_IDS.PopulationRecovery]);
   assert.equal(registry.get(REGISTRY_KEYS.worldState).placements[0].episodeId, EPISODE_IDS.PopulationRecovery);
 

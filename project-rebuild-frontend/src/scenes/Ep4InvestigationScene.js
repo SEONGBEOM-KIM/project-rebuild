@@ -5,6 +5,7 @@ import { createScreenBackground } from '../ui/ScreenBackground.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 import ProgressStepper from '../ui/ProgressStepper.js';
 import IndustrializationRiskManager from '../systems/IndustrializationRiskManager.js';
+import LearningProgress from '../systems/LearningProgress.js';
 import Ep4InvestigationViewManager from '../systems/Ep4InvestigationViewManager.js';
 import Ep4InvestigationRenderer from '../systems/Ep4InvestigationRenderer.js';
 
@@ -20,7 +21,7 @@ export default class Ep4InvestigationScene extends Phaser.Scene {
       placedBuildings: this.registry.get(REGISTRY_KEYS.placedBuildings) ?? [],
       placementEpisodeId: EPISODE_IDS.EconomyGrowth,
     });
-    this.reviewedRiskIds = new Set();
+    this.reviewedRiskIds = new Set(LearningProgress.get(this.registry).reviewedRiskIds ?? []);
     this.selectedRiskId = null;
     this.cardObjects = new Map();
     const layout = Ep4InvestigationViewManager.getScreenLayout(width);
@@ -45,6 +46,7 @@ export default class Ep4InvestigationScene extends Phaser.Scene {
   selectRisk(risk) {
     this.selectedRiskId = risk.id;
     this.reviewedRiskIds.add(risk.id);
+    LearningProgress.addReviewedRisk(this.registry, risk.id);
     this.detailText.setText(Ep4InvestigationViewManager.formatDetail(risk));
     this.updateUi();
   }
