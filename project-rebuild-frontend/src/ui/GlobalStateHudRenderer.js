@@ -4,6 +4,7 @@ import { DEFAULT_STATE_KEYS } from '../data/stateLabels.js';
 import { getEpisode } from '../data/episodes.js';
 import { getPlacementConfig } from '../data/episodePlacementConfigs.js';
 import TimeStateManager from '../systems/TimeStateManager.js';
+import { UI_THEME } from './UiTheme.js';
 
 const EXCLUDED_SCENES = new Set([
   'BootScene',
@@ -13,14 +14,7 @@ const EXCLUDED_SCENES = new Set([
 ]);
 
 const HUD_STYLE = Object.freeze({
-  panelColor: 0x0f172a,
-  panelAlpha: 0.94,
-  panelStrokeColor: 0x334155,
-  cardColor: 0x1e293b,
-  cardStrokeColor: 0x475569,
-  textColor: '#e2e8f0',
-  valueColor: '#f8fafc',
-  episodeColor: '#fde68a',
+  ...UI_THEME.hud,
   labelFontSize: '12px',
   valueFontSize: '16px',
 });

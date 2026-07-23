@@ -5671,7 +5671,11 @@ function testSharedUiComponentStyles() {
     },
   };
   createScreenBackground(screenScene, 0x10253f);
-  assert.deepEqual(screenCalls, [[960, 540, 1920, 1080, 0x10253f]]);
+  assert.deepEqual(screenCalls, [
+    [960, 540, 1920, 1080, 0x10253f],
+    [960, 3, 1920, 6, 0x60a5fa, 0.9],
+    [960, 1078.5, 1920, 3, 0x0b1220, 0.35],
+  ]);
 }
 
 
