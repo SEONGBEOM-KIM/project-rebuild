@@ -20,6 +20,7 @@ export default class BootFlowManager {
       [REGISTRY_KEYS.selectedPolicy, null],
       [REGISTRY_KEYS.selectedPlacementStrategy, null],
       [REGISTRY_KEYS.exploredPlaces, []],
+      [REGISTRY_KEYS.viewedDataCardIds, []],
       [REGISTRY_KEYS.quizResult, null],
       [REGISTRY_KEYS.reflectionChoice, null],
       [REGISTRY_KEYS.selectedSolutionPlan, null],

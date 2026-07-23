@@ -118,6 +118,7 @@ function buildRequestExample(config = API_REQUEST_EXAMPLE_CONFIGS[DEFAULT_EXAMPL
     },
     learning_steps: {
       explored_places: ['school', 'market', 'bus_stop'],
+      viewed_data_card_ids: ['population_change', 'regional_gap', 'aging_ratio'],
       data_viewed: true,
       quiz_result: {
         question_id: currentEpisodeContent.causeQuestion.id,

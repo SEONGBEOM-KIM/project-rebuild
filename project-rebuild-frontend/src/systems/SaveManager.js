@@ -82,6 +82,7 @@ export default class SaveManager {
       episodeJourney: Array.isArray(payload.episode_journey) ? [...payload.episode_journey] : [],
       summary: SaveManager.fromApiSummary(payload.summary),
       exploredPlaces: payload.learning_steps.explored_places,
+      viewedDataCardIds: payload.learning_steps.viewed_data_card_ids ?? [],
       dataViewed: Boolean(payload.learning_steps.data_viewed),
       quizResult: SaveManager.fromApiQuizResult(payload.learning_steps.quiz_result),
       quizResults: (payload.learning_steps.quiz_results ?? []).map((result) => SaveManager.fromApiQuizResult(result)).filter(Boolean),

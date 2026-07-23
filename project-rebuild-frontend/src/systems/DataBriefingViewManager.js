@@ -5,6 +5,7 @@ const DATA_BRIEFING_SCREEN_LAYOUT = {
   progressStep: 'data',
   title: { y: 70, text: 'EP1. 자료 확인', fontSize: '60px', color: '#ffffff', fontStyle: 'bold' },
   subtitle: { y: 138, fontSize: '28px', color: '#bfdbfe' },
+  progress: { x: 960, y: 910, wordWrapWidth: 900 },
 };
 
 const DATA_CARD_LAYOUT = {
@@ -37,6 +38,7 @@ const DATA_CARD_TEXT_STYLES = {
   barValue: { fontSize: '23px', color: '#0f172a' },
   takeawayTitle: { fontSize: '23px', color: '#172554', fontStyle: 'bold' },
   takeawayBody: { fontSize: '21px', color: '#334155', lineSpacing: 7 },
+  progress: { fontSize: '24px', color: '#dbeafe', fontStyle: 'bold' },
 };
 
 const CONCEPT_BOX_TEXT_STYLES = {
@@ -56,6 +58,7 @@ export default class DataBriefingViewManager {
       progressStep: DATA_BRIEFING_SCREEN_LAYOUT.progressStep,
       title: { x: width / 2, ...DATA_BRIEFING_SCREEN_LAYOUT.title },
       subtitle: { x: width / 2, ...DATA_BRIEFING_SCREEN_LAYOUT.subtitle },
+      progress: { ...DATA_BRIEFING_SCREEN_LAYOUT.progress },
     };
   }
 
@@ -89,6 +92,7 @@ export default class DataBriefingViewManager {
       barValue: { ...DATA_CARD_TEXT_STYLES.barValue },
       takeawayTitle: { ...DATA_CARD_TEXT_STYLES.takeawayTitle },
       takeawayBody: { ...DATA_CARD_TEXT_STYLES.takeawayBody },
+      progress: { ...DATA_CARD_TEXT_STYLES.progress },
     };
   }
 
@@ -137,6 +141,18 @@ export default class DataBriefingViewManager {
 
   static formatSubtitle(regionName) {
     return `탐색에서 본 ${regionName} 문제를 숫자 자료로 다시 확인합니다.`;
+  }
+
+  static formatProgress(viewedCount, totalCount) {
+    return viewedCount >= totalCount
+      ? `자료 확인 완료: ${viewedCount}/${totalCount}개 · 이제 원인 질문을 풀어보세요.`
+      : `자료 확인: ${viewedCount}/${totalCount}개 · 카드를 클릭해 각 자료를 자세히 살펴보세요.`;
+  }
+
+  static getCardState(viewed) {
+    return viewed
+      ? { strokeColor: 0x22c55e, strokeWidth: 7, fillAlpha: 1 }
+      : { strokeColor: 0x93c5fd, strokeWidth: 5, fillAlpha: 0.97 };
   }
 
   static validateCards(cards) {

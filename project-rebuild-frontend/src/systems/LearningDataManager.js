@@ -15,6 +15,7 @@ export default class LearningDataManager {
     const progress = LearningProgress.get(registry);
     const quizResult = registry.get(REGISTRY_KEYS.quizResult);
     const quizResults = registry.get(REGISTRY_KEYS.quizResults) ?? [];
+    const viewedDataCardIds = registry.get(REGISTRY_KEYS.viewedDataCardIds) ?? [];
     const selectedPolicy = registry.get(REGISTRY_KEYS.selectedPolicy);
     const selectedStrategy = EpisodeFlowManager.resolveSelectedStrategy({ registry, learningProgress: progress, selectedPolicy });
     const { placementConfig, evaluationProfile } = PlacementContextManager.resolve({
@@ -74,6 +75,7 @@ export default class LearningDataManager {
       reviewedRiskIds: progress.reviewedRiskIds ?? [],
       ep4InvestigationCompleted: Boolean(progress.ep4InvestigationCompleted),
       dataViewed: progress.dataViewed,
+      viewedDataCardIds,
       quizResult: quizResult ?? progress.quizResult,
       quizResults,
       problemSummaryCompleted: progress.problemSummaryCompleted,

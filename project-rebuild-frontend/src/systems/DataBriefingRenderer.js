@@ -3,11 +3,17 @@ import { createLayoutText } from '../ui/LayoutText.js';
 import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
 
 export default class DataBriefingRenderer {
-  static renderDataCard(scene, card, x, y) {
+  static renderDataCard(scene, card, x, y, { viewed = false, onSelect = null } = {}) {
     const layout = DataBriefingViewManager.getDataCardLayout(x, y);
     const textStyles = DataBriefingViewManager.getDataCardTextStyles();
 
-    createPanelBackground(scene, layout.panel, layout.panel);
+    const panel = createPanelBackground(scene, layout.panel, {
+      ...layout.panel,
+      ...DataBriefingViewManager.getCardState(viewed),
+    });
+    if (onSelect) {
+      panel.setInteractive({ useHandCursor: true }).on('pointerdown', () => onSelect(card));
+    }
     createPanelTitle(scene, layout.title, textStyles.title, { text: card.title, origin: 0.5 });
     createLayoutText(scene, layout.subtitle, {
       text: card.subtitle,
@@ -17,6 +23,7 @@ export default class DataBriefingRenderer {
 
     DataBriefingRenderer.renderBars(scene, card.bars, layout, x, y, textStyles);
     DataBriefingRenderer.renderTakeaway(scene, card.takeaway, layout, textStyles);
+    return { panel };
   }
 
   static renderBars(scene, bars, layout, x, y, textStyles) {

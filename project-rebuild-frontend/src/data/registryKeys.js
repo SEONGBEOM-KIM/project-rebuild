@@ -6,6 +6,7 @@ export const REGISTRY_KEYS = Object.freeze({
   selectedPlacementStrategy: 'ep2StrategyId',
   placementConfigId: 'placementConfigId',
   exploredPlaces: 'exploredPlaces',
+  viewedDataCardIds: 'viewedDataCardIds',
   quizResult: 'quizResult',
   quizResults: 'quizResults',
   reflectionChoice: 'reflectionChoice',

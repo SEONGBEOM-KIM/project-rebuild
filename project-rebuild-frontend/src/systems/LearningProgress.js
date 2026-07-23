@@ -5,6 +5,7 @@ const INITIAL_PROGRESS = Object.freeze({
   episode: CURRENT_EPISODE.id,
   exploredPlaces: [],
   dataViewed: false,
+  viewedDataCardIds: [],
   quizResult: null,
   quizResults: [],
   problemSummaryCompleted: false,
@@ -27,6 +28,7 @@ export default class LearningProgress {
       placedBuildingIds: [],
       reviewedRiskIds: [],
       quizResults: [],
+      viewedDataCardIds: [],
     };
   }
 

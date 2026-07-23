@@ -403,6 +403,7 @@ function testBootFlowManager() {
     'selectedPolicy',
     REGISTRY_KEYS.selectedPlacementStrategy,
     'exploredPlaces',
+    REGISTRY_KEYS.viewedDataCardIds,
     'quizResult',
     'reflectionChoice',
     REGISTRY_KEYS.selectedSolutionPlan,
@@ -414,6 +415,7 @@ function testBootFlowManager() {
   assert.deepEqual(values.get('gameState'), GameState.createInitialState());
   assert.deepEqual(values.get('placedBuildings'), []);
   assert.deepEqual(values.get('exploredPlaces'), []);
+  assert.deepEqual(values.get(REGISTRY_KEYS.viewedDataCardIds), []);
   assert.equal(values.get('lastPlacementResult'), null);
   assert.equal(values.get('selectedPolicy'), null);
   assert.equal(values.get(REGISTRY_KEYS.selectedPlacementStrategy), null);

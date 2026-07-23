@@ -53,6 +53,7 @@ export default class LearningApiPayloadManager {
       } : null,
       learning_steps: {
         explored_places: learningData.exploredPlaces ?? [],
+        viewed_data_card_ids: learningData.viewedDataCardIds ?? [],
         data_viewed: Boolean(learningData.dataViewed),
         quiz_result: learningData.quizResult ? {
           question_id: learningData.quizResult.questionId,
@@ -180,6 +181,13 @@ export default class LearningApiPayloadManager {
         ok: Array.isArray(payload.learning_steps?.explored_places),
         label: '탐색 장소 배열 확인',
         message: 'explored_places 배열이 없습니다.',
+      },
+      {
+        ok: payload.learning_steps?.viewed_data_card_ids == null
+          || (Array.isArray(payload.learning_steps.viewed_data_card_ids)
+            && payload.learning_steps.viewed_data_card_ids.every((id) => typeof id === 'string')),
+        label: '자료 카드 기록 배열 확인',
+        message: 'viewed_data_card_ids는 문자열 배열이어야 합니다.',
       },
       {
         ok: payload.learning_steps?.quiz_result === null || Boolean(payload.learning_steps?.quiz_result?.selected),
