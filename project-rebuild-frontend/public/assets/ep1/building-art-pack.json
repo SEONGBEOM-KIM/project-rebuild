@@ -1,0 +1,32 @@
+{
+  "frames": {
+    "bus_station": {
+      "frame": { "x": 0, "y": 0, "w": 620, "h": 793 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 620, "h": 793 },
+      "sourceSize": { "w": 620, "h": 793 }
+    },
+    "youth_center": {
+      "frame": { "x": 620, "y": 0, "w": 720, "h": 793 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 720, "h": 793 },
+      "sourceSize": { "w": 720, "h": 793 }
+    },
+    "small_park": {
+      "frame": { "x": 1340, "y": 0, "w": 643, "h": 793 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 643, "h": 793 },
+      "sourceSize": { "w": 643, "h": 793 }
+    }
+  },
+  "meta": {
+    "app": "Project Rebuild",
+    "version": "1.0",
+    "image": "building-art-pack-generated.png",
+    "format": "RGBA8888",
+    "scale": "1"
+  }
+}

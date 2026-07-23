@@ -120,6 +120,7 @@ import { getLayoutTextStyle } from '../src/ui/LayoutText.js';
 import { createPanelBackground, createPanelTitle, getPanelTitleStyle } from '../src/ui/PanelRenderer.js';
 import { createScreenBackground } from '../src/ui/ScreenBackground.js';
 import GlobalStateHudRenderer from '../src/ui/GlobalStateHudRenderer.js';
+import { EP1_VISUAL_ASSETS, getEp1VisualAsset } from '../src/data/visualAssets.js';
 
 
 const PROJECT_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -433,6 +434,15 @@ function testBootFlowManager() {
   assert.deepEqual(resetRegistry.get(REGISTRY_KEYS.worldState), WorldStateManager.createInitialWorldState());
   assert.deepEqual(resetRegistry.get(REGISTRY_KEYS.timeState), TimeStateManager.createInitialTimeState());
   assert.equal(BootFlowManager.getTargetScene(), 'TitleScene');
+}
+
+function testVisualAssetCatalog() {
+  assert.equal(EP1_VISUAL_ASSETS.atlas.key, 'ep1-buildings');
+  assert.equal(EP1_VISUAL_ASSETS.atlas.image, '/assets/ep1/building-art-pack-generated.png');
+  assert.deepEqual(Object.keys(EP1_VISUAL_ASSETS.buildings), ['bus_station', 'youth_center', 'small_park']);
+  assert.equal(getEp1VisualAsset('bus_station').frame, 'bus_station');
+  assert.equal(getEp1VisualAsset('unknown'), null);
+  assert.match(readProjectFile('public', 'assets', 'ep1', 'building-art-pack.json'), /"small_park"/);
 }
 
 function testEpisodeMetadata() {
@@ -5809,6 +5819,7 @@ function testGlobalStateHudRenderer() {
 
 async function run() {
   testBootFlowManager();
+  testVisualAssetCatalog();
   testEpisodeMetadata();
   testEpisodeContent();
   testCauseQuizViewManager();
