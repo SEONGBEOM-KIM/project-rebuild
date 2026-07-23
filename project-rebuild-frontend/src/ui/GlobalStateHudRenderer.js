@@ -1,6 +1,8 @@
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
 import StateHudManager from '../systems/StateHudManager.js';
 import { DEFAULT_STATE_KEYS } from '../data/stateLabels.js';
+import { getEpisode } from '../data/episodes.js';
+import { getPlacementConfig } from '../data/episodePlacementConfigs.js';
 
 const EXCLUDED_SCENES = new Set([
   'BootScene',
@@ -17,6 +19,7 @@ const HUD_STYLE = Object.freeze({
   cardStrokeColor: 0x475569,
   textColor: '#e2e8f0',
   valueColor: '#f8fafc',
+  episodeColor: '#fde68a',
   labelFontSize: '12px',
   valueFontSize: '16px',
 });
@@ -32,8 +35,9 @@ export default class GlobalStateHudRenderer {
     const gap = 6;
     const margin = 20;
     const panelHeight = 56;
-    const panelWidth = Math.min(900, Math.max(560, width - margin * 2));
+    const panelWidth = Math.min(900, Math.max(560, Math.floor(width * 0.6)));
     const cardWidth = (panelWidth - gap * (stateKeyCount + 1)) / stateKeyCount;
+    const episodeBadgeWidth = Math.min(400, Math.max(260, width - panelWidth - margin * 3));
 
     return {
       panel: {
@@ -47,6 +51,12 @@ export default class GlobalStateHudRenderer {
       itemWidth: cardWidth,
       itemHeight: 44,
       itemGap: gap,
+      episodeBadge: {
+        x: width - margin - episodeBadgeWidth / 2,
+        y: 30,
+        width: episodeBadgeWidth,
+        height: panelHeight,
+      },
     };
   }
 
@@ -60,7 +70,49 @@ export default class GlobalStateHudRenderer {
     panel.setStrokeStyle?.(1, HUD_STYLE.panelStrokeColor);
 
     const renderedItems = items.map((item, index) => this.renderItem(scene, item, layout, index));
-    return { panel, items: renderedItems, layout };
+    const episode = this.getEpisodeContext(scene);
+    const episodeBadge = episode ? this.renderEpisodeBadge(scene, episode, layout.episodeBadge) : null;
+    return { panel, items: renderedItems, episodeBadge, episode, layout };
+  }
+
+  static getEpisodeContext(scene) {
+    const worldState = scene.registry.get(REGISTRY_KEYS.worldState);
+    const placementConfigId = scene.registry.get(REGISTRY_KEYS.placementConfigId);
+    const sceneEpisodeIds = {
+      StoryScene: 'ep1',
+      ExplorationScene: 'ep1',
+      DataBriefingScene: 'ep1',
+      CauseQuizScene: 'ep1',
+      ProblemSummaryScene: 'ep1',
+      SelectionScene: 'ep2',
+      Ep2BriefingScene: 'ep2',
+      Ep3PreviewScene: 'ep3',
+      Ep4BriefingScene: 'ep4',
+      Ep4InvestigationScene: 'ep4',
+      Ep4ConclusionScene: 'ep4',
+      Ep5PreviewScene: 'ep5',
+      SustainabilityEvaluationScene: 'ep6',
+    };
+    const episodeId = sceneEpisodeIds[scene.scene?.key]
+      ?? worldState?.activeEpisodeId
+      ?? getPlacementConfig(placementConfigId)?.episodeId;
+    return episodeId ? getEpisode(episodeId) : null;
+  }
+
+  static renderEpisodeBadge(scene, episode, layout) {
+    const badge = this.createRectangle(scene, layout, 0x172554, 0.96);
+    badge.setStrokeStyle?.(1, 0x60a5fa);
+    const text = scene.add.text(layout.x, layout.y, episode.shortTitle, {
+      color: HUD_STYLE.episodeColor,
+      fontSize: '18px',
+      fontStyle: 'bold',
+      align: 'center',
+      wordWrap: { width: layout.width - 20 },
+    });
+    text.setOrigin?.(0.5);
+    text.setScrollFactor?.(0);
+    text.setDepth?.(1000);
+    return { badge, text, episode };
   }
 
   static renderItem(scene, item, layout, index) {

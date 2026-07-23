@@ -5633,7 +5633,13 @@ function testGlobalStateHudRenderer() {
   const scene = {
     scene: { key: 'EpisodeTransitionScene' },
     scale: { width: 1920, height: 1080 },
-    registry: { get: (key) => key === REGISTRY_KEYS.gameState ? GameState.createInitialState() : undefined },
+    registry: {
+      get: (key) => {
+        if (key === REGISTRY_KEYS.gameState) return GameState.createInitialState();
+        if (key === REGISTRY_KEYS.worldState) return { activeEpisodeId: 'ep4' };
+        return undefined;
+      },
+    },
     add: {
       rectangle: (...args) => createObject('rectangle', args),
       text: (...args) => createObject('text', args),
@@ -5644,6 +5650,8 @@ function testGlobalStateHudRenderer() {
   assert.equal(hud.items.length, DEFAULT_STATE_KEYS.length);
   assert.equal(hud.items[0].value.args[2], '1,000');
   assert.equal(hud.items[4].value.args[2], '1,000');
+  assert.equal(hud.episode.shortTitle, 'EP4. 부작용 발생');
+  assert.equal(hud.episodeBadge.text.args[2], 'EP4. 부작용 발생');
   assert.equal(GlobalStateHudRenderer.shouldRender({ ...scene, scene: { key: 'PlacementScene' } }), false);
   assert.equal(GlobalStateHudRenderer.shouldRender({ ...scene, scene: { key: 'TitleScene' } }), false);
   assert.equal(GlobalStateHudRenderer.formatValue(Number.NaN), '-');
