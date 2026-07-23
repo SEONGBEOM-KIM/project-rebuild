@@ -34,7 +34,7 @@ export default class GlobalStateHudRenderer {
   static getLayout(width, stateKeyCount = DEFAULT_STATE_KEYS.length) {
     const gap = 6;
     const margin = 20;
-    const panelHeight = 56;
+    const panelHeight = 48;
     const panelWidth = Math.min(900, Math.max(560, Math.floor(width * 0.6)));
     const cardWidth = (panelWidth - gap * (stateKeyCount + 1)) / stateKeyCount;
     const episodeBadgeWidth = Math.min(400, Math.max(260, width - panelWidth - margin * 3));
@@ -42,14 +42,14 @@ export default class GlobalStateHudRenderer {
     return {
       panel: {
         x: margin + panelWidth / 2,
-        y: 30,
+        y: 24,
         width: panelWidth,
         height: panelHeight,
       },
       itemStartX: margin + gap + cardWidth / 2,
-      itemY: 30,
+      itemY: 24,
       itemWidth: cardWidth,
-      itemHeight: 44,
+      itemHeight: 40,
       itemGap: gap,
       episodeBadge: {
         x: width - margin - episodeBadgeWidth / 2,
