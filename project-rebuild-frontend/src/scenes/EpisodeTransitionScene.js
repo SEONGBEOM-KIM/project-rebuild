@@ -24,10 +24,16 @@ export default class EpisodeTransitionScene extends Phaser.Scene {
       return;
     }
 
+    this.worldState = WorldStateManager.startEpisode(
+      WorldStateManager.get(this.registry),
+      transition.episodeId,
+    );
+    this.registry.set(REGISTRY_KEYS.worldState, this.worldState);
+
     const { width } = this.scale;
     const activityFlow = EpisodeActivityFlowManager.get(this.episodeId);
     const carryoverSummary = EpisodeActivityFlowManager.formatCarryoverSummary(
-      WorldStateManager.get(this.registry),
+      this.worldState,
     );
     createScreenBackground(this, 0x0f172a);
     createLayoutText(this, { x: width / 2, y: 185, text: transition.title }, {
@@ -73,11 +79,6 @@ export default class EpisodeTransitionScene extends Phaser.Scene {
       textColor: '#123524',
     }, { fontSize: '32px', padding: { x: 38, y: 20 } });
     nextButton.on('pointerdown', () => {
-      const startedWorldState = WorldStateManager.startEpisode(
-        WorldStateManager.get(this.registry),
-        transition.episodeId,
-      );
-      this.registry.set(REGISTRY_KEYS.worldState, startedWorldState);
       this.scene.start(transition.nextScene, { episodeId: transition.episodeId });
     });
   }
