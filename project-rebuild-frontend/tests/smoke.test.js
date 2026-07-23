@@ -120,7 +120,7 @@ import { getLayoutTextStyle } from '../src/ui/LayoutText.js';
 import { createPanelBackground, createPanelTitle, getPanelTitleStyle } from '../src/ui/PanelRenderer.js';
 import { createScreenBackground } from '../src/ui/ScreenBackground.js';
 import GlobalStateHudRenderer from '../src/ui/GlobalStateHudRenderer.js';
-import { EP1_VISUAL_ASSETS, getEp1VisualAsset } from '../src/data/visualAssets.js';
+import { EP1_VISUAL_ASSETS, getEp1ExplorationVisual, getEp1VisualAsset } from '../src/data/visualAssets.js';
 
 
 const PROJECT_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -442,6 +442,10 @@ function testVisualAssetCatalog() {
   assert.deepEqual(Object.keys(EP1_VISUAL_ASSETS.buildings), ['bus_station', 'youth_center', 'small_park']);
   assert.equal(getEp1VisualAsset('bus_station').frame, 'bus_station');
   assert.equal(getEp1VisualAsset('unknown'), null);
+  assert.equal(getEp1ExplorationVisual('school').textureKey, 'ep1-exploration-school');
+  assert.equal(getEp1ExplorationVisual('unknown'), null);
+  assert.deepEqual(Object.keys(EP1_VISUAL_ASSETS.exploration), ['school', 'market', 'bus_stop', 'clinic', 'empty_houses']);
+  assert.equal(readFileSync(join(PROJECT_ROOT, 'public', 'assets', 'ep1', 'exploration-school.png')).subarray(0, 8).toString('hex'), '89504e470d0a1a0a');
   assert.match(readProjectFile('public', 'assets', 'ep1', 'building-art-pack.json'), /"small_park"/);
 }
 
@@ -765,7 +769,7 @@ function testExplorationViewManager() {
   assert.equal(ExplorationViewManager.formatSubtitle(CURRENT_EPISODE.regionName), '장소를 클릭해 푸른군의 문제가 어디에서 드러나는지 확인하세요.');
   assert.equal(ExplorationViewManager.getMapLayout().backdrop.width, 1120);
   assert.equal(ExplorationViewManager.getMapLayout().roads.length, 2);
-  assert.match(ExplorationViewManager.getMapLayout().note.text, /임시 지도 데이터/);
+  assert.match(ExplorationViewManager.getMapLayout().note.text, /흐름 검증용 임시 데이터/);
   assert.deepEqual(ExplorationViewManager.getPlaceMarkerLayout().check, { x: 43, y: -45, text: '✓' });
   assert.equal(ExplorationViewManager.getInfoPanelLayout().progress.wordWrapWidth, 500);
   assert.equal(ExplorationViewManager.getTextStyles().panelBody.lineSpacing, 7);
@@ -925,7 +929,7 @@ function testExplorationMapRenderer() {
   ExplorationMapRenderer.renderBackdrop(backdropFixture.scene);
   assert.equal(backdropFixture.calls.filter((call) => call[0] === 'ellipse').length, 2);
   assert.equal(backdropFixture.calls.filter((call) => call[0] === 'angle').length, 3);
-  assert.ok(backdropFixture.calls.some((call) => call[0] === 'text' && call[3].includes('임시 지도 데이터')));
+  assert.ok(backdropFixture.calls.some((call) => call[0] === 'text' && call[3].includes('흐름 검증용 임시 데이터')));
 
   const markerFixture = createRendererSceneSpy();
   const selectedPlaces = [];

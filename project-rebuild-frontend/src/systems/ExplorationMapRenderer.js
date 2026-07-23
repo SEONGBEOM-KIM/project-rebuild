@@ -1,6 +1,7 @@
 import ExplorationViewManager from './ExplorationViewManager.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 import { createPanelBackground } from '../ui/PanelRenderer.js';
+import { getEp1ExplorationVisual } from '../data/visualAssets.js';
 
 export default class ExplorationMapRenderer {
   static renderBackdrop(scene) {
@@ -24,11 +25,16 @@ export default class ExplorationMapRenderer {
     const marker = scene.add.circle(layout.marker.x, layout.marker.y, layout.marker.radius, place.color, layout.marker.fillAlpha)
       .setStrokeStyle(layout.marker.strokeWidth, layout.marker.strokeColor)
       .setInteractive({ useHandCursor: true });
-    const icon = createLayoutText(scene, layout.icon, {
-      text: place.icon,
-      style: textStyles.markerIcon,
-      origin: 0.5,
-    });
+    const visual = getEp1ExplorationVisual(place.id);
+    const icon = visual && scene.textures?.exists?.(visual.textureKey)
+      ? scene.add.image(layout.icon.x, layout.icon.y - 18, visual.textureKey)
+        .setOrigin(0.5, 0.86)
+        .setScale(0.13)
+      : createLayoutText(scene, layout.icon, {
+        text: place.icon,
+        style: textStyles.markerIcon,
+        origin: 0.5,
+      });
     const labelBg = createPanelBackground(scene, layout.labelBackground, layout.labelBackground, {
       strokeColor: place.color,
     });

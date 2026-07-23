@@ -11,6 +11,9 @@ export default class BootScene extends Phaser.Scene {
     Object.values(EP1_VISUAL_ASSETS.buildings).forEach((asset) => {
       this.load.image(asset.textureKey, asset.source);
     });
+    Object.values(EP1_VISUAL_ASSETS.exploration).forEach((asset) => {
+      this.load.image(asset.textureKey, asset.source);
+    });
     this.load.atlas(
       EP1_VISUAL_ASSETS.atlas.key,
       EP1_VISUAL_ASSETS.atlas.image,

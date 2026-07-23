@@ -18,7 +18,7 @@ const EXPLORATION_MAP_LAYOUT = {
     { x: 1010, y: 430, width: 760, height: 34, fillColor: 0x64748b, fillAlpha: 1, angle: 28 },
   ],
   river: { x: 1040, y: 260, width: 80, height: 760, fillColor: 0x2563eb, fillAlpha: 0.82, angle: 36 },
-  note: { x: 410, y: 875, text: '※ 임시 지도 데이터: 실제 아트가 아니라 EP1 탐색 흐름 검증용 도형입니다.' },
+  note: { x: 410, y: 875, text: '※ 지도 배경은 흐름 검증용 임시 데이터이며 장소 아이콘은 EP1 생성 아트입니다.' },
 };
 
 const PLACE_MARKER_LAYOUT = {

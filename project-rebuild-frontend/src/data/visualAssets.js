@@ -19,6 +19,28 @@ export const EP1_VISUAL_ASSETS = Object.freeze({
       source: '/assets/ep1/small-park.png',
     }),
   }),
+  exploration: Object.freeze({
+    school: Object.freeze({
+      textureKey: 'ep1-exploration-school',
+      source: '/assets/ep1/exploration-school.png',
+    }),
+    market: Object.freeze({
+      textureKey: 'ep1-exploration-market',
+      source: '/assets/ep1/exploration-market.png',
+    }),
+    bus_stop: Object.freeze({
+      textureKey: 'ep1-exploration-bus-stop',
+      source: '/assets/ep1/exploration-bus-stop.png',
+    }),
+    clinic: Object.freeze({
+      textureKey: 'ep1-exploration-clinic',
+      source: '/assets/ep1/exploration-clinic.png',
+    }),
+    empty_houses: Object.freeze({
+      textureKey: 'ep1-exploration-empty-houses',
+      source: '/assets/ep1/exploration-empty-houses.png',
+    }),
+  }),
   atlas: Object.freeze({
     key: 'ep1-buildings',
     image: '/assets/ep1/building-art-pack.png',
@@ -28,4 +50,8 @@ export const EP1_VISUAL_ASSETS = Object.freeze({
 
 export function getEp1VisualAsset(buildingId) {
   return EP1_VISUAL_ASSETS.buildings[buildingId] ?? null;
+}
+
+export function getEp1ExplorationVisual(placeId) {
+  return EP1_VISUAL_ASSETS.exploration[placeId] ?? null;
 }
