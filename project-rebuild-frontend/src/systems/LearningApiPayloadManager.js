@@ -33,6 +33,12 @@ export default class LearningApiPayloadManager {
         current: LearningApiPayloadManager.formatEpisodeContext(learningData.episodeContext.current),
         placement: LearningApiPayloadManager.formatEpisodeContext(learningData.episodeContext.placement),
       } : null,
+      time_state: learningData.timeState ? {
+        current_year: learningData.timeState.currentYear,
+        turn: learningData.timeState.turn,
+        last_event: learningData.timeState.lastEvent ?? null,
+      } : null,
+      episode_journey: Array.isArray(learningData.episodeJourney) ? [...learningData.episodeJourney] : [],
       completed: Boolean(learningData.completed),
       summary: learningData.summary ? {
         outcome_type: learningData.summary.outcomeType,
@@ -113,6 +119,20 @@ export default class LearningApiPayloadManager {
         ok: payload.episode_context == null || Boolean(payload.episode_context?.placement?.code),
         label: '배치 에피소드 메타 확인',
         message: 'episode_context.placement.code 값이 없습니다.',
+      },
+      {
+        ok: payload.time_state == null
+          || (Number.isFinite(payload.time_state.current_year)
+            && Number.isFinite(payload.time_state.turn)
+            && (payload.time_state.last_event == null || typeof payload.time_state.last_event === 'object')),
+        label: '시간 상태 구조 확인',
+        message: 'time_state.current_year/turn 또는 last_event 구조가 올바르지 않습니다.',
+      },
+      {
+        ok: payload.episode_journey == null
+          || (Array.isArray(payload.episode_journey) && payload.episode_journey.every((entry) => typeof entry === 'string')),
+        label: '에피소드 여정 배열 확인',
+        message: 'episode_journey는 문자열 배열이어야 합니다.',
       },
       {
         ok: payload.summary == null || Boolean(payload.summary?.outcome_type),

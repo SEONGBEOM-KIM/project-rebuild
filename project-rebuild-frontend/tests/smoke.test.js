@@ -164,6 +164,8 @@ function createCompleteLearningData(overrides = {}) {
       current: LearningDataManager.serializeEpisode(CURRENT_EPISODE),
       placement: LearningDataManager.serializeEpisode(CURRENT_PLACEMENT_EPISODE),
     },
+    timeState: { currentYear: 2036, turn: 2, lastEvent: { episodeId: 'ep2', reason: 'episode_start', year: 2036, turn: 2 } },
+    episodeJourney: ['EP2 회복: 균형 성장 선택 / 생활 기반 시설 배치'],
     summary: {
       outcomeType: '환경 우선 회복안',
       outcomeMessage: '생활 환경 개선 효과가 뚜렷합니다.',
@@ -4471,6 +4473,12 @@ function testLearningApiPayloadManager() {
   assert.equal(payload.episode_id, 1);
   assert.equal(payload.episode_context.current.code, 'ep1');
   assert.equal(payload.episode_context.placement.code, 'ep2');
+  assert.deepEqual(payload.time_state, {
+    current_year: 2036,
+    turn: 2,
+    last_event: { episodeId: 'ep2', reason: 'episode_start', year: 2036, turn: 2 },
+  });
+  assert.deepEqual(payload.episode_journey, ['EP2 회복: 균형 성장 선택 / 생활 기반 시설 배치']);
   assert.equal(payload.summary.outcome_type, '환경 우선 회복안');
   assert.equal(payload.summary.next_action.label, '개발 효과와 환경 부담 비교');
   assert.equal(payload.summary.selected_strategy_title, '균형 성장');
@@ -4548,6 +4556,18 @@ function testLearningApiPayloadManager() {
     episode_context: { current: {}, placement: payload.episode_context.placement },
   });
   assert.equal(invalidEpisodeContext.find((row) => row.label === '현재 에피소드 메타 확인').ok, false);
+
+  const invalidTimeState = LearningApiPayloadManager.validate({
+    ...payload,
+    time_state: { current_year: '2036', turn: 2, last_event: null },
+  });
+  assert.equal(invalidTimeState.find((row) => row.label === '시간 상태 구조 확인').ok, false);
+
+  const invalidEpisodeJourney = LearningApiPayloadManager.validate({
+    ...payload,
+    episode_journey: ['valid', 2],
+  });
+  assert.equal(invalidEpisodeJourney.find((row) => row.label === '에피소드 여정 배열 확인').ok, false);
 
   const mismatchedSummaryContext = LearningApiPayloadManager.validate({
     ...payload,
@@ -5235,6 +5255,12 @@ function testSaveImport() {
   const apiPayload = LearningApiPayloadManager.build(createCompleteLearningData());
   const importedApiPayload = SaveManager.importJsonText(JSON.stringify(apiPayload));
   assert.equal(importedApiPayload.data.episode, apiPayload.episode_id);
+  assert.deepEqual(importedApiPayload.data.timeState, {
+    currentYear: apiPayload.time_state.current_year,
+    turn: apiPayload.time_state.turn,
+    lastEvent: apiPayload.time_state.last_event,
+  });
+  assert.deepEqual(importedApiPayload.data.episodeJourney, apiPayload.episode_journey);
   assert.equal(importedApiPayload.data.episodeContext.current.code, apiPayload.episode_context.current.code);
   assert.equal(importedApiPayload.data.episodeContext.placement.code, apiPayload.episode_context.placement.code);
   assert.deepEqual(importedApiPayload.data.exploredPlaces, apiPayload.learning_steps.explored_places);
@@ -5276,6 +5302,8 @@ function testApiContract() {
     'schema_version',
     'episode_id',
     'episode_context',
+    'time_state',
+    'episode_journey',
     'completed',
     'summary',
     'learning_steps',

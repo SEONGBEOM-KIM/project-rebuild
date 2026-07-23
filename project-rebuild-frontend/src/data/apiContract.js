@@ -87,6 +87,15 @@ function buildRequestExample(config = API_REQUEST_EXAMPLE_CONFIGS[DEFAULT_EXAMPL
       current: serializeEpisode(CURRENT_EPISODE),
       placement: serializeEpisode(placementEpisode),
     },
+    time_state: {
+      current_year: 2035,
+      turn: 1,
+      last_event: null,
+    },
+    episode_journey: [
+      'EP2 회복: 균형 성장 선택 / 생활 기반 시설 배치',
+      'EP3 성장: 방문 경제 성장 전략 선택 / 교통 부담 관찰',
+    ],
     completed: true,
     summary: {
       outcome_type: config.outcomeType,

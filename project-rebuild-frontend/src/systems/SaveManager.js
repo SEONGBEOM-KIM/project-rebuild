@@ -1,5 +1,7 @@
 export const LEARNING_SAVE_STORAGE_KEY = 'project-rebuild:learning-save:v1';
 
+const DEFAULT_TIME_STATE = Object.freeze({ currentYear: 2035, turn: 1, lastEvent: null });
+
 export default class SaveManager {
   static save(data) {
     const payload = {
@@ -68,6 +70,16 @@ export default class SaveManager {
     return {
       episode: payload.episode_id,
       episodeContext: SaveManager.fromApiEpisodeContext(payload.episode_context),
+      timeState: {
+        currentYear: Number.isFinite(payload.time_state?.current_year)
+          ? payload.time_state.current_year
+          : DEFAULT_TIME_STATE.currentYear,
+        turn: Number.isFinite(payload.time_state?.turn)
+          ? payload.time_state.turn
+          : DEFAULT_TIME_STATE.turn,
+        lastEvent: payload.time_state?.last_event ?? DEFAULT_TIME_STATE.lastEvent,
+      },
+      episodeJourney: Array.isArray(payload.episode_journey) ? [...payload.episode_journey] : [],
       summary: SaveManager.fromApiSummary(payload.summary),
       exploredPlaces: payload.learning_steps.explored_places,
       dataViewed: Boolean(payload.learning_steps.data_viewed),
