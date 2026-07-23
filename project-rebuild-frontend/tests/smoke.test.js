@@ -1385,6 +1385,23 @@ function testEpisodeContent() {
   assert.equal(getEpisodeTransition(EPISODE_IDS.SustainabilityEvaluation).nextScene, SCENE_KEYS.SustainabilityEvaluation);
   assert.equal(EpisodeActivityFlowManager.formatActivityRows(EPISODE_IDS.EconomyGrowth).length, 3);
   assert.match(EpisodeActivityFlowManager.formatActivityRows(EPISODE_IDS.SideEffects)[1], /문제 비교/);
+  const activityRegistry = createMemoryRegistry();
+  activityRegistry.set(REGISTRY_KEYS.learningProgress, {
+    ...LearningProgress.createInitialProgress(),
+    exploredPlaces: ['school', 'market', 'bus_stop'],
+    dataViewed: true,
+    quizResult: { correct: true },
+  });
+  assert.deepEqual(EpisodeActivityFlowManager.getProgress(EPISODE_IDS.Crisis, activityRegistry), {
+    steps: [
+      { id: 'explore', label: '지역 탐색', description: '학교·시장·교통 등 변화한 장소를 살펴봅니다.', completed: true },
+      { id: 'evidence', label: '자료 확인', description: '인구 변화와 고령화 자료를 비교합니다.', completed: true },
+      { id: 'cause', label: '원인 정리', description: '인구 유출의 원인을 생활 조건과 연결합니다.', completed: true },
+    ],
+    completedCount: 3,
+    activeIndex: 2,
+  });
+  assert.match(EpisodeActivityFlowManager.formatActivityRows(EPISODE_IDS.Crisis, { registry: activityRegistry, showStatus: true })[0], /^완료/);
   assert.match(EpisodeActivityFlowManager.formatCarryoverSummary({
     completedEpisodeIds: [EPISODE_IDS.PopulationRecovery],
     placements: [{ buildingId: 'youth_center', buildingName: '청년 센터' }],

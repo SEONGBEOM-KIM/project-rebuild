@@ -72,7 +72,7 @@ export default class EpisodeTransitionScene extends Phaser.Scene {
     createLayoutText(this, { x: width / 2 - 620, y: 465, text: transition.dialogue.join('\n\n'), wordWrapWidth: 1240 }, {
       style: { fontSize: '25px', color: '#ffffff', lineSpacing: 10 },
     });
-    createLayoutText(this, { x: width / 2 - 620, y: 675, text: EpisodeActivityFlowManager.formatActivityRows(this.episodeId).join('\n'), wordWrapWidth: 1240 }, {
+    createLayoutText(this, { x: width / 2 - 620, y: 675, text: EpisodeActivityFlowManager.formatActivityRows(this.episodeId, { registry: this.registry, showStatus: true }).join('\n'), wordWrapWidth: 1240 }, {
       style: { fontSize: '20px', color: '#cbd5e1', lineSpacing: 6 },
     });
 
