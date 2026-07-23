@@ -42,7 +42,7 @@ const EXPLORATION_TEXT_STYLES = {
   markerLabel: { fontSize: '22px', color: '#ffffff', fontStyle: 'bold' },
   markerCheck: { fontSize: '30px', color: '#bbf7d0', fontStyle: 'bold' },
   panelTitle: { fontSize: '38px', color: '#172554', fontStyle: 'bold' },
-  panelBody: { fontSize: '26px', color: '#1e293b', lineSpacing: 13 },
+  panelBody: { fontSize: '22px', color: '#1e293b', lineSpacing: 7 },
   progress: { fontSize: '24px', color: '#172554', lineSpacing: 8 },
 };
 
@@ -135,6 +135,9 @@ export default class ExplorationViewManager {
       '',
       '자료 카드',
       place.data,
+      '',
+      '현장 목소리',
+      place.voice,
       '',
       '학습 개념',
       place.concept,

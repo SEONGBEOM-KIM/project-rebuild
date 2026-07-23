@@ -7,6 +7,7 @@ export const explorationPlaces = [
     problem: '학생 수가 줄어 폐교 위기가 커지고 있습니다.',
     data: '10년 전 18학급 → 현재 6학급',
     concept: '인구 감소는 학교와 같은 생활 기반 시설 유지에 영향을 줍니다.',
+    voice: '“친구들이 줄어서 쉬는 시간에도 운동장이 예전처럼 붐비지 않아요.” — 초등학생 주민',
     color: 0x60a5fa,
   },
   {
@@ -17,6 +18,7 @@ export const explorationPlaces = [
     problem: '손님이 줄어 빈 점포가 늘고 있습니다.',
     data: '영업 점포 120곳 → 63곳',
     concept: '상권 침체는 일자리와 지역 경제의 활력을 약하게 만듭니다.',
+    voice: '“가게를 열어도 손님이 없으니 자녀들이 다른 지역에서 일자리를 찾으러 떠납니다.” — 시장 상인',
     color: 0xf59e0b,
   },
   {
@@ -27,6 +29,7 @@ export const explorationPlaces = [
     problem: '버스 배차가 줄어 이동이 어려워졌습니다.',
     data: '하루 운행 28회 → 11회',
     concept: '교통 접근성은 주민의 생활 편의와 지역 선택에 영향을 줍니다.',
+    voice: '“버스 시간이 맞지 않아 병원이나 시장에 가려면 하루 일정을 통째로 바꿔야 해요.” — 고령 주민',
     color: 0xfacc15,
   },
   {
@@ -37,6 +40,7 @@ export const explorationPlaces = [
     problem: '고령 주민은 늘었지만 의료 접근은 충분하지 않습니다.',
     data: '65세 이상 비율 18% → 39%',
     concept: '고령화가 진행되면 의료·복지 수요가 커집니다.',
+    voice: '“어르신은 많아졌는데 가까운 곳에서 진료받을 수 있는 날은 오히려 줄었습니다.” — 보건소 직원',
     color: 0xf87171,
   },
   {
@@ -47,6 +51,7 @@ export const explorationPlaces = [
     problem: '떠난 사람이 늘며 빈집과 관리되지 않는 공간이 증가했습니다.',
     data: '빈집 42채 → 190채',
     concept: '인구 유출은 주거 공백과 지역 경관 문제로 이어질 수 있습니다.',
+    voice: '“빈집이 늘면서 밤길이 어두워지고, 마을을 관리하는 일도 점점 힘들어지고 있습니다.” — 마을 이장',
     color: 0xa78bfa,
   },
 ];

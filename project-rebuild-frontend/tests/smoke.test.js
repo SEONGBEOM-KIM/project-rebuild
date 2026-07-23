@@ -756,7 +756,8 @@ function testExplorationViewManager() {
   assert.match(ExplorationViewManager.getMapLayout().note.text, /임시 지도 데이터/);
   assert.deepEqual(ExplorationViewManager.getPlaceMarkerLayout().check, { x: 43, y: -45, text: '✓' });
   assert.equal(ExplorationViewManager.getInfoPanelLayout().progress.wordWrapWidth, 500);
-  assert.equal(ExplorationViewManager.getTextStyles().panelBody.lineSpacing, 13);
+  assert.equal(ExplorationViewManager.getTextStyles().panelBody.lineSpacing, 7);
+  assert.equal(ExplorationViewManager.getTextStyles().panelBody.fontSize, '22px');
   assert.deepEqual(ExplorationViewManager.getButtonStyle(), {
     fontSize: '32px',
     padding: { x: 34, y: 18 },
@@ -775,6 +776,8 @@ function testExplorationViewManager() {
   assert.equal(ExplorationViewManager.formatPanelTitle(school), '🏫 초등학교');
   assert.match(ExplorationViewManager.formatPanelBody(school), /확인한 문제/);
   assert.match(ExplorationViewManager.formatPanelBody(school), /자료 카드/);
+  assert.match(ExplorationViewManager.formatPanelBody(school), /현장 목소리/);
+  assert.match(ExplorationViewManager.formatPanelBody(school), /초등학생 주민/);
   assert.match(ExplorationViewManager.formatPanelBody(school), /학습 개념/);
   assert.match(ExplorationViewManager.formatProgressText(2, 5, 3), /1곳 더 탐색|장소를 더 클릭/);
   assert.match(ExplorationViewManager.formatProgressText(3, 5, 3), /다음 단계로 이동/);
