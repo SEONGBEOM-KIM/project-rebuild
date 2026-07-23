@@ -30,7 +30,7 @@ export default class EpisodeTransitionScene extends Phaser.Scene {
       transition.episodeId,
     );
     this.registry.set(REGISTRY_KEYS.worldState, this.worldState);
-    this.timeState = TimeStateManager.advance(this.registry, {
+    this.timeState = TimeStateManager.advanceForEpisode(this.registry, {
       episodeId: transition.episodeId,
       reason: `${transition.title} 시작`,
     });

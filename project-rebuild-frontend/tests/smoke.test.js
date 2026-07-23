@@ -1395,7 +1395,7 @@ function testEpisodeContent() {
   assert.match(transitionSceneSource, /formatCarryoverSummary/, 'episode transitions should summarize prior choices');
   assert.match(transitionSceneSource, /WorldStateManager\.get\(this\.registry\)/, 'episode transitions should read persisted world state');
   assert.match(transitionSceneSource, /WorldStateManager\.startEpisode/, 'episode transitions should start the next world-state run');
-  assert.match(transitionSceneSource, /TimeStateManager\.advance/, 'episode transitions should advance time');
+  assert.match(transitionSceneSource, /TimeStateManager\.advanceForEpisode/, 'episode transitions should advance time once per episode');
   assert.match(transitionSceneSource, /this\.scene\.start\(transition\.nextScene, \{ episodeId: transition\.episodeId \}\)/, 'episode transitions should pass the episode id forward');
 
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.Crisis].dataCards, EP1_DATA_CARDS, 'EP1 data cards should be addressable through episode content registry');
@@ -5632,6 +5632,11 @@ function testTimeStateManager() {
     turn: 2,
   });
   assert.equal(TimeStateManager.formatCompact(advanced), '2036년 · 2턴');
+  const repeated = TimeStateManager.advanceForEpisode(registry, {
+    episodeId: EPISODE_IDS.PopulationRecovery,
+    reason: 'EP2 재진입',
+  });
+  assert.deepEqual(repeated, advanced, 're-entering the same episode should not advance time twice');
 }
 
 function testGlobalStateHudRenderer() {

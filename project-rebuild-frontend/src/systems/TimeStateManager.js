@@ -43,6 +43,15 @@ export default class TimeStateManager {
     });
   }
 
+  static advanceForEpisode(registry, { episodeId = null, reason = null, years = 1, turns = 1 } = {}) {
+    const current = TimeStateManager.get(registry);
+    if (episodeId && current.lastEvent?.episodeId === episodeId) {
+      return current;
+    }
+
+    return TimeStateManager.advance(registry, { episodeId, reason, years, turns });
+  }
+
   static formatCompact(timeState = {}) {
     const normalized = normalizeTimeState(timeState);
     return `${normalized.currentYear}년 · ${normalized.turn}턴`;
