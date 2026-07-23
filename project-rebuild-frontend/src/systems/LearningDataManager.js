@@ -104,6 +104,7 @@ export default class LearningDataManager {
       // the shared Blue County state after a refresh or import.
       worldState,
       timeState: TimeStateManager.get(registry),
+      episodeJourney: EndingSummaryManager.formatEpisodeJourney(worldState),
       sustainabilityEvaluation,
       reflectionChoice,
       selectedSolutionPlan: selectedSolutionPlan ? { id: selectedSolutionPlan.id, title: selectedSolutionPlan.title } : null,

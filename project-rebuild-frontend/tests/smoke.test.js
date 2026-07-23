@@ -3967,6 +3967,7 @@ function testTeacherReportManager() {
   assert.equal(report.selectedStrategy.id, 'jobs_services');
   assert.equal(report.placementConfig.id, DEFAULT_PLACEMENT_CONFIG_ID);
   assert.equal(report.evaluationProfile.id, DEFAULT_EVALUATION_PROFILE_ID);
+  assert.equal(report.episodeJourney.length, 4);
   assert.deepEqual(report.placementContext, {
     placementConfigId: DEFAULT_PLACEMENT_CONFIG_ID,
     placementConfigTitle: '푸른군 인구 회복 배치 실험',
@@ -3984,6 +3985,8 @@ function testTeacherReportManager() {
   assert.match(TeacherReportManager.formatEpisodeContextReport(report), /필요 배치: 3개/);
   assert.match(TeacherReportManager.formatEpisodeContextReport(report), /표시 지표: population, economy, environment/);
   assert.match(TeacherReportManager.formatEpisodeContextReport(report), /평가 기준: ep2_population_recovery_default/);
+  assert.match(TeacherReportManager.formatEpisodeContextReport(report), /현재 시점: 2035년 · 1턴/);
+  assert.match(TeacherReportManager.formatEpisodeJourneyReport(report), /EP2 회복/);
   assert.deepEqual(TeacherReportManager.buildPlacementContextSummary(
     getPlacementConfig(ENVIRONMENT_PLACEMENT_CONFIG_ID),
     getEvaluationProfile(ENVIRONMENT_EVALUATION_PROFILE_ID),
@@ -4011,7 +4014,8 @@ function testTeacherReportManager() {
   assert.match(TeacherReportManager.buildReportText(report), /\[프로젝트 리빌드 EP1\. 지역 위기 탐색 교사용 요약\]/);
   assert.match(TeacherReportManager.buildReportText(report), /0\. 에피소드\/설정/);
   assert.match(TeacherReportManager.buildReportText(report), /1\. 수업 결론/);
-  assert.match(TeacherReportManager.buildReportText(report), /4\. 지도 포인트/);
+  assert.match(TeacherReportManager.buildReportText(report), /3\. 에피소드 여정/);
+  assert.match(TeacherReportManager.buildReportText(report), /5\. 지도 포인트/);
   assert.match(TeacherReportManager.buildReportText(report), /EP6 종합 평가는 아직 완료되지 않았습니다/);
 
   const sustainabilityEvaluation = SustainabilityEvaluationManager.serialize(SustainabilityEvaluationManager.evaluate({
@@ -4028,7 +4032,7 @@ function testTeacherReportManager() {
   const sustainabilityReport = { ...report, sustainabilityEvaluation };
   assert.match(TeacherReportManager.formatClassSummaryReport(sustainabilityReport), /지속 가능한 푸른군/);
   assert.match(TeacherReportManager.formatSustainabilityReport(sustainabilityReport), /종합 점수: 4\/4/);
-  assert.match(TeacherReportManager.buildReportText(sustainabilityReport), /5\. 지속 가능성 평가/);
+  assert.match(TeacherReportManager.buildReportText(sustainabilityReport), /6\. 지속 가능성 평가/);
 
 
   const ep3Registry = createMemoryRegistry();
@@ -4241,6 +4245,7 @@ function testLearningDataManager() {
   const data = LearningDataManager.build(registry);
   assert.equal(data.episode, 1);
   assert.deepEqual(data.timeState, TimeStateManager.createInitialTimeState());
+  assert.equal(data.episodeJourney.length, 4);
   assert.equal(data.exploredPlaceNames.length, 3);
   assert.equal(data.placements.length, 3);
   assert.equal(data.summary.selectedPolicyName, '청년 생활 지원');

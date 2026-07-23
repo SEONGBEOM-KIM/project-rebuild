@@ -9,6 +9,7 @@ import PlacementContextManager from './PlacementContextManager.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
 import WorldStateManager from './WorldStateManager.js';
 import SustainabilityEvaluationManager from './SustainabilityEvaluationManager.js';
+import TimeStateManager from './TimeStateManager.js';
 
 const TEACHER_REPORT_DOWNLOAD_CONFIG = {
   mimeType: 'text/plain;charset=utf-8',
@@ -96,6 +97,8 @@ export default class TeacherReportManager {
       ending,
       exploredNames,
       sustainabilityEvaluation,
+      timeState: TimeStateManager.get(registry),
+      episodeJourney: EndingSummaryManager.formatEpisodeJourney(worldState),
     };
   }
 
@@ -123,6 +126,7 @@ export default class TeacherReportManager {
     const currentEpisode = report.episodeContext?.current;
     const placementEpisode = report.episodeContext?.placement;
     const placementContext = report.placementContext ?? TeacherReportManager.buildPlacementContextSummary(report.placementConfig, report.evaluationProfile);
+    const timeText = report.timeState ? `현재 시점: ${TimeStateManager.formatCompact(report.timeState)}` : null;
     return [
       `학습 흐름: ${currentEpisode?.shortTitle ?? '알 수 없음'} (${currentEpisode?.code ?? '-'})`,
       `배치 실험: ${placementEpisode?.shortTitle ?? '알 수 없음'} (${placementEpisode?.code ?? '-'})`,
@@ -130,7 +134,12 @@ export default class TeacherReportManager {
       `필요 배치: ${placementContext.requiredPlacements ?? '-'}개`,
       `표시 지표: ${(placementContext.stateKeys ?? []).join(', ') || '없음'}`,
       `평가 기준: ${placementContext.evaluationProfileId ?? '없음'}`,
-    ].join('\n');
+      timeText,
+    ].filter(Boolean).join('\n');
+  }
+
+  static formatEpisodeJourneyReport(report) {
+    return (report.episodeJourney ?? EndingSummaryManager.formatEpisodeJourney(report.worldState ?? {})).join('\n');
   }
 
   static formatClassSummaryReport(report) {
@@ -251,13 +260,16 @@ export default class TeacherReportManager {
       '2. 학습 진행',
       TeacherReportManager.formatProgressReport(report),
       '',
-      '3. 선택과 결과',
+      '3. 에피소드 여정',
+      TeacherReportManager.formatEpisodeJourneyReport(report),
+      '',
+      '4. 선택과 결과',
       TeacherReportManager.formatChoiceReport(report),
       '',
-      '4. 지도 포인트',
+      '5. 지도 포인트',
       TeacherReportManager.formatTeachingPointReport(report),
       '',
-      '5. 지속 가능성 평가',
+      '6. 지속 가능성 평가',
       TeacherReportManager.formatSustainabilityReport(report),
     ].join('\n');
   }
