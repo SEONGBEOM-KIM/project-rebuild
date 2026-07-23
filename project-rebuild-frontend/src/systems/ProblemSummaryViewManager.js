@@ -130,29 +130,33 @@ export default class ProblemSummaryViewManager {
       .join(', ') || '없음';
   }
 
-  static formatQuizStatus(quizResult) {
+  static formatQuizStatus(quizResult, quizResults = []) {
+    if (quizResults.length > 0) {
+      const correctCount = quizResults.filter((result) => result.correct).length;
+      return `${quizResults.length}문제 응답 · 정답 ${correctCount}문제`;
+    }
     if (!quizResult) {
       return '미응답';
     }
     return quizResult.correct ? '정답' : '오답 후 피드백 확인';
   }
 
-  static formatLearningRecordRows(allPlaces, exploredPlaceIds, quizResult, coreCauseSummary) {
+  static formatLearningRecordRows(allPlaces, exploredPlaceIds, quizResult, coreCauseSummary, quizResults = []) {
     const exploredIds = exploredPlaceIds ?? [];
     return [
       `탐색한 장소: ${exploredIds.length}곳`,
       ProblemSummaryViewManager.formatExploredNames(allPlaces, exploredIds),
       '',
-      `원인 질문: ${ProblemSummaryViewManager.formatQuizStatus(quizResult)}`,
+      `원인 질문: ${ProblemSummaryViewManager.formatQuizStatus(quizResult, quizResults)}`,
       '',
       '핵심 원인:',
       coreCauseSummary,
     ];
   }
 
-  static formatLearningRecordText(allPlaces, exploredPlaceIds, quizResult, coreCauseSummary) {
+  static formatLearningRecordText(allPlaces, exploredPlaceIds, quizResult, coreCauseSummary, quizResults = []) {
     return ProblemSummaryViewManager
-      .formatLearningRecordRows(allPlaces, exploredPlaceIds, quizResult, coreCauseSummary)
+      .formatLearningRecordRows(allPlaces, exploredPlaceIds, quizResult, coreCauseSummary, quizResults)
       .join('\n');
   }
 

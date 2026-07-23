@@ -15,11 +15,14 @@ export default class CauseQuizPanelRenderer {
     });
   }
 
-  static renderQuestionPanel(scene, question, onChoiceSelect) {
+  static renderQuestionPanel(scene, question, onChoiceSelect, progressText = null) {
     const layout = CauseQuizViewManager.getQuestionLayout();
     const textStyles = CauseQuizViewManager.getTextStyles();
-    createPanelBackground(scene, layout.panel, layout.panel);
-    createLayoutText(scene, layout.prompt, {
+    const panel = createPanelBackground(scene, layout.panel, layout.panel);
+    const progress = progressText
+      ? createLayoutText(scene, layout.progress, { text: progressText, style: textStyles.progress, origin: 0.5 })
+      : null;
+    const prompt = createLayoutText(scene, layout.prompt, {
       text: question.prompt,
       style: textStyles.prompt,
       origin: 0.5,
@@ -34,7 +37,7 @@ export default class CauseQuizPanelRenderer {
       style: textStyles.feedback,
     });
 
-    return { choiceObjects, feedbackText };
+    return { panel, progress, prompt, choiceObjects, feedbackText };
   }
 
   static renderChoice(scene, choice, index, number, onChoiceSelect) {

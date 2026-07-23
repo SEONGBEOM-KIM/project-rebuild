@@ -84,6 +84,7 @@ export default class SaveManager {
       exploredPlaces: payload.learning_steps.explored_places,
       dataViewed: Boolean(payload.learning_steps.data_viewed),
       quizResult: SaveManager.fromApiQuizResult(payload.learning_steps.quiz_result),
+      quizResults: (payload.learning_steps.quiz_results ?? []).map((result) => SaveManager.fromApiQuizResult(result)).filter(Boolean),
       problemSummaryCompleted: Boolean(payload.learning_steps.problem_summary_completed),
       selectedPolicy: SaveManager.fromApiPolicy(payload.selected_policy),
       selectedStrategy: SaveManager.fromApiStrategy(payload.selected_strategy),

@@ -124,6 +124,11 @@ function buildRequestExample(config = API_REQUEST_EXAMPLE_CONFIGS[DEFAULT_EXAMPL
         selected: currentEpisodeContent.causeQuestion.choices.find((choice) => choice.correct)?.id ?? null,
         correct: true,
       },
+      quiz_results: [{
+        question_id: currentEpisodeContent.causeQuestion.id,
+        selected: currentEpisodeContent.causeQuestion.choices.find((choice) => choice.correct)?.id ?? null,
+        correct: true,
+      }],
       problem_summary_completed: true,
       reflection_choice: {
         id: reflectionChoice.id,

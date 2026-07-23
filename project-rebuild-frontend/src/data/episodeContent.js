@@ -61,6 +61,58 @@ export const EP1_CAUSE_QUESTION = {
   ],
 };
 
+export const EP1_CAUSE_QUESTIONS = [
+  EP1_CAUSE_QUESTION,
+  {
+    id: 'ep1_q2_school_market_cycle',
+    prompt: '학생 수와 손님이 함께 줄어드는 현상을 가장 잘 설명하는 것은 무엇일까요?',
+    choices: [
+      {
+        id: 'population_service_cycle',
+        text: '인구가 줄면 학교와 상점 같은 생활 기반도 약해져 다시 인구가 빠져나갈 수 있다.',
+        correct: true,
+        feedback: '맞습니다. 인구 감소와 생활 기반 약화는 서로 영향을 주고받는 순환 구조로 나타날 수 있습니다.',
+      },
+      {
+        id: 'school_market_unrelated',
+        text: '학교와 상점은 서로 영향을 주지 않으므로 각각 따로 해결해야 한다.',
+        correct: false,
+        feedback: '학교와 상점은 주민 수와 생활 수요를 통해 연결되어 있습니다. 지역 문제는 서로 영향을 주고받습니다.',
+      },
+      {
+        id: 'temporary_holiday',
+        text: '주민들이 모두 같은 날 휴가를 떠났기 때문에 일시적으로 줄어든 것이다.',
+        correct: false,
+        feedback: '일시적인 변화보다 학생 수와 손님 감소가 오랜 기간 이어지는 구조를 살펴봐야 합니다.',
+      },
+    ],
+  },
+  {
+    id: 'ep1_q3_priority_condition',
+    prompt: '인구가 다시 찾아오고 주민이 계속 살고 싶게 하려면 무엇을 함께 살펴봐야 할까요?',
+    choices: [
+      {
+        id: 'jobs_living_conditions',
+        text: '일자리뿐 아니라 교육, 의료, 교통 같은 생활 조건도 함께 살펴봐야 한다.',
+        correct: true,
+        feedback: '맞습니다. 사람들은 일자리만이 아니라 생활에 필요한 여러 조건을 함께 보고 지역에 머물지 결정합니다.',
+      },
+      {
+        id: 'single_landmark',
+        text: '눈에 잘 띄는 시설 하나만 만들면 다른 조건은 고려하지 않아도 된다.',
+        correct: false,
+        feedback: '시설 하나의 효과만으로는 교육, 의료, 교통처럼 서로 연결된 생활 문제를 해결하기 어렵습니다.',
+      },
+      {
+        id: 'population_only',
+        text: '인구 숫자만 높이면 주민의 생활 불편은 자연스럽게 사라진다.',
+        correct: false,
+        feedback: '인구 수와 함께 주민이 실제로 경험하는 생활 조건과 만족도도 확인해야 합니다.',
+      },
+    ],
+  },
+];
+
 export const EP1_EXPLORATION_CLUES = [
   '• 학교: 학생 수 감소와 폐교 위기',
   '• 시장: 손님 감소와 빈 점포 증가',
@@ -437,6 +489,7 @@ export const EPISODE_CONTENT = Object.freeze({
     dataCards: EP1_DATA_CARDS,
     coreConcept: EP1_CORE_CONCEPT,
     causeQuestion: EP1_CAUSE_QUESTION,
+    causeQuestions: EP1_CAUSE_QUESTIONS,
     explorationClues: EP1_EXPLORATION_CLUES,
     problemItems: EP1_PROBLEM_ITEMS,
     coreCauseSummary: EP1_CORE_CAUSE_SUMMARY,

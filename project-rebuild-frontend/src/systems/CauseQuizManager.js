@@ -30,8 +30,6 @@ export default class CauseQuizManager {
     return [
       choice.correct ? '정답입니다.' : '다시 생각해 볼 수 있습니다.',
       choice.feedback,
-      '',
-      '다음 단계에서는 확인한 문제를 정리합니다.',
     ].join('\n');
   }
 

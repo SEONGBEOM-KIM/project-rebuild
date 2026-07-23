@@ -20,6 +20,7 @@ export default class ProblemSummaryScene extends Phaser.Scene {
     const { width } = this.scale;
     const exploredPlaces = this.registry.get(REGISTRY_KEYS.exploredPlaces) ?? [];
     const quizResult = this.registry.get(REGISTRY_KEYS.quizResult);
+    const quizResults = this.registry.get(REGISTRY_KEYS.quizResults) ?? [];
 
     const layout = ProblemSummaryViewManager.getScreenLayout(width);
 
@@ -29,7 +30,7 @@ export default class ProblemSummaryScene extends Phaser.Scene {
     createLayoutText(this, layout.subtitle, { origin: 0.5 });
 
     this.drawProblemGrid();
-    this.drawLearningRecord(exploredPlaces, quizResult);
+    this.drawLearningRecord(exploredPlaces, quizResult, quizResults);
     this.drawNextMission();
     this.drawControls();
   }
@@ -38,7 +39,7 @@ export default class ProblemSummaryScene extends Phaser.Scene {
     ProblemSummaryRenderer.renderProblemGrid(this, getCurrentEpisodeContent().problemItems);
   }
 
-  drawLearningRecord(exploredPlaces, quizResult) {
+  drawLearningRecord(exploredPlaces, quizResult, quizResults) {
     ProblemSummaryRenderer.renderLearningRecord(
       this,
       ProblemSummaryViewManager.formatLearningRecordText(
@@ -46,6 +47,7 @@ export default class ProblemSummaryScene extends Phaser.Scene {
         exploredPlaces,
         quizResult,
         getCurrentEpisodeContent().coreCauseSummary,
+        quizResults,
       ),
     );
   }

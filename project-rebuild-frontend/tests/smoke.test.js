@@ -111,7 +111,7 @@ import { EPISODE_ACTIVITY_FLOWS, getEpisodeActivityFlow } from '../src/data/epis
 import { EPISODE_TRANSITIONS, getEpisodeTransition } from '../src/data/episodeTransitions.js';
 import SCENE_KEYS from '../src/data/sceneKeys.js';
 import { REGISTRY_KEYS } from '../src/data/registryKeys.js';
-import { EP1_CAUSE_QUESTION, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES, EP2_MISSION_BRIEFING, EP2_NEXT_DEVELOPMENT_GOALS, EP2_REFLECTION_CHOICES, EP3_MISSION_PREVIEW, EP3_MISSION_BRIEFING, EP3_NEXT_DEVELOPMENT_GOALS, EP3_REFLECTION_CHOICES, EP4_MISSION_BRIEFING, EP4_NEXT_DEVELOPMENT_GOALS, EP5_MISSION_PREVIEW, EPISODE_CONTENT, getCurrentEpisodeContent, getCurrentPlacementEpisodeContent, getCurrentPlacementMissionBriefing, getCurrentPlacementNextDevelopmentGoals, getEpisodeContent, getNextDevelopmentGoals, getNextEpisodeContent, getReflectionChoices } from '../src/data/episodeContent.js';
+import { EP1_CAUSE_QUESTION, EP1_CAUSE_QUESTIONS, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES, EP2_MISSION_BRIEFING, EP2_NEXT_DEVELOPMENT_GOALS, EP2_REFLECTION_CHOICES, EP3_MISSION_PREVIEW, EP3_MISSION_BRIEFING, EP3_NEXT_DEVELOPMENT_GOALS, EP3_REFLECTION_CHOICES, EP4_MISSION_BRIEFING, EP4_NEXT_DEVELOPMENT_GOALS, EP5_MISSION_PREVIEW, EPISODE_CONTENT, getCurrentEpisodeContent, getCurrentPlacementEpisodeContent, getCurrentPlacementMissionBriefing, getCurrentPlacementNextDevelopmentGoals, getEpisodeContent, getNextDevelopmentGoals, getNextEpisodeContent, getReflectionChoices } from '../src/data/episodeContent.js';
 import ProgressStepper from '../src/ui/ProgressStepper.js';
 import { getTextButtonColor } from '../src/ui/TextButton.js';
 import { DEFAULT_STATE_KEYS, STATE_ICONS } from '../src/data/stateLabels.js';
@@ -491,11 +491,12 @@ function testCauseQuizViewManager() {
   assert.equal(CauseQuizViewManager.getScreenLayout(1920).progressStep, 'quiz');
   assert.equal(CauseQuizViewManager.getExplorationSummaryLayout().title.text, '탐색에서 확인한 단서');
   assert.equal(CauseQuizViewManager.getQuestionLayout().feedback.text, '답을 선택하면 피드백이 표시됩니다.');
+  assert.equal(CauseQuizViewManager.getQuestionLayout().progress.y, 245);
   assert.deepEqual(CauseQuizViewManager.getChoiceLayout(1).text, { x: 820, y: 505, wordWrapWidth: 700 });
   assert.deepEqual(CauseQuizViewManager.getTextStyles().feedback, {
-    fontSize: '25px',
+    fontSize: '23px',
     color: '#334155',
-    lineSpacing: 10,
+    lineSpacing: 6,
   });
   assert.deepEqual(CauseQuizViewManager.getButtonStyle(), {
     fontSize: '32px',
@@ -541,6 +542,7 @@ function testCauseQuizPanelRenderer() {
   );
   assert.equal(rendered.choiceObjects.size, EP1_CAUSE_QUESTION.choices.length);
   assert.ok(questionFixture.calls.some((call) => call[0] === 'text' && call[3] === EP1_CAUSE_QUESTION.prompt));
+  assert.ok(questionFixture.calls.some((call) => call[0] === 'text' && call[3] === EP1_CAUSE_QUESTION.prompt));
   rendered.choiceObjects.get(EP1_CAUSE_QUESTION.choices[0].id).background.events.get('pointerdown')();
   assert.deepEqual(selectedChoices, [EP1_CAUSE_QUESTION.choices[0].id]);
 }
@@ -562,6 +564,9 @@ function testCauseQuizManager() {
   assert.match(CauseQuizManager.formatFeedback(wrongChoice), /다시 생각해 볼 수 있습니다/);
   assert.equal(CauseQuizManager.getFeedbackColor(correctChoice), '#166534');
   assert.equal(CauseQuizManager.getFeedbackColor(wrongChoice), '#991b1b');
+  assert.equal(EP1_CAUSE_QUESTIONS.length, 3);
+  assert.equal(EP1_CAUSE_QUESTIONS[0].id, EP1_CAUSE_QUESTION.id);
+  assert.equal(new Set(EP1_CAUSE_QUESTIONS.map((question) => question.id)).size, 3);
 }
 
 function testSelectionViewManager() {
@@ -711,6 +716,13 @@ function testProblemSummaryViewManager() {
   assert.equal(ProblemSummaryViewManager.formatQuizStatus(null), '미응답');
   assert.equal(ProblemSummaryViewManager.formatQuizStatus({ correct: true }), '정답');
   assert.equal(ProblemSummaryViewManager.formatQuizStatus({ correct: false }), '오답 후 피드백 확인');
+  assert.equal(
+    ProblemSummaryViewManager.formatQuizStatus(
+      { correct: true },
+      [{ correct: true }, { correct: false }, { correct: true }],
+    ),
+    '3문제 응답 · 정답 2문제',
+  );
 
   const text = ProblemSummaryViewManager.formatLearningRecordText(
     explorationPlaces,

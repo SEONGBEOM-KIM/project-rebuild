@@ -42,6 +42,7 @@ export default class LearningDataRestoreManager {
     registry.set(REGISTRY_KEYS.placementConfigId, progress.placementConfigId);
     registry.set(REGISTRY_KEYS.exploredPlaces, progress.exploredPlaces);
     registry.set(REGISTRY_KEYS.quizResult, progress.quizResult);
+    registry.set(REGISTRY_KEYS.quizResults, progress.quizResults ?? []);
     registry.set(REGISTRY_KEYS.reflectionChoice, progress.reflectionChoice);
     registry.set(REGISTRY_KEYS.selectedSolutionPlan, getEp5SolutionPlan(data.selectedSolutionPlan?.id));
     registry.set(REGISTRY_KEYS.learningProgress, progress);
@@ -121,6 +122,7 @@ export default class LearningDataRestoreManager {
       exploredPlaces: data.exploredPlaces ?? [],
       dataViewed: Boolean(data.dataViewed),
       quizResult: data.quizResult ?? null,
+      quizResults: data.quizResults ?? [],
       problemSummaryCompleted: Boolean(data.problemSummaryCompleted),
       selectedPolicyId: selectedPolicy?.id ?? null,
       selectedStrategyId: selectedStrategy?.id ?? null,

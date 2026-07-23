@@ -59,6 +59,11 @@ export default class LearningApiPayloadManager {
           selected: learningData.quizResult.selected,
           correct: Boolean(learningData.quizResult.correct),
         } : null,
+        quiz_results: (learningData.quizResults ?? []).map((result) => ({
+          question_id: result.questionId,
+          selected: result.selected,
+          correct: Boolean(result.correct),
+        })),
         problem_summary_completed: Boolean(learningData.problemSummaryCompleted),
         reflection_choice: learningData.reflectionChoice ? {
           id: learningData.reflectionChoice.id,

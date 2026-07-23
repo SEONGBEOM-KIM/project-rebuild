@@ -6,6 +6,7 @@ const INITIAL_PROGRESS = Object.freeze({
   exploredPlaces: [],
   dataViewed: false,
   quizResult: null,
+  quizResults: [],
   problemSummaryCompleted: false,
   selectedPolicyId: null,
   selectedStrategyId: null,
@@ -25,6 +26,7 @@ export default class LearningProgress {
       exploredPlaces: [],
       placedBuildingIds: [],
       reviewedRiskIds: [],
+      quizResults: [],
     };
   }
 

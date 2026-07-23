@@ -15,17 +15,19 @@ const EXPLORATION_SUMMARY_LAYOUT = {
 
 const CAUSE_QUESTION_LAYOUT = {
   panel: { x: 1170, y: 525, width: 900, height: 630, fillColor: 0xffffff, fillAlpha: 0.97, strokeWidth: 5, strokeColor: 0xfde68a },
-  prompt: { x: 1170, y: 255, wordWrapWidth: 780 },
+  progress: { x: 1170, y: 245 },
+  prompt: { x: 1170, y: 295, wordWrapWidth: 780 },
   choice: { x: 1170, startY: 390, gapY: 115, width: 760, height: 82, fillColor: 0xe0f2fe, fillAlpha: 1, strokeWidth: 3, strokeColor: 0x93c5fd, textOffsetX: -350, wordWrapWidth: 700 },
-  feedback: { x: 760, y: 760, text: '답을 선택하면 피드백이 표시됩니다.', wordWrapWidth: 820 },
+  feedback: { x: 760, y: 745, text: '답을 선택하면 피드백이 표시됩니다.', wordWrapWidth: 820 },
 };
 
 const CAUSE_QUIZ_TEXT_STYLES = {
   summaryTitle: { fontSize: '34px', color: '#ffffff', fontStyle: 'bold' },
   summaryBody: { fontSize: '24px', color: '#dbeafe', lineSpacing: 11 },
   prompt: { fontSize: '36px', color: '#172554', fontStyle: 'bold', align: 'center' },
+  progress: { fontSize: '24px', color: '#64748b', fontStyle: 'bold', align: 'center' },
   choice: { fontSize: '25px', color: '#0f172a' },
-  feedback: { fontSize: '25px', color: '#334155', lineSpacing: 10 },
+  feedback: { fontSize: '23px', color: '#334155', lineSpacing: 6 },
 };
 
 const CAUSE_QUIZ_BUTTON_STYLE = {
@@ -54,6 +56,7 @@ export default class CauseQuizViewManager {
   static getQuestionLayout() {
     return {
       panel: { ...CAUSE_QUESTION_LAYOUT.panel },
+      progress: { ...CAUSE_QUESTION_LAYOUT.progress },
       prompt: { ...CAUSE_QUESTION_LAYOUT.prompt },
       feedback: { ...CAUSE_QUESTION_LAYOUT.feedback },
     };
@@ -81,6 +84,7 @@ export default class CauseQuizViewManager {
       summaryTitle: { ...CAUSE_QUIZ_TEXT_STYLES.summaryTitle },
       summaryBody: { ...CAUSE_QUIZ_TEXT_STYLES.summaryBody },
       prompt: { ...CAUSE_QUIZ_TEXT_STYLES.prompt },
+      progress: { ...CAUSE_QUIZ_TEXT_STYLES.progress },
       choice: { ...CAUSE_QUIZ_TEXT_STYLES.choice },
       feedback: { ...CAUSE_QUIZ_TEXT_STYLES.feedback },
     };
@@ -91,6 +95,7 @@ export default class CauseQuizViewManager {
       back: { x: 760, y: 955, label: '자료 다시 보기', target: SCENE_KEYS.DataBriefing, backgroundColor: '#93c5fd', textColor: '#0f172a' },
       nextDisabled: { x: 1160, y: 955, label: '답 선택 필요', backgroundColor: '#94a3b8', textColor: '#0f172a' },
       nextEnabled: { label: '문제 정리', target: SCENE_KEYS.ProblemSummary, backgroundColor: '#bbf7d0' },
+      nextQuestion: { label: '다음 문제', backgroundColor: '#bfdbfe' },
     };
   }
 
