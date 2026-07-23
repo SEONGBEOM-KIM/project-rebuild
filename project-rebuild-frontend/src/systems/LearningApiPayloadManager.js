@@ -43,6 +43,7 @@ export default class LearningApiPayloadManager {
         placement_context: summaryPlacementContext,
         placement_count: learningData.summary.placementCount,
         next_action: learningData.summary.nextAction,
+        sustainability_evaluation: learningData.summary.sustainabilityEvaluation ?? null,
       } : null,
       learning_steps: {
         explored_places: learningData.exploredPlaces ?? [],
@@ -117,6 +118,14 @@ export default class LearningApiPayloadManager {
         ok: payload.summary == null || Boolean(payload.summary?.outcome_type),
         label: '요약 구조 확인',
         message: 'summary.outcome_type 값이 없습니다.',
+      },
+      {
+        ok: payload.summary?.sustainability_evaluation == null
+          || (Number.isFinite(payload.summary.sustainability_evaluation.score)
+            && Boolean(payload.summary.sustainability_evaluation.outcome?.title)
+            && Array.isArray(payload.summary.sustainability_evaluation.dimensions)),
+        label: '지속 가능성 평가 구조 확인',
+        message: 'summary.sustainability_evaluation 구조가 올바르지 않습니다.',
       },
       {
         ok: payload.summary?.placement_context == null || Boolean(payload.summary.placement_context.placement_config_id),

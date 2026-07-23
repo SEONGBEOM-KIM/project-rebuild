@@ -3586,6 +3586,9 @@ function testSustainabilityEvaluation() {
   assert.equal(balancedEvaluation.outcome.title, '지속 가능한 푸른군');
   assert.equal(balancedEvaluation.dimensions.every((dimension) => dimension.passed), true);
   assert.match(SustainabilityEvaluationManager.formatFinalTakeaway(balancedEvaluation), /모든 균형 기준을 충족/);
+  assert.deepEqual(SustainabilityEvaluationManager.serialize(balancedEvaluation).dimensions[0], {
+    id: 'growth', title: '지역 활력', passed: true, valueText: '인구 1080 / 경제 82',
+  });
 
   const recoveryEvaluation = SustainabilityEvaluationManager.evaluate({
     ...balancedState,
@@ -3606,6 +3609,7 @@ function testSustainabilityEvaluation() {
 
   const sceneSource = readProjectFile('src', 'scenes', 'SustainabilityEvaluationScene.js');
   assert.match(sceneSource, /completeEpisode/, 'EP6 should persist its completion in world state');
+  assert.match(sceneSource, /sustainabilityEvaluation/, 'EP6 should persist its evaluation for later records');
   assert.match(sceneSource, /SustainabilityEvaluationManager\.evaluate/, 'EP6 should evaluate the final regional state');
   const mainSource = readProjectFile('src', 'main.js');
   assert.match(mainSource, /SustainabilityEvaluationScene/, 'main game configuration should register the EP6 scene');
@@ -3958,6 +3962,23 @@ function testTeacherReportManager() {
   assert.match(TeacherReportManager.buildReportText(report), /0\. 에피소드\/설정/);
   assert.match(TeacherReportManager.buildReportText(report), /1\. 수업 결론/);
   assert.match(TeacherReportManager.buildReportText(report), /4\. 지도 포인트/);
+  assert.match(TeacherReportManager.buildReportText(report), /EP6 종합 평가는 아직 완료되지 않았습니다/);
+
+  const sustainabilityEvaluation = SustainabilityEvaluationManager.serialize(SustainabilityEvaluationManager.evaluate({
+    ...finalState,
+    population: 1080,
+    economy: 82,
+    environment: 76,
+    satisfaction: 72,
+    budget: 640,
+    traffic: 17,
+    pollution: 14,
+    inequality: 36,
+  }));
+  const sustainabilityReport = { ...report, sustainabilityEvaluation };
+  assert.match(TeacherReportManager.formatClassSummaryReport(sustainabilityReport), /지속 가능한 푸른군/);
+  assert.match(TeacherReportManager.formatSustainabilityReport(sustainabilityReport), /종합 점수: 4\/4/);
+  assert.match(TeacherReportManager.buildReportText(sustainabilityReport), /5\. 지속 가능성 평가/);
 
 
   const ep3Registry = createMemoryRegistry();
@@ -4196,6 +4217,23 @@ function testLearningDataManager() {
   assert.equal(data.summary.nextAction.title, '예산 균형 보완');
   assert.deepEqual(data.worldState.completedEpisodeIds, []);
 
+  const sustainabilityEvaluation = SustainabilityEvaluationManager.serialize(SustainabilityEvaluationManager.evaluate({
+    ...GameState.createInitialState(),
+    population: 1080, economy: 82, environment: 76, satisfaction: 72,
+    budget: 640, traffic: 17, pollution: 14, inequality: 36,
+  }));
+  registry.set(REGISTRY_KEYS.worldState, {
+    completedEpisodeIds: [EPISODE_IDS.SustainabilityEvaluation],
+    episodeRuns: {
+      [EPISODE_IDS.SustainabilityEvaluation]: { metadata: { sustainabilityEvaluation } },
+    },
+  });
+  const finalJourneyData = LearningDataManager.build(registry);
+  assert.equal(finalJourneyData.sustainabilityEvaluation.score, 4);
+  assert.equal(finalJourneyData.summary.sustainabilityEvaluation.outcome.title, '지속 가능한 푸른군');
+  assert.match(LearningDataViewManager.formatSummaryText(finalJourneyData), /지속 가능성 4\/4/);
+  registry.set(REGISTRY_KEYS.worldState, undefined);
+
   registry.set('placementConfigId', ENVIRONMENT_PLACEMENT_CONFIG_ID);
   const alternateData = LearningDataManager.build(registry);
   assert.equal(alternateData.placementConfig.id, ENVIRONMENT_PLACEMENT_CONFIG_ID);
@@ -4380,6 +4418,7 @@ function testLearningApiPayloadManager() {
   assert.equal(payload.summary.outcome_type, '환경 우선 회복안');
   assert.equal(payload.summary.next_action.label, '개발 효과와 환경 부담 비교');
   assert.equal(payload.summary.selected_strategy_title, '균형 성장');
+  assert.equal(payload.summary.sustainability_evaluation, null);
   assert.deepEqual(payload.summary.placement_context, {
     placement_config_id: ENVIRONMENT_PLACEMENT_CONFIG_ID,
     placement_config_title: '푸른군 환경 균형 배치 실험',
@@ -4397,6 +4436,19 @@ function testLearningApiPayloadManager() {
   assert.equal(payload.placements[0].building_id, 'small_park');
   assert.equal(payload.placements[0].order, 1);
   assert.equal(LearningApiPayloadManager.validate(payload).every((row) => row.ok), true);
+
+  const sustainabilityPayload = LearningApiPayloadManager.build({
+    ...learningData,
+    summary: {
+      ...learningData.summary,
+      sustainabilityEvaluation: SustainabilityEvaluationManager.serialize(SustainabilityEvaluationManager.evaluate({
+        ...GameState.createInitialState(), population: 1080, economy: 82, environment: 76,
+        satisfaction: 72, budget: 640, traffic: 17, pollution: 14, inequality: 36,
+      })),
+    },
+  });
+  assert.equal(sustainabilityPayload.summary.sustainability_evaluation.score, 4);
+  assert.equal(LearningApiPayloadManager.validate(sustainabilityPayload).every((row) => row.ok), true);
 
   const alternatePayload = LearningApiPayloadManager.build(createCompleteLearningData({
     selectedStrategy: {

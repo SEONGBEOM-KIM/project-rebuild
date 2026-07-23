@@ -6,6 +6,7 @@ import EndingSummaryManager from './EndingSummaryManager.js';
 import EpisodeFlowManager from './EpisodeFlowManager.js';
 import PlacementContextManager from './PlacementContextManager.js';
 import WorldStateManager from './WorldStateManager.js';
+import SustainabilityEvaluationManager from './SustainabilityEvaluationManager.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
 
 export default class LearningDataManager {
@@ -35,6 +36,8 @@ export default class LearningDataManager {
     const gameState = registry.get(REGISTRY_KEYS.gameState);
     const reflectionChoice = registry.get(REGISTRY_KEYS.reflectionChoice);
     const selectedSolutionPlan = registry.get(REGISTRY_KEYS.selectedSolutionPlan);
+    const worldState = WorldStateManager.get(registry);
+    const sustainabilityEvaluation = SustainabilityEvaluationManager.getRecordedEvaluation(worldState);
     const issues = IndustrializationRiskManager.detect({
       gameState,
       placedBuildings,
@@ -62,6 +65,7 @@ export default class LearningDataManager {
         reflectionChoice,
         placementConfig,
         evaluationProfile,
+        sustainabilityEvaluation,
       }),
       exploredPlaces: progress.exploredPlaces,
       exploredPlaceNames,
@@ -97,7 +101,8 @@ export default class LearningDataManager {
       // The learning-record API intentionally stays focused on the current episode.
       // Local saves also carry this optional snapshot so later episodes can resume
       // the shared Blue County state after a refresh or import.
-      worldState: WorldStateManager.get(registry),
+      worldState,
+      sustainabilityEvaluation,
       reflectionChoice,
       selectedSolutionPlan: selectedSolutionPlan ? { id: selectedSolutionPlan.id, title: selectedSolutionPlan.title } : null,
       completed: progress.completed,
@@ -124,7 +129,7 @@ export default class LearningDataManager {
     };
   }
 
-  static buildSummary({ ending, issues, selectedPolicy, selectedStrategy, placementCount, placementBreakdown, reflectionChoice, placementConfig = null, evaluationProfile = null }) {
+  static buildSummary({ ending, issues, selectedPolicy, selectedStrategy, placementCount, placementBreakdown, reflectionChoice, placementConfig = null, evaluationProfile = null, sustainabilityEvaluation = null }) {
     const priorityIssue = issues.find((issue) => issue.primary) ?? issues[0] ?? null;
     return {
       outcomeType: ending.title,
@@ -144,6 +149,7 @@ export default class LearningDataManager {
         title: reflectionChoice.title,
         label: reflectionChoice.nextActionLabel ?? reflectionChoice.title,
       } : null,
+      sustainabilityEvaluation,
     };
   }
 

@@ -200,11 +200,17 @@ export default class LearningDataViewManager {
     const configText = placementContext?.placementConfigId ?? learningData.placementConfig?.id ?? 'config 없음';
     const profileText = placementContext?.evaluationProfileId ?? learningData.evaluationProfile?.id ?? 'profile 없음';
     const placementBreakdownText = LearningDataViewManager.formatPlacementBreakdown(learningData);
+    const sustainabilityText = summary.sustainabilityEvaluation?.outcome
+      ? `${summary.sustainabilityEvaluation.outcome.title}: ${summary.sustainabilityEvaluation.outcome.message}`
+      : `${summary.outcomeType}: ${summary.outcomeMessage}`;
+    const sustainabilityScore = summary.sustainabilityEvaluation
+      ? ` / 지속 가능성 ${summary.sustainabilityEvaluation.score}/4`
+      : '';
     return [
-      `${summary.outcomeType}: ${summary.outcomeMessage}`,
+      sustainabilityText,
       `${currentEpisodeText} → ${placementEpisodeText} / ${configText} / ${profileText}`,
       `배치 전략: ${strategyText} / 회복 방향: ${policyText}`,
-      `우선 보완: ${issueText} / 다음 액션: ${actionText} / ${placementBreakdownText}`,
+      `우선 보완: ${issueText} / 다음 액션: ${actionText} / ${placementBreakdownText}${sustainabilityScore}`,
     ].join('\n');
   }
 

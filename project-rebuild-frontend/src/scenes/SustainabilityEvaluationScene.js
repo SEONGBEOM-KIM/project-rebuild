@@ -17,9 +17,14 @@ export default class SustainabilityEvaluationScene extends Phaser.Scene {
     const { width } = this.scale;
     const layout = SustainabilityEvaluationViewManager.getScreenLayout(width);
     const gameState = this.registry.get(REGISTRY_KEYS.gameState);
-    const startedWorldState = WorldStateManager.startEpisode(WorldStateManager.get(this.registry), EPISODE_IDS.SustainabilityEvaluation);
-    WorldStateManager.set(this.registry, WorldStateManager.completeEpisode(startedWorldState, EPISODE_IDS.SustainabilityEvaluation, { gameState }));
     const evaluation = SustainabilityEvaluationManager.evaluate(gameState);
+    const startedWorldState = WorldStateManager.startEpisode(WorldStateManager.get(this.registry), EPISODE_IDS.SustainabilityEvaluation);
+    const evaluatedWorldState = WorldStateManager.setEpisodeRunMetadata(
+      startedWorldState,
+      EPISODE_IDS.SustainabilityEvaluation,
+      { sustainabilityEvaluation: SustainabilityEvaluationManager.serialize(evaluation) },
+    );
+    WorldStateManager.set(this.registry, WorldStateManager.completeEpisode(evaluatedWorldState, EPISODE_IDS.SustainabilityEvaluation, { gameState }));
 
     createScreenBackground(this, layout.backgroundColor);
     createLayoutText(this, layout.title, { origin: 0.5 });

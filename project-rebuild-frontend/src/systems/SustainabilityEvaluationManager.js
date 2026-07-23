@@ -1,3 +1,5 @@
+import { EPISODE_IDS } from '../data/episodes.js';
+
 const DIMENSIONS = Object.freeze([
   {
     id: 'growth',
@@ -86,5 +88,27 @@ export default class SustainabilityEvaluationManager {
       '',
       dimension.passed ? '✓ 지속 가능성 기준 충족' : '△ 다음 계획에서 보완 필요',
     ].join('\n');
+  }
+
+  static serialize(evaluation) {
+    if (!evaluation) {
+      return null;
+    }
+
+    return {
+      score: evaluation.score,
+      outcome: { ...evaluation.outcome },
+      remainingTitles: [...evaluation.remainingTitles],
+      dimensions: evaluation.dimensions.map((dimension) => ({
+        id: dimension.id,
+        title: dimension.title,
+        passed: dimension.passed,
+        valueText: dimension.valueText,
+      })),
+    };
+  }
+
+  static getRecordedEvaluation(worldState = {}) {
+    return worldState.episodeRuns?.[EPISODE_IDS.SustainabilityEvaluation]?.metadata?.sustainabilityEvaluation ?? null;
   }
 }

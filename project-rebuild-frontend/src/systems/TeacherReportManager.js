@@ -7,6 +7,8 @@ import EndingSummaryManager from './EndingSummaryManager.js';
 import EpisodeFlowManager from './EpisodeFlowManager.js';
 import PlacementContextManager from './PlacementContextManager.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
+import WorldStateManager from './WorldStateManager.js';
+import SustainabilityEvaluationManager from './SustainabilityEvaluationManager.js';
 
 const TEACHER_REPORT_DOWNLOAD_CONFIG = {
   mimeType: 'text/plain;charset=utf-8',
@@ -61,6 +63,8 @@ export default class TeacherReportManager {
     const gameState = registry.get(REGISTRY_KEYS.gameState);
     const reflectionChoice = registry.get(REGISTRY_KEYS.reflectionChoice);
     const quizResult = registry.get(REGISTRY_KEYS.quizResult) ?? progress.quizResult;
+    const worldState = WorldStateManager.get(registry);
+    const sustainabilityEvaluation = SustainabilityEvaluationManager.getRecordedEvaluation(worldState);
     const issues = IndustrializationRiskManager.detect({
       gameState,
       placedBuildings,
@@ -91,6 +95,7 @@ export default class TeacherReportManager {
       sideEffectRisks: IndustrializationRiskManager.summarize(issues),
       ending,
       exploredNames,
+      sustainabilityEvaluation,
     };
   }
 
@@ -135,14 +140,38 @@ export default class TeacherReportManager {
       ?? report.reflectionChoice?.title
       ?? '보완 방향 미선택';
 
+    const conclusion = report.sustainabilityEvaluation?.outcome
+      ? `${report.sustainabilityEvaluation.outcome.title}: ${report.sustainabilityEvaluation.outcome.message}`
+      : `${report.ending.title}: ${report.ending.message}`;
+
     return [
-      `${report.ending.title}: ${report.ending.message}`,
+      conclusion,
       `우선 보완: ${issueText}`,
       priorityIssue?.severity ? `부작용 수준: ${priorityIssue.severity.label}` : null,
       `학생 다음 액션: ${actionText}`,
       `배치 전략: ${report.selectedStrategy?.title ?? '미선택'}`,
       `회복 방향: ${report.selectedPolicy?.name ?? '미선택'} / 배치 ${report.placedBuildings.length}개`,
     ].filter((row) => row !== null).join('\n');
+  }
+
+  static formatSustainabilityReport(report) {
+    const evaluation = report.sustainabilityEvaluation;
+    if (!evaluation) {
+      return 'EP6 종합 평가는 아직 완료되지 않았습니다.';
+    }
+
+    const dimensionRows = evaluation.dimensions
+      .map((dimension) => `• ${dimension.title}: ${dimension.passed ? '충족' : '보완 필요'} (${dimension.valueText})`)
+      .join('\n');
+    const remainingText = evaluation.remainingTitles.length
+      ? `다음 보완: ${evaluation.remainingTitles.join(' · ')}`
+      : '모든 지속 가능성 기준을 충족했습니다.';
+
+    return [
+      `종합 점수: ${evaluation.score}/4`,
+      dimensionRows,
+      remainingText,
+    ].join('\n');
   }
 
   static formatProgressReport(report) {
@@ -227,6 +256,9 @@ export default class TeacherReportManager {
       '',
       '4. 지도 포인트',
       TeacherReportManager.formatTeachingPointReport(report),
+      '',
+      '5. 지속 가능성 평가',
+      TeacherReportManager.formatSustainabilityReport(report),
     ].join('\n');
   }
 }
