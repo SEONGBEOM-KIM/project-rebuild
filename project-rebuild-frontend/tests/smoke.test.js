@@ -767,13 +767,14 @@ function testExplorationViewManager() {
     fontStyle: 'bold',
   });
   assert.equal(ExplorationViewManager.formatSubtitle(CURRENT_EPISODE.regionName), '장소를 클릭해 푸른군의 문제가 어디에서 드러나는지 확인하세요.');
+  assert.equal(ExplorationViewManager.formatSubtitle(CURRENT_EPISODE.regionName, CURRENT_EPISODE.requiredExploredCount), '푸른군의 장소 5곳을 클릭해 문제와 변화를 한눈에 확인하세요.');
   assert.equal(ExplorationViewManager.getMapLayout().backdrop.width, 1120);
   assert.equal(ExplorationViewManager.getMapLayout().roads.length, 2);
   assert.match(ExplorationViewManager.getMapLayout().note.text, /흐름 검증용 임시 데이터/);
   assert.deepEqual(ExplorationViewManager.getPlaceMarkerLayout().check, { x: 43, y: -45, text: '✓' });
   assert.equal(ExplorationViewManager.getInfoPanelLayout().progress.wordWrapWidth, 500);
-  assert.equal(ExplorationViewManager.getTextStyles().panelBody.lineSpacing, 7);
-  assert.equal(ExplorationViewManager.getTextStyles().panelBody.fontSize, '22px');
+  assert.equal(ExplorationViewManager.getTextStyles().panelBody.lineSpacing, 5);
+  assert.equal(ExplorationViewManager.getTextStyles().panelBody.fontSize, '21px');
   assert.deepEqual(ExplorationViewManager.getButtonStyle(), {
     fontSize: '32px',
     padding: { x: 34, y: 18 },
@@ -790,12 +791,12 @@ function testExplorationViewManager() {
   assert.equal(ExplorationViewManager.canContinue(2, 3), false);
   assert.equal(ExplorationViewManager.canContinue(3, 3), true);
   assert.equal(ExplorationViewManager.formatPanelTitle(school), '🏫 초등학교');
-  assert.match(ExplorationViewManager.formatPanelBody(school), /확인한 문제/);
-  assert.match(ExplorationViewManager.formatPanelBody(school), /자료 카드/);
-  assert.match(ExplorationViewManager.formatPanelBody(school), /현장 목소리/);
+  assert.match(ExplorationViewManager.formatPanelBody(school), /핵심 문제/);
+  assert.match(ExplorationViewManager.formatPanelBody(school), /변화 자료/);
+  assert.match(ExplorationViewManager.formatPanelBody(school), /주민 한마디/);
   assert.match(ExplorationViewManager.formatPanelBody(school), /초등학생 주민/);
-  assert.match(ExplorationViewManager.formatPanelBody(school), /학습 개념/);
-  assert.match(ExplorationViewManager.formatProgressText(2, 5, 3), /1곳 더 탐색|장소를 더 클릭/);
+  assert.match(ExplorationViewManager.formatPanelBody(school), /왜 중요할까/);
+  assert.match(ExplorationViewManager.formatProgressText(2, 5, 3), /1곳을 더 확인/);
   assert.match(ExplorationViewManager.formatProgressText(3, 5, 3), /다음 단계로 이동/);
   assert.match(ExplorationViewManager.formatNeedMoreText(1, 5, 3), /최소 3곳/);
   assert.deepEqual(ExplorationViewManager.getNextButtonState(2, 3), {

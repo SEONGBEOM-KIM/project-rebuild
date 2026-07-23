@@ -10,7 +10,7 @@ export default class ExplorationRenderer {
     return {
       title: createLayoutText(scene, layout.title, { text: CURRENT_EPISODE.shortTitle }),
       subtitle: createLayoutText(scene, layout.subtitle, {
-        text: ExplorationViewManager.formatSubtitle(CURRENT_EPISODE.regionName),
+        text: ExplorationViewManager.formatSubtitle(CURRENT_EPISODE.regionName, CURRENT_EPISODE.requiredExploredCount),
       }),
     };
   }

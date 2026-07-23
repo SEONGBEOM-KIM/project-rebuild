@@ -42,8 +42,8 @@ const EXPLORATION_TEXT_STYLES = {
   markerLabel: { fontSize: '22px', color: '#ffffff', fontStyle: 'bold' },
   markerCheck: { fontSize: '30px', color: '#bbf7d0', fontStyle: 'bold' },
   panelTitle: { fontSize: '38px', color: '#172554', fontStyle: 'bold' },
-  panelBody: { fontSize: '22px', color: '#1e293b', lineSpacing: 7 },
-  progress: { fontSize: '24px', color: '#172554', lineSpacing: 8 },
+  panelBody: { fontSize: '21px', color: '#1e293b', lineSpacing: 5 },
+  progress: { fontSize: '22px', color: '#172554', lineSpacing: 5 },
 };
 
 const EXPLORATION_BUTTON_STYLE = {
@@ -61,8 +61,10 @@ export default class ExplorationViewManager {
     };
   }
 
-  static formatSubtitle(regionName) {
-    return `장소를 클릭해 ${regionName}의 문제가 어디에서 드러나는지 확인하세요.`;
+  static formatSubtitle(regionName, requiredCount = null) {
+    return requiredCount
+      ? `${regionName}의 장소 ${requiredCount}곳을 클릭해 문제와 변화를 한눈에 확인하세요.`
+      : `장소를 클릭해 ${regionName}의 문제가 어디에서 드러나는지 확인하세요.`;
   }
 
   static getMapLayout() {
@@ -130,16 +132,16 @@ export default class ExplorationViewManager {
 
   static formatPanelBody(place) {
     return [
-      '확인한 문제',
+      '핵심 문제',
       place.problem,
       '',
-      '자료 카드',
+      '변화 자료',
       place.data,
       '',
-      '현장 목소리',
+      '주민 한마디',
       place.voice,
       '',
-      '학습 개념',
+      '왜 중요할까?',
       place.concept,
     ].join('\n');
   }
@@ -147,16 +149,16 @@ export default class ExplorationViewManager {
   static formatProgressText(exploredCount, totalCount, requiredCount) {
     const canContinue = ExplorationViewManager.canContinue(exploredCount, requiredCount);
     return [
-      `탐색 진행: ${exploredCount}/${totalCount}`,
-      `필수 확인: ${requiredCount}곳 이상`,
-      canContinue ? '다음 단계로 이동할 수 있습니다.' : '장소를 더 클릭해 문제를 확인하세요.',
+      `확인한 장소: ${exploredCount}/${totalCount}`,
+      `필수 확인: ${requiredCount}곳`,
+      canContinue ? '다음 단계로 이동할 수 있습니다.' : `${requiredCount - exploredCount}곳을 더 확인하세요.`,
     ].join('\n');
   }
 
   static formatNeedMoreText(exploredCount, totalCount, requiredCount) {
     return [
-      `탐색 진행: ${exploredCount}/${totalCount}`,
-      `최소 ${requiredCount}곳을 확인해야 다음 단계로 갈 수 있습니다.`,
+      `확인한 장소: ${exploredCount}/${totalCount}`,
+      `최소 ${requiredCount}곳을 확인해야 합니다.`,
       '지도 위 장소 마커를 클릭하세요.',
     ].join('\n');
   }
