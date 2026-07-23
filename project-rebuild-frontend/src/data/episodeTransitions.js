@@ -54,6 +54,19 @@ export const EPISODE_TRANSITIONS = Object.freeze({
     nextLabel: 'EP5 해결안 준비',
     nextScene: SCENE_KEYS.Ep5Preview,
   }),
+  [EPISODE_IDS.SustainabilityEvaluation]: Object.freeze({
+    episodeId: EPISODE_IDS.SustainabilityEvaluation,
+    title: 'EP6. 지속 가능성 평가',
+    subtitle: '푸른군의 모든 선택이 지속 가능한 성장으로 이어졌는지 확인합니다.',
+    speaker: '군수',
+    dialogue: [
+      '여러분의 선택으로 푸른군은 많은 변화를 겪었습니다.',
+      '이제 인구와 경제만이 아니라 환경, 주민 생활, 재정까지 함께 살펴봐야 합니다.',
+      '푸른군이 오래도록 살기 좋은 지역이 되었는지 마지막 평가를 시작합시다.',
+    ],
+    nextLabel: 'EP6 종합 평가 시작',
+    nextScene: SCENE_KEYS.SustainabilityEvaluation,
+  }),
 });
 
 export function getEpisodeTransition(episodeId) {

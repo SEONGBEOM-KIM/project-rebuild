@@ -16,6 +16,7 @@ const SCENE_KEYS = Object.freeze({
   Ep4Investigation: 'Ep4InvestigationScene',
   Ep4Conclusion: 'Ep4ConclusionScene',
   Ep5Preview: 'Ep5PreviewScene',
+  SustainabilityEvaluation: 'SustainabilityEvaluationScene',
   Selection: 'SelectionScene',
   Placement: 'PlacementScene',
   Result: 'ResultScene',

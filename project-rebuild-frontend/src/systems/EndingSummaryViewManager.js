@@ -161,7 +161,7 @@ export default class EndingSummaryViewManager {
   }
 
   static getControlLayout(centerX, placementEpisodeId = null) {
-    const hasNextEpisode = placementEpisodeId !== EPISODE_IDS.BalancedSolutions;
+    const hasNextEpisode = Boolean(EpisodeActivityFlowManager.getNextEpisodeId(placementEpisodeId));
     return {
       retry: { x: centerX - 360, y: 955, label: '배치 다시 조정', target: SCENE_KEYS.Placement, backgroundColor: '#c4b5fd', textColor: '#0f172a' },
       next: {

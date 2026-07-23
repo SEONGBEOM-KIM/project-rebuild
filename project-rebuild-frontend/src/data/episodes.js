@@ -15,6 +15,7 @@ export const EPISODE_IDS = Object.freeze({
   EconomyGrowth: 'ep3',
   SideEffects: 'ep4',
   BalancedSolutions: 'ep5',
+  SustainabilityEvaluation: 'ep6',
 });
 
 export const EPISODES = Object.freeze({
@@ -84,6 +85,19 @@ export const EPISODES = Object.freeze({
     intro: [
       '푸른군의 성장을 멈추는 대신, 성장의 혜택과 부담을 더 공정하고 안전하게 조정할 차례입니다.',
       '한 문제를 먼저 해결하되, 다른 문제를 키우지 않는 균형안을 설계합니다.',
+    ],
+  },
+  [EPISODE_IDS.SustainabilityEvaluation]: {
+    id: 6,
+    code: EPISODE_IDS.SustainabilityEvaluation,
+    title: '푸른군 지속 가능성 평가',
+    shortTitle: 'EP6. 지속 가능성 평가',
+    regionName: '푸른군',
+    theme: '성장과 삶의 질이 함께 이어지는지 종합 평가',
+    requiredExploredCount: 0,
+    intro: [
+      '푸른군의 회복과 성장, 부작용 보완 과정을 모두 마쳤습니다.',
+      '이제 여러 선택이 지속 가능한 지역 발전으로 이어졌는지 종합 평가합니다.',
     ],
   },
 });

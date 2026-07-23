@@ -54,6 +54,17 @@ export const EPISODE_ACTIVITY_FLOWS = Object.freeze({
       { id: 'final-evaluation', label: '최종 평가', description: '성장과 삶의 질이 함께 좋아졌는지 확인합니다.' },
     ]),
     completionFocus: '푸른군의 성장을 지속할 수 있는 균형 해결안을 완성했습니다.',
+    nextEpisodeId: EPISODE_IDS.SustainabilityEvaluation,
+  }),
+  [EPISODE_IDS.SustainabilityEvaluation]: Object.freeze({
+    episodeId: EPISODE_IDS.SustainabilityEvaluation,
+    learningGoal: '인구·경제 성장과 환경·생활 균형이 함께 유지되는지 근거를 들어 평가합니다.',
+    activitySteps: Object.freeze([
+      { id: 'review', label: '여정 돌아보기', description: 'EP2부터 EP5까지의 선택과 결과를 연결합니다.' },
+      { id: 'evaluate', label: '균형 평가', description: '성장·환경·생활·재정 지표를 함께 확인합니다.' },
+      { id: 'conclude', label: '최종 결론', description: '푸른군의 다음 과제를 한 문장으로 정리합니다.' },
+    ]),
+    completionFocus: '푸른군이 지속 가능한 성장에 가까워졌는지 종합적으로 평가합니다.',
     nextEpisodeId: null,
   }),
 });

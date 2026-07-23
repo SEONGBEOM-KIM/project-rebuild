@@ -27,6 +27,9 @@ import Ep4ConclusionRenderer from '../src/systems/Ep4ConclusionRenderer.js';
 import Ep5SolutionPlanManager from '../src/systems/Ep5SolutionPlanManager.js';
 import Ep5PreviewViewManager from '../src/systems/Ep5PreviewViewManager.js';
 import Ep5PreviewRenderer from '../src/systems/Ep5PreviewRenderer.js';
+import SustainabilityEvaluationManager from '../src/systems/SustainabilityEvaluationManager.js';
+import SustainabilityEvaluationViewManager from '../src/systems/SustainabilityEvaluationViewManager.js';
+import SustainabilityEvaluationRenderer from '../src/systems/SustainabilityEvaluationRenderer.js';
 import LearningProgress from '../src/systems/LearningProgress.js';
 import WorldStateManager from '../src/systems/WorldStateManager.js';
 import EpisodePlacementLaunchManager from '../src/systems/EpisodePlacementLaunchManager.js';
@@ -1372,7 +1375,9 @@ function testEpisodeContent() {
   assert.equal(getEpisodeTransition('missing_episode'), null);
   assert.equal(getEpisodeActivityFlow(EPISODE_IDS.PopulationRecovery), EPISODE_ACTIVITY_FLOWS[EPISODE_IDS.PopulationRecovery]);
   assert.equal(EpisodeActivityFlowManager.getNextEpisodeId(EPISODE_IDS.PopulationRecovery), EPISODE_IDS.EconomyGrowth);
-  assert.equal(EpisodeActivityFlowManager.getNextEpisodeId(EPISODE_IDS.BalancedSolutions), null);
+  assert.equal(EpisodeActivityFlowManager.getNextEpisodeId(EPISODE_IDS.BalancedSolutions), EPISODE_IDS.SustainabilityEvaluation);
+  assert.equal(EpisodeActivityFlowManager.getNextEpisodeId(EPISODE_IDS.SustainabilityEvaluation), null);
+  assert.equal(getEpisodeTransition(EPISODE_IDS.SustainabilityEvaluation).nextScene, SCENE_KEYS.SustainabilityEvaluation);
   assert.equal(EpisodeActivityFlowManager.formatActivityRows(EPISODE_IDS.EconomyGrowth).length, 3);
   assert.match(EpisodeActivityFlowManager.formatActivityRows(EPISODE_IDS.SideEffects)[1], /문제 비교/);
   assert.match(EpisodeActivityFlowManager.formatCarryoverSummary({
@@ -3314,7 +3319,7 @@ function testEndingSummaryViewManager() {
   assert.equal(panels.nextMission.width, 360);
   assert.equal(panels.journey.title, '푸른군 여정');
   assert.equal(EndingSummaryViewManager.getPanelLayout(EPISODE_IDS.PopulationRecovery).nextMission.title, '다음: EP3. 경제 성장');
-  assert.equal(EndingSummaryViewManager.getPanelLayout(EPISODE_IDS.BalancedSolutions).nextMission.title, '프로젝트 마무리');
+  assert.equal(EndingSummaryViewManager.getPanelLayout(EPISODE_IDS.BalancedSolutions).nextMission.title, '다음: EP6. 지속 가능성 평가');
   assert.deepEqual(EndingSummaryViewManager.getTakeawayLayout(960).title, { x: 170, y: 178, text: '학습 결론' });
   assert.deepEqual(EndingSummaryViewManager.getPanelTitlePosition(panels.choice), { x: 430, y: 265 });
   assert.deepEqual(EndingSummaryViewManager.getPanelBodyPosition(panels.choice), { x: 175, y: 325 });
@@ -3344,7 +3349,7 @@ function testEndingSummaryViewManager() {
     backgroundColor: '#bbf7d0',
     textColor: '#123524',
   });
-  assert.equal(EndingSummaryViewManager.getControlLayout(960, EPISODE_IDS.BalancedSolutions).next.label, '학습 마무리');
+  assert.equal(EndingSummaryViewManager.getControlLayout(960, EPISODE_IDS.BalancedSolutions).next.label, '다음 에피소드');
 }
 
 
@@ -3562,6 +3567,48 @@ function testEp5PlacementSetup() {
   const ep5PreviewSceneSource = readProjectFile('src', 'scenes', 'Ep5PreviewScene.js');
   assert.match(ep5PreviewSceneSource, /sideEffectSummary/, 'EP5 should use the recorded EP4 risk summary when it exists');
   assert.match(ep5PreviewSceneSource, /formatMissionHandoff/, 'EP5 should show the selected plan against the EP4 priority');
+}
+
+function testSustainabilityEvaluation() {
+  const balancedState = {
+    ...GameState.createInitialState(),
+    population: 1080,
+    economy: 82,
+    environment: 76,
+    satisfaction: 72,
+    budget: 640,
+    traffic: 17,
+    pollution: 14,
+    inequality: 36,
+  };
+  const balancedEvaluation = SustainabilityEvaluationManager.evaluate(balancedState);
+  assert.equal(balancedEvaluation.score, 4);
+  assert.equal(balancedEvaluation.outcome.title, '지속 가능한 푸른군');
+  assert.equal(balancedEvaluation.dimensions.every((dimension) => dimension.passed), true);
+  assert.match(SustainabilityEvaluationManager.formatFinalTakeaway(balancedEvaluation), /모든 균형 기준을 충족/);
+
+  const recoveryEvaluation = SustainabilityEvaluationManager.evaluate({
+    ...balancedState,
+    traffic: 28,
+    inequality: 49,
+  });
+  assert.equal(recoveryEvaluation.score, 3);
+  assert.match(SustainabilityEvaluationManager.formatFinalTakeaway(recoveryEvaluation), /생활 균형/);
+  assert.match(SustainabilityEvaluationManager.formatDimensionBody(recoveryEvaluation.dimensions[2]), /보완 필요/);
+  assert.equal(SustainabilityEvaluationViewManager.getScreenLayout(1920).title.text, 'EP6. 지속 가능성 평가');
+  assert.equal(SustainabilityEvaluationViewManager.getControls(960).learningData.target, 'LearningDataScene');
+
+  const fixture = createRendererSceneSpy();
+  SustainabilityEvaluationRenderer.renderTakeaway(fixture.scene, 960, balancedEvaluation);
+  SustainabilityEvaluationRenderer.renderDimensionCard(fixture.scene, balancedEvaluation.dimensions[0], 0);
+  assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3] === '종합 평가 결론'));
+  assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3] === '지역 활력'));
+
+  const sceneSource = readProjectFile('src', 'scenes', 'SustainabilityEvaluationScene.js');
+  assert.match(sceneSource, /completeEpisode/, 'EP6 should persist its completion in world state');
+  assert.match(sceneSource, /SustainabilityEvaluationManager\.evaluate/, 'EP6 should evaluate the final regional state');
+  const mainSource = readProjectFile('src', 'main.js');
+  assert.match(mainSource, /SustainabilityEvaluationScene/, 'main game configuration should register the EP6 scene');
 }
 
 function testEp2BriefingRenderer() {
@@ -5550,6 +5597,7 @@ async function run() {
   testEp3PreviewViewManager();
   testEp4Briefing();
   testEp5PlacementSetup();
+  testSustainabilityEvaluation();
   testEp2BriefingRenderer();
   testEp2BriefingViewManager();
   testEndingSummaryManager();
