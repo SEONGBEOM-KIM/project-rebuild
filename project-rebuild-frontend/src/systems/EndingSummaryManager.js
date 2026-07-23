@@ -153,6 +153,7 @@ export default class EndingSummaryManager {
     const economyRun = episodeRuns[EPISODE_IDS.EconomyGrowth] ?? {};
     const sideEffectRun = episodeRuns[EPISODE_IDS.SideEffects] ?? {};
     const solutionRun = episodeRuns[EPISODE_IDS.BalancedSolutions] ?? {};
+    const sustainabilityRun = episodeRuns[EPISODE_IDS.SustainabilityEvaluation] ?? {};
     const economyStrategy = getEpisodeContent(EPISODE_IDS.EconomyGrowth).missionBriefing?.strategies?.find(
       (strategy) => strategy.id === economyRun.metadata?.selectedStrategyId,
     );
@@ -168,11 +169,21 @@ export default class EndingSummaryManager {
       (record) => record.episodeId === EPISODE_IDS.PopulationRecovery,
     ).length;
 
-    return [
+    const journeyRows = [
       `EP2 회복: 생활 기반 시설 ${ep2Placements}개를 배치해 인구 유입 조건을 살폈습니다.`,
       `EP3 성장: ${economyStrategy?.title ?? '성장 전략'} 선택 / ${economyChanges}`,
       `EP4 점검: ${primaryRisk?.title ?? '교통·환경·소득 격차'} 문제를 함께 확인했습니다.`,
       `EP5 해결: ${solutionPlan?.title ?? '균형 해결안'}으로 우선 문제를 보완하며 세 지표를 함께 관리했습니다.`,
     ];
+
+    const sustainabilityEvaluation = sustainabilityRun.metadata?.sustainabilityEvaluation;
+    if (sustainabilityEvaluation) {
+      const remainingText = sustainabilityEvaluation.remainingTitles?.length
+        ? `다음 보완: ${sustainabilityEvaluation.remainingTitles.join(' · ')}`
+        : '모든 지속 가능성 기준 충족';
+      journeyRows.push(`EP6 평가: ${sustainabilityEvaluation.score}/4 · ${sustainabilityEvaluation.outcome?.title ?? '종합 평가'} / ${remainingText}`);
+    }
+
+    return journeyRows;
   }
 }

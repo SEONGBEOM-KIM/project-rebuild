@@ -37,7 +37,9 @@ export default class EndingScene extends Phaser.Scene {
     });
     const ending = EndingSummaryManager.getEndingSummary(gameState, placedBuildings, evaluationProfile);
 
-    const layout = EndingSummaryViewManager.getScreenLayout(width, placementConfig.episodeId);
+    const isFinalJourney = worldState.completedEpisodeIds.includes(EPISODE_IDS.SustainabilityEvaluation);
+    const endingEpisodeId = isFinalJourney ? EPISODE_IDS.SustainabilityEvaluation : placementConfig.episodeId;
+    const layout = EndingSummaryViewManager.getScreenLayout(width, endingEpisodeId);
 
     createScreenBackground(this, layout.background.color);
     ProgressStepper.render(this, layout.progressStep);
@@ -54,7 +56,7 @@ export default class EndingScene extends Phaser.Scene {
     EndingSummaryRenderer.renderPanel(this, panels.state, EndingSummaryManager.formatStateSummary(
       gameState, ending, placementConfig.stateKeys, evaluationProfile, placedBuildings, placementConfig.episodeId,
     ));
-    if (placementConfig.episodeId === EPISODE_IDS.BalancedSolutions) {
+    if (placementConfig.episodeId === EPISODE_IDS.BalancedSolutions || isFinalJourney) {
       EndingSummaryRenderer.renderEpisodeJourneyPanel(this, panels.journey, EndingSummaryManager.formatEpisodeJourney(worldState));
     } else {
       EndingSummaryRenderer.renderNextMissionPanel(this, panels.nextMission, EpisodeFlowManager.getNextDevelopmentGoals({ registry: this.registry, learningProgress, placementConfig }));
@@ -64,7 +66,7 @@ export default class EndingScene extends Phaser.Scene {
       width / 2,
       EndingSummaryManager.formatLearningRecordRows(learningProgress, exploredPlaces, quizResult, reflectionChoice, selectedStrategy, placementConfig, evaluationProfile),
     );
-    this.drawControls(width / 2, placementConfig.episodeId);
+    this.drawControls(width / 2, isFinalJourney ? EPISODE_IDS.SustainabilityEvaluation : placementConfig.episodeId);
   }
 
 

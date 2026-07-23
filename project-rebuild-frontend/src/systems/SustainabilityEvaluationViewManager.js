@@ -40,7 +40,8 @@ export default class SustainabilityEvaluationViewManager {
   static getControls(centerX) {
     return {
       learningData: { x: centerX - 220, y: 1000, label: '학습 기록 보기', target: SCENE_KEYS.LearningData, backgroundColor: '#bfdbfe', textColor: '#172554' },
-      restart: { x: centerX + 220, y: 1000, label: '처음 화면으로', target: SCENE_KEYS.Boot, backgroundColor: '#fde68a', textColor: '#0f172a' },
+      ending: { x: centerX + 40, y: 1000, label: '최종 결과 보기', target: SCENE_KEYS.Ending, backgroundColor: '#bbf7d0', textColor: '#123524' },
+      restart: { x: centerX + 300, y: 1000, label: '처음 화면으로', target: SCENE_KEYS.Boot, backgroundColor: '#fde68a', textColor: '#0f172a' },
     };
   }
 }

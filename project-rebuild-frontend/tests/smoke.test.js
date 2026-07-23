@@ -3600,6 +3600,7 @@ function testSustainabilityEvaluation() {
   assert.match(SustainabilityEvaluationManager.formatDimensionBody(recoveryEvaluation.dimensions[2]), /보완 필요/);
   assert.equal(SustainabilityEvaluationViewManager.getScreenLayout(1920).title.text, 'EP6. 지속 가능성 평가');
   assert.equal(SustainabilityEvaluationViewManager.getControls(960).learningData.target, 'LearningDataScene');
+  assert.equal(SustainabilityEvaluationViewManager.getControls(960).ending.target, 'EndingScene');
 
   const fixture = createRendererSceneSpy();
   SustainabilityEvaluationRenderer.renderTakeaway(fixture.scene, 960, balancedEvaluation);
@@ -3761,7 +3762,7 @@ function testEndingSummaryManager() {
   assert.match(EndingSummaryManager.formatStateSummary(finalState, ending), /최종 상태:/);
   assert.match(EndingSummaryManager.formatStateSummary(finalState, ending), /큰 부작용 신호 없음/);
   assert.match(EndingSummaryManager.formatReflectionNextAction(null), /아직 기록하지 않음/);
-  const journeyRows = EndingSummaryManager.formatEpisodeJourney({
+  const journeyWorldState = {
     placements: [{ episodeId: EPISODE_IDS.PopulationRecovery }],
     episodeRuns: {
       [EPISODE_IDS.EconomyGrowth]: {
@@ -3776,12 +3777,31 @@ function testEndingSummaryManager() {
         metadata: { selectedSolutionPlanId: 'inclusive_local_benefits' },
       },
     },
-  });
+  };
+  const journeyRows = EndingSummaryManager.formatEpisodeJourney(journeyWorldState);
   assert.equal(journeyRows.length, 4);
   assert.match(journeyRows[0], /EP2 회복: 생활 기반 시설 1개/);
   assert.match(journeyRows[1], /유통 성장 거점/);
   assert.match(journeyRows[2], /소득 격차/);
   assert.match(journeyRows[3], /생활 혜택 공유 계획/);
+  const finalJourneyRows = EndingSummaryManager.formatEpisodeJourney({
+    ...journeyWorldState,
+    episodeRuns: {
+      ...journeyWorldState.episodeRuns,
+      [EPISODE_IDS.SustainabilityEvaluation]: {
+        metadata: {
+          sustainabilityEvaluation: {
+            score: 3,
+            outcome: { title: '균형 회복 중인 푸른군' },
+            remainingTitles: ['재정 지속성'],
+          },
+        },
+      },
+    },
+  });
+  assert.equal(finalJourneyRows.length, 5);
+  assert.match(finalJourneyRows[4], /EP6 평가: 3\/4/);
+  assert.match(finalJourneyRows[4], /재정 지속성/);
   const endingSceneSource = readProjectFile('src', 'scenes', 'EndingScene.js');
   assert.match(endingSceneSource, /renderEpisodeJourneyPanel/, 'EP5 ending should render the connected episode journey');
   assert.match(endingSceneSource, /formatEpisodeJourney/, 'EP5 ending should summarize persisted episode records');
