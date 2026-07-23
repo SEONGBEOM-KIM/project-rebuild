@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { getEpisodeTransition } from '../data/episodeTransitions.js';
 import EpisodeActivityFlowManager from '../systems/EpisodeActivityFlowManager.js';
 import WorldStateManager from '../systems/WorldStateManager.js';
+import { REGISTRY_KEYS } from '../data/registryKeys.js';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
@@ -71,6 +72,13 @@ export default class EpisodeTransitionScene extends Phaser.Scene {
       backgroundColor: '#bbf7d0',
       textColor: '#123524',
     }, { fontSize: '32px', padding: { x: 38, y: 20 } });
-    nextButton.on('pointerdown', () => this.scene.start(transition.nextScene));
+    nextButton.on('pointerdown', () => {
+      const startedWorldState = WorldStateManager.startEpisode(
+        WorldStateManager.get(this.registry),
+        transition.episodeId,
+      );
+      this.registry.set(REGISTRY_KEYS.worldState, startedWorldState);
+      this.scene.start(transition.nextScene, { episodeId: transition.episodeId });
+    });
   }
 }

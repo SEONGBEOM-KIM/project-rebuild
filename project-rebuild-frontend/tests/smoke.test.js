@@ -1390,6 +1390,8 @@ function testEpisodeContent() {
   const transitionSceneSource = readProjectFile('src', 'scenes', 'EpisodeTransitionScene.js');
   assert.match(transitionSceneSource, /formatCarryoverSummary/, 'episode transitions should summarize prior choices');
   assert.match(transitionSceneSource, /WorldStateManager\.get\(this\.registry\)/, 'episode transitions should read persisted world state');
+  assert.match(transitionSceneSource, /WorldStateManager\.startEpisode/, 'episode transitions should start the next world-state run');
+  assert.match(transitionSceneSource, /this\.scene\.start\(transition\.nextScene, \{ episodeId: transition\.episodeId \}\)/, 'episode transitions should pass the episode id forward');
 
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.Crisis].dataCards, EP1_DATA_CARDS, 'EP1 data cards should be addressable through episode content registry');
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.PopulationRecovery].missionBriefing, EP2_MISSION_BRIEFING, 'EP2 mission briefing should be addressable through episode content registry');
