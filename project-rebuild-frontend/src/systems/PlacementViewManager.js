@@ -1,5 +1,6 @@
 import SCENE_KEYS from '../data/sceneKeys.js';
 import { formatEffect } from '../data/stateLabels.js';
+import { getEp1VisualAsset, EP1_VISUAL_ASSETS } from '../data/visualAssets.js';
 
 
 export const TILE_COLORS = {
@@ -316,6 +317,23 @@ export default class PlacementViewManager {
       alpha: 0.46,
       strokeColor: 0xfde68a,
       strokeWidth: 5,
+    };
+  }
+
+  static getBuildingArtVisual(building, tileX, tileY, { inherited = false } = {}) {
+    const asset = getEp1VisualAsset(building.id);
+    if (!asset) {
+      return null;
+    }
+
+    return {
+    textureKey: asset.textureKey,
+    frame: undefined,
+      scale: 0.16,
+    offsetY: -54,
+      originY: 0.86,
+      alpha: inherited ? 0.58 : 1,
+    depth: 60 + tileX + tileY,
     };
   }
 

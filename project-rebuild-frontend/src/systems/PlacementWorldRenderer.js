@@ -30,7 +30,18 @@ export default class PlacementWorldRenderer {
       buildingVisual,
     );
 
-    const labelPosition = this.geometry.getFootprintCenter(tileX, tileY, building.footprint);
+    const artVisual = this.viewManager.getBuildingArtVisual?.(building, tileX, tileY, { inherited });
+    const footprintCenter = this.geometry.getFootprintCenter(tileX, tileY, building.footprint);
+    const sprite = artVisual && this.scene.textures?.exists?.(artVisual.textureKey)
+      ? this.objectRegistry.registerWorldObject(this.scene.add.sprite(
+        footprintCenter.x,
+        footprintCenter.y + artVisual.offsetY,
+        artVisual.textureKey,
+        artVisual.frame,
+      ).setOrigin(0.5, artVisual.originY).setScale(artVisual.scale).setAlpha(artVisual.alpha).setDepth(artVisual.depth))
+      : null;
+
+    const labelPosition = footprintCenter;
     const labelLayout = this.viewManager.getBuildingLabelLayout(labelPosition, tileX, tileY);
     graphics.fillStyle(labelLayout.background.fillColor, labelLayout.background.fillAlpha);
     graphics.fillRoundedRect(
@@ -48,7 +59,7 @@ export default class PlacementWorldRenderer {
     ).setOrigin(0.5).setDepth(labelLayout.text.depth));
 
     this.mapLabels.add(label);
-    return { graphics, label };
+    return { graphics, sprite, label };
   }
 
   drawImpactMarkers(building, tileX, tileY, animate = true) {

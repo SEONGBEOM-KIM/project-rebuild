@@ -438,7 +438,7 @@ function testBootFlowManager() {
 
 function testVisualAssetCatalog() {
   assert.equal(EP1_VISUAL_ASSETS.atlas.key, 'ep1-buildings');
-  assert.equal(EP1_VISUAL_ASSETS.atlas.image, '/assets/ep1/building-art-pack-generated.png');
+  assert.equal(EP1_VISUAL_ASSETS.atlas.image, '/assets/ep1/building-art-pack.png');
   assert.deepEqual(Object.keys(EP1_VISUAL_ASSETS.buildings), ['bus_station', 'youth_center', 'small_park']);
   assert.equal(getEp1VisualAsset('bus_station').frame, 'bus_station');
   assert.equal(getEp1VisualAsset('unknown'), null);
@@ -2990,6 +2990,16 @@ function testPlacementViewManager() {
   assert.equal(PlacementViewManager.getTextStyles().recommendationBadge.color, '#78350f');
   assert.equal(PlacementViewManager.getTextStyles().impactIcon.fontStyle, 'bold');
   assert.equal(PlacementViewManager.getTextStyles().buildingLabel.fontSize, '18px');
+  assert.deepEqual(PlacementViewManager.getBuildingArtVisual(buildings.find((building) => building.id === 'bus_station'), 2, 3), {
+    textureKey: 'ep1-building-bus-station',
+    frame: undefined,
+    scale: 0.16,
+    offsetY: -54,
+    originY: 0.86,
+    alpha: 1,
+    depth: 65,
+  });
+  assert.equal(PlacementViewManager.getBuildingArtVisual({ id: 'food_factory' }, 2, 3), null);
   assert.equal(PREVIEW_STYLES.valid.fillColor, 0x22c55e);
   assert.equal(PLACEMENT_UI_LAYOUT.title.text, '건물 선택');
   assert.equal(BUILDING_CARD_LAYOUT.card.width, 300);

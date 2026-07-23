@@ -25,7 +25,7 @@
   "meta": {
     "app": "Project Rebuild",
     "version": "1.0",
-    "image": "building-art-pack-generated.png",
+    "image": "building-art-pack.png",
     "format": "RGBA8888",
     "scale": "1"
   }
