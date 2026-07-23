@@ -111,7 +111,7 @@ import { EPISODE_ACTIVITY_FLOWS, getEpisodeActivityFlow } from '../src/data/epis
 import { EPISODE_TRANSITIONS, getEpisodeTransition } from '../src/data/episodeTransitions.js';
 import SCENE_KEYS from '../src/data/sceneKeys.js';
 import { REGISTRY_KEYS } from '../src/data/registryKeys.js';
-import { EP1_CAUSE_QUESTION, EP1_CAUSE_QUESTIONS, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES, EP2_MISSION_BRIEFING, EP2_NEXT_DEVELOPMENT_GOALS, EP2_REFLECTION_CHOICES, EP3_MISSION_PREVIEW, EP3_MISSION_BRIEFING, EP3_NEXT_DEVELOPMENT_GOALS, EP3_REFLECTION_CHOICES, EP4_MISSION_BRIEFING, EP4_NEXT_DEVELOPMENT_GOALS, EP5_MISSION_PREVIEW, EPISODE_CONTENT, getCurrentEpisodeContent, getCurrentPlacementEpisodeContent, getCurrentPlacementMissionBriefing, getCurrentPlacementNextDevelopmentGoals, getEpisodeContent, getNextDevelopmentGoals, getNextEpisodeContent, getReflectionChoices } from '../src/data/episodeContent.js';
+import { EP1_CAUSE_QUESTION, EP1_CAUSE_QUESTIONS, EP1_CORE_CAUSE_SUMMARY, EP1_CORE_CONCEPT, EP1_DATA_CARDS, EP1_EXPLORATION_CLUES, EP1_NEXT_DEVELOPMENT_GOALS, EP1_NEXT_MISSION, EP1_PROBLEM_ITEMS, EP1_REFLECTION_CHOICES, EP1_STORY_BEATS, EP2_MISSION_BRIEFING, EP2_NEXT_DEVELOPMENT_GOALS, EP2_REFLECTION_CHOICES, EP3_MISSION_PREVIEW, EP3_MISSION_BRIEFING, EP3_NEXT_DEVELOPMENT_GOALS, EP3_REFLECTION_CHOICES, EP4_MISSION_BRIEFING, EP4_NEXT_DEVELOPMENT_GOALS, EP5_MISSION_PREVIEW, EPISODE_CONTENT, getCurrentEpisodeContent, getCurrentPlacementEpisodeContent, getCurrentPlacementMissionBriefing, getCurrentPlacementNextDevelopmentGoals, getEpisodeContent, getNextDevelopmentGoals, getNextEpisodeContent, getReflectionChoices } from '../src/data/episodeContent.js';
 import ProgressStepper from '../src/ui/ProgressStepper.js';
 import { getTextButtonColor } from '../src/ui/TextButton.js';
 import { DEFAULT_STATE_KEYS, STATE_ICONS } from '../src/data/stateLabels.js';
@@ -1270,6 +1270,18 @@ function testStoryRenderer() {
   rendered.buttonBg.events.get('pointerdown')();
   rendered.buttonText.events.get('pointerdown')();
   assert.deepEqual(selectedTargets, ['ExplorationScene', 'ExplorationScene']);
+
+  const dialogueFixture = createRendererSceneSpy();
+  const dialogue = StoryRenderer.renderDialogue(
+    dialogueFixture.scene,
+    EP1_STORY_BEATS[0],
+    StoryViewManager.getDialogueLayout(1920, 0, EP1_STORY_BEATS.length),
+    { isFinal: false, onNext: () => selectedTargets.push('dialogue') },
+  );
+  assert.equal(dialogue.speaker.type, 'text');
+  assert.ok(dialogueFixture.calls.some((call) => call[0] === 'text' && call[3] === EP1_STORY_BEATS[0].speaker));
+  dialogue.buttonBg.events.get('pointerdown')();
+  assert.equal(selectedTargets.at(-1), 'dialogue');
 }
 
 function testStoryViewManager() {
@@ -1280,6 +1292,9 @@ function testStoryViewManager() {
   assert.equal(layout.intro.lineSpacing, 18);
   assert.equal(layout.startButton.strokeWidth, 4);
   assert.equal(layout.startButton.textColor, '#123524');
+  assert.equal(EP1_STORY_BEATS.length, 4);
+  assert.equal(StoryViewManager.getDialogueLayout(1920, 0, 4).progress.text, '1 / 4');
+  assert.equal(StoryViewManager.getDialogueLayout(1920, 3, 4).nextButton.finalLabel, '지역 탐색 시작');
   assert.deepEqual(StoryViewManager.getStartButton(1920), {
     ...layout.startButton,
     x: 960,

@@ -151,6 +151,25 @@ export const EP1_NEXT_DEVELOPMENT_GOALS = [
   '다음은 인구 유입 전략을 비교합니다.',
 ];
 
+export const EP1_STORY_BEATS = [
+  {
+    speaker: '시청 직원',
+    text: '시장님, 푸른군의 인구가 10년 전보다 크게 줄었습니다. 학교와 시장에서도 변화가 보이기 시작했어요.',
+  },
+  {
+    speaker: '시장 상인',
+    text: '손님이 줄고 빈 점포가 늘었습니다. 젊은 사람들은 일자리를 찾아 다른 지역으로 떠나고 있습니다.',
+  },
+  {
+    speaker: '고령 주민',
+    text: '병원과 버스가 줄어 생활이 불편해졌습니다. 사람 수만 늘리는 것보다 계속 살 수 있는 조건이 필요합니다.',
+  },
+  {
+    speaker: '지역 회복 프로젝트 담당자',
+    text: '먼저 여러 장소를 직접 살펴보고, 푸른군의 문제가 어떻게 연결되어 있는지 알아보겠습니다.',
+  },
+];
+
 export const EP2_NEXT_DEVELOPMENT_GOALS = [
   'EP3 경제 성장 예고',
   '',
@@ -495,6 +514,7 @@ export const EPISODE_CONTENT = Object.freeze({
     coreCauseSummary: EP1_CORE_CAUSE_SUMMARY,
     nextMission: EP1_NEXT_MISSION,
     nextDevelopmentGoals: EP1_NEXT_DEVELOPMENT_GOALS,
+    storyBeats: EP1_STORY_BEATS,
     reflectionChoices: EP1_REFLECTION_CHOICES,
   }),
   [EPISODE_IDS.PopulationRecovery]: Object.freeze({
