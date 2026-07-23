@@ -118,6 +118,7 @@ import { copyTextToClipboard, downloadTextFile } from '../src/ui/BrowserFileActi
 import { getLayoutTextStyle } from '../src/ui/LayoutText.js';
 import { createPanelBackground, createPanelTitle, getPanelTitleStyle } from '../src/ui/PanelRenderer.js';
 import { createScreenBackground } from '../src/ui/ScreenBackground.js';
+import GlobalStateHudRenderer from '../src/ui/GlobalStateHudRenderer.js';
 
 
 const PROJECT_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -5604,6 +5605,51 @@ async function testBrowserFileActions() {
   ]);
 }
 
+function testGlobalStateHudRenderer() {
+  const calls = [];
+  const createObject = (type, args) => {
+    const object = {
+      type,
+      args,
+      setStrokeStyle: (...strokeArgs) => {
+        calls.push(['stroke', type, ...strokeArgs]);
+        return object;
+      },
+      setScrollFactor: (value) => {
+        calls.push(['scrollFactor', type, value]);
+        return object;
+      },
+      setDepth: (value) => {
+        calls.push(['depth', type, value]);
+        return object;
+      },
+      setOrigin: (value) => {
+        calls.push(['origin', type, value]);
+        return object;
+      },
+    };
+    return object;
+  };
+  const scene = {
+    scene: { key: 'EpisodeTransitionScene' },
+    scale: { width: 1920, height: 1080 },
+    registry: { get: (key) => key === REGISTRY_KEYS.gameState ? GameState.createInitialState() : undefined },
+    add: {
+      rectangle: (...args) => createObject('rectangle', args),
+      text: (...args) => createObject('text', args),
+    },
+  };
+
+  const hud = GlobalStateHudRenderer.renderIfAvailable(scene);
+  assert.equal(hud.items.length, DEFAULT_STATE_KEYS.length);
+  assert.equal(hud.items[0].value.args[2], '1,000');
+  assert.equal(hud.items[4].value.args[2], '1,000');
+  assert.equal(GlobalStateHudRenderer.shouldRender({ ...scene, scene: { key: 'PlacementScene' } }), false);
+  assert.equal(GlobalStateHudRenderer.shouldRender({ ...scene, scene: { key: 'TitleScene' } }), false);
+  assert.equal(GlobalStateHudRenderer.formatValue(Number.NaN), '-');
+  assert.ok(calls.some(([name, type, value]) => name === 'depth' && type === 'text' && value === 1000));
+}
+
 async function run() {
   testBootFlowManager();
   testEpisodeMetadata();
@@ -5631,6 +5677,7 @@ async function run() {
   testApiContractRenderer();
   testApiContractViewManager();
   testStateHudManager();
+  testGlobalStateHudRenderer();
   testEvaluationRuleConstants();
   testResultViewManager();
   testEvaluationManager();
