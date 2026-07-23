@@ -150,12 +150,16 @@ export default class EndingSummaryManager {
 
   static formatEpisodeJourney(worldState = {}) {
     const episodeRuns = worldState.episodeRuns ?? {};
+    const recoveryRun = episodeRuns[EPISODE_IDS.PopulationRecovery] ?? {};
     const economyRun = episodeRuns[EPISODE_IDS.EconomyGrowth] ?? {};
     const sideEffectRun = episodeRuns[EPISODE_IDS.SideEffects] ?? {};
     const solutionRun = episodeRuns[EPISODE_IDS.BalancedSolutions] ?? {};
     const sustainabilityRun = episodeRuns[EPISODE_IDS.SustainabilityEvaluation] ?? {};
     const economyStrategy = getEpisodeContent(EPISODE_IDS.EconomyGrowth).missionBriefing?.strategies?.find(
       (strategy) => strategy.id === economyRun.metadata?.selectedStrategyId,
+    );
+    const recoveryStrategy = getEpisodeContent(EPISODE_IDS.PopulationRecovery).missionBriefing?.strategies?.find(
+      (strategy) => strategy.id === recoveryRun.metadata?.selectedStrategyId,
     );
     const solutionPlan = getEp5SolutionPlan(solutionRun.metadata?.selectedSolutionPlanId);
     const primaryRisk = sideEffectRun.metadata?.riskSummary?.primaryRisk ?? null;
@@ -170,7 +174,7 @@ export default class EndingSummaryManager {
     ).length;
 
     const journeyRows = [
-      `EP2 회복: 생활 기반 시설 ${ep2Placements}개를 배치해 인구 유입 조건을 살폈습니다.`,
+      `EP2 회복: ${recoveryStrategy?.title ?? '회복 전략'} 선택 / 생활 기반 시설 ${ep2Placements}개를 배치해 인구 유입 조건을 살폈습니다.`,
       `EP3 성장: ${economyStrategy?.title ?? '성장 전략'} 선택 / ${economyChanges}`,
       `EP4 점검: ${primaryRisk?.title ?? '교통·환경·소득 격차'} 문제를 함께 확인했습니다.`,
       `EP5 해결: ${solutionPlan?.title ?? '균형 해결안'}으로 우선 문제를 보완하며 세 지표를 함께 관리했습니다.`,

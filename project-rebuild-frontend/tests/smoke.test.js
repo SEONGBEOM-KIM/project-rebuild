@@ -3792,6 +3792,9 @@ function testEndingSummaryManager() {
   const journeyWorldState = {
     placements: [{ episodeId: EPISODE_IDS.PopulationRecovery }],
     episodeRuns: {
+      [EPISODE_IDS.PopulationRecovery]: {
+        metadata: { selectedStrategyId: 'jobs_services' },
+      },
       [EPISODE_IDS.EconomyGrowth]: {
         metadata: { selectedStrategyId: 'logistics_growth_hub' },
         startGameState: GameState.createInitialState(),
@@ -3807,7 +3810,7 @@ function testEndingSummaryManager() {
   };
   const journeyRows = EndingSummaryManager.formatEpisodeJourney(journeyWorldState);
   assert.equal(journeyRows.length, 4);
-  assert.match(journeyRows[0], /EP2 회복: 생활 기반 시설 1개/);
+  assert.match(journeyRows[0], /EP2 회복: 일자리와 생활 기반 선택 \/ 생활 기반 시설 1개/);
   assert.match(journeyRows[1], /유통 성장 거점/);
   assert.match(journeyRows[2], /소득 격차/);
   assert.match(journeyRows[3], /생활 혜택 공유 계획/);
