@@ -11,4 +11,5 @@ export const REGISTRY_KEYS = Object.freeze({
   selectedSolutionPlan: 'selectedSolutionPlan',
   learningProgress: 'learningProgress',
   worldState: 'worldState',
+  timeState: 'timeState',
 });

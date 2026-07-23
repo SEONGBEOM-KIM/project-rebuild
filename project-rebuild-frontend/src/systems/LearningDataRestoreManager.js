@@ -8,6 +8,7 @@ import PlacementContextManager from './PlacementContextManager.js';
 import WorldStateManager from './WorldStateManager.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
 import { getEp5SolutionPlan } from '../data/ep5SolutionPlans.js';
+import TimeStateManager from './TimeStateManager.js';
 
 export default class LearningDataRestoreManager {
   static findPolicyById(policyId) {
@@ -44,6 +45,7 @@ export default class LearningDataRestoreManager {
     registry.set(REGISTRY_KEYS.reflectionChoice, progress.reflectionChoice);
     registry.set(REGISTRY_KEYS.selectedSolutionPlan, getEp5SolutionPlan(data.selectedSolutionPlan?.id));
     registry.set(REGISTRY_KEYS.learningProgress, progress);
+    TimeStateManager.set(registry, data.timeState);
     WorldStateManager.set(registry, worldState);
 
     return {

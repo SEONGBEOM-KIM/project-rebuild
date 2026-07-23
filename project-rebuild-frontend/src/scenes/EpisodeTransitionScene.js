@@ -3,6 +3,7 @@ import { getEpisodeTransition } from '../data/episodeTransitions.js';
 import EpisodeActivityFlowManager from '../systems/EpisodeActivityFlowManager.js';
 import WorldStateManager from '../systems/WorldStateManager.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
+import TimeStateManager from '../systems/TimeStateManager.js';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 import { createPanelBackground, createPanelTitle } from '../ui/PanelRenderer.js';
@@ -29,6 +30,10 @@ export default class EpisodeTransitionScene extends Phaser.Scene {
       transition.episodeId,
     );
     this.registry.set(REGISTRY_KEYS.worldState, this.worldState);
+    this.timeState = TimeStateManager.advance(this.registry, {
+      episodeId: transition.episodeId,
+      reason: `${transition.title} 시작`,
+    });
 
     const { width } = this.scale;
     const activityFlow = EpisodeActivityFlowManager.get(this.episodeId);

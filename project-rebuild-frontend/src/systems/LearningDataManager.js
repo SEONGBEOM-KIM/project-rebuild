@@ -8,6 +8,7 @@ import PlacementContextManager from './PlacementContextManager.js';
 import WorldStateManager from './WorldStateManager.js';
 import SustainabilityEvaluationManager from './SustainabilityEvaluationManager.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
+import TimeStateManager from './TimeStateManager.js';
 
 export default class LearningDataManager {
   static build(registry) {
@@ -102,6 +103,7 @@ export default class LearningDataManager {
       // Local saves also carry this optional snapshot so later episodes can resume
       // the shared Blue County state after a refresh or import.
       worldState,
+      timeState: TimeStateManager.get(registry),
       sustainabilityEvaluation,
       reflectionChoice,
       selectedSolutionPlan: selectedSolutionPlan ? { id: selectedSolutionPlan.id, title: selectedSolutionPlan.title } : null,

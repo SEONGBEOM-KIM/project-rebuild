@@ -32,6 +32,7 @@ import SustainabilityEvaluationViewManager from '../src/systems/SustainabilityEv
 import SustainabilityEvaluationRenderer from '../src/systems/SustainabilityEvaluationRenderer.js';
 import LearningProgress from '../src/systems/LearningProgress.js';
 import WorldStateManager from '../src/systems/WorldStateManager.js';
+import TimeStateManager from '../src/systems/TimeStateManager.js';
 import EpisodePlacementLaunchManager from '../src/systems/EpisodePlacementLaunchManager.js';
 import EpisodeFlowManager from '../src/systems/EpisodeFlowManager.js';
 import EpisodeActivityFlowManager from '../src/systems/EpisodeActivityFlowManager.js';
@@ -405,6 +406,7 @@ function testBootFlowManager() {
     REGISTRY_KEYS.selectedSolutionPlan,
     'learningProgress',
     REGISTRY_KEYS.worldState,
+    REGISTRY_KEYS.timeState,
   ]);
   const values = new Map(entries);
   assert.deepEqual(values.get('gameState'), GameState.createInitialState());
@@ -418,12 +420,14 @@ function testBootFlowManager() {
   assert.equal(values.get(REGISTRY_KEYS.selectedSolutionPlan), null);
   assert.equal(values.get('learningProgress').episode, 1);
   assert.deepEqual(values.get(REGISTRY_KEYS.worldState), WorldStateManager.createInitialWorldState());
+  assert.deepEqual(values.get(REGISTRY_KEYS.timeState), TimeStateManager.createInitialTimeState());
   const resetRegistry = createMemoryRegistry();
   resetRegistry.set(REGISTRY_KEYS.gameState, { population: 9999 });
   resetRegistry.set(REGISTRY_KEYS.worldState, { completedEpisodeIds: [EPISODE_IDS.PopulationRecovery] });
   BootFlowManager.resetRegistry(resetRegistry);
   assert.deepEqual(resetRegistry.get(REGISTRY_KEYS.gameState), GameState.createInitialState());
   assert.deepEqual(resetRegistry.get(REGISTRY_KEYS.worldState), WorldStateManager.createInitialWorldState());
+  assert.deepEqual(resetRegistry.get(REGISTRY_KEYS.timeState), TimeStateManager.createInitialTimeState());
   assert.equal(BootFlowManager.getTargetScene(), 'TitleScene');
 }
 
@@ -1391,6 +1395,7 @@ function testEpisodeContent() {
   assert.match(transitionSceneSource, /formatCarryoverSummary/, 'episode transitions should summarize prior choices');
   assert.match(transitionSceneSource, /WorldStateManager\.get\(this\.registry\)/, 'episode transitions should read persisted world state');
   assert.match(transitionSceneSource, /WorldStateManager\.startEpisode/, 'episode transitions should start the next world-state run');
+  assert.match(transitionSceneSource, /TimeStateManager\.advance/, 'episode transitions should advance time');
   assert.match(transitionSceneSource, /this\.scene\.start\(transition\.nextScene, \{ episodeId: transition\.episodeId \}\)/, 'episode transitions should pass the episode id forward');
 
   assert.equal(EPISODE_CONTENT[EPISODE_IDS.Crisis].dataCards, EP1_DATA_CARDS, 'EP1 data cards should be addressable through episode content registry');
@@ -4205,6 +4210,7 @@ function testLearningDataManager() {
 
   const data = LearningDataManager.build(registry);
   assert.equal(data.episode, 1);
+  assert.deepEqual(data.timeState, TimeStateManager.createInitialTimeState());
   assert.equal(data.exploredPlaceNames.length, 3);
   assert.equal(data.placements.length, 3);
   assert.equal(data.summary.selectedPolicyName, '청년 생활 지원');
@@ -4715,6 +4721,11 @@ function testLearningDataRestoreManager() {
       { buildingId: 'unknown_building', position: { x: 9, y: 9 }, effect: {} },
     ],
     gameState: { ...GameState.createInitialState(), environment: 92, budget: 860 },
+    timeState: {
+      currentYear: 2038,
+      turn: 4,
+      lastEvent: { episodeId: EPISODE_IDS.PopulationRecovery, reason: 'EP2 시작', year: 2038, turn: 4 },
+    },
     reflectionChoice: { id: 'environment', title: '환경 보완' },
     selectedSolutionPlan: { id: 'clean_growth_guardrails', title: '친환경 성장 기준' },
     completed: true,
@@ -4744,6 +4755,7 @@ function testLearningDataRestoreManager() {
   assert.equal(registry.get(REGISTRY_KEYS.selectedSolutionPlan).id, 'clean_growth_guardrails');
   assert.deepEqual(registry.get(REGISTRY_KEYS.worldState).completedEpisodeIds, [EPISODE_IDS.PopulationRecovery]);
   assert.equal(registry.get(REGISTRY_KEYS.worldState).placements[0].episodeId, EPISODE_IDS.PopulationRecovery);
+  assert.deepEqual(registry.get(REGISTRY_KEYS.timeState), data.timeState);
 
   const alternateProgress = LearningDataRestoreManager.buildProgress(
     {
@@ -5599,6 +5611,29 @@ async function testBrowserFileActions() {
   ]);
 }
 
+function testTimeStateManager() {
+  const registry = createMemoryRegistry();
+  assert.deepEqual(TimeStateManager.get(registry), {
+    currentYear: 2035,
+    turn: 1,
+    lastEvent: null,
+  });
+
+  const advanced = TimeStateManager.advance(registry, {
+    episodeId: EPISODE_IDS.PopulationRecovery,
+    reason: 'EP2 시작',
+  });
+  assert.equal(advanced.currentYear, 2036);
+  assert.equal(advanced.turn, 2);
+  assert.deepEqual(advanced.lastEvent, {
+    episodeId: EPISODE_IDS.PopulationRecovery,
+    reason: 'EP2 시작',
+    year: 2036,
+    turn: 2,
+  });
+  assert.equal(TimeStateManager.formatCompact(advanced), '2036년 · 2턴');
+}
+
 function testGlobalStateHudRenderer() {
   const calls = [];
   const createObject = (type, args) => {
@@ -5631,6 +5666,7 @@ function testGlobalStateHudRenderer() {
       get: (key) => {
         if (key === REGISTRY_KEYS.gameState) return GameState.createInitialState();
         if (key === REGISTRY_KEYS.worldState) return { activeEpisodeId: 'ep4' };
+        if (key === REGISTRY_KEYS.timeState) return { currentYear: 2036, turn: 2 };
         return undefined;
       },
     },
@@ -5646,6 +5682,8 @@ function testGlobalStateHudRenderer() {
   assert.equal(hud.items[4].value.args[2], '1,000');
   assert.equal(hud.episode.shortTitle, 'EP4. 부작용 발생');
   assert.equal(hud.episodeBadge.text.args[2], 'EP4. 부작용 발생');
+  assert.equal(hud.timeState.currentYear, 2036);
+  assert.equal(hud.episodeBadge.time.args[2], '2036년 · 2턴');
   assert.equal(GlobalStateHudRenderer.shouldRender({ ...scene, scene: { key: 'PlacementScene' } }), false);
   assert.equal(GlobalStateHudRenderer.shouldRender({ ...scene, scene: { key: 'TitleScene' } }), false);
   assert.equal(GlobalStateHudRenderer.formatValue(Number.NaN), '-');
@@ -5728,6 +5766,7 @@ async function run() {
   testLearningDataRenderer();
   testLearningDataViewManager();
   testLearningDataManager();
+  testTimeStateManager();
   testApiPayloadRenderer();
   testApiPayloadViewManager();
   testLearningApiPayloadManager();

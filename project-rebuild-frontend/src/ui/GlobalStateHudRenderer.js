@@ -3,6 +3,7 @@ import StateHudManager from '../systems/StateHudManager.js';
 import { DEFAULT_STATE_KEYS } from '../data/stateLabels.js';
 import { getEpisode } from '../data/episodes.js';
 import { getPlacementConfig } from '../data/episodePlacementConfigs.js';
+import TimeStateManager from '../systems/TimeStateManager.js';
 
 const EXCLUDED_SCENES = new Set([
   'BootScene',
@@ -71,8 +72,9 @@ export default class GlobalStateHudRenderer {
 
     const renderedItems = items.map((item, index) => this.renderItem(scene, item, layout, index));
     const episode = this.getEpisodeContext(scene);
-    const episodeBadge = episode ? this.renderEpisodeBadge(scene, episode, layout.episodeBadge) : null;
-    return { panel, items: renderedItems, episodeBadge, episode, layout };
+    const timeState = TimeStateManager.get(scene.registry);
+    const episodeBadge = episode ? this.renderEpisodeBadge(scene, episode, timeState, layout.episodeBadge) : null;
+    return { panel, items: renderedItems, episodeBadge, episode, timeState, layout };
   }
 
   static getEpisodeContext(scene) {
@@ -99,12 +101,12 @@ export default class GlobalStateHudRenderer {
     return episodeId ? getEpisode(episodeId) : null;
   }
 
-  static renderEpisodeBadge(scene, episode, layout) {
+  static renderEpisodeBadge(scene, episode, timeState, layout) {
     const badge = this.createRectangle(scene, layout, 0x172554, 0.96);
     badge.setStrokeStyle?.(1, 0x60a5fa);
-    const text = scene.add.text(layout.x, layout.y, episode.shortTitle, {
+    const text = scene.add.text(layout.x, layout.y - 7, episode.shortTitle, {
       color: HUD_STYLE.episodeColor,
-      fontSize: '18px',
+      fontSize: '16px',
       fontStyle: 'bold',
       align: 'center',
       wordWrap: { width: layout.width - 20 },
@@ -112,7 +114,15 @@ export default class GlobalStateHudRenderer {
     text.setOrigin?.(0.5);
     text.setScrollFactor?.(0);
     text.setDepth?.(1000);
-    return { badge, text, episode };
+    const time = scene.add.text(layout.x, layout.y + 12, TimeStateManager.formatCompact(timeState), {
+      color: HUD_STYLE.textColor,
+      fontSize: '11px',
+      align: 'center',
+    });
+    time.setOrigin?.(0.5);
+    time.setScrollFactor?.(0);
+    time.setDepth?.(1000);
+    return { badge, text, time, episode, timeState };
   }
 
   static renderItem(scene, item, layout, index) {
