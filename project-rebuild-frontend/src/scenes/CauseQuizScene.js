@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
-import ProgressStepper from '../ui/ProgressStepper.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import CauseQuizManager from '../systems/CauseQuizManager.js';
 import CauseQuizViewManager from '../systems/CauseQuizViewManager.js';
@@ -24,7 +23,6 @@ export default class CauseQuizScene extends Phaser.Scene {
     const layout = CauseQuizViewManager.getScreenLayout(width);
 
     createScreenBackground(this, layout.background.color);
-    ProgressStepper.render(this, layout.progressStep);
     createLayoutText(this, layout.title, { origin: 0.5 });
 
     createLayoutText(this, layout.subtitle, { origin: 0.5 });

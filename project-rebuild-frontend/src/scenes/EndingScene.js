@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
-import ProgressStepper from '../ui/ProgressStepper.js';
 import PlacementContextManager from '../systems/PlacementContextManager.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import EndingSummaryManager from '../systems/EndingSummaryManager.js';
@@ -42,7 +41,6 @@ export default class EndingScene extends Phaser.Scene {
     const layout = EndingSummaryViewManager.getScreenLayout(width, endingEpisodeId);
 
     createScreenBackground(this, layout.background.color);
-    ProgressStepper.render(this, layout.progressStep);
     createLayoutText(this, layout.title, { origin: 0.5 });
 
     createLayoutText(this, layout.subtitle, { origin: 0.5 });

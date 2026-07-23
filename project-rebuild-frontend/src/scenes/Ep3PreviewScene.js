@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
-import ProgressStepper from '../ui/ProgressStepper.js';
 import { getEpisodeContent } from '../data/episodeContent.js';
 import { economyBuildings } from '../data/economyBuildings.js';
 import { economyPolicies } from '../data/economyPolicies.js';
@@ -23,7 +22,6 @@ export default class Ep3PreviewScene extends Phaser.Scene {
     const layout = Ep3PreviewViewManager.getScreenLayout(width);
 
     createScreenBackground(this, layout.backgroundColor);
-    ProgressStepper.render(this, layout.progressStep);
     createLayoutText(this, layout.title, { origin: 0.5 });
     createLayoutText(this, layout.subtitle, { origin: 0.5 });
 

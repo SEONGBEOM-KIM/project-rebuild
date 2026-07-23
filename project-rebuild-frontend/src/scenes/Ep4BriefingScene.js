@@ -4,7 +4,6 @@ import { getEpisodeContent } from '../data/episodeContent.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
 import { createLayoutText } from '../ui/LayoutText.js';
-import ProgressStepper from '../ui/ProgressStepper.js';
 import IndustrializationRiskManager from '../systems/IndustrializationRiskManager.js';
 import Ep4BriefingViewManager from '../systems/Ep4BriefingViewManager.js';
 import Ep4BriefingRenderer from '../systems/Ep4BriefingRenderer.js';
@@ -34,7 +33,6 @@ export default class Ep4BriefingScene extends Phaser.Scene {
     const layout = Ep4BriefingViewManager.getScreenLayout(width);
 
     createScreenBackground(this, layout.background.color);
-    ProgressStepper.render(this, layout.progressStep);
     createLayoutText(this, layout.title, { origin: 0.5 });
     createLayoutText(this, layout.subtitle, { origin: 0.5 });
     Ep4BriefingRenderer.renderIntroPanel(this, briefing, Ep4BriefingViewManager.formatGrowthRecord({

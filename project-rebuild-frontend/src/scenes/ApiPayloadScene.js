@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
-import ProgressStepper from '../ui/ProgressStepper.js';
 import LearningDataManager from '../systems/LearningDataManager.js';
 import LearningApiPayloadManager from '../systems/LearningApiPayloadManager.js';
 import MockApiClient from '../systems/MockApiClient.js';
@@ -23,7 +22,6 @@ export default class ApiPayloadScene extends Phaser.Scene {
 
     const screenLayout = ApiPayloadViewManager.getScreenLayout(width);
     createScreenBackground(this, screenLayout.backgroundColor);
-    ProgressStepper.render(this, screenLayout.progressStep);
 
     createLayoutText(this, screenLayout.title, { origin: 0.5 });
     createLayoutText(this, screenLayout.subtitle, { origin: 0.5 });

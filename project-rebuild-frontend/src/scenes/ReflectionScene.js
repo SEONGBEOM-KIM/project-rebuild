@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
-import ProgressStepper from '../ui/ProgressStepper.js';
 import PlacementContextManager from '../systems/PlacementContextManager.js';
 import IndustrializationRiskManager from '../systems/IndustrializationRiskManager.js';
 import LearningProgress from '../systems/LearningProgress.js';
@@ -39,7 +38,6 @@ export default class ReflectionScene extends Phaser.Scene {
     const layout = ReflectionViewManager.getScreenLayout(width);
 
     createScreenBackground(this, layout.background.color);
-    ProgressStepper.render(this, layout.progressStep);
 
     createLayoutText(this, layout.title, { origin: 0.5 });
 

@@ -4,7 +4,6 @@ import { getEpisodeContent } from '../data/episodeContent.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
 import { createLayoutText } from '../ui/LayoutText.js';
-import ProgressStepper from '../ui/ProgressStepper.js';
 import IndustrializationRiskManager from '../systems/IndustrializationRiskManager.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import Ep5SolutionPlanManager from '../systems/Ep5SolutionPlanManager.js';
@@ -34,7 +33,6 @@ export default class Ep5PreviewScene extends Phaser.Scene {
     this.cardObjects = new Map();
     const layout = Ep5PreviewViewManager.getScreenLayout(width);
     createScreenBackground(this, layout.background.color);
-    ProgressStepper.render(this, layout.progressStep);
     createLayoutText(this, layout.title, { origin: 0.5 });
     createLayoutText(this, layout.subtitle, { origin: 0.5 });
     this.primaryRisk = Ep5SolutionPlanManager.getPrimaryRisk(this.risks);

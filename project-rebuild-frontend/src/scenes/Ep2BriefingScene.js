@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
-import ProgressStepper from '../ui/ProgressStepper.js';
 import { getCurrentPlacementMissionBriefing } from '../data/episodeContent.js';
 import { policies } from '../data/policies.js';
 import { getPlacementConfigIdForStrategy } from '../data/episodePlacementConfigs.js';
@@ -18,7 +17,6 @@ export default class Ep2BriefingScene extends Phaser.Scene {
     const { width } = this.scale;
     const layout = Ep2BriefingViewManager.getScreenLayout(width);
     createScreenBackground(this, layout.backgroundColor);
-    ProgressStepper.render(this, layout.progressStep);
     createLayoutText(this, layout.title, { origin: 0.5 });
     createLayoutText(this, layout.subtitle, { origin: 0.5 });
 

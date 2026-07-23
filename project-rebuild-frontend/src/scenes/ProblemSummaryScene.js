@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
-import ProgressStepper from '../ui/ProgressStepper.js';
 import { explorationPlaces } from '../data/explorationPlaces.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import ProblemSummaryViewManager from '../systems/ProblemSummaryViewManager.js';
@@ -25,7 +24,6 @@ export default class ProblemSummaryScene extends Phaser.Scene {
     const layout = ProblemSummaryViewManager.getScreenLayout(width);
 
     createScreenBackground(this, layout.background.color);
-    ProgressStepper.render(this, layout.progressStep);
     createLayoutText(this, layout.title, { origin: 0.5 });
 
     createLayoutText(this, layout.subtitle, { origin: 0.5 });

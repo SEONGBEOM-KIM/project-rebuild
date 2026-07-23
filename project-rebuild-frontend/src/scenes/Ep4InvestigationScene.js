@@ -3,7 +3,6 @@ import { EPISODE_IDS } from '../data/episodes.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
 import { createLayoutText } from '../ui/LayoutText.js';
-import ProgressStepper from '../ui/ProgressStepper.js';
 import IndustrializationRiskManager from '../systems/IndustrializationRiskManager.js';
 import LearningProgress from '../systems/LearningProgress.js';
 import Ep4InvestigationViewManager from '../systems/Ep4InvestigationViewManager.js';
@@ -27,7 +26,6 @@ export default class Ep4InvestigationScene extends Phaser.Scene {
     const layout = Ep4InvestigationViewManager.getScreenLayout(width);
 
     createScreenBackground(this, layout.background.color);
-    ProgressStepper.render(this, layout.progressStep);
     createLayoutText(this, layout.title, { origin: 0.5 });
     createLayoutText(this, layout.subtitle, { origin: 0.5 });
     this.progressText = createLayoutText(this, layout.progress, { text: '', style: { fontSize: '22px', color: '#dbeafe', align: 'center', wordWrap: { width: layout.progress.wordWrapWidth } }, origin: 0.5 });

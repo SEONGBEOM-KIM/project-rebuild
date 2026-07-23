@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
-import ProgressStepper from '../ui/ProgressStepper.js';
 import IndustrializationRiskManager from '../systems/IndustrializationRiskManager.js';
 import SideEffectViewManager from '../systems/SideEffectViewManager.js';
 import SideEffectRenderer from '../systems/SideEffectRenderer.js';
@@ -34,7 +33,6 @@ export default class SideEffectScene extends Phaser.Scene {
     const layout = SideEffectViewManager.getScreenLayout(width);
 
     createScreenBackground(this, layout.background.color);
-    ProgressStepper.render(this, layout.progressStep);
 
     createLayoutText(this, layout.title, { origin: 0.5 });
 

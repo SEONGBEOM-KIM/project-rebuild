@@ -2497,7 +2497,6 @@ function createPlacementSceneBootstrapFixture() {
   const worldObjects = [];
   const uiObjects = [];
   const cameraCalls = [];
-  const progressCalls = [];
   const scene = {
     scale: { width: 1920, height: 1080 },
     add: {
@@ -2527,14 +2526,8 @@ function createPlacementSceneBootstrapFixture() {
       return this;
     }
   }
-  const progressStepper = {
-    render: (...args) => {
-      progressCalls.push(args);
-      return createBootstrapDisplayObjectSpy('progress');
-    },
-  };
-  const bootstrap = new PlacementSceneBootstrap({ scene, progressStepper, cameraControllerClass: CameraControllerSpy });
-  return { bootstrap, scene, worldObjects, uiObjects, cameraCalls, progressCalls };
+  const bootstrap = new PlacementSceneBootstrap({ scene, cameraControllerClass: CameraControllerSpy });
+  return { bootstrap, scene, worldObjects, uiObjects, cameraCalls };
 }
 
 function testPlacementSceneBootstrap() {
@@ -2544,7 +2537,7 @@ function testPlacementSceneBootstrap() {
   cloned.tiles[0][0].occupied = true;
   assert.notEqual(cloned.tiles[0][0].occupied, mapData.tiles[0][0].occupied);
 
-  const { bootstrap, cameraCalls, progressCalls } = createPlacementSceneBootstrapFixture();
+  const { bootstrap, cameraCalls } = createPlacementSceneBootstrapFixture();
   const core = bootstrap.createCoreSystems();
   assert.ok(core.placementSystem);
   assert.ok(core.mapGeometry);
@@ -2552,9 +2545,8 @@ function testPlacementSceneBootstrap() {
   assert.ok(core.objectRegistry);
 
   bootstrap.drawBackground(core.objectRegistry);
-  assert.equal(progressCalls.length, 1);
   assert.equal(core.objectRegistry.worldObjects[0].type, 'rectangle');
-  assert.equal(core.objectRegistry.uiObjects.length, 2);
+  assert.equal(core.objectRegistry.uiObjects.length, 1);
 
   const world = bootstrap.createWorldObjects(core);
   assert.equal(world.mapGraphics.type, 'graphics');

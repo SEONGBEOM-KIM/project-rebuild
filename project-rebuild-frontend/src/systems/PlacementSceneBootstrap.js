@@ -1,4 +1,3 @@
-import ProgressStepper from '../ui/ProgressStepper.js';
 import { mapData } from '../data/mapData.js';
 import PlacementSystem from './PlacementSystem.js';
 import PlacementViewManager from './PlacementViewManager.js';
@@ -12,13 +11,11 @@ export default class PlacementSceneBootstrap {
     scene,
     sourceMapData = mapData,
     viewManager = PlacementViewManager,
-    progressStepper = ProgressStepper,
     cameraControllerClass = null,
   }) {
     this.scene = scene;
     this.sourceMapData = sourceMapData;
     this.viewManager = viewManager;
-    this.progressStepper = progressStepper;
     this.cameraControllerClass = cameraControllerClass;
   }
 
@@ -50,10 +47,6 @@ export default class PlacementSceneBootstrap {
     const { width, height } = this.scene.scale;
     const layout = this.viewManager.getScreenLayout();
     objectRegistry.registerWorldObject(this.scene.add.rectangle(width / 2, height / 2, width, height, layout.background.color).setScrollFactor(0).setDepth(-10));
-    const progressStepper = this.progressStepper.render(this.scene, layout.progressStep);
-    if (progressStepper) {
-      objectRegistry.registerUiObject(progressStepper);
-    }
     objectRegistry.registerUiObject(this.scene.add.text(layout.topHint.x, layout.topHint.y, layout.topHint.text, layout.topHint).setScrollFactor(0).setDepth(100));
   }
 

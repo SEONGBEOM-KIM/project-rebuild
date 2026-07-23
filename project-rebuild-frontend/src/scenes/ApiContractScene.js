@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
-import ProgressStepper from '../ui/ProgressStepper.js';
 
 import { formatContractRequest, formatContractResponse } from '../data/apiContract.js';
 import ApiContractViewManager from '../systems/ApiContractViewManager.js';
@@ -18,7 +17,6 @@ export default class ApiContractScene extends Phaser.Scene {
     this.selectedExampleKey = 'ep2';
     const screenLayout = ApiContractViewManager.getScreenLayout(width);
     createScreenBackground(this, screenLayout.backgroundColor);
-    ProgressStepper.render(this, screenLayout.progressStep);
 
     createLayoutText(this, screenLayout.title, { origin: 0.5 });
     createLayoutText(this, screenLayout.subtitle, { origin: 0.5 });
