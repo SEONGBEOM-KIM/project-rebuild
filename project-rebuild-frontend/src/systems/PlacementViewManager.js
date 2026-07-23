@@ -130,7 +130,7 @@ export const BUILDING_CARD_LAYOUT = {
 
 export const PLACEMENT_MAP_VISUALS = {
   tile: { alpha: 0.88, strokeWidth: 1.5 },
-  placedBuilding: { alpha: 0.78, strokeColor: 0xffffff, strokeWidth: 2, depthBase: 10 },
+  placedBuilding: { alpha: 0.42, strokeColor: 0xffffff, strokeAlpha: 0.55, strokeWidth: 2, depthBase: 10 },
   buildingLabel: {
     width: 128,
     height: 34,
@@ -306,6 +306,7 @@ export default class PlacementViewManager {
       fillColor: building.color,
       alpha: PLACEMENT_MAP_VISUALS.placedBuilding.alpha,
       strokeColor: PLACEMENT_MAP_VISUALS.placedBuilding.strokeColor,
+      strokeAlpha: PLACEMENT_MAP_VISUALS.placedBuilding.strokeAlpha,
       strokeWidth: PLACEMENT_MAP_VISUALS.placedBuilding.strokeWidth,
       depth: PLACEMENT_MAP_VISUALS.placedBuilding.depthBase + tileX + tileY,
     };
@@ -327,13 +328,13 @@ export default class PlacementViewManager {
     }
 
     return {
-    textureKey: asset.textureKey,
-    frame: undefined,
-      scale: 0.16,
-    offsetY: -54,
+      textureKey: asset.textureKey,
+      frame: undefined,
+      scale: 0.2,
+      offsetY: -70,
       originY: 0.86,
       alpha: inherited ? 0.58 : 1,
-    depth: 60 + tileX + tileY,
+      depth: 60 + tileX + tileY,
     };
   }
 

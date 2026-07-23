@@ -2509,6 +2509,7 @@ function createPlacementWorldRendererFixture() {
       text: (...args) => createWorldDisplayObjectSpy('text', args),
       container: (...args) => createWorldDisplayObjectSpy('container', args),
       circle: (...args) => createWorldDisplayObjectSpy('circle', args),
+      ellipse: (...args) => createWorldDisplayObjectSpy('ellipse', args),
       rectangle: (...args) => createWorldDisplayObjectSpy('rectangle', args),
     },
     tweens: {
@@ -2548,6 +2549,7 @@ function testPlacementWorldRenderer() {
 
   const placed = fixture.renderer.drawPlacedBuilding(youthCenter, 2, 7);
   assert.equal(placed.graphics.type, 'graphics');
+  assert.equal(placed.foundation.type, 'ellipse');
   assert.equal(placed.label.type, 'text');
   assert.equal(placed.label.args[2], '청년센터');
   const inherited = fixture.renderer.drawPlacedBuilding(youthCenter, 2, 7, { inherited: true });
@@ -2997,8 +2999,8 @@ function testPlacementViewManager() {
   assert.deepEqual(PlacementViewManager.getBuildingArtVisual(buildings.find((building) => building.id === 'bus_station'), 2, 3), {
     textureKey: 'ep1-building-bus-station',
     frame: undefined,
-    scale: 0.16,
-    offsetY: -54,
+    scale: 0.2,
+    offsetY: -70,
     originY: 0.86,
     alpha: 1,
     depth: 65,
@@ -3118,8 +3120,9 @@ function testPlacementViewManager() {
   });
   assert.deepEqual(PlacementViewManager.getPlacedBuildingVisual(buildings.find((building) => building.id === 'small_park'), 6, 1), {
     fillColor: buildings.find((building) => building.id === 'small_park').color,
-    alpha: 0.78,
+    alpha: 0.42,
     strokeColor: 0xffffff,
+    strokeAlpha: 0.55,
     strokeWidth: 2,
     depth: 17,
   });
