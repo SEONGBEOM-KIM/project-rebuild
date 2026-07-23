@@ -1385,6 +1385,16 @@ function testEpisodeContent() {
   assert.equal(getEpisodeTransition(EPISODE_IDS.SustainabilityEvaluation).nextScene, SCENE_KEYS.SustainabilityEvaluation);
   assert.equal(EpisodeActivityFlowManager.formatActivityRows(EPISODE_IDS.EconomyGrowth).length, 3);
   assert.match(EpisodeActivityFlowManager.formatActivityRows(EPISODE_IDS.SideEffects)[1], /문제 비교/);
+  assert.match(EpisodeActivityFlowManager.formatCarryoverSummary({
+    completedEpisodeIds: [EPISODE_IDS.PopulationRecovery],
+    episodeRuns: {
+      [EPISODE_IDS.PopulationRecovery]: { metadata: { selectedStrategyId: 'jobs_services' } },
+    },
+    placements: [],
+    gameState: GameState.createInitialState(),
+  }), /이전 전략: 일자리와 생활 기반/);
+  const ep2BriefingSource = readProjectFile('src', 'scenes', 'Ep2BriefingScene.js');
+  assert.match(ep2BriefingSource, /setEpisodeRunMetadata/, 'EP2 strategy should be retained in world state metadata');
   const activityRegistry = createMemoryRegistry();
   activityRegistry.set(REGISTRY_KEYS.learningProgress, {
     ...LearningProgress.createInitialProgress(),

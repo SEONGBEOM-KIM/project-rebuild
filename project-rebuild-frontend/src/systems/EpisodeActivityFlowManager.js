@@ -1,5 +1,6 @@
 import { getEpisodeActivityFlow } from '../data/episodeActivityFlows.js';
 import { EPISODE_IDS } from '../data/episodes.js';
+import { getEpisodeContent } from '../data/episodeContent.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
 import LearningProgress from './LearningProgress.js';
 import StateHudManager from './StateHudManager.js';
@@ -94,12 +95,19 @@ export default class EpisodeActivityFlowManager {
     const facilityText = facilityNames.length
       ? `이전 시설 ${placements.length}개: ${facilityNames.slice(0, 3).join(' · ')}`
       : '이전 시설 기록 없음';
+    const lastCompletedEpisodeId = completedEpisodeIds[completedEpisodeIds.length - 1];
+    const lastRun = lastCompletedEpisodeId ? worldState.episodeRuns?.[lastCompletedEpisodeId] : null;
+    const selectedStrategyId = lastRun?.metadata?.selectedStrategyId;
+    const selectedStrategy = getEpisodeContent(lastCompletedEpisodeId)?.missionBriefing?.strategies?.find(
+      (strategy) => strategy.id === selectedStrategyId,
+    );
+    const choiceText = selectedStrategy ? `이전 전략: ${selectedStrategy.title}` : null;
     const stateText = worldState.gameState
       ? StateHudManager.formatCompactText(worldState.gameState, {
         stateKeys: ['population', 'economy', 'environment', 'satisfaction'],
       })
       : '지역 상태 기록 없음';
 
-    return `이전 선택 이어받기 · ${facilityText}  |  ${stateText}`;
+    return `이전 선택 이어받기 · ${[choiceText, facilityText].filter(Boolean).join(' · ')}  |  ${stateText}`;
   }
 }

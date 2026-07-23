@@ -5,8 +5,10 @@ import { policies } from '../data/policies.js';
 import { getPlacementConfigIdForStrategy } from '../data/episodePlacementConfigs.js';
 import Ep2BriefingViewManager from '../systems/Ep2BriefingViewManager.js';
 import Ep2BriefingRenderer from '../systems/Ep2BriefingRenderer.js';
+import WorldStateManager from '../systems/WorldStateManager.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 import { REGISTRY_KEYS } from '../data/registryKeys.js';
+import { EPISODE_IDS } from '../data/episodes.js';
 
 export default class Ep2BriefingScene extends Phaser.Scene {
   constructor() {
@@ -85,5 +87,14 @@ export default class Ep2BriefingScene extends Phaser.Scene {
     if (policy) {
       this.registry.set(REGISTRY_KEYS.selectedPolicy, policy);
     }
+    const worldState = WorldStateManager.get(this.registry);
+    this.registry.set(
+      REGISTRY_KEYS.worldState,
+      WorldStateManager.setEpisodeRunMetadata(worldState, EPISODE_IDS.PopulationRecovery, {
+        selectedStrategyId: strategy?.id ?? null,
+        selectedPolicyId: policy?.id ?? null,
+        placementConfigId: getPlacementConfigIdForStrategy(strategy),
+      }),
+    );
   }
 }
