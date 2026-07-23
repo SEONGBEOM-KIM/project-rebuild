@@ -111,6 +111,30 @@ export const EP1_CAUSE_QUESTIONS = [
       },
     ],
   },
+  {
+    id: 'ep1_q4_regional_balance',
+    prompt: '푸른군의 인구 감소를 지역 불균형 문제와 연결해 설명한 내용으로 알맞은 것은 무엇일까요?',
+    choices: [
+      {
+        id: 'regional_imbalance_connection',
+        text: '일자리와 생활 조건이 더 좋은 곳으로 인구가 이동하면서 지역 간 인구와 기회의 차이가 커질 수 있다.',
+        correct: true,
+        feedback: '맞습니다. 인구 이동은 지역마다 일자리와 생활 조건의 차이를 키워 지역 불균형으로 이어질 수 있습니다.',
+      },
+      {
+        id: 'population_neutral',
+        text: '인구가 이동해도 지역마다 일자리와 생활 조건의 차이는 생기지 않는다.',
+        correct: false,
+        feedback: '인구 이동이 계속되면 사람과 기회가 한쪽에 모여 지역 간 차이가 커질 수 있습니다.',
+      },
+      {
+        id: 'distance_only',
+        text: '지역 불균형은 지역 사이의 거리만으로 결정된다.',
+        correct: false,
+        feedback: '지역 불균형은 거리뿐 아니라 일자리, 교육, 의료, 교통 같은 생활 조건의 차이와도 연결됩니다.',
+      },
+    ],
+  },
 ];
 
 export const EP1_EXPLORATION_CLUES = [

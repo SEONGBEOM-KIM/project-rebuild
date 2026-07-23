@@ -26,7 +26,7 @@ export const EPISODES = Object.freeze({
     shortTitle: 'EP1. 지역 위기 탐색',
     regionName: '푸른군',
     theme: '인구 감소와 생활 기반 약화',
-    requiredExploredCount: 3,
+    requiredExploredCount: 5,
     intro: [
       '푸른군은 인구가 줄고 상권의 활기가 사라지고 있습니다.',
       '여러분은 지역 회복 프로젝트 담당자가 되어',

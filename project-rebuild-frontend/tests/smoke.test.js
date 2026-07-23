@@ -453,7 +453,7 @@ function testEpisodeMetadata() {
   assert.equal(CURRENT_EPISODE.id, 1);
   assert.equal(CURRENT_EPISODE.code, EPISODE_IDS.Crisis);
   assert.equal(CURRENT_EPISODE.regionName, '푸른군');
-  assert.equal(CURRENT_EPISODE.requiredExploredCount, 3);
+  assert.equal(CURRENT_EPISODE.requiredExploredCount, 5);
   assert.ok(CURRENT_EPISODE.intro.length >= 3, 'episode intro should provide story lines');
   assert.equal(CURRENT_PLACEMENT_EPISODE.id, 2);
   assert.equal(CURRENT_PLACEMENT_EPISODE.code, EPISODE_IDS.PopulationRecovery);
@@ -580,9 +580,9 @@ function testCauseQuizManager() {
   assert.match(CauseQuizManager.formatFeedback(wrongChoice), /다시 생각해 볼 수 있습니다/);
   assert.equal(CauseQuizManager.getFeedbackColor(correctChoice), '#166534');
   assert.equal(CauseQuizManager.getFeedbackColor(wrongChoice), '#991b1b');
-  assert.equal(EP1_CAUSE_QUESTIONS.length, 3);
+  assert.equal(EP1_CAUSE_QUESTIONS.length, 4);
   assert.equal(EP1_CAUSE_QUESTIONS[0].id, EP1_CAUSE_QUESTION.id);
-  assert.equal(new Set(EP1_CAUSE_QUESTIONS.map((question) => question.id)).size, 3);
+  assert.equal(new Set(EP1_CAUSE_QUESTIONS.map((question) => question.id)).size, 4);
 }
 
 function testSelectionViewManager() {
