@@ -1,6 +1,7 @@
 import { createLayoutText } from '../ui/LayoutText.js';
 import { createPanelBackground } from '../ui/PanelRenderer.js';
 import SCENE_KEYS from '../data/sceneKeys.js';
+import { UI_THEME } from '../ui/UiTheme.js';
 
 export default class StoryRenderer {
   static renderDialogue(scene, dialogue, layout, { isFinal = false, onNext }) {
@@ -46,8 +47,32 @@ export default class StoryRenderer {
 
     buttonBg.on('pointerover', () => buttonBg.setFillStyle(button.hoverFillColor));
     buttonBg.on('pointerout', () => buttonBg.setFillStyle(button.fillColor));
-    buttonBg.on('pointerdown', onStart);
-    buttonText.on('pointerdown', onStart);
+    buttonBg.on('pointerover', () => {
+      buttonBg.setScale(UI_THEME.button.hoverScale);
+      buttonText.setScale(UI_THEME.button.hoverScale);
+    });
+    buttonBg.on('pointerout', () => {
+      buttonBg.setScale(1);
+      buttonText.setScale(1);
+    });
+    buttonBg.on('pointerdown', () => {
+      buttonBg.setScale(UI_THEME.button.activeScale);
+      buttonText.setScale(UI_THEME.button.activeScale);
+      onStart();
+    });
+    buttonText.on('pointerover', () => {
+      buttonBg.setScale(UI_THEME.button.hoverScale);
+      buttonText.setScale(UI_THEME.button.hoverScale);
+    });
+    buttonText.on('pointerout', () => {
+      buttonBg.setScale(1);
+      buttonText.setScale(1);
+    });
+    buttonText.on('pointerdown', () => {
+      buttonBg.setScale(UI_THEME.button.activeScale);
+      buttonText.setScale(UI_THEME.button.activeScale);
+      onStart();
+    });
 
     return { buttonBg, buttonText };
   }

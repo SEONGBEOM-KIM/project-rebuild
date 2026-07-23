@@ -833,6 +833,11 @@ function createRendererSceneSpy() {
       this.origin = value;
       return this;
     },
+    setScale(value) {
+      calls.push(['scale', type, value]);
+      this.scale = value;
+      return this;
+    },
     setVisible(value) {
       calls.push(['visible', type, value]);
       this.visible = value;
@@ -1269,9 +1274,17 @@ function testStoryRenderer() {
   assert.equal(rendered.buttonText.type, 'text');
   assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3] === '지역 탐색 시작'));
   assert.ok(fixture.calls.some((call) => call[0] === 'interactive' && call[1] === 'rectangle'));
+  rendered.buttonBg.events.get('pointerover')();
+  assert.equal(rendered.buttonBg.scale, 1.03);
+  assert.equal(rendered.buttonText.scale, 1.03);
   rendered.buttonBg.events.get('pointerdown')();
+  assert.equal(rendered.buttonBg.scale, 0.98);
+  assert.equal(rendered.buttonText.scale, 0.98);
   rendered.buttonText.events.get('pointerdown')();
   assert.deepEqual(selectedTargets, ['ExplorationScene', 'ExplorationScene']);
+  rendered.buttonText.events.get('pointerout')();
+  assert.equal(rendered.buttonBg.scale, 1);
+  assert.equal(rendered.buttonText.scale, 1);
 
   const dialogueFixture = createRendererSceneSpy();
   const dialogue = StoryRenderer.renderDialogue(
