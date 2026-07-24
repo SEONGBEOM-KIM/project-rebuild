@@ -43,7 +43,7 @@ export default class ReflectionScene extends Phaser.Scene {
 
     createLayoutText(this, layout.subtitle, { origin: 0.5 });
     createLayoutText(this, layout.contextSummary, {
-      text: ReflectionViewManager.formatContextSummary(placementConfig, evaluationProfile),
+      text: ReflectionViewManager.formatContextSummary(placementConfig, evaluationProfile, selectedStrategy),
       style: ReflectionViewManager.getContextSummaryTextStyle(),
       origin: 0.5,
     });

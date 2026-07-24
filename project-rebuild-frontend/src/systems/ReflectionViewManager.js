@@ -66,7 +66,7 @@ const REFLECTION_CHOICE_TEXT_STYLES = {
   description: { fontSize: '23px', color: '#dbeafe', lineSpacing: 8 },
 };
 
-const REFLECTION_ISSUE_PRIORITY_ORDER = ['budget', 'environment', 'traffic', 'satisfaction'];
+const REFLECTION_ISSUE_PRIORITY_ORDER = ['budget', 'environment', 'traffic', 'inequality', 'satisfaction'];
 
 const REFLECTION_BUTTON_STYLE = {
   fontSize: '32px',
@@ -90,12 +90,12 @@ export default class ReflectionViewManager {
     };
   }
 
-  static formatContextSummary(placementConfig, evaluationProfile) {
+  static formatContextSummary(placementConfig, evaluationProfile, selectedStrategy = null) {
     return [
       placementConfig?.title ?? '배치 실험',
       `필요 배치: ${placementConfig?.requiredPlacements ?? '-'}개`,
-      `평가 기준: ${evaluationProfile?.id ?? '기본'}`,
-    ].join('  |  ');
+      selectedStrategy?.title ? `전략: ${selectedStrategy.title}` : null,
+    ].filter(Boolean).join('  |  ');
   }
 
   static getContextSummaryTextStyle() {
@@ -191,6 +191,9 @@ export default class ReflectionViewManager {
     }
 
     return [...issues].sort((a, b) => {
+      if (Boolean(a.primary) !== Boolean(b.primary)) {
+        return a.primary ? -1 : 1;
+      }
       const rankA = REFLECTION_ISSUE_PRIORITY_ORDER.indexOf(a.id);
       const rankB = REFLECTION_ISSUE_PRIORITY_ORDER.indexOf(b.id);
       return (rankA === -1 ? REFLECTION_ISSUE_PRIORITY_ORDER.length : rankA) - (rankB === -1 ? REFLECTION_ISSUE_PRIORITY_ORDER.length : rankB);
@@ -211,8 +214,8 @@ export default class ReflectionViewManager {
     const contextText = ReflectionViewManager.formatRunContext(selectedPolicy, selectedStrategy);
 
     return [
-      `${contextText}  |  배치: ${placedBuildings.length}개  |  우선 보완: ${issueText}`,
-      `최종 상태: 인구 ${gameState.population}, 경제 ${gameState.economy}, 만족도 ${gameState.satisfaction}, 예산 ${gameState.budget}`,
+      `${contextText}  |  배치: ${placedBuildings.length}개  |  가장 두드러진 문제: ${issueText}`,
+      `최종 상태: 인구 ${gameState.population}, 경제 ${gameState.economy}, 만족도 ${gameState.satisfaction}, 예산 ${gameState.budget}  |  함께 관리: 교통·환경·소득 격차`,
     ].join('\n');
   }
 
@@ -221,12 +224,12 @@ export default class ReflectionViewManager {
     const icon = selectedStrategy?.icon ?? '📌';
     const focus = selectedStrategy?.stateFocus ?? selectedPolicy?.focus?.join(' · ') ?? '상태 변화 확인';
     const priorityIssue = ReflectionViewManager.getPriorityIssue(issues);
-    const issueText = priorityIssue ? `함께 확인할 점은 ${priorityIssue.title}입니다.` : '현재 큰 부작용 신호는 없습니다.';
+    const issueText = priorityIssue ? `가장 크게 드러난 문제는 ${priorityIssue.title}입니다.` : '현재 큰 부작용 신호는 없습니다.';
     return {
       id: selectedStrategy?.id ?? selectedPolicy?.id ?? 'default',
       icon,
       title: `내가 선택한 전략: ${title}`,
-      body: `이 전략은 ${focus}에 가장 큰 영향을 주도록 설계되었습니다. 이번 결과에서 인구 ${gameState.population}, 경제 ${gameState.economy}, 만족도 ${gameState.satisfaction}로 변화했습니다. ${issueText}`,
+      body: `이 전략은 ${focus}에 가장 큰 영향을 주도록 설계되었습니다. 이번 결과에서 인구 ${gameState.population}, 경제 ${gameState.economy}, 만족도 ${gameState.satisfaction}로 변화했습니다. ${issueText} 교통·환경·소득 격차는 모두 함께 관리해야 합니다.`,
     };
   }
 

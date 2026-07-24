@@ -1080,8 +1080,8 @@ function testReflectionViewManager() {
   assert.equal(ReflectionViewManager.getScreenLayout(1920).summaryTitle.text, '이번 결과 요약');
   assert.deepEqual(ReflectionViewManager.getScreenLayout(1920).feedback, { x: 960, y: 840, wordWrapWidth: 1150 });
   assert.equal(
-    ReflectionViewManager.formatContextSummary(getPlacementConfig(ENVIRONMENT_PLACEMENT_CONFIG_ID), getEvaluationProfile(ENVIRONMENT_EVALUATION_PROFILE_ID)),
-    '푸른군 환경 균형 배치 실험  |  필요 배치: 2개  |  평가 기준: ep2_environment_focus',
+    ReflectionViewManager.formatContextSummary(getPlacementConfig(ENVIRONMENT_PLACEMENT_CONFIG_ID), getEvaluationProfile(ENVIRONMENT_EVALUATION_PROFILE_ID), EP2_MISSION_BRIEFING.strategies[0]),
+    '푸른군 환경 균형 배치 실험  |  필요 배치: 2개  |  전략: 일자리와 생활 기반',
   );
   assert.deepEqual(ReflectionViewManager.getContextSummaryTextStyle(), {
     fontSize: '21px',
@@ -1122,8 +1122,16 @@ function testReflectionViewManager() {
     placedBuildings: [createPlacementRecord('youth_center')],
   });
   assert.match(runSummary, /선택 방향: 청년 생활 지원/);
-  assert.match(runSummary, /우선 보완: 예산 부족/);
+  assert.match(runSummary, /가장 두드러진 문제: 예산 부족/);
+  assert.match(runSummary, /함께 관리: 교통·환경·소득 격차/);
   assert.match(runSummary, /최종 상태: 인구 1240/);
+  assert.equal(
+    ReflectionViewManager.getPriorityIssue([
+      { id: 'environment', title: '환경 오염' },
+      { id: 'traffic', title: '교통 혼잡', primary: true },
+    ]).id,
+    'traffic',
+  );
   assert.equal(ReflectionViewManager.formatRunContext(policies[0], null), '선택 방향: 청년 생활 지원');
   assert.match(ReflectionViewManager.formatRunContext(policies[0], EP2_MISSION_BRIEFING.strategies[0]), /배치 전략: 일자리와 생활 기반/);
   assert.match(ReflectionViewManager.formatRunContext(policies[0], EP2_MISSION_BRIEFING.strategies[0]), /목표: 인구·경제 동시 개선/);
@@ -1135,6 +1143,7 @@ function testReflectionViewManager() {
   });
   assert.match(selectedInsight.title, /내가 선택한 전략: 일자리와 생활 기반/);
   assert.match(selectedInsight.body, /큰 부작용 신호는 없습니다/);
+  assert.match(selectedInsight.body, /교통·환경·소득 격차는 모두 함께 관리해야 합니다/);
   assert.equal(ReflectionViewManager.buildAlternativeInsights(EP2_MISSION_BRIEFING.strategies, EP2_MISSION_BRIEFING.strategies[0]).length, 2);
   assert.match(ReflectionViewManager.buildAlternativeInsights(EP2_MISSION_BRIEFING.strategies, EP2_MISSION_BRIEFING.strategies[0])[0].title, /다른 선택:/);
   assert.equal(ReflectionViewManager.buildStrategyReflectionRecord(selectedInsight).title, '일자리와 생활 기반');
@@ -3115,7 +3124,7 @@ function testPlacementViewManager() {
   assert.match(reflectionSceneSource, /EpisodeFlowManager\.resolveSelectedStrategy/, 'reflection scene should recover the active episode strategy through episode flow manager');
   assert.match(reflectionSceneSource, /PlacementContextManager/, 'reflection scene should resolve active placement context');
   assert.match(reflectionSceneSource, /IndustrializationRiskManager\.detect\(\{ gameState, placedBuildings, placementEpisodeId, evaluationProfile \}\)/, 'reflection scene should carry industrialization risks into reflection');
-  assert.match(reflectionSceneSource, /formatContextSummary\(placementConfig, evaluationProfile\)/, 'reflection scene should display active placement context summary');
+  assert.match(reflectionSceneSource, /formatContextSummary\(placementConfig, evaluationProfile, selectedStrategy\)/, 'reflection scene should display active placement context summary');
   const apiContractSceneSource = readProjectFile('src', 'scenes', 'ApiContractScene.js');
   assert.match(apiContractSceneSource, /getExampleSelectorLayout/, 'api contract scene should render example selector controls');
   assert.match(apiContractSceneSource, /selectExample\(option\.exampleKey\)/, 'api contract scene should bind selector buttons to example keys');
