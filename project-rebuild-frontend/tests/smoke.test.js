@@ -1222,11 +1222,12 @@ function testTitleRenderer() {
 function testTitleViewManager() {
   assert.deepEqual(TitleViewManager.getScreenText(), {
     backgroundColor: 0x10253f,
-    eyebrow: { x: 92, y: 66, text: '푸른군  ·  지역 회복 시뮬레이션', fontSize: '24px', color: '#d1fae5', fontStyle: 'bold' },
-    title: { x: 150, y: 735, text: '프로젝트 리빌드', fontSize: '92px', color: '#f8fafc', fontStyle: 'bold' },
-    subtitle: { x: 156, y: 805, text: '균형 있게 성장하는 지역을 위하여', fontSize: '32px', color: '#dbeafe' },
+    eyebrow: { y: 78, text: '푸른군  ·  지역 회복 시뮬레이션', fontSize: '22px', color: '#d1fae5', fontStyle: 'bold' },
+    title: { y: 155, text: '프로젝트 리빌드', fontSize: '92px', color: '#f8fafc', fontStyle: 'bold' },
+    subtitle: { y: 245, text: '균형 있게 성장하는 지역을 향하여', fontSize: '32px', color: '#dbeafe' },
     startPrompt: { y: 850, text: '새로운 지역의 이야기를 시작하세요', fontSize: '24px', color: '#d1fae5' },
   });
+  assert.equal(TitleViewManager.getTitleBanner().width, 900);
   assert.deepEqual(TitleViewManager.getLayout(false), {
     startButtonY: 930,
     loadButtonY: null,
