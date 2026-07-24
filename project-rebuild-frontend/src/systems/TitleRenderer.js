@@ -2,18 +2,24 @@ import TitleViewManager from './TitleViewManager.js';
 import { createScreenBackground } from '../ui/ScreenBackground.js';
 import { createLayoutText } from '../ui/LayoutText.js';
 import { createTextButton } from '../ui/TextButton.js';
+import { TITLE_VISUAL_ASSETS } from '../data/visualAssets.js';
 
 export default class TitleRenderer {
   static renderScreen(scene, width, saved, continueButtonState = null) {
     const hasSave = Boolean(saved);
     const screenText = TitleViewManager.getScreenText();
     createScreenBackground(scene, screenText.backgroundColor);
-    createLayoutText(scene, screenText.title, { x: width / 2, origin: 0.5 });
-    createLayoutText(scene, screenText.subtitle, { x: width / 2, origin: 0.5 });
+    TitleRenderer.renderBackdrop(scene, width, scene.scale.height);
+    createLayoutText(scene, screenText.eyebrow);
+    createLayoutText(scene, screenText.title);
+    createLayoutText(scene, screenText.subtitle);
+    createLayoutText(scene, { x: width / 2, ...screenText.startPrompt }, { origin: 0.5 });
+    const startSurface = scene.add.rectangle(width / 2, scene.scale.height / 2, width, scene.scale.height, 0x000000, 0)
+      .setInteractive();
 
     const layout = TitleViewManager.getLayout(hasSave);
     const controls = TitleRenderer.renderControls(scene, width, layout, hasSave, continueButtonState);
-    return { layout, ...controls };
+    return { layout, startSurface, ...controls };
   }
 
   static renderControls(scene, width, layout, hasSave, continueButtonState = null) {
@@ -27,11 +33,11 @@ export default class TitleRenderer {
     };
 
     return {
-      startButton: TitleRenderer.renderTitleButton(scene, width / 2, layout.startButtonY, startButtonConfig, TitleViewManager.getPrimaryButtonStyle()),
-      importButton: TitleRenderer.renderTitleButton(scene, width / 2, layout.importButtonY, importButtonConfig, TitleViewManager.getSecondaryButtonStyle()),
-      storageButton: TitleRenderer.renderTitleButton(scene, width / 2, layout.storageButtonY, storageButtonConfig, TitleViewManager.getStorageButtonStyle()),
+      startButton: TitleRenderer.renderTitleButton(scene, hasSave ? width / 2 - 170 : width / 2, layout.startButtonY, startButtonConfig, TitleViewManager.getPrimaryButtonStyle()),
+      importButton: TitleRenderer.renderTitleButton(scene, width / 2 - 125, layout.importButtonY, importButtonConfig, TitleViewManager.getSecondaryButtonStyle()),
+      storageButton: TitleRenderer.renderTitleButton(scene, width / 2 + 125, layout.storageButtonY, storageButtonConfig, TitleViewManager.getStorageButtonStyle()),
       loadButton: hasSave
-        ? TitleRenderer.renderTitleButton(scene, width / 2, layout.loadButtonY, loadButtonConfig, TitleViewManager.getLoadButtonStyle())
+        ? TitleRenderer.renderTitleButton(scene, width / 2 + 170, layout.loadButtonY, loadButtonConfig, TitleViewManager.getLoadButtonStyle())
         : null,
       importHintText: TitleRenderer.renderImportHint(scene, width / 2, layout.importHint),
       importStatusText: TitleRenderer.renderImportStatus(scene, width / 2, layout.importStatusY),
@@ -40,6 +46,15 @@ export default class TitleRenderer {
       storageButtonConfig,
       loadButtonConfig,
     };
+  }
+
+  static renderBackdrop(scene, width, height) {
+    const background = scene.add.image(width / 2, height / 2, TITLE_VISUAL_ASSETS.background.textureKey);
+    background.setDisplaySize?.(width, height);
+    background.setDepth?.(-10);
+    const titleShade = scene.add.rectangle(width / 2, height * 0.82, width, height * 0.36, 0x07111f, 0.26);
+    titleShade.setDepth?.(-9);
+    return { background, titleShade };
   }
 
   static renderTitleButton(scene, x, y, config, style) {

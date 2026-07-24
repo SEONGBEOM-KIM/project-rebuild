@@ -18,6 +18,11 @@ export default class TitleScene extends Phaser.Scene {
     const controls = TitleRenderer.renderScreen(this, width, saved, continueButtonState);
     this.importStatusText = controls.importStatusText;
 
+    controls.startSurface.on('pointerdown', () => {
+      BootFlowManager.resetRegistry(this.registry);
+      this.scene.start(controls.startButtonConfig.targetScene);
+    });
+
     controls.startButton.on('pointerdown', () => {
       BootFlowManager.resetRegistry(this.registry);
       this.scene.start(controls.startButtonConfig.targetScene);

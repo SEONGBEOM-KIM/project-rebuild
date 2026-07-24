@@ -2,16 +2,18 @@ import SCENE_KEYS from '../data/sceneKeys.js';
 
 export const TITLE_LAYOUT = {
   backgroundColor: 0x10253f,
-  title: { y: 280, text: '프로젝트 리빌드', fontSize: '92px', color: '#f7fbff', fontStyle: 'bold' },
-  subtitle: { y: 380, text: '균형 있게 성장하는 지역을 위하여', fontSize: '36px', color: '#b9d7ff' },
-  importHint: { savedY: 700, emptyY: 700, text: '앱 저장 JSON과 API 미리보기 JSON을 가져올 수 있습니다.', fontSize: '20px', color: '#bfdbfe' },
+  eyebrow: { x: 92, y: 66, text: '푸른군  ·  지역 회복 시뮬레이션', fontSize: '24px', color: '#d1fae5', fontStyle: 'bold' },
+  title: { x: 150, y: 735, text: '프로젝트 리빌드', fontSize: '92px', color: '#f8fafc', fontStyle: 'bold' },
+  subtitle: { x: 156, y: 805, text: '균형 있게 성장하는 지역을 위하여', fontSize: '32px', color: '#dbeafe' },
+  startPrompt: { y: 850, text: '새로운 지역의 이야기를 시작하세요', fontSize: '24px', color: '#d1fae5' },
+  importHint: { savedY: 1015, emptyY: 1015, text: '', fontSize: '18px', color: '#bfdbfe' },
   buttons: {
-    start: { y: 620, label: '시작하기', targetScene: SCENE_KEYS.Auth },
-    load: { savedY: 745, label: '저장 데이터 확인', targetScene: SCENE_KEYS.SavedData },
-    import: { savedY: 835, emptyY: 745, label: 'JSON 가져오기' },
-    storage: { savedY: 910, emptyY: 820, label: '브라우저 저장 관리', targetScene: SCENE_KEYS.StorageManager },
+    start: { y: 930, label: '새 게임 시작', targetScene: SCENE_KEYS.Auth },
+    load: { savedY: 930, label: '이어하기', targetScene: SCENE_KEYS.SavedData },
+    import: { savedY: 1015, emptyY: 1015, label: 'JSON 가져오기' },
+    storage: { savedY: 1015, emptyY: 1015, label: '저장 관리', targetScene: SCENE_KEYS.StorageManager },
   },
-  importStatus: { savedY: 975, emptyY: 885 },
+  importStatus: { savedY: 1055, emptyY: 1055 },
   importFile: { type: 'file', accept: 'application/json,.json', successTargetScene: SCENE_KEYS.SavedData },
   importStatusStyle: { fontSize: '22px', color: '#fecaca', align: 'center' },
 };
@@ -20,8 +22,10 @@ export default class TitleViewManager {
   static getScreenText() {
     return {
       backgroundColor: TITLE_LAYOUT.backgroundColor,
+      eyebrow: TITLE_LAYOUT.eyebrow,
       title: TITLE_LAYOUT.title,
       subtitle: TITLE_LAYOUT.subtitle,
+      startPrompt: TITLE_LAYOUT.startPrompt,
     };
   }
 

@@ -48,6 +48,13 @@ export const EP1_VISUAL_ASSETS = Object.freeze({
   }),
 });
 
+export const TITLE_VISUAL_ASSETS = Object.freeze({
+  background: Object.freeze({
+    textureKey: 'title-main-background',
+    source: '/assets/title/main-background.png',
+  }),
+});
+
 export function getEp1VisualAsset(buildingId) {
   return EP1_VISUAL_ASSETS.buildings[buildingId] ?? null;
 }

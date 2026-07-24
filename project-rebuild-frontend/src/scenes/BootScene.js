@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import BootFlowManager from '../systems/BootFlowManager.js';
-import { EP1_VISUAL_ASSETS } from '../data/visualAssets.js';
+import { EP1_VISUAL_ASSETS, TITLE_VISUAL_ASSETS } from '../data/visualAssets.js';
 
 export default class BootScene extends Phaser.Scene {
   constructor() {
@@ -8,6 +8,7 @@ export default class BootScene extends Phaser.Scene {
   }
 
   preload() {
+    this.load.image(TITLE_VISUAL_ASSETS.background.textureKey, TITLE_VISUAL_ASSETS.background.source);
     Object.values(EP1_VISUAL_ASSETS.buildings).forEach((asset) => {
       this.load.image(asset.textureKey, asset.source);
     });

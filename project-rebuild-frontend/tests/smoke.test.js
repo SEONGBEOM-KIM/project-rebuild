@@ -120,7 +120,7 @@ import { getLayoutTextStyle } from '../src/ui/LayoutText.js';
 import { createPanelBackground, createPanelTitle, getPanelTitleStyle } from '../src/ui/PanelRenderer.js';
 import { createScreenBackground } from '../src/ui/ScreenBackground.js';
 import GlobalStateHudRenderer from '../src/ui/GlobalStateHudRenderer.js';
-import { EP1_VISUAL_ASSETS, getEp1ExplorationVisual, getEp1VisualAsset } from '../src/data/visualAssets.js';
+import { EP1_VISUAL_ASSETS, TITLE_VISUAL_ASSETS, getEp1ExplorationVisual, getEp1VisualAsset } from '../src/data/visualAssets.js';
 
 
 const PROJECT_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -437,6 +437,8 @@ function testBootFlowManager() {
 }
 
 function testVisualAssetCatalog() {
+  assert.equal(TITLE_VISUAL_ASSETS.background.textureKey, 'title-main-background');
+  assert.equal(TITLE_VISUAL_ASSETS.background.source, '/assets/title/main-background.png');
   assert.equal(EP1_VISUAL_ASSETS.atlas.key, 'ep1-buildings');
   assert.equal(EP1_VISUAL_ASSETS.atlas.image, '/assets/ep1/building-art-pack.png');
   assert.deepEqual(Object.keys(EP1_VISUAL_ASSETS.buildings), ['bus_station', 'youth_center', 'small_park']);
@@ -892,6 +894,10 @@ function createRendererSceneSpy() {
           calls.push(['circle', ...args]);
           return createObject('circle', args);
         },
+        image: (...args) => {
+          calls.push(['image', ...args]);
+          return createObject('image', args);
+        },
         text: (...args) => {
           calls.push(['text', ...args]);
           return createObject('text', args);
@@ -1192,16 +1198,17 @@ function testTitleRenderer() {
   assert.equal(emptyControls.importHintText.type, 'text');
   assert.equal(emptyControls.importStatusText.type, 'text');
   assert.ok(emptyFixture.calls.some((call) => call[0] === 'rectangle' && call[5] === TitleViewManager.getScreenText().backgroundColor));
+  assert.ok(emptyFixture.calls.some((call) => call[0] === 'image' && call[3] === 'title-main-background'));
+  assert.ok(emptyFixture.calls.some((call) => call[0] === 'text' && call[3] === '새로운 지역의 이야기를 시작하세요'));
   assert.ok(emptyFixture.calls.some((call) => call[0] === 'text' && call[3] === '프로젝트 리빌드'));
-  assert.ok(emptyFixture.calls.some((call) => call[0] === 'text' && call[3] === '시작하기'));
+  assert.ok(emptyFixture.calls.some((call) => call[0] === 'text' && call[3] === '새 게임 시작'));
   assert.ok(emptyFixture.calls.some((call) => call[0] === 'text' && call[3] === 'JSON 가져오기'));
-  assert.ok(emptyFixture.calls.some((call) => call[0] === 'text' && call[3].includes('API 미리보기 JSON')));
 
   const savedFixture = createRendererSceneSpy();
   savedFixture.scene.scale = { width: 1920, height: 1080 };
   const savedControls = TitleRenderer.renderScreen(savedFixture.scene, 1920, { data: {} });
   assert.equal(savedControls.loadButton.type, 'text');
-  assert.ok(savedFixture.calls.some((call) => call[0] === 'text' && call[3] === '저장 데이터 확인'));
+  assert.ok(savedFixture.calls.some((call) => call[0] === 'text' && call[3] === '이어하기'));
   assert.deepEqual(savedControls.layout, TitleViewManager.getLayout(true));
   const resumeFixture = createRendererSceneSpy();
   resumeFixture.scene.scale = { width: 1920, height: 1080 };
@@ -1215,43 +1222,45 @@ function testTitleRenderer() {
 function testTitleViewManager() {
   assert.deepEqual(TitleViewManager.getScreenText(), {
     backgroundColor: 0x10253f,
-    title: { y: 280, text: '프로젝트 리빌드', fontSize: '92px', color: '#f7fbff', fontStyle: 'bold' },
-    subtitle: { y: 380, text: '균형 있게 성장하는 지역을 위하여', fontSize: '36px', color: '#b9d7ff' },
+    eyebrow: { x: 92, y: 66, text: '푸른군  ·  지역 회복 시뮬레이션', fontSize: '24px', color: '#d1fae5', fontStyle: 'bold' },
+    title: { x: 150, y: 735, text: '프로젝트 리빌드', fontSize: '92px', color: '#f8fafc', fontStyle: 'bold' },
+    subtitle: { x: 156, y: 805, text: '균형 있게 성장하는 지역을 위하여', fontSize: '32px', color: '#dbeafe' },
+    startPrompt: { y: 850, text: '새로운 지역의 이야기를 시작하세요', fontSize: '24px', color: '#d1fae5' },
   });
   assert.deepEqual(TitleViewManager.getLayout(false), {
-    startButtonY: 620,
+    startButtonY: 930,
     loadButtonY: null,
-    importButtonY: 745,
-    storageButtonY: 820,
-    importStatusY: 885,
+    importButtonY: 1015,
+    storageButtonY: 1015,
+    importStatusY: 1055,
     importHint: {
-      savedY: 700,
-      emptyY: 700,
-      y: 700,
-      text: '앱 저장 JSON과 API 미리보기 JSON을 가져올 수 있습니다.',
-      fontSize: '20px',
+      savedY: 1015,
+      emptyY: 1015,
+      y: 1015,
+      text: '',
+      fontSize: '18px',
       color: '#bfdbfe',
     },
   });
   assert.deepEqual(TitleViewManager.getLayout(true), {
-    startButtonY: 620,
-    loadButtonY: 745,
-    importButtonY: 835,
-    storageButtonY: 910,
-    importStatusY: 975,
+    startButtonY: 930,
+    loadButtonY: 930,
+    importButtonY: 1015,
+    storageButtonY: 1015,
+    importStatusY: 1055,
     importHint: {
-      savedY: 700,
-      emptyY: 700,
-      y: 700,
-      text: '앱 저장 JSON과 API 미리보기 JSON을 가져올 수 있습니다.',
-      fontSize: '20px',
+      savedY: 1015,
+      emptyY: 1015,
+      y: 1015,
+      text: '',
+      fontSize: '18px',
       color: '#bfdbfe',
     },
   });
-  assert.deepEqual(TitleViewManager.getStartButton(), { y: 620, label: '시작하기', targetScene: 'AuthScene' });
-  assert.deepEqual(TitleViewManager.getLoadButton(), { savedY: 745, label: '저장 데이터 확인', targetScene: 'SavedDataScene' });
+  assert.deepEqual(TitleViewManager.getStartButton(), { y: 930, label: '새 게임 시작', targetScene: 'AuthScene' });
+  assert.deepEqual(TitleViewManager.getLoadButton(), { savedY: 930, label: '이어하기', targetScene: 'SavedDataScene' });
   assert.equal(TitleViewManager.getImportButton().label, 'JSON 가져오기');
-  assert.deepEqual(TitleViewManager.getStorageButton(), { savedY: 910, emptyY: 820, label: '브라우저 저장 관리', targetScene: 'StorageManagerScene' });
+  assert.deepEqual(TitleViewManager.getStorageButton(), { savedY: 1015, emptyY: 1015, label: '저장 관리', targetScene: 'StorageManagerScene' });
   assert.deepEqual(TitleViewManager.getImportHint(true), TitleViewManager.getLayout(true).importHint);
   assert.deepEqual(TitleViewManager.getImportFileConfig(), { type: 'file', accept: 'application/json,.json', successTargetScene: 'SavedDataScene' });
   assert.equal(TitleViewManager.formatImportError(new Error('bad json')), 'bad json');
