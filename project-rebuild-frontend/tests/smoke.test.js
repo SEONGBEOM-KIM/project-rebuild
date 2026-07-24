@@ -52,7 +52,7 @@ import ReflectionViewManager from '../src/systems/ReflectionViewManager.js';
 import ReflectionRenderer from '../src/systems/ReflectionRenderer.js';
 import TitleViewManager from '../src/systems/TitleViewManager.js';
 import TitleRenderer from '../src/systems/TitleRenderer.js';
-import AuthViewManager from '../src/systems/AuthViewManager.js';
+import AuthViewManager, { AUTH_MODES } from '../src/systems/AuthViewManager.js';
 import AuthRenderer from '../src/systems/AuthRenderer.js';
 import StoryViewManager from '../src/systems/StoryViewManager.js';
 import StoryRenderer from '../src/systems/StoryRenderer.js';
@@ -1260,33 +1260,56 @@ function testTitleViewManager() {
 
 function testAuthRenderer() {
   const fixture = createRendererSceneSpy();
-  AuthRenderer.renderAuthPanel(fixture.scene, 700, 580, '로그인');
-  assert.ok(fixture.calls.some((call) => call[0] === 'rectangle' && call[1] === 700 && call[2] === 580));
-  assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3] === '로그인'));
-  assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3] === '이름'));
+  const modeChanges = [];
+  const submits = [];
+  const rendered = AuthRenderer.renderAuthScreen(fixture.scene, 1920, 1080, AUTH_MODES.teacherLogin, {
+    onModeChange: (mode) => modeChanges.push(mode),
+    onSubmit: (mode) => submits.push(mode),
+  });
+  assert.equal(rendered.card.type, 'rectangle');
+  assert.ok(fixture.calls.some((call) => call[0] === 'rectangle' && call[1] === 960 && call[2] === 505));
+  assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3] === '교사 로그인'));
+  assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3] === '아이디'));
   assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3] === '비밀번호'));
-  assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3] === 'UI 샘플'));
+  assert.ok(fixture.calls.some((call) => call[0] === 'text' && call[3].includes('교사 회원가입')));
+  rendered.submitButton.events.get('pointerdown')();
+  assert.deepEqual(submits, [AUTH_MODES.teacherLogin]);
+  rendered.helperButton.events.get('pointerdown')();
+  assert.deepEqual(modeChanges, [AUTH_MODES.teacherRecovery]);
+  rendered.signupButton.events.get('pointerdown')();
+  assert.deepEqual(modeChanges, [AUTH_MODES.teacherRecovery, AUTH_MODES.teacherSignup]);
+
+  const studentFixture = createRendererSceneSpy();
+  const studentRendered = AuthRenderer.renderAuthScreen(studentFixture.scene, 1920, 1080, AUTH_MODES.studentCode);
+  assert.ok(studentFixture.calls.some((call) => call[0] === 'text' && call[3] === '8자리 인증코드'));
+  assert.ok(studentFixture.calls.some((call) => call[0] === 'text' && call[3] === '학습 시작하기'));
+  assert.ok(studentRendered.guestButton);
+
+  const guestFixture = createRendererSceneSpy();
+  AuthRenderer.renderAuthScreen(guestFixture.scene, 1920, 1080, AUTH_MODES.guest);
+  assert.ok(guestFixture.calls.some((call) => call[0] === 'text' && call[3] === '임시 코드 발급받기'));
+  assert.ok(guestFixture.calls.some((call) => call[0] === 'text' && call[3] === '진행 상황은 임시 코드와 함께 저장됩니다.'));
 }
 
 function testAuthViewManager() {
   const layout = AuthViewManager.getLayout();
-  assert.equal(layout.title.text, '학습자 입장');
-  assert.equal(layout.proceedButton.targetScene, 'StoryScene');
-  assert.equal(layout.title.fontSize, '68px');
-  assert.equal(layout.subtitle.color, '#93c5fd');
-  assert.equal(layout.proceedButton.backgroundColor, '#fde68a');
-  assert.deepEqual(AuthViewManager.getPanelPositions(1920, 1080).map((panel) => panel.title), ['로그인', '회원가입']);
-  assert.deepEqual(AuthViewManager.getPanelPositions(1920, 1080).map((panel) => ({ x: panel.x, y: panel.y })), [
-    { x: 700, y: 580 },
-    { x: 1220, y: 580 },
+  assert.equal(layout.title.text, '푸른군에 입장하기');
+  assert.equal(layout.targetScene, 'StoryScene');
+  assert.equal(layout.title.fontSize, '58px');
+  assert.equal(layout.subtitle.color, '#bfdbfe');
+  assert.equal(layout.card.width, 760);
+  assert.deepEqual(AuthViewManager.getModeTabs(1920, AUTH_MODES.studentCode).map((tab) => tab.id), [
+    AUTH_MODES.teacherLogin,
+    AUTH_MODES.studentCode,
+    AUTH_MODES.guest,
   ]);
-  assert.deepEqual(AuthViewManager.getProceedButton(1920), {
-    ...layout.proceedButton,
-    x: 960,
-  });
-  assert.deepEqual(layout.panel.fields.map((field) => field.label), ['이름', '비밀번호']);
-  assert.equal(layout.panel.strokeWidth, 4);
-  assert.equal(layout.panel.sampleButton.textColor, '#0f172a');
+  assert.equal(AuthViewManager.getModeTabs(1920, AUTH_MODES.studentCode)[1].active, true);
+  assert.deepEqual(AuthViewManager.getMode(AUTH_MODES.teacherSignup).fields, ['이메일', '학교 이름', '아이디', '비밀번호']);
+  assert.deepEqual(AuthViewManager.getMode(AUTH_MODES.teacherRecovery).fields, ['가입 이메일']);
+  assert.equal(AuthViewManager.getMode(AUTH_MODES.studentCode).fields[0], '8자리 인증코드');
+  assert.equal(AuthViewManager.getMode(AUTH_MODES.guest).fields.length, 0);
+  assert.equal(AuthViewManager.getSignupButton(1920).targetMode, AUTH_MODES.teacherSignup);
+  assert.equal(AuthViewManager.getGuestButton(1920).targetMode, AUTH_MODES.guest);
 }
 
 function testStoryRenderer() {
