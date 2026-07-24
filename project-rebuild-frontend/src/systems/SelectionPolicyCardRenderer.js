@@ -35,10 +35,16 @@ export default class SelectionPolicyCardRenderer {
       style: textStyles.recommended,
       origin: 0.5,
     });
+    const status = SelectionViewManager.getCardStatus(policy.id, selectedPolicy);
+    const statusText = createLayoutText(scene, layout.status, {
+      text: status.label,
+      style: { ...textStyles.status, color: status.color },
+      origin: 0.5,
+    });
 
-    container.add([background, colorBar, title, tagline, description, focus, recommended]);
+    container.add([background, colorBar, title, tagline, description, focus, recommended, statusText]);
     background.on('pointerdown', () => onSelect(policy));
 
-    return { background, title, container };
+    return { background, title, statusText, container };
   }
 }

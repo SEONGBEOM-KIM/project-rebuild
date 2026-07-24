@@ -89,6 +89,10 @@ export default class SelectionScene extends Phaser.Scene {
       const style = SelectionViewManager.getCardStyle(policyId, this.selectedPolicy);
       objects.background.setStrokeStyle(style.strokeWidth, style.strokeColor);
       objects.background.setFillStyle(style.fillColor, style.fillAlpha);
+      if (objects.statusText) {
+        const status = SelectionViewManager.getCardStatus(policyId, this.selectedPolicy);
+        objects.statusText.setText(status.label).setColor(status.color);
+      }
     }
 
     if (this.detailText) {

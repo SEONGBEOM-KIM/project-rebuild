@@ -21,6 +21,7 @@ const POLICY_CARD_LAYOUT = {
   description: { x: 0, y: -10, wordWrapWidth: 365 },
   focus: { x: 0, y: 108 },
   recommended: { x: 0, y: 156, wordWrapWidth: 370 },
+  status: { x: 0, y: 190 },
 };
 
 const SELECTION_TEXT_STYLES = {
@@ -30,6 +31,7 @@ const SELECTION_TEXT_STYLES = {
   description: { fontSize: '22px', color: '#dbeafe', align: 'center', lineSpacing: 8 },
   focus: { fontSize: '21px', color: '#bbf7d0', align: 'center' },
   recommended: { fontSize: '20px', color: '#bfdbfe', align: 'center' },
+  status: { fontSize: '19px', color: '#fde68a', fontStyle: 'bold', align: 'center' },
 };
 
 const SELECTION_BUTTON_STYLE = {
@@ -64,6 +66,7 @@ export default class SelectionViewManager {
       description: { ...POLICY_CARD_LAYOUT.description },
       focus: { ...POLICY_CARD_LAYOUT.focus },
       recommended: { ...POLICY_CARD_LAYOUT.recommended },
+      status: { ...POLICY_CARD_LAYOUT.status },
     };
   }
 
@@ -82,6 +85,7 @@ export default class SelectionViewManager {
       description: { ...SELECTION_TEXT_STYLES.description },
       focus: { ...SELECTION_TEXT_STYLES.focus },
       recommended: { ...SELECTION_TEXT_STYLES.recommended },
+      status: { ...SELECTION_TEXT_STYLES.status },
     };
   }
 
@@ -138,5 +142,11 @@ export default class SelectionViewManager {
       fillColor: selected ? 0x1e293b : 0x0f172a,
       fillAlpha: 0.96,
     };
+  }
+
+  static getCardStatus(policyId, selectedPolicy) {
+    return policyId === selectedPolicy?.id
+      ? { label: '✓ 현재 선택됨', color: '#fde68a' }
+      : { label: '선택해서 비교하기', color: '#94a3b8' };
   }
 }

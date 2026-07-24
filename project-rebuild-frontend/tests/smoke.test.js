@@ -606,6 +606,7 @@ function testSelectionViewManager() {
   assert.deepEqual(SelectionViewManager.getPolicyCardPosition(2), { x: 1490, y: 420 });
   assert.deepEqual(SelectionViewManager.getPolicyCardLayout().background, { x: 0, y: 0, width: 450, height: 430 });
   assert.equal(SelectionViewManager.getPolicyCardLayout().recommended.wordWrapWidth, 370);
+  assert.deepEqual(SelectionViewManager.getPolicyCardLayout().status, { x: 0, y: 190 });
   assert.deepEqual(SelectionViewManager.getTextStyles().description, {
     fontSize: '22px',
     color: '#dbeafe',
@@ -661,6 +662,8 @@ function testSelectionViewManager() {
     fillColor: 0x0f172a,
     fillAlpha: 0.96,
   });
+  assert.deepEqual(SelectionViewManager.getCardStatus(selectedPolicy.id, selectedPolicy), { label: '✓ 현재 선택됨', color: '#fde68a' });
+  assert.deepEqual(SelectionViewManager.getCardStatus(otherPolicy.id, selectedPolicy), { label: '선택해서 비교하기', color: '#94a3b8' });
 }
 
 function testSelectionPolicyCardRenderer() {
@@ -673,7 +676,8 @@ function testSelectionPolicyCardRenderer() {
 
   assert.equal(cardObjects.container.type, 'container');
   assert.equal(cardObjects.background.type, 'rectangle');
-  assert.ok(fixture.calls.some((call) => call[0] === 'container.add' && call[1].length === 7));
+  assert.ok(fixture.calls.some((call) => call[0] === 'container.add' && call[1].length === 8));
+  assert.equal(cardObjects.statusText.type, 'text');
   cardObjects.background.events.get('pointerdown')();
   assert.deepEqual(selected, [policy.id]);
 }
