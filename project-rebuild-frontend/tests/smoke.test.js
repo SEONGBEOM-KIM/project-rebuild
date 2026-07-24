@@ -1976,6 +1976,12 @@ function testSideEffectViewManager() {
   assert.equal(SideEffectViewManager.sortIssuesByPriority(issues)[0].id, 'budget');
   assert.match(SideEffectViewManager.getIssuePriorityLabel(issues[0]), /비용 균형/);
   assert.match(SideEffectViewManager.formatIssueSummary(issues), /예산 부족 · 총 2개 신호/);
+  const primaryIssue = { id: 'inequality', title: '소득 격차', primary: true };
+  assert.equal(
+    SideEffectViewManager.sortIssuesByPriority([{ id: 'traffic', title: '교통 혼잡' }, primaryIssue])[0].id,
+    'inequality',
+  );
+  assert.match(SideEffectViewManager.formatIssueSummary([primaryIssue, { id: 'traffic', title: '교통 혼잡' }]), /가장 두드러진 문제: 소득 격차/);
   assert.match(SideEffectViewManager.formatHintText(issues, EP2_MISSION_BRIEFING.strategies[0]), /관찰 기준: 예산 대비 효과/);
   assert.match(SideEffectViewManager.formatHintText(issues), /대응:/);
 }

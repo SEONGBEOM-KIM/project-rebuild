@@ -158,7 +158,10 @@ export default class SideEffectViewManager {
   }
 
   static sortIssuesByPriority(issues) {
-    return [...issues].sort((a, b) => SideEffectViewManager.getIssuePriorityRank(a) - SideEffectViewManager.getIssuePriorityRank(b));
+    return [...issues].sort((a, b) => (
+      Number(Boolean(b.primary)) - Number(Boolean(a.primary))
+      || SideEffectViewManager.getIssuePriorityRank(a) - SideEffectViewManager.getIssuePriorityRank(b)
+    ));
   }
 
   static formatIssueSummary(issues) {
@@ -167,7 +170,8 @@ export default class SideEffectViewManager {
     }
 
     const [firstIssue] = SideEffectViewManager.sortIssuesByPriority(issues);
-    return `우선 확인: ${firstIssue.title} · 총 ${issues.length}개 신호`;
+    const label = firstIssue.primary ? '가장 두드러진 문제' : '우선 확인';
+    return `${label}: ${firstIssue.title} · 총 ${issues.length}개 신호`;
   }
 
   static formatEmptyIssueMessage() {
