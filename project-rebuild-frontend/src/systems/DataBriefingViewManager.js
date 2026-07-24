@@ -17,6 +17,7 @@ const DATA_CARD_LAYOUT = {
   strokeColor: 0x93c5fd,
   title: { offsetY: -230, wordWrapWidth: 440 },
   subtitle: { offsetY: -185 },
+  status: { offsetX: 176, offsetY: -145 },
   barLabel: { offsetX: -205 },
   barValue: { offsetX: 335 },
   barBackgroundColor: 0xe2e8f0,
@@ -34,6 +35,7 @@ const CONCEPT_BOX_LAYOUT = {
 const DATA_CARD_TEXT_STYLES = {
   title: { fontSize: '33px', color: '#172554', fontStyle: 'bold', align: 'center' },
   subtitle: { fontSize: '22px', color: '#475569' },
+  status: { fontSize: '18px', color: '#166534', fontStyle: 'bold' },
   barLabel: { fontSize: '23px', color: '#1e293b', fontStyle: 'bold' },
   barValue: { fontSize: '23px', color: '#0f172a' },
   takeawayTitle: { fontSize: '23px', color: '#172554', fontStyle: 'bold' },
@@ -67,6 +69,7 @@ export default class DataBriefingViewManager {
       panel: { x, y, width: DATA_CARD_LAYOUT.width, height: DATA_CARD_LAYOUT.height, fillColor: DATA_CARD_LAYOUT.fillColor, fillAlpha: DATA_CARD_LAYOUT.fillAlpha, strokeWidth: DATA_CARD_LAYOUT.strokeWidth, strokeColor: DATA_CARD_LAYOUT.strokeColor },
       title: { x, y: y + DATA_CARD_LAYOUT.title.offsetY, wordWrapWidth: DATA_CARD_LAYOUT.title.wordWrapWidth },
       subtitle: { x, y: y + DATA_CARD_LAYOUT.subtitle.offsetY },
+      status: { x: x + DATA_CARD_LAYOUT.status.offsetX, y: y + DATA_CARD_LAYOUT.status.offsetY },
       barLabel: { x: x + DATA_CARD_LAYOUT.barLabel.offsetX },
       barValue: { x: x + DATA_CARD_LAYOUT.barValue.offsetX },
       barBackgroundColor: DATA_CARD_LAYOUT.barBackgroundColor,
@@ -88,6 +91,7 @@ export default class DataBriefingViewManager {
     return {
       title: { ...DATA_CARD_TEXT_STYLES.title },
       subtitle: { ...DATA_CARD_TEXT_STYLES.subtitle },
+      status: { ...DATA_CARD_TEXT_STYLES.status },
       barLabel: { ...DATA_CARD_TEXT_STYLES.barLabel },
       barValue: { ...DATA_CARD_TEXT_STYLES.barValue },
       takeawayTitle: { ...DATA_CARD_TEXT_STYLES.takeawayTitle },
@@ -153,6 +157,12 @@ export default class DataBriefingViewManager {
     return viewed
       ? { strokeColor: 0x22c55e, strokeWidth: 7, fillAlpha: 1 }
       : { strokeColor: 0x93c5fd, strokeWidth: 5, fillAlpha: 0.97 };
+  }
+
+  static getCardStatus(viewed) {
+    return viewed
+      ? { label: '✓ 확인 완료', color: '#166534' }
+      : { label: '카드를 눌러 확인', color: '#64748b' };
   }
 
   static validateCards(cards) {

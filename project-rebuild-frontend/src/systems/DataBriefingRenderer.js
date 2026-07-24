@@ -20,10 +20,16 @@ export default class DataBriefingRenderer {
       style: textStyles.subtitle,
       origin: 0.5,
     });
+    const status = DataBriefingViewManager.getCardStatus(viewed);
+    const statusText = createLayoutText(scene, layout.status, {
+      text: status.label,
+      style: { ...textStyles.status, color: status.color },
+      origin: [1, 0.5],
+    });
 
     DataBriefingRenderer.renderBars(scene, card.bars, layout, x, y, textStyles);
     DataBriefingRenderer.renderTakeaway(scene, card.takeaway, layout, textStyles);
-    return { panel };
+    return { panel, statusText };
   }
 
   static renderBars(scene, bars, layout, x, y, textStyles) {

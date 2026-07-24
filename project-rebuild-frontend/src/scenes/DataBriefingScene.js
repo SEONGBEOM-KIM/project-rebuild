@@ -62,6 +62,10 @@ export default class DataBriefingScene extends Phaser.Scene {
       const state = DataBriefingViewManager.getCardState(true);
       cardObjects.panel.setStrokeStyle(state.strokeWidth, state.strokeColor);
     }
+    if (cardObjects?.statusText) {
+      const status = DataBriefingViewManager.getCardStatus(true);
+      cardObjects.statusText.setText(status.label).setColor(status.color);
+    }
     this.updateControls();
   }
 

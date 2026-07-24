@@ -949,7 +949,8 @@ function testExplorationMapRenderer() {
 
 function testDataBriefingRenderer() {
   const cardFixture = createRendererSceneSpy();
-  DataBriefingRenderer.renderDataCard(cardFixture.scene, EP1_DATA_CARDS[0], 390, 500);
+  const renderedDataCard = DataBriefingRenderer.renderDataCard(cardFixture.scene, EP1_DATA_CARDS[0], 390, 500);
+  assert.equal(renderedDataCard.statusText.type, 'text');
   assert.ok(cardFixture.calls.some((call) => call[0] === 'rectangle' && call[3] === 500 && call[4] === 560));
   assert.ok(cardFixture.calls.some((call) => call[0] === 'text' && call[3] === EP1_DATA_CARDS[0].title));
   assert.ok(cardFixture.calls.some((call) => call[0] === 'text' && call[3] === '읽어야 할 점'));
@@ -982,9 +983,12 @@ function testDataBriefingViewManager() {
     strokeColor: 0x93c5fd,
   });
   assert.equal(DataBriefingViewManager.getDataCardLayout(390, 500).takeawayTitle.text, '읽어야 할 점');
+  assert.deepEqual(DataBriefingViewManager.getDataCardLayout(390, 500).status, { x: 566, y: 355 });
   assert.deepEqual(DataBriefingViewManager.getConceptBoxLayout().title, { x: 350, y: 810, text: '핵심 개념' });
   assert.equal(DataBriefingViewManager.getDataCardTextStyles().title.fontSize, '33px');
   assert.equal(DataBriefingViewManager.getConceptBoxTextStyles().body.color, '#ffffff');
+  assert.deepEqual(DataBriefingViewManager.getCardStatus(false), { label: '카드를 눌러 확인', color: '#64748b' });
+  assert.deepEqual(DataBriefingViewManager.getCardStatus(true), { label: '✓ 확인 완료', color: '#166534' });
   assert.deepEqual(DataBriefingViewManager.getButtonStyle(), {
     fontSize: '32px',
     padding: { x: 34, y: 18 },
