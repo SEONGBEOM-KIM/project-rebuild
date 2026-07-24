@@ -46,7 +46,10 @@ export default class PlacementUiStateManager {
   }
 
   static formatStatusText(state, stateKeys = DEFAULT_STATE_KEYS) {
-    return StateHudManager.formatStackedText(state, { stateKeys });
+    return [
+      '현재 상태',
+      StateHudManager.formatCompactText(state, { stateKeys }),
+    ].join('\n');
   }
 
   static getEmptyLastChangeState() {

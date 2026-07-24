@@ -2891,10 +2891,10 @@ function testPlacementUiUpdater() {
   assert.equal(updater.stateHud.itemObjects[0].value.text, '1090 (+90)');
 
   updater.updateStatusBar(GameState.createInitialState());
-  assert.match(statusText.text, /현재 상태\n👥 인구: 1000/);
+  assert.match(statusText.text, /현재 상태\n👥 인구 1000/);
 
   updater.updateStatusBar(GameState.createInitialState(), ['budget', 'pollution']);
-  assert.equal(statusText.text, '현재 상태\n💰 예산: 1000\n☁️ 오염: 10');
+  assert.equal(statusText.text, '현재 상태\n💰 예산 1000  ☁️ 오염 10');
 
   const youthCenter = buildings.find((building) => building.id === 'youth_center');
   updater.updateLastChangePanel({
@@ -3019,6 +3019,11 @@ function testPlacementViewManager() {
   assert.equal(PlacementViewManager.getBuildingArtVisual({ id: 'food_factory' }, 2, 3), null);
   assert.equal(PREVIEW_STYLES.valid.fillColor, 0x22c55e);
   assert.equal(PLACEMENT_UI_LAYOUT.title.text, '건물 선택');
+  assert.equal(PLACEMENT_UI_LAYOUT.leftPanel.height, 1040);
+  assert.equal(PLACEMENT_UI_LAYOUT.mission.wordWrapWidth, 330);
+  assert.equal(PLACEMENT_UI_LAYOUT.buildingList.startY, 305);
+  assert.equal(PLACEMENT_UI_LAYOUT.buildingList.gapY, 160);
+  assert.equal(PLACEMENT_UI_LAYOUT.status.y, 815);
   assert.equal(BUILDING_CARD_LAYOUT.card.width, 300);
   assert.deepEqual(BUILDING_CARD_VISUALS.card, { fillColor: 0x1e293b, fillAlpha: 1, strokeColor: 0x475569 });
   assert.equal(PLACEMENT_MAP_VISUALS.impactMarker.bubbleRadius, 34);
@@ -3162,8 +3167,8 @@ function testPlacementViewManager() {
     text: '커서 타일: (1, 2)\n지형: 빈 땅 / 구역: 중심지\n판정: 배치 가능',
     color: '#bbf7d0',
   });
-  assert.match(PlacementUiStateManager.formatStatusText(GameState.createInitialState()), /현재 상태\n👥 인구: 1000/);
-  assert.equal(PlacementUiStateManager.formatStatusText(GameState.createInitialState(), ['economy', 'customMetric']), '현재 상태\n🏪 경제: 50\n• customMetric: 0');
+  assert.match(PlacementUiStateManager.formatStatusText(GameState.createInitialState()), /현재 상태\n👥 인구 1000/);
+  assert.equal(PlacementUiStateManager.formatStatusText(GameState.createInitialState(), ['economy', 'customMetric']), '현재 상태\n🏪 경제 50  • customMetric 0');
   assert.equal(PlacementUiStateManager.formatLastChangeState(null).color, '#fde68a');
   assert.equal(PlacementUiStateManager.formatPlacementHistoryState([]).color, '#bfdbfe');
 

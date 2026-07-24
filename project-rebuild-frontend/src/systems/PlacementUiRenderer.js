@@ -42,7 +42,9 @@ export default class PlacementUiRenderer {
     this.objectRegistry.createFixedTextFromLayout(layout.title, textStyles.title);
     this.objectRegistry.createFixedTextFromLayout(layout.subtitle, textStyles.subtitle);
 
-    const missionText = this.objectRegistry.createFixedTextFromLayout(layout.mission, textStyles.mission);
+    const missionText = this.objectRegistry.createFixedLayoutText(layout.mission, {
+      style: textStyles.mission,
+    });
 
     this.buildings.forEach((building, index) => {
       cardObjects.set(
