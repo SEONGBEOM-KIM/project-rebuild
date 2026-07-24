@@ -13,7 +13,7 @@ export default class AuthScene extends Phaser.Scene {
   create(data = {}) {
     const { width } = this.scale;
     const layout = AuthViewManager.getLayout();
-    const mode = data.authMode ?? AUTH_MODES.teacherLogin;
+    const mode = data.authMode ?? AUTH_MODES.entry;
     createScreenBackground(this, layout.backgroundColor);
     createLayoutText(this, layout.title, { x: width / 2, origin: 0.5 });
     createLayoutText(this, layout.subtitle, { x: width / 2, origin: 0.5 });

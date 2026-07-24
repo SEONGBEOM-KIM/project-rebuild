@@ -1,17 +1,18 @@
 import SCENE_KEYS from '../data/sceneKeys.js';
 
 export const AUTH_MODES = Object.freeze({
+  entry: 'entry',
   teacherLogin: 'teacherLogin',
   teacherSignup: 'teacherSignup',
   teacherRecovery: 'teacherRecovery',
   studentCode: 'studentCode',
-  guest: 'guest',
+  guestConfirm: 'guestConfirm',
 });
 
 export const AUTH_LAYOUT = Object.freeze({
   backgroundColor: 0x0b1727,
   title: { y: 118, text: '푸른군에 입장하기', fontSize: '58px', color: '#ffffff', fontStyle: 'bold' },
-  subtitle: { y: 184, text: '수업 코드를 입력하거나, 교사 계정으로 학습을 이어가세요.', fontSize: '24px', color: '#bfdbfe' },
+  subtitle: { y: 184, text: '로그인 방법을 선택해 학습을 시작하세요.', fontSize: '24px', color: '#bfdbfe' },
   card: {
     x: 960,
     y: 505,
@@ -24,8 +25,7 @@ export const AUTH_LAYOUT = Object.freeze({
   modeRail: { x: 960, y: 270, width: 760, height: 64, fillColor: 0x0f1f3d },
   modes: [
     { id: AUTH_MODES.teacherLogin, label: '교사 로그인', shortLabel: '교사' },
-    { id: AUTH_MODES.studentCode, label: '학생 코드', shortLabel: '학생' },
-    { id: AUTH_MODES.guest, label: '게스트', shortLabel: '게스트' },
+    { id: AUTH_MODES.studentCode, label: '학생 로그인', shortLabel: '학생' },
   ],
   modeStyle: {
     fontSize: '22px',
@@ -34,6 +34,10 @@ export const AUTH_LAYOUT = Object.freeze({
     textColor: '#dbeafe',
   },
   modeContent: {
+    [AUTH_MODES.entry]: {
+      title: '입장 방법을 선택하세요',
+      description: '학생은 교사에게 받은 인증코드로, 교사는 계정으로 입장합니다.',
+    },
     [AUTH_MODES.teacherLogin]: {
       title: '교사 로그인',
       description: '수업을 열고 학생들의 학습 진행을 관리합니다.',
@@ -62,12 +66,12 @@ export const AUTH_LAYOUT = Object.freeze({
       submitLabel: '학습 시작하기',
       helperLabel: '코드를 잊었다면 교사에게 다시 요청하세요.',
     },
-    [AUTH_MODES.guest]: {
-      title: '게스트로 시작',
-      description: '교사 없이도 임시 코드로 학습을 시작할 수 있습니다.',
+    [AUTH_MODES.guestConfirm]: {
+      title: '게스트 모드로 시작합니다',
+      description: '교사 없이 학습할 수 있는 임시 아이디가 부과됩니다.',
       fields: [],
-      submitLabel: '임시 코드 발급받기',
-      helperLabel: '임시 코드는 이 기기에서 다시 입장할 때 필요합니다.',
+      submitLabel: '확인하고 시작하기',
+      helperLabel: '취소하고 입장 방법으로 돌아가기',
     },
   },
   footer: { y: 918, text: '학생은 회원가입 없이 8자리 인증코드로 참여합니다.', fontSize: '20px', color: '#94a3b8' },
@@ -79,8 +83,8 @@ export default class AuthViewManager {
     return AUTH_LAYOUT;
   }
 
-  static getMode(mode = AUTH_MODES.teacherLogin) {
-    return AUTH_LAYOUT.modeContent[mode] ?? AUTH_LAYOUT.modeContent[AUTH_MODES.teacherLogin];
+  static getMode(mode = AUTH_MODES.entry) {
+    return AUTH_LAYOUT.modeContent[mode] ?? AUTH_LAYOUT.modeContent[AUTH_MODES.entry];
   }
 
   static getModeTabs(width, activeMode = AUTH_MODES.teacherLogin) {
@@ -100,7 +104,7 @@ export default class AuthViewManager {
   }
 
   static getGuestButton(width) {
-    return { x: width / 2, y: 838, label: '교사 없이 게스트로 시작', targetMode: AUTH_MODES.guest };
+    return { x: width / 2, y: 790, label: '게스트모드로 진행하기', targetMode: AUTH_MODES.guestConfirm };
   }
 
   static getFooter(width) {
