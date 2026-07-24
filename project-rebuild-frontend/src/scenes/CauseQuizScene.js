@@ -50,7 +50,7 @@ export default class CauseQuizScene extends Phaser.Scene {
       this,
       question,
       (choice) => this.selectChoice(choice),
-      `문제 ${this.questionIndex + 1}/${this.questions.length}`,
+      CauseQuizManager.formatQuestionProgress(this.questionIndex, this.questions.length, this.quizResults),
     );
     this.questionPanelObjects = renderedPanel;
     this.choiceObjects = renderedPanel.choiceObjects;
@@ -113,6 +113,9 @@ export default class CauseQuizScene extends Phaser.Scene {
     const layout = CauseQuizViewManager.getControlLayout();
     this.feedbackText.setText(CauseQuizManager.formatFeedback(choice));
     this.feedbackText.setColor(CauseQuizManager.getFeedbackColor(choice));
+    this.questionPanelObjects.progress?.setText(
+      CauseQuizManager.formatQuestionProgress(this.questionIndex, this.questions.length, this.quizResults),
+    );
     const isLastQuestion = this.questionIndex === this.questions.length - 1;
     this.nextButton.setText(isLastQuestion ? layout.nextEnabled.label : layout.nextQuestion.label);
     this.nextButton.setStyle({ backgroundColor: isLastQuestion ? layout.nextEnabled.backgroundColor : layout.nextQuestion.backgroundColor });

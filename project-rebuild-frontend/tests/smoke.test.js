@@ -570,6 +570,8 @@ function testCauseQuizManager() {
   assert.deepEqual(CauseQuizManager.formatExplorationSummaryRows(2, ['단서 A']).slice(0, 3), ['확인한 장소: 2곳', '', '단서 A']);
   assert.equal(CauseQuizManager.formatMissingChoiceFeedback(), '먼저 답을 하나 선택하세요.');
   assert.equal(CauseQuizManager.getMissingChoiceFeedbackColor(), '#b91c1c');
+  assert.equal(CauseQuizManager.formatQuestionProgress(0, 4, []), '문제 1/4 · 현재 정답 0개');
+  assert.equal(CauseQuizManager.formatQuestionProgress(3, 4, [{ correct: true }, { correct: false }, { correct: true }]), '문제 4/4 · 현재 정답 2개');
 
   assert.deepEqual(CauseQuizManager.buildQuizResult(EP1_CAUSE_QUESTION, correctChoice), {
     questionId: EP1_CAUSE_QUESTION.id,

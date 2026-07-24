@@ -14,6 +14,11 @@ export default class CauseQuizManager {
     return '먼저 답을 하나 선택하세요.';
   }
 
+  static formatQuestionProgress(questionIndex, totalQuestions, quizResults = []) {
+    const correctCount = quizResults.filter((result) => result.correct).length;
+    return `문제 ${questionIndex + 1}/${totalQuestions} · 현재 정답 ${correctCount}개`;
+  }
+
   static getMissingChoiceFeedbackColor() {
     return '#b91c1c';
   }
