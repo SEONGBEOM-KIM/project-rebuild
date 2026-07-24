@@ -33,7 +33,7 @@ export default class Ep3PreviewScene extends Phaser.Scene {
     Ep3PreviewRenderer.renderIntroPanel(this, briefing);
     this.worldProgressObjects = Ep3PreviewRenderer.renderWorldProgress(this, this.worldState);
     this.renderStrategyCards();
-    Ep3PreviewRenderer.renderTransitionNote(this, briefing, economyPolicies, economyBuildings);
+    this.transitionNoteObjects = Ep3PreviewRenderer.renderTransitionNote(this, briefing, economyPolicies, economyBuildings, this.selectedStrategy);
 
     const controls = Ep3PreviewRenderer.renderControls(this, width / 2);
     controls.endingButton.on('pointerdown', () => this.scene.start(controls.layout.ending.target));
@@ -77,6 +77,9 @@ export default class Ep3PreviewScene extends Phaser.Scene {
       objects.selectionLabel.setText(Ep3PreviewViewManager.formatSelectionLabel(strategyId, this.selectedStrategy?.id));
       objects.selectionLabel.setColor(Ep3PreviewViewManager.getSelectionLabelStyle(style.selected).color);
     }
+    this.transitionNoteObjects?.policyBody.setText(
+      Ep3PreviewViewManager.formatPolicyPreviewRows(economyPolicies, this.selectedStrategy),
+    );
   }
 
   prepareEp3Placement() {

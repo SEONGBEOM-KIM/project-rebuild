@@ -3522,14 +3522,14 @@ function testEp3PreviewRenderer() {
     (strategy) => selectedStrategyIds.push(strategy.id),
   );
   assert.ok(cardFixture.calls.some((call) => call[0] === 'text' && call[3] === EP3_MISSION_BRIEFING.strategies[0].title));
-  assert.ok(cardFixture.calls.some((call) => call[0] === 'text' && call[3].includes('상태 초점: 경제↑ 인구↑')));
+  assert.ok(cardFixture.calls.some((call) => call[0] === 'text' && call[3].includes('초점: 경제↑ 인구↑')));
   assert.ok(cardFixture.calls.some((call) => call[0] === 'text' && call[3] === '선택된 성장 전략'));
   card.background.events.get('pointerdown')();
   card.selectionLabel.events.get('pointerdown')();
   assert.deepEqual(selectedStrategyIds, [EP3_MISSION_BRIEFING.strategies[0].id, EP3_MISSION_BRIEFING.strategies[0].id]);
 
   const noteFixture = createRendererSceneSpy();
-  Ep3PreviewRenderer.renderTransitionNote(noteFixture.scene, EP3_MISSION_BRIEFING, economyPolicies, economyBuildings);
+  Ep3PreviewRenderer.renderTransitionNote(noteFixture.scene, EP3_MISSION_BRIEFING, economyPolicies, economyBuildings, EP3_MISSION_BRIEFING.strategies[0]);
   assert.ok(noteFixture.calls.some((call) => call[0] === 'text' && call[3] === 'EP3 배치 준비'));
   assert.ok(noteFixture.calls.some((call) => call[0] === 'text' && call[3].includes('산업 정책 후보:')));
   assert.ok(noteFixture.calls.some((call) => call[0] === 'text' && call[3].includes('지역 산업 일자리')));
@@ -3581,11 +3581,12 @@ function testEp3PreviewViewManager() {
     textColor: '#123524',
   });
   assert.match(Ep3PreviewViewManager.formatIntroText(EP3_MISSION_BRIEFING), /일자리와 산업 성장/);
-  assert.match(Ep3PreviewViewManager.formatFocusBody(EP3_MISSION_BRIEFING.strategies[2]), /교통 부담↑ 오염 신호↑/);
+  assert.match(Ep3PreviewViewManager.formatFocusBody(EP3_MISSION_BRIEFING.strategies[2]), /초점: 경제↑ 교통 부담↑ 오염 신호↑/);
   assert.match(Ep3PreviewViewManager.formatWorldProgress({ completedEpisodeIds: [EPISODE_IDS.PopulationRecovery] }), /EP2 배치 완료/);
   assert.match(Ep3PreviewViewManager.formatWorldModeStatus({}), /기본 푸른군 상태/);
   assert.match(Ep3PreviewViewManager.formatWorldModeStatus({ completedEpisodeIds: [EPISODE_IDS.PopulationRecovery] }), /결과 이어받기/);
-  assert.match(Ep3PreviewViewManager.formatTransitionNote(EP3_MISSION_BRIEFING), /경제 성장 미션 브리핑/);
+  assert.match(Ep3PreviewViewManager.formatTransitionNote(EP3_MISSION_BRIEFING, EP3_MISSION_BRIEFING.strategies[0]), /선택한 성장 전략: 지역 산업 일자리/);
+  assert.match(Ep3PreviewViewManager.formatPolicyPreviewRows(economyPolicies, EP3_MISSION_BRIEFING.strategies[0]), /선택 정책: 지역 산업 일자리/);
   assert.match(Ep3PreviewViewManager.formatPolicyPreviewRows(economyPolicies), /방문 경제 활성화/);
   assert.match(Ep3PreviewViewManager.formatBuildingPreviewRows(economyBuildings), /물류 센터/);
   const previewSceneSource = readProjectFile('src', 'scenes', 'Ep3PreviewScene.js');

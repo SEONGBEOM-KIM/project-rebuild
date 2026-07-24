@@ -61,9 +61,9 @@ export default class Ep3PreviewRenderer {
     const body = createLayoutText(scene, layout.body, {
       text: Ep3PreviewViewManager.formatFocusBody(focusArea),
       style: {
-        fontSize: style.bodyFontSize,
+        fontSize: '19px',
         color: style.bodyColor,
-        lineSpacing: style.bodyLineSpacing,
+        lineSpacing: 3,
         wordWrap: { width: layout.body.wordWrapWidth },
       },
     });
@@ -85,7 +85,7 @@ export default class Ep3PreviewRenderer {
     return { background, icon, title, body, selectionLabel, strategy: focusArea };
   }
 
-  static renderTransitionNote(scene, preview, policies = [], buildings = []) {
+  static renderTransitionNote(scene, preview, policies = [], buildings = [], selectedStrategy = null) {
     const layout = Ep3PreviewViewManager.getTransitionNoteLayout();
     const style = Ep3PreviewViewManager.getNoteStyle();
     createPanelBackground(scene, layout.panel, style);
@@ -96,7 +96,7 @@ export default class Ep3PreviewRenderer {
       lineSpacing: style.bodyLineSpacing,
     };
     const policyBody = createLayoutText(scene, layout.policyBody, {
-      text: Ep3PreviewViewManager.formatPolicyPreviewRows(policies),
+      text: Ep3PreviewViewManager.formatPolicyPreviewRows(policies, selectedStrategy),
       style: { ...textStyle, wordWrap: { width: layout.policyBody.wordWrapWidth } },
     });
     const buildingBody = createLayoutText(scene, layout.buildingBody, {

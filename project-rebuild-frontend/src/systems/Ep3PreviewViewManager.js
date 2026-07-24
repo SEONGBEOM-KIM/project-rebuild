@@ -46,9 +46,9 @@ const EP3_PREVIEW_NOTE_STYLE = {
   titleFontSize: '28px',
   titleColor: '#bbf7d0',
   titleFontStyle: 'bold',
-  bodyFontSize: '18px',
+  bodyFontSize: '17px',
   bodyColor: '#dbeafe',
-  bodyLineSpacing: 4,
+  bodyLineSpacing: 3,
 };
 
 const EP3_PREVIEW_BUTTON_STYLE = {
@@ -109,26 +109,26 @@ export default class Ep3PreviewViewManager {
 
   static getFocusCardLayout(index) {
     const positions = [
-      { x: 440, y: 620 },
+      { x: 420, y: 620 },
       { x: 960, y: 620 },
-      { x: 1480, y: 620 },
+      { x: 1500, y: 620 },
     ];
     const position = positions[index];
     return {
       panel: { x: position.x, y: position.y, width: 440, height: 300 },
       icon: { x: position.x, y: position.y - 112 },
       title: { x: position.x, y: position.y - 56, wordWrapWidth: 360 },
-      body: { x: position.x - 180, y: position.y - 16, wordWrapWidth: 360 },
+      body: { x: position.x - 195, y: position.y - 16, wordWrapWidth: 390 },
       selection: { x: position.x, y: position.y + 132 },
     };
   }
 
   static getTransitionNoteLayout() {
     return {
-      panel: { x: 960, y: 855, width: 1510, height: 150 },
-      title: { x: 250, y: 800, text: 'EP3 배치 준비' },
-      policyBody: { x: 250, y: 835, wordWrapWidth: 650 },
-      buildingBody: { x: 975, y: 835, wordWrapWidth: 650 },
+      panel: { x: 960, y: 855, width: 1510, height: 170 },
+      title: { x: 250, y: 790, text: 'EP3 배치 준비' },
+      policyBody: { x: 250, y: 820, wordWrapWidth: 650 },
+      buildingBody: { x: 975, y: 820, wordWrapWidth: 650 },
     };
   }
 
@@ -193,26 +193,26 @@ export default class Ep3PreviewViewManager {
 
   static formatFocusBody(strategy) {
     return [
-      `상태 초점: ${strategy.stateFocus}`,
+      `초점: ${strategy.stateFocus}`,
       strategy.description,
-      '',
       `관찰: ${strategy.observationPointShort ?? strategy.observationPoint}`,
     ].join('\n');
   }
 
-  static formatTransitionNote(briefing) {
+  static formatTransitionNote(briefing, selectedStrategy = null) {
     return [
-      'EP3는 이제 예고가 아니라 경제 성장 미션 브리핑 데이터로 구성됩니다.',
-      `배치 설정: ${briefing.placementConfigId}`,
-      '이번 단계에서는 대표 성장 방향 3가지를 보여주고 기본 정책으로 배치 연습에 진입합니다.',
-      '다음 개발 단위에서 EP3 전용 정책 선택 화면으로 확장할 수 있습니다.',
+      `선택한 성장 전략: ${selectedStrategy?.title ?? briefing.strategies?.[0]?.title ?? '기본 전략'}`,
+      '선택한 전략에 맞는 산업 정책과 시설 후보를 확인한 뒤 배치 실험으로 이동합니다.',
+      '경제 효과와 함께 교통·환경 부담도 계속 관찰합니다.',
     ].join('\n');
   }
 
-  static formatPolicyPreviewRows(policies) {
+  static formatPolicyPreviewRows(policies, selectedStrategy = null) {
+    const selectedPolicyId = selectedStrategy?.policyId;
     return [
+      `선택 정책: ${policies.find((policy) => policy.id === selectedPolicyId)?.name ?? '기본 정책'}`,
       '산업 정책 후보:',
-      ...policies.map((policy) => `• ${policy.name}: ${policy.focus.join(' · ')}`),
+      ...policies.map((policy) => `${policy.id === selectedPolicyId ? '✓' : '•'} ${policy.name}: ${policy.focus.join(' · ')}`),
     ].join('\n');
   }
 
