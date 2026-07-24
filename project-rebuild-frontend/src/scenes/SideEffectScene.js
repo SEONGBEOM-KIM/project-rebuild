@@ -38,7 +38,7 @@ export default class SideEffectScene extends Phaser.Scene {
 
     createLayoutText(this, layout.subtitle, { origin: 0.5 });
     createLayoutText(this, layout.contextSummary, {
-      text: SideEffectViewManager.formatContextSummary(placementConfig, evaluationProfile),
+      text: SideEffectViewManager.formatContextSummary(placementConfig, evaluationProfile, selectedStrategy),
       style: SideEffectViewManager.getContextSummaryTextStyle(),
       origin: 0.5,
     });

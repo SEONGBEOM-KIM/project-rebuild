@@ -1912,7 +1912,15 @@ function testSideEffectViewManager() {
   });
   assert.equal(
     SideEffectViewManager.formatContextSummary(getPlacementConfig(ENVIRONMENT_PLACEMENT_CONFIG_ID), getEvaluationProfile(ENVIRONMENT_EVALUATION_PROFILE_ID)),
-    '푸른군 환경 균형 배치 실험  |  필요 배치: 2개  |  평가 기준: ep2_environment_focus',
+    '푸른군 환경 균형 배치 실험  |  필요 배치: 2개',
+  );
+  assert.match(
+    SideEffectViewManager.formatContextSummary(
+      getPlacementConfig(ENVIRONMENT_PLACEMENT_CONFIG_ID),
+      getEvaluationProfile(ENVIRONMENT_EVALUATION_PROFILE_ID),
+      EP2_MISSION_BRIEFING.strategies[0],
+    ),
+    /전략: 일자리와 생활 기반/,
   );
   assert.equal(SideEffectViewManager.getTextStyles().issueSummary.fontStyle, 'bold');
   assert.equal(SideEffectViewManager.getTextStyles().cardPriority.fontSize, '16px');
@@ -3096,7 +3104,7 @@ function testPlacementViewManager() {
   const sideEffectSceneSource = readProjectFile('src', 'scenes', 'SideEffectScene.js');
   assert.match(sideEffectSceneSource, /PlacementContextManager/, 'side effect scene should resolve active placement context');
   assert.match(sideEffectSceneSource, /IndustrializationRiskManager\.detect\(\{ gameState, placedBuildings, placementEpisodeId, evaluationProfile \}\)/, 'side effect scene should classify EP3 industrialization risks from active placements');
-  assert.match(sideEffectSceneSource, /formatContextSummary\(placementConfig, evaluationProfile\)/, 'side effect scene should display active placement context summary');
+  assert.match(sideEffectSceneSource, /formatContextSummary\(placementConfig, evaluationProfile, selectedStrategy\)/, 'side effect scene should display active placement context summary');
   const endingSceneSource = readProjectFile('src', 'scenes', 'EndingScene.js');
   assert.match(endingSceneSource, /EpisodeFlowManager\.resolveSelectedStrategy/, 'ending scene should recover the active episode strategy through episode flow manager');
   assert.match(endingSceneSource, /PlacementContextManager/, 'ending scene should resolve active placement context');

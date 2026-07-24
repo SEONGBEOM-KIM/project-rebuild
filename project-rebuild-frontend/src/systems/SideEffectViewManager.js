@@ -71,12 +71,12 @@ export default class SideEffectViewManager {
     };
   }
 
-  static formatContextSummary(placementConfig, evaluationProfile) {
+  static formatContextSummary(placementConfig, evaluationProfile, selectedStrategy = null) {
     return [
       placementConfig?.title ?? '배치 실험',
       `필요 배치: ${placementConfig?.requiredPlacements ?? '-'}개`,
-      `평가 기준: ${evaluationProfile?.id ?? '기본'}`,
-    ].join('  |  ');
+      selectedStrategy?.title ? `전략: ${selectedStrategy.title}` : null,
+    ].filter(Boolean).join('  |  ');
   }
 
   static getContextSummaryTextStyle() {
