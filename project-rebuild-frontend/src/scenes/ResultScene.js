@@ -59,6 +59,7 @@ export default class ResultScene extends Phaser.Scene {
         placementConfig,
         evaluationProfile,
         WorldStateManager.getPlacementBreakdown(worldState.placements, placementEpisodeId),
+        selectedStrategy,
       ),
       style: ResultViewManager.getContextSummaryTextStyle(),
       origin: 0.5,

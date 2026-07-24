@@ -1629,7 +1629,7 @@ function testResultViewManager() {
   assert.equal(ResultViewManager.getPanelBodyStyle(panels.beforeAfter).fontSize, '22px');
   assert.equal(
     ResultViewManager.formatContextSummary(getPlacementConfig(ENVIRONMENT_PLACEMENT_CONFIG_ID), getEvaluationProfile(ENVIRONMENT_EVALUATION_PROFILE_ID)),
-    '푸른군 환경 균형 배치 실험  |  필요 배치: 2개  |  평가 기준: ep2_environment_focus',
+    '푸른군 환경 균형 배치 실험  |  필요 배치: 2개',
   );
   assert.match(
     ResultViewManager.formatContextSummary(
@@ -1644,6 +1644,15 @@ function testResultViewManager() {
     color: '#c7d2fe',
     align: 'center',
   });
+  assert.match(
+    ResultViewManager.formatContextSummary(
+      getPlacementConfig(ENVIRONMENT_PLACEMENT_CONFIG_ID),
+      getEvaluationProfile(ENVIRONMENT_EVALUATION_PROFILE_ID),
+      null,
+      EP2_MISSION_BRIEFING.strategies[0],
+    ),
+    /전략: 일자리와 생활 기반/,
+  );
   assert.deepEqual(ResultViewManager.getEvaluationTitleTextStyle('#22c55e'), {
     fontSize: '30px',
     align: 'center',
