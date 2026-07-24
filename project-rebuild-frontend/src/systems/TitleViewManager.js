@@ -2,11 +2,10 @@ import SCENE_KEYS from '../data/sceneKeys.js';
 
 export const TITLE_LAYOUT = {
   backgroundColor: 0x10253f,
-  eyebrow: { y: 78, text: '푸른군  ·  지역 회복 시뮬레이션', fontSize: '22px', color: '#d1fae5', fontStyle: 'bold' },
   title: { y: 155, text: '프로젝트 리빌드', fontSize: '92px', color: '#f8fafc', fontStyle: 'bold' },
   subtitle: { y: 245, text: '균형 있게 성장하는 지역을 향하여', fontSize: '32px', color: '#dbeafe' },
   titleBanner: { y: 178, width: 900, height: 260 },
-  startPrompt: { y: 850, text: '새로운 지역의 이야기를 시작하세요', fontSize: '24px', color: '#d1fae5' },
+  startPrompt: { y: 770, text: '새로운 지역의 이야기를 시작하세요', fontSize: '34px', color: '#fef3c7', fontStyle: 'bold' },
   importHint: { savedY: 1015, emptyY: 1015, text: '', fontSize: '18px', color: '#bfdbfe' },
   buttons: {
     start: { y: 930, label: '새 게임 시작', targetScene: SCENE_KEYS.Auth },
@@ -23,7 +22,6 @@ export default class TitleViewManager {
   static getScreenText() {
     return {
       backgroundColor: TITLE_LAYOUT.backgroundColor,
-      eyebrow: TITLE_LAYOUT.eyebrow,
       title: TITLE_LAYOUT.title,
       subtitle: TITLE_LAYOUT.subtitle,
       startPrompt: TITLE_LAYOUT.startPrompt,

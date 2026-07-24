@@ -1190,42 +1190,22 @@ function testReflectionViewManager() {
 function testTitleRenderer() {
   const emptyFixture = createRendererSceneSpy();
   emptyFixture.scene.scale = { width: 1920, height: 1080 };
-  const emptyControls = TitleRenderer.renderScreen(emptyFixture.scene, 1920, null);
-  assert.equal(emptyControls.startButton.type, 'text');
-  assert.equal(emptyControls.importButton.type, 'text');
-  assert.equal(emptyControls.storageButton.type, 'text');
-  assert.equal(emptyControls.loadButton, null);
-  assert.equal(emptyControls.importHintText.type, 'text');
-  assert.equal(emptyControls.importStatusText.type, 'text');
+  const emptyControls = TitleRenderer.renderScreen(emptyFixture.scene, 1920);
+  assert.equal(emptyControls.startSurface.type, 'rectangle');
+  assert.equal(emptyControls.startTargetScene, 'AuthScene');
   assert.ok(emptyFixture.calls.some((call) => call[0] === 'rectangle' && call[5] === TitleViewManager.getScreenText().backgroundColor));
   assert.ok(emptyFixture.calls.some((call) => call[0] === 'image' && call[3] === 'title-main-background'));
   assert.ok(emptyFixture.calls.some((call) => call[0] === 'text' && call[3] === '새로운 지역의 이야기를 시작하세요'));
   assert.ok(emptyFixture.calls.some((call) => call[0] === 'text' && call[3] === '프로젝트 리빌드'));
-  assert.ok(emptyFixture.calls.some((call) => call[0] === 'text' && call[3] === '새 게임 시작'));
-  assert.ok(emptyFixture.calls.some((call) => call[0] === 'text' && call[3] === 'JSON 가져오기'));
-
-  const savedFixture = createRendererSceneSpy();
-  savedFixture.scene.scale = { width: 1920, height: 1080 };
-  const savedControls = TitleRenderer.renderScreen(savedFixture.scene, 1920, { data: {} });
-  assert.equal(savedControls.loadButton.type, 'text');
-  assert.ok(savedFixture.calls.some((call) => call[0] === 'text' && call[3] === '이어하기'));
-  assert.deepEqual(savedControls.layout, TitleViewManager.getLayout(true));
-  const resumeFixture = createRendererSceneSpy();
-  resumeFixture.scene.scale = { width: 1920, height: 1080 };
-  TitleRenderer.renderScreen(resumeFixture.scene, 1920, { data: {} }, {
-    label: 'EP3 미션 이어보기',
-    targetScene: 'Ep3PreviewScene',
-  });
-  assert.ok(resumeFixture.calls.some((call) => call[0] === 'text' && call[3] === 'EP3 미션 이어보기'));
+  assert.equal(emptyFixture.calls.filter((call) => call[0] === 'text' && ['새 게임 시작', '이어하기', 'JSON 가져오기', '저장 관리'].includes(call[3])).length, 0);
 }
 
 function testTitleViewManager() {
   assert.deepEqual(TitleViewManager.getScreenText(), {
     backgroundColor: 0x10253f,
-    eyebrow: { y: 78, text: '푸른군  ·  지역 회복 시뮬레이션', fontSize: '22px', color: '#d1fae5', fontStyle: 'bold' },
     title: { y: 155, text: '프로젝트 리빌드', fontSize: '92px', color: '#f8fafc', fontStyle: 'bold' },
     subtitle: { y: 245, text: '균형 있게 성장하는 지역을 향하여', fontSize: '32px', color: '#dbeafe' },
-    startPrompt: { y: 850, text: '새로운 지역의 이야기를 시작하세요', fontSize: '24px', color: '#d1fae5' },
+    startPrompt: { y: 770, text: '새로운 지역의 이야기를 시작하세요', fontSize: '34px', color: '#fef3c7', fontStyle: 'bold' },
   });
   assert.equal(TitleViewManager.getTitleBanner().width, 900);
   assert.deepEqual(TitleViewManager.getLayout(false), {
@@ -3617,8 +3597,8 @@ function testEp3PreviewViewManager() {
   assert.match(previewSceneSource, /prepareEp3Placement/, 'EP3 preview scene should prepare placement context before starting placement');
   assert.match(previewSceneSource, /EpisodePlacementLaunchManager/, 'EP3 preview scene should delegate placement launch setup');
   const titleSceneSource = readProjectFile('src', 'scenes', 'TitleScene.js');
-  assert.match(titleSceneSource, /LearningDataRestoreManager\.restore\(this\.registry, saved\.data\)/, 'title scene should restore the saved world before continuing');
-  assert.match(titleSceneSource, /continueButtonState\.targetScene/, 'title scene should continue directly to the saved progress target');
+  assert.doesNotMatch(titleSceneSource, /LearningDataRestoreManager\.restore/, 'title scene should not expose a secondary resume button');
+  assert.match(titleSceneSource, /controls\.startTargetScene/, 'title scene should route the full-screen start interaction to authentication');
   assert.match(titleSceneSource, /BootFlowManager\.resetRegistry\(this\.registry\)/, 'title scene should reset runtime progress before beginning a new game');
 }
 
